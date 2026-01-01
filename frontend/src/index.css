@@ -774,9 +774,163 @@ h4 {
 }
 
 /* ============================================================================
-   Responsive - iPad optimized
+   Responsive - Mobile first, then iPad+
    ============================================================================ */
 
+/* Mobile-specific styles (phones under 480px) */
+@media (max-width: 480px) {
+  :root {
+    --space-md: 0.75rem;
+    --space-lg: 1rem;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .app-container {
+    padding: var(--space-sm);
+    padding-bottom: 90px;
+  }
+
+  .page-header {
+    padding: var(--space-sm) 0;
+    margin-bottom: var(--space-md);
+  }
+
+  /* Widgets: 2 columns on mobile but smaller */
+  .widgets-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .widget {
+    padding: var(--space-md);
+  }
+
+  .widget-icon {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .widget-label {
+    font-size: 0.65rem;
+  }
+
+  .widget-value {
+    font-size: 1.25rem;
+  }
+
+  .widget-detail {
+    font-size: 0.75rem;
+  }
+
+  /* Quick actions bottom bar */
+  .quick-actions {
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+  }
+
+  .action-btn {
+    min-width: 60px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.65rem;
+  }
+
+  .action-btn .icon {
+    font-size: 1.25rem;
+  }
+
+  /* Timeline items */
+  .timeline-item {
+    padding: var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  .timeline-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .timeline-title {
+    font-size: 0.9rem;
+  }
+
+  .timeline-subtitle,
+  .timeline-time {
+    font-size: 0.75rem;
+  }
+
+  /* Cards */
+  .card {
+    padding: var(--space-md);
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  /* Type selector (Health tab buttons) */
+  .type-selector {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .type-btn {
+    padding: var(--space-sm);
+    font-size: 0.75rem;
+    min-width: 0;
+  }
+
+  /* Forms */
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .form-input,
+  .form-select {
+    padding: var(--space-sm);
+    font-size: 0.9rem;
+  }
+
+  /* Modals */
+  .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .modal-body,
+  .modal-footer {
+    padding: var(--space-md);
+  }
+
+  /* Baby selector */
+  .baby-selector {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .baby-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .baby-name {
+    font-size: 0.9rem;
+  }
+}
+
+/* iPad and larger (768px+) */
 @media (min-width: 768px) {
   .widgets-grid {
     grid-template-columns: repeat(4, 1fr);
