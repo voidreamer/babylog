@@ -3,7 +3,7 @@ import { api } from '../api/client';
 
 export default function FeedingModal({ babyId, onClose, onSave }) {
     const [type, setType] = useState('breast');
-    const [time, setTime] = useState(new Date().toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
     const [duration, setDuration] = useState('');
     const [amount, setAmount] = useState('');
     const [notes, setNotes] = useState('');

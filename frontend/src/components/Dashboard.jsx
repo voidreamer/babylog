@@ -118,11 +118,14 @@ export default function Dashboard() {
                 />
 
                 <Widget
-                    type="stats"
-                    icon="📊"
-                    label="Today"
-                    value={timeline.length}
-                    detail="events logged"
+                    type="pumping"
+                    icon="🍶"
+                    label="Last pumping"
+                    value={formatTimeAgo(dashboard?.last_pumping?.time)}
+                    detail={dashboard?.last_pumping?.amount_ml
+                        ? `${dashboard.last_pumping.amount_ml}ml`
+                        : null}
+                    onClick={() => setPumpingModal(true)}
                 />
             </div>
 

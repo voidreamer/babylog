@@ -3,7 +3,7 @@ import { api } from '../api/client';
 
 export default function DiaperModal({ babyId, onClose, onSave }) {
     const [type, setType] = useState('pee');
-    const [time, setTime] = useState(new Date().toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
     const [pooColor, setPooColor] = useState('');
     const [pooConsistency, setPooConsistency] = useState('');
     const [pooAmount, setPooAmount] = useState('');

@@ -3,7 +3,7 @@ import { api } from '../api/client';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
-    const [startTime, setStartTime] = useState(new Date().toISOString().slice(0, 16));
+    const [startTime, setStartTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
     const [endTime, setEndTime] = useState('');
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
