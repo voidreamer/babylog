@@ -83,5 +83,20 @@ def get_user_id(user: dict = Depends(get_current_user)) -> str:
 
 
 def get_user_email(user: dict = Depends(get_current_user)) -> str:
-    """Extract user email from token claims."""
-    return user.get("email", "")
+    """Extract user email from token claims.
+    
+    For Google federated logins, email may be in different claims:
+    - 'email' (standard)
+    - 'cognito:username' (sometimes includes email)
+    """
+    # Try direct email claim first
+    email = user.get("email", "")
+    if email:
+        return email.lower().strip()
+    
+    # Try cognito:username (for some IdP configs)
+    username = user.get("cognito:username", "")
+    if "@" in username:
+        return username.lower().strip()
+    
+    return ""
