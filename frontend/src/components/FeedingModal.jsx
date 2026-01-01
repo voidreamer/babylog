@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 
 export default function FeedingModal({ babyId, onClose, onSave }) {
+    const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
     const [type, setType] = useState('breast');
     const [time, setTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
     const [duration, setDuration] = useState('');
@@ -9,7 +10,67 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
-    const handleSubmit = async (e) => {
+    // Timer state
+    const [timerRunning, setTimerRunning] = useState(false);
+    const [timerSeconds, setTimerSeconds] = useState(0);
+    const [startTime, setStartTime] = useState(null);
+    const intervalRef = useRef(null);
+
+    // Timer effect
+    useEffect(() => {
+        if (timerRunning) {
+            intervalRef.current = setInterval(() => {
+                setTimerSeconds(prev => prev + 1);
+            }, 1000);
+        }
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, [timerRunning]);
+
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const handleStartTimer = () => {
+        setStartTime(new Date());
+        setTimerRunning(true);
+        setTimerSeconds(0);
+    };
+
+    const handleStopTimer = () => {
+        setTimerRunning(false);
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+    };
+
+    const handleSaveTimer = async () => {
+        if (timerSeconds < 1) return;
+
+        setSaving(true);
+        try {
+            await api.createFeeding({
+                baby_id: babyId,
+                time: startTime.toISOString(),
+                type,
+                duration_minutes: Math.ceil(timerSeconds / 60),
+                amount_ml: amount ? parseInt(amount) : null,
+                notes: notes || null,
+            });
+            onSave();
+        } catch (error) {
+            alert('Failed to save feeding');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSubmitQuick = async (e) => {
         e.preventDefault();
         setSaving(true);
 
@@ -24,7 +85,6 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            console.error('Failed to save feeding:', error);
             alert('Failed to save feeding');
         } finally {
             setSaving(false);
@@ -39,54 +99,104 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label className="form-label">Type</label>
-                            <div className="type-selector">
-                                <button
-                                    type="button"
-                                    className={`type-btn ${type === 'breast' ? 'active' : ''}`}
-                                    onClick={() => setType('breast')}
-                                >
-                                    🤱 Breast
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`type-btn ${type === 'formula' ? 'active' : ''}`}
-                                    onClick={() => setType('formula')}
-                                >
-                                    🍼 Formula
-                                </button>
-                            </div>
+                <div className="modal-body">
+                    {/* Mode Toggle */}
+                    <div className="form-group">
+                        <div className="type-selector">
+                            <button
+                                type="button"
+                                className={`type-btn ${mode === 'quick' ? 'active' : ''}`}
+                                onClick={() => { setMode('quick'); handleStopTimer(); }}
+                            >
+                                ✏️ Quick Log
+                            </button>
+                            <button
+                                type="button"
+                                className={`type-btn ${mode === 'timer' ? 'active' : ''}`}
+                                onClick={() => setMode('timer')}
+                            >
+                                ⏱️ Timer
+                            </button>
                         </div>
+                    </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Time</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                                required
-                            />
+                    {/* Type Selection */}
+                    <div className="form-group">
+                        <label className="form-label">Type</label>
+                        <div className="type-selector">
+                            <button
+                                type="button"
+                                className={`type-btn ${type === 'breast' ? 'active' : ''}`}
+                                onClick={() => setType('breast')}
+                            >
+                                🤱 Breast
+                            </button>
+                            <button
+                                type="button"
+                                className={`type-btn ${type === 'bottle' ? 'active' : ''}`}
+                                onClick={() => setType('bottle')}
+                            >
+                                🍼 Bottle
+                            </button>
+                            <button
+                                type="button"
+                                className={`type-btn ${type === 'formula' ? 'active' : ''}`}
+                                onClick={() => setType('formula')}
+                            >
+                                🥛 Formula
+                            </button>
                         </div>
+                    </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label className="form-label">Duration (min)</label>
-                                <input
-                                    type="number"
-                                    className="form-input"
-                                    placeholder="Optional"
-                                    value={duration}
-                                    onChange={(e) => setDuration(e.target.value)}
-                                    min="0"
-                                    max="120"
-                                />
+                    {mode === 'timer' ? (
+                        <>
+                            {/* Timer Display */}
+                            <div style={{
+                                textAlign: 'center',
+                                padding: 'var(--space-xl)',
+                                background: timerRunning ? 'var(--feeding-bg)' : 'var(--surface)',
+                                borderRadius: 'var(--radius-xl)',
+                                marginBottom: 'var(--space-lg)'
+                            }}>
+                                <div style={{
+                                    fontSize: '3rem',
+                                    fontWeight: 'bold',
+                                    fontFamily: 'monospace',
+                                    color: timerRunning ? 'var(--feeding)' : 'var(--text)'
+                                }}>
+                                    {formatTime(timerSeconds)}
+                                </div>
+                                {startTime && (
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 'var(--space-sm)' }}>
+                                        Started at {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                )}
                             </div>
 
-                            {type === 'formula' && (
+                            {/* Timer Controls */}
+                            <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
+                                {!timerRunning ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary btn-block btn-lg"
+                                        onClick={handleStartTimer}
+                                        style={{ background: 'var(--feeding)' }}
+                                    >
+                                        ▶️ Start Feeding
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary btn-block btn-lg"
+                                        onClick={handleStopTimer}
+                                    >
+                                        ⏹️ Stop
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Amount for bottle/formula */}
+                            {(type === 'bottle' || type === 'formula') && (
                                 <div className="form-group">
                                     <label className="form-label">Amount (ml)</label>
                                     <input
@@ -100,29 +210,95 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                                     />
                                 </div>
                             )}
-                        </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Notes</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="Optional notes..."
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                            />
-                        </div>
-                    </div>
+                            <div className="form-group">
+                                <label className="form-label">Notes</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Optional notes..."
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        /* Quick Log Mode */
+                        <form id="quick-form" onSubmit={handleSubmitQuick}>
+                            <div className="form-group">
+                                <label className="form-label">Time</label>
+                                <input
+                                    type="datetime-local"
+                                    className="form-input"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    required
+                                />
+                            </div>
 
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn btn-primary" disabled={saving}>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label className="form-label">Duration (min)</label>
+                                    <input
+                                        type="number"
+                                        className="form-input"
+                                        placeholder="Optional"
+                                        value={duration}
+                                        onChange={(e) => setDuration(e.target.value)}
+                                        min="0"
+                                        max="120"
+                                    />
+                                </div>
+
+                                {(type === 'bottle' || type === 'formula') && (
+                                    <div className="form-group">
+                                        <label className="form-label">Amount (ml)</label>
+                                        <input
+                                            type="number"
+                                            className="form-input"
+                                            placeholder="Optional"
+                                            value={amount}
+                                            onChange={(e) => setAmount(e.target.value)}
+                                            min="0"
+                                            max="500"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Notes</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Optional notes..."
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                />
+                            </div>
+                        </form>
+                    )}
+                </div>
+
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" onClick={onClose}>
+                        Cancel
+                    </button>
+                    {mode === 'timer' ? (
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            disabled={saving || timerSeconds < 1}
+                            onClick={handleSaveTimer}
+                        >
                             {saving ? 'Saving...' : 'Save Feeding'}
                         </button>
-                    </div>
-                </form>
+                    ) : (
+                        <button type="submit" form="quick-form" className="btn btn-primary" disabled={saving}>
+                            {saving ? 'Saving...' : 'Save Feeding'}
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
