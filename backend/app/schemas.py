@@ -1,6 +1,16 @@
-from pydantic import BaseModel
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime, timezone
 from typing import Optional, List, Literal
+
+
+# Custom datetime serialization to ensure UTC 'Z' suffix
+def serialize_datetime(dt: datetime) -> str:
+    if dt is None:
+        return None
+    # Ensure timezone-aware and convert to ISO format with Z suffix
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 # ============================================================================
@@ -29,8 +39,10 @@ class BabyResponse(BabyBase):
     is_owner: bool = True
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
 
 
 class BabyShareRequest(BaseModel):
@@ -68,8 +80,10 @@ class FeedingResponse(FeedingBase):
     baby_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
 
 
 # ============================================================================
@@ -108,8 +122,10 @@ class DiaperResponse(DiaperBase):
     baby_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
 
 
 # ============================================================================
@@ -138,8 +154,10 @@ class SleepResponse(SleepBase):
     duration_minutes: Optional[int] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
 
 
 # ============================================================================
@@ -169,8 +187,10 @@ class PumpingResponse(PumpingBase):
     baby_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
 
 
 # ============================================================================
@@ -183,8 +203,10 @@ class TimelineEvent(BaseModel):
     time: datetime
     details: dict
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
 
 
 # ============================================================================
