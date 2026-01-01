@@ -41,9 +41,11 @@ class BabyShareRequest(BaseModel):
 # Feeding Schemas
 # ============================================================================
 
+FeedingTypeEnum = Literal["formula", "breast", "bottle", "solid"]
+
 class FeedingBase(BaseModel):
     time: datetime
-    type: Literal["formula", "breast"]
+    type: FeedingTypeEnum
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
     notes: Optional[str] = None
@@ -55,7 +57,7 @@ class FeedingCreate(FeedingBase):
 
 class FeedingUpdate(BaseModel):
     time: Optional[datetime] = None
-    type: Optional[Literal["formula", "breast"]] = None
+    type: Optional[FeedingTypeEnum] = None
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
     notes: Optional[str] = None
@@ -71,12 +73,20 @@ class FeedingResponse(FeedingBase):
 
 
 # ============================================================================
-# Diaper Schemas
+# Diaper Schemas (Enhanced with poo details)
 # ============================================================================
+
+DiaperTypeEnum = Literal["pee", "poo", "mixed"]
+PooColorEnum = Literal["yellow", "brown", "green", "black", "red", "white", "orange"]
+PooConsistencyEnum = Literal["liquid", "soft", "formed", "hard", "pellets"]
+PooAmountEnum = Literal["small", "medium", "large", "blowout"]
 
 class DiaperBase(BaseModel):
     time: datetime
-    type: Literal["pee", "poo", "mixed"]
+    type: DiaperTypeEnum
+    poo_color: Optional[PooColorEnum] = None
+    poo_consistency: Optional[PooConsistencyEnum] = None
+    poo_amount: Optional[PooAmountEnum] = None
     notes: Optional[str] = None
 
 
@@ -86,7 +96,10 @@ class DiaperCreate(DiaperBase):
 
 class DiaperUpdate(BaseModel):
     time: Optional[datetime] = None
-    type: Optional[Literal["pee", "poo", "mixed"]] = None
+    type: Optional[DiaperTypeEnum] = None
+    poo_color: Optional[PooColorEnum] = None
+    poo_consistency: Optional[PooConsistencyEnum] = None
+    poo_amount: Optional[PooAmountEnum] = None
     notes: Optional[str] = None
 
 
@@ -174,9 +187,32 @@ class TimelineEvent(BaseModel):
         from_attributes = True
 
 
+# ============================================================================
+# Dashboard / Summary Schemas
+# ============================================================================
+
+class DailySummary(BaseModel):
+    date: str
+    total_feedings: int
+    total_ml: int
+    breast_count: int
+    bottle_count: int
+    formula_count: int
+    solid_count: int
+    total_diapers: int
+    pee_count: int
+    poo_count: int
+    mixed_count: int
+    total_sleep_minutes: int
+    sleep_count: int
+    total_pumping_ml: int
+    pumping_count: int
+
+
 class DashboardStats(BaseModel):
     last_feeding: Optional[FeedingResponse] = None
     last_diaper: Optional[DiaperResponse] = None
     last_sleep: Optional[SleepResponse] = None
     last_pumping: Optional[PumpingResponse] = None
     current_sleep: Optional[SleepResponse] = None
+    daily_summary: Optional[DailySummary] = None

@@ -9,6 +9,7 @@ import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
+import DailySummary from './DailySummary';
 
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
@@ -75,6 +76,9 @@ export default function Dashboard() {
 
     return (
         <div>
+            {/* Daily Summary */}
+            <DailySummary summary={dashboard?.daily_summary} />
+
             {/* Widgets */}
             <div className="widgets-grid">
                 <Widget

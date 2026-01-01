@@ -2,20 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import enum
 from .database import Base
-
-
-# Enum values for Pydantic (not used in SQLAlchemy anymore)
-class FeedingType(str, enum.Enum):
-    FORMULA = "formula"
-    BREAST = "breast"
-
-
-class DiaperType(str, enum.Enum):
-    PEE = "pee"
-    POO = "poo"
-    MIXED = "mixed"
 
 
 class Baby(Base):
@@ -42,7 +29,7 @@ class Feeding(Base):
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
-    type = Column(String, nullable=False)  # 'formula' or 'breast'
+    type = Column(String, nullable=False)  # 'formula', 'breast', 'bottle', 'solid'
     duration_minutes = Column(Integer, nullable=True)
     amount_ml = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
@@ -57,7 +44,11 @@ class Diaper(Base):
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
-    type = Column(String, nullable=False)  # 'pee', 'poo', or 'mixed'
+    type = Column(String, nullable=False)  # 'pee', 'poo', 'mixed'
+    # Poo details
+    poo_color = Column(String, nullable=True)  # 'yellow', 'brown', 'green', 'black', 'red', 'white', 'orange'
+    poo_consistency = Column(String, nullable=True)  # 'liquid', 'soft', 'formed', 'hard', 'pellets'
+    poo_amount = Column(String, nullable=True)  # 'small', 'medium', 'large', 'blowout'
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
