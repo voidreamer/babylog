@@ -1,23 +1,25 @@
+import Icon from './Icon';
+
 export default function QuickActions({ onFeeding, onDiaper, onSleep, onPumping }) {
     return (
         <div className="quick-actions">
             <button className="action-btn feeding" onClick={onFeeding}>
-                <span className="icon">🍼</span>
+                <Icon name="feeding" size={36} />
                 <span>Feeding</span>
             </button>
 
             <button className="action-btn diaper" onClick={onDiaper}>
-                <span className="icon">🧷</span>
+                <Icon name="diaper" size={36} />
                 <span>Diaper</span>
             </button>
 
             <button className="action-btn sleep" onClick={onSleep}>
-                <span className="icon">😴</span>
+                <Icon name="sleep" size={36} />
                 <span>Sleep</span>
             </button>
 
             <button className="action-btn pumping" onClick={onPumping}>
-                <span className="icon">🍶</span>
+                <Icon name="pumping" size={36} />
                 <span>Pump</span>
             </button>
         </div>
