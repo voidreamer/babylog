@@ -6,7 +6,7 @@ from datetime import datetime
 from ..database import get_db
 from ..models import Sleep, Baby
 from ..schemas import SleepCreate, SleepUpdate, SleepResponse
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/sleeps", tags=["sleeps"])
@@ -18,11 +18,11 @@ def get_sleeps(
     skip: int = 0,
     limit: int = 50,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get all sleep sessions for a baby."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Sleep).filter(
@@ -34,11 +34,11 @@ def get_sleeps(
 def get_current_sleep(
     baby_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get the current active sleep session (if baby is sleeping)."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Sleep).filter(
@@ -51,11 +51,11 @@ def get_current_sleep(
 def get_sleep(
     sleep_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get a specific sleep session by ID."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
@@ -75,11 +75,11 @@ def get_sleep(
 def create_sleep(
     sleep_data: SleepCreate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Start or log a sleep session."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, sleep_data.baby_id, user_id, user_email)
     
     sleep = Sleep(
@@ -99,11 +99,11 @@ def update_sleep(
     sleep_id: int,
     sleep_data: SleepUpdate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Update a sleep session (e.g., end the sleep)."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
@@ -129,11 +129,11 @@ def update_sleep(
 def end_sleep(
     sleep_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """End an active sleep session (sets end_time to now)."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
@@ -159,11 +159,11 @@ def end_sleep(
 def delete_sleep(
     sleep_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Delete a sleep record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,

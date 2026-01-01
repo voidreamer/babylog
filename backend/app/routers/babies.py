@@ -81,11 +81,11 @@ def get_baby(
 def create_baby(
     baby_data: BabyCreate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Create a new baby."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     baby = Baby(
         user_id=user_id,

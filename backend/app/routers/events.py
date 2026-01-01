@@ -9,7 +9,7 @@ from ..schemas import (
     TimelineEvent, DashboardStats, DailySummary,
     FeedingResponse, DiaperResponse, SleepResponse, PumpingResponse
 )
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -20,11 +20,11 @@ def get_timeline(
     baby_id: int,
     date: datetime | None = None,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get all events for a specific day as a timeline."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     # Default to today
@@ -192,11 +192,11 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime) -> Dai
 def get_dashboard(
     baby_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get dashboard stats with last events, current sleep status, and daily summary."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     # Last feeding
@@ -244,11 +244,11 @@ def get_summary(
     baby_id: int,
     date: str,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get summary for a specific date."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     try:

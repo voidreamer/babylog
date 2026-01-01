@@ -5,7 +5,7 @@ from typing import List
 from ..database import get_db
 from ..models import Feeding, Baby
 from ..schemas import FeedingCreate, FeedingUpdate, FeedingResponse
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/feedings", tags=["feedings"])
@@ -17,11 +17,11 @@ def get_feedings(
     skip: int = 0,
     limit: int = 50,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get all feedings for a baby."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Feeding).filter(
@@ -33,11 +33,11 @@ def get_feedings(
 def get_feeding(
     feeding_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get a specific feeding by ID."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     feeding = db.query(Feeding).join(Baby).filter(
         Feeding.id == feeding_id,
@@ -57,11 +57,11 @@ def get_feeding(
 def create_feeding(
     feeding_data: FeedingCreate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Log a new feeding."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, feeding_data.baby_id, user_id, user_email)
     
     feeding = Feeding(
@@ -83,11 +83,11 @@ def update_feeding(
     feeding_id: int,
     feeding_data: FeedingUpdate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Update a feeding record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     feeding = db.query(Feeding).join(Baby).filter(
         Feeding.id == feeding_id,
@@ -113,11 +113,11 @@ def update_feeding(
 def delete_feeding(
     feeding_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Delete a feeding record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     feeding = db.query(Feeding).join(Baby).filter(
         Feeding.id == feeding_id,

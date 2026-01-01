@@ -5,7 +5,7 @@ from typing import List
 from ..database import get_db
 from ..models import Pumping, Baby
 from ..schemas import PumpingCreate, PumpingUpdate, PumpingResponse
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/pumpings", tags=["pumpings"])
@@ -17,11 +17,11 @@ def get_pumpings(
     skip: int = 0,
     limit: int = 50,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get all pumping sessions for a baby."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Pumping).filter(
@@ -33,11 +33,11 @@ def get_pumpings(
 def get_pumping(
     pumping_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get a specific pumping session by ID."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     pumping = db.query(Pumping).join(Baby).filter(
         Pumping.id == pumping_id,
@@ -57,11 +57,11 @@ def get_pumping(
 def create_pumping(
     pumping_data: PumpingCreate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Log a new pumping session."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, pumping_data.baby_id, user_id, user_email)
     
     pumping = Pumping(
@@ -82,11 +82,11 @@ def update_pumping(
     pumping_id: int,
     pumping_data: PumpingUpdate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Update a pumping record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     pumping = db.query(Pumping).join(Baby).filter(
         Pumping.id == pumping_id,
@@ -112,11 +112,11 @@ def update_pumping(
 def delete_pumping(
     pumping_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Delete a pumping record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     pumping = db.query(Pumping).join(Baby).filter(
         Pumping.id == pumping_id,

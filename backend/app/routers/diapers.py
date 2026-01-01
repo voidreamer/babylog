@@ -5,7 +5,7 @@ from typing import List
 from ..database import get_db
 from ..models import Diaper, Baby
 from ..schemas import DiaperCreate, DiaperUpdate, DiaperResponse
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/diapers", tags=["diapers"])
@@ -17,11 +17,11 @@ def get_diapers(
     skip: int = 0,
     limit: int = 50,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get all diaper changes for a baby."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Diaper).filter(
@@ -33,11 +33,11 @@ def get_diapers(
 def get_diaper(
     diaper_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get a specific diaper change by ID."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
@@ -57,11 +57,11 @@ def get_diaper(
 def create_diaper(
     diaper_data: DiaperCreate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Log a new diaper change."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     verify_baby_access(db, diaper_data.baby_id, user_id, user_email)
     
     diaper = Diaper(
@@ -81,11 +81,11 @@ def update_diaper(
     diaper_id: int,
     diaper_data: DiaperUpdate,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Update a diaper record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
@@ -111,11 +111,11 @@ def update_diaper(
 def delete_diaper(
     diaper_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Delete a diaper record."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
