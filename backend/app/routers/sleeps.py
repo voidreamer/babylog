@@ -61,7 +61,7 @@ def get_sleep(
         Sleep.id == sleep_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     
@@ -109,7 +109,7 @@ def update_sleep(
         Sleep.id == sleep_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     
@@ -139,7 +139,7 @@ def end_sleep(
         Sleep.id == sleep_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     
@@ -169,7 +169,7 @@ def delete_sleep(
         Sleep.id == sleep_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     

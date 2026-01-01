@@ -43,7 +43,7 @@ def get_diaper(
         Diaper.id == diaper_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     
@@ -91,7 +91,7 @@ def update_diaper(
         Diaper.id == diaper_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     
@@ -121,7 +121,7 @@ def delete_diaper(
         Diaper.id == diaper_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     

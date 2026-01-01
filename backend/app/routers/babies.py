@@ -16,7 +16,7 @@ def get_accessible_baby(db: Session, baby_id: int, user_id: str, user_email: str
         Baby.id == baby_id,
         or_(
             Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
+            Baby.shared_with_emails.any(user_email)
         )
     ).first()
     return baby
@@ -46,12 +46,15 @@ def get_babies(
     user_email = user.get("email", "")
     
     # Get babies user owns OR that are shared with their email
-    babies = db.query(Baby).filter(
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.contains([user_email])
-        )
-    ).all()
+    if user_email:
+        babies = db.query(Baby).filter(
+            or_(
+                Baby.user_id == user_id,
+                Baby.shared_with_emails.any(user_email)
+            )
+        ).all()
+    else:
+        babies = db.query(Baby).filter(Baby.user_id == user_id).all()
     
     return [baby_to_response(b, user_id) for b in babies]
 
