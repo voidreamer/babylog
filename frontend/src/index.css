@@ -96,12 +96,13 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
+  color: var(--text);
 }
 
 h1 {
-  font-size: 1.875rem;
+  font-size: 2rem;
 }
 
 h2 {
@@ -161,9 +162,9 @@ h4 {
 }
 
 .card-title {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* ============================================================================
@@ -178,11 +179,10 @@ h4 {
 }
 
 .widget {
-  background: var(--surface);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  border: none;
   transition: var(--transition);
   cursor: pointer;
 }
@@ -190,26 +190,31 @@ h4 {
 .widget:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  filter: brightness(1.1);
 }
 
 .widget.feeding {
-  border-left: 4px solid var(--feeding);
+  background: linear-gradient(135deg, var(--feeding-bg) 0%, rgba(251, 191, 36, 0.25) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 .widget.diaper {
-  border-left: 4px solid var(--diaper);
+  background: linear-gradient(135deg, var(--diaper-bg) 0%, rgba(52, 211, 153, 0.25) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .widget.sleep {
-  border-left: 4px solid var(--sleep);
+  background: linear-gradient(135deg, var(--sleep-bg) 0%, rgba(96, 165, 250, 0.25) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 .widget.pumping {
-  border-left: 4px solid var(--pumping);
+  background: linear-gradient(135deg, var(--pumping-bg) 0%, rgba(244, 114, 182, 0.25) 100%);
+  border: 1px solid rgba(244, 114, 182, 0.3);
 }
 
 .widget.sleeping {
-  background: linear-gradient(135deg, var(--sleep-bg), var(--surface));
+  background: linear-gradient(135deg, var(--sleep-bg), rgba(96, 165, 250, 0.35));
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -221,33 +226,35 @@ h4 {
   }
 
   50% {
-    opacity: 0.8;
+    opacity: 0.85;
   }
 }
 
 .widget-icon {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   margin-bottom: var(--space-sm);
 }
 
 .widget-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: var(--space-xs);
 }
 
 .widget-value {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--text);
 }
 
 .widget-detail {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   margin-top: var(--space-xs);
+  font-weight: 500;
 }
 
 /* ============================================================================
@@ -431,8 +438,9 @@ h4 {
   border: 2px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
+  color: var(--text);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   text-align: center;
@@ -440,12 +448,13 @@ h4 {
 
 .type-btn.active {
   border-color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--primary);
+  background: rgba(139, 92, 246, 0.2);
+  color: var(--primary-light);
 }
 
 .type-btn:hover:not(.active) {
   background: var(--surface-hover);
+  color: var(--text);
 }
 
 /* ============================================================================
