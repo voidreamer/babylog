@@ -3,10 +3,13 @@ import { api } from '../api/client';
 
 const AuthContext = createContext(null);
 
-// Cognito configuration - will be set from environment
-const COGNITO_DOMAIN = import.meta.env.VITE_COGNITO_DOMAIN || '';
-const COGNITO_CLIENT_ID = import.meta.env.VITE_COGNITO_CLIENT_ID || '';
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || window.location.origin + '/callback';
+// Cognito configuration - use env vars or production defaults
+const COGNITO_DOMAIN = import.meta.env.VITE_COGNITO_DOMAIN ||
+    (import.meta.env.PROD ? 'https://huckle-nah7qom7.auth.ca-central-1.amazoncognito.com' : '');
+const COGNITO_CLIENT_ID = import.meta.env.VITE_COGNITO_CLIENT_ID ||
+    (import.meta.env.PROD ? '34up4ahjhh0umosq03grphmcur' : '');
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI ||
+    (import.meta.env.PROD ? 'https://d3nsr7lzhub0bz.cloudfront.net/callback' : window.location.origin + '/callback');
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
