@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider } from './hooks/useBaby';
@@ -5,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import BabySelector from './components/BabySelector';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
+import Health from './pages/Health';
 
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -26,6 +28,7 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
     const { user, logout } = useAuth();
+    const [activeTab, setActiveTab] = useState('dashboard');
 
     return (
         <BabyProvider>
@@ -50,8 +53,29 @@ function AppContent() {
                     </div>
                 </header>
 
+                {/* Tab Navigation */}
+                <nav style={{ padding: '0 var(--space-md)', marginBottom: 'var(--space-md)' }}>
+                    <div className="type-selector">
+                        <button
+                            className={`type-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('dashboard')}
+                            style={{ flex: 1 }}
+                        >
+                            🏠 Dashboard
+                        </button>
+                        <button
+                            className={`type-btn ${activeTab === 'health' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('health')}
+                            style={{ flex: 1 }}
+                        >
+                            🏥 Health
+                        </button>
+                    </div>
+                </nav>
+
                 <main>
-                    <Dashboard />
+                    {activeTab === 'dashboard' && <Dashboard />}
+                    {activeTab === 'health' && <Health />}
                 </main>
             </div>
         </BabyProvider>
@@ -72,6 +96,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </AuthProvider>
     );

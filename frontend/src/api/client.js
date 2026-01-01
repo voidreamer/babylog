@@ -186,6 +186,86 @@ class ApiClient {
     async getDashboard(babyId) {
         return this.request(`/events/dashboard?baby_id=${babyId}`);
     }
+
+    // Health - Doctor Visits
+    async getDoctorVisits(babyId) {
+        return this.request(`/health/doctor-visits/?baby_id=${babyId}`);
+    }
+
+    async createDoctorVisit(data) {
+        return this.request('/health/doctor-visits/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteDoctorVisit(id) {
+        return this.request(`/health/doctor-visits/${id}`, { method: 'DELETE' });
+    }
+
+    // Health - Vaccinations
+    async getVaccinations(babyId) {
+        return this.request(`/health/vaccinations/?baby_id=${babyId}`);
+    }
+
+    async createVaccination(data) {
+        return this.request('/health/vaccinations/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteVaccination(id) {
+        return this.request(`/health/vaccinations/${id}`, { method: 'DELETE' });
+    }
+
+    // Health - Medications
+    async getMedications(babyId, activeOnly = false) {
+        return this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`);
+    }
+
+    async createMedication(data) {
+        return this.request('/health/medications/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteMedication(id) {
+        return this.request(`/health/medications/${id}`, { method: 'DELETE' });
+    }
+
+    // Health - Milestones
+    async getMilestones(babyId) {
+        return this.request(`/health/milestones/?baby_id=${babyId}`);
+    }
+
+    async createMilestone(data) {
+        return this.request('/health/milestones/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteMilestone(id) {
+        return this.request(`/health/milestones/${id}`, { method: 'DELETE' });
+    }
+
+    // Health - Growth
+    async getGrowthRecords(babyId) {
+        return this.request(`/health/growth/?baby_id=${babyId}`);
+    }
+
+    async createGrowthRecord(data) {
+        return this.request('/health/growth/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteGrowthRecord(id) {
+        return this.request(`/health/growth/${id}`, { method: 'DELETE' });
+    }
 }
 
 export const api = new ApiClient();

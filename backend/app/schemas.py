@@ -238,3 +238,127 @@ class DashboardStats(BaseModel):
     last_pumping: Optional[PumpingResponse] = None
     current_sleep: Optional[SleepResponse] = None
     daily_summary: Optional[DailySummary] = None
+
+
+# ============================================================================
+# Health Integration Schemas
+# ============================================================================
+
+VisitTypeEnum = Literal["checkup", "sick", "emergency", "specialist", "vaccination"]
+
+class DoctorVisitBase(BaseModel):
+    visit_date: datetime
+    doctor_name: Optional[str] = None
+    visit_type: Optional[VisitTypeEnum] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    head_cm: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class DoctorVisitCreate(DoctorVisitBase):
+    baby_id: int
+
+
+class DoctorVisitResponse(DoctorVisitBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class VaccinationBase(BaseModel):
+    vaccine_name: str
+    dose_number: int = 1
+    given_date: datetime
+    next_due_date: Optional[datetime] = None
+    administered_by: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class VaccinationCreate(VaccinationBase):
+    baby_id: int
+
+
+class VaccinationResponse(VaccinationBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class MedicationBase(BaseModel):
+    medication_name: str
+    dosage: Optional[str] = None
+    frequency: Optional[str] = None
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    is_active: bool = True
+    notes: Optional[str] = None
+
+
+class MedicationCreate(MedicationBase):
+    baby_id: int
+
+
+class MedicationResponse(MedicationBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class MilestoneBase(BaseModel):
+    milestone_type: str
+    achieved_date: datetime
+    notes: Optional[str] = None
+
+
+class MilestoneCreate(MilestoneBase):
+    baby_id: int
+
+
+class MilestoneResponse(MilestoneBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class GrowthRecordBase(BaseModel):
+    recorded_date: datetime
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    head_cm: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class GrowthRecordCreate(GrowthRecordBase):
+    baby_id: int
+
+
+class GrowthRecordResponse(GrowthRecordBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
