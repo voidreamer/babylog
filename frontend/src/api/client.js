@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://a4h1jfeguj.execute-api.ca-central-1.amazonaws.com' : '');
 
 class ApiClient {
     constructor() {
