@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from .models import FeedingType, DiaperType
 
 
@@ -25,10 +25,17 @@ class BabyUpdate(BaseModel):
 class BabyResponse(BabyBase):
     id: int
     user_id: str
+    owner_email: Optional[str] = None
+    shared_with_emails: List[str] = []
+    is_owner: bool = True  # Computed field to indicate if current user owns this baby
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class BabyShareRequest(BaseModel):
+    email: str
 
 
 # ============================================================================

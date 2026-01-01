@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
+import ShareModal from './ShareModal';
 
 export default function BabySelector() {
-    const { babies, selectedBaby, selectBaby, addBaby } = useBaby();
+    const { babies, selectedBaby, selectBaby, addBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const [newBabyName, setNewBabyName] = useState('');
     const [newBabyDob, setNewBabyDob] = useState('');
 
@@ -136,9 +138,37 @@ export default function BabySelector() {
                         >
                             <div className="baby-avatar">{getInitial(baby.name)}</div>
                             <span>{baby.name}</span>
+                            {!baby.is_owner && (
+                                <span style={{
+                                    fontSize: '0.75rem',
+                                    background: 'var(--primary)',
+                                    color: 'white',
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                }}>
+                                    Shared
+                                </span>
+                            )}
                             {baby.id === selectedBaby?.id && <span style={{ marginLeft: 'auto' }}>✓</span>}
                         </div>
                     ))}
+
+                    {selectedBaby?.is_owner && (
+                        <div
+                            style={{
+                                padding: 'var(--space-md)',
+                                borderTop: '1px solid var(--border)',
+                                cursor: 'pointer',
+                                color: 'var(--text-secondary)',
+                            }}
+                            onClick={() => {
+                                setShowShareModal(true);
+                                setShowDropdown(false);
+                            }}
+                        >
+                            🔗 Share {selectedBaby?.name}
+                        </div>
+                    )}
 
                     <div
                         style={{
@@ -203,6 +233,14 @@ export default function BabySelector() {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {showShareModal && selectedBaby && (
+                <ShareModal
+                    baby={selectedBaby}
+                    onClose={() => setShowShareModal(false)}
+                    onShare={() => refresh()}
+                />
             )}
         </div>
     );

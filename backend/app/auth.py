@@ -80,3 +80,8 @@ async def get_current_user(
 def get_user_id(user: dict = Depends(get_current_user)) -> str:
     """Extract user ID from token claims."""
     return user.get("sub")
+
+
+def get_user_email(user: dict = Depends(get_current_user)) -> str:
+    """Extract user email from token claims."""
+    return user.get("email", "")

@@ -82,6 +82,19 @@ class ApiClient {
         });
     }
 
+    async shareBaby(id, email) {
+        return this.request(`/babies/${id}/share`, {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+        });
+    }
+
+    async unshareBaby(id, email) {
+        return this.request(`/babies/${id}/share/${encodeURIComponent(email)}`, {
+            method: 'DELETE',
+        });
+    }
+
     // Feedings
     async getFeedings(babyId, limit = 50) {
         return this.request(`/feedings/?baby_id=${babyId}&limit=${limit}`);

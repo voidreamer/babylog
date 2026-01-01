@@ -1,20 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from typing import List
 from ..database import get_db
 from ..models import Diaper, Baby
 from ..schemas import DiaperCreate, DiaperUpdate, DiaperResponse
-from ..auth import get_user_id
+from ..auth import get_current_user
+from .utils import verify_baby_access
 
 router = APIRouter(prefix="/diapers", tags=["diapers"])
-
-
-def verify_baby_ownership(db: Session, baby_id: int, user_id: str):
-    """Verify the baby belongs to the user."""
-    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    return baby
 
 
 @router.get("/", response_model=List[DiaperResponse])
@@ -22,11 +16,13 @@ def get_diapers(
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Get all diaper changes for a baby."""
-    verify_baby_ownership(db, baby_id, user_id)
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Diaper).filter(
         Diaper.baby_id == baby_id
@@ -36,13 +32,19 @@ def get_diapers(
 @router.get("/{diaper_id}", response_model=DiaperResponse)
 def get_diaper(
     diaper_id: int,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Get a specific diaper change by ID."""
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
-        Baby.user_id == user_id
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.contains([user_email])
+        )
     ).first()
     
     if not diaper:
@@ -54,11 +56,13 @@ def get_diaper(
 @router.post("/", response_model=DiaperResponse, status_code=status.HTTP_201_CREATED)
 def create_diaper(
     diaper_data: DiaperCreate,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Log a new diaper change."""
-    verify_baby_ownership(db, diaper_data.baby_id, user_id)
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    verify_baby_access(db, diaper_data.baby_id, user_id, user_email)
     
     diaper = Diaper(
         baby_id=diaper_data.baby_id,
@@ -76,13 +80,19 @@ def create_diaper(
 def update_diaper(
     diaper_id: int,
     diaper_data: DiaperUpdate,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Update a diaper record."""
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
-        Baby.user_id == user_id
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.contains([user_email])
+        )
     ).first()
     
     if not diaper:
@@ -100,13 +110,19 @@ def update_diaper(
 @router.delete("/{diaper_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_diaper(
     diaper_id: int,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Delete a diaper record."""
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
-        Baby.user_id == user_id
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.contains([user_email])
+        )
     ).first()
     
     if not diaper:

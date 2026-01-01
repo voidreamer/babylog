@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -21,8 +22,10 @@ class Baby(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, index=True, nullable=False)
+    owner_email = Column(String, nullable=True)  # Email of the owner
     name = Column(String, nullable=False)
     birth_date = Column(DateTime, nullable=True)
+    shared_with_emails = Column(ARRAY(String), default=list)  # List of emails who can access
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

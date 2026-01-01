@@ -1,32 +1,28 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from datetime import datetime, timedelta
 from typing import List
 from ..database import get_db
 from ..models import Baby, Feeding, Diaper, Sleep
 from ..schemas import TimelineEvent, DashboardStats, FeedingResponse, DiaperResponse, SleepResponse
-from ..auth import get_user_id
+from ..auth import get_current_user
+from .utils import verify_baby_access
 
 router = APIRouter(prefix="/events", tags=["events"])
-
-
-def verify_baby_ownership(db: Session, baby_id: int, user_id: str):
-    """Verify the baby belongs to the user."""
-    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    return baby
 
 
 @router.get("/timeline", response_model=List[TimelineEvent])
 def get_timeline(
     baby_id: int,
     date: datetime | None = None,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Get all events for a specific day as a timeline."""
-    verify_baby_ownership(db, baby_id, user_id)
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    verify_baby_access(db, baby_id, user_id, user_email)
     
     # Default to today
     if date is None:
@@ -104,11 +100,13 @@ def get_timeline(
 @router.get("/dashboard", response_model=DashboardStats)
 def get_dashboard(
     baby_id: int,
-    user_id: str = Depends(get_user_id),
+    user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Get dashboard stats with last events and current sleep status."""
-    verify_baby_ownership(db, baby_id, user_id)
+    user_id = user.get("sub")
+    user_email = user.get("email", "")
+    verify_baby_access(db, baby_id, user_id, user_email)
     
     # Last feeding
     last_feeding = db.query(Feeding).filter(
