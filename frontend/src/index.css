@@ -179,6 +179,8 @@ h4 {
 }
 
 .widget {
+  position: relative;
+  overflow: hidden;
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   box-shadow: var(--shadow);
@@ -216,6 +218,25 @@ h4 {
 .widget.sleeping {
   background: linear-gradient(135deg, var(--sleep-bg), rgba(96, 165, 250, 0.35));
   animation: pulse 2s ease-in-out infinite;
+}
+
+/* Large semi-transparent background icon */
+.widget-bg-icon {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.widget-bg-icon img {
+  width: 80px;
+  height: 80px;
+}
+
+.widget-content {
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes pulse {
