@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
-import { formatDistanceToNow, format, subDays } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import Widget from './Widget';
-import Timeline from './Timeline';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
@@ -13,35 +12,21 @@ import DailySummary from './DailySummary';
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
     const [dashboard, setDashboard] = useState(null);
-    const [timeline, setTimeline] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedDate, setSelectedDate] = useState('today'); // 'today' or 'yesterday'
 
     const [feedingModal, setFeedingModal] = useState(false);
     const [diaperModal, setDiaperModal] = useState(false);
     const [sleepModal, setSleepModal] = useState(false);
     const [pumpingModal, setPumpingModal] = useState(false);
 
-    const getDateParam = () => {
-        if (selectedDate === 'yesterday') {
-            return subDays(new Date(), 1).toISOString();
-        }
-        return null; // Today is default
-    };
-
     const loadData = async () => {
         if (!selectedBaby) return;
 
         try {
-            const dateParam = getDateParam();
-            const [dashboardData, timelineData] = await Promise.all([
-                api.getDashboard(selectedBaby.id),
-                api.getTimeline(selectedBaby.id, dateParam),
-            ]);
+            const dashboardData = await api.getDashboard(selectedBaby.id);
             setDashboard(dashboardData);
-            setTimeline(timelineData);
         } catch (error) {
-            // Silent fail - dashboard will show empty state
+            // Silent fail
         } finally {
             setLoading(false);
         }
@@ -49,18 +34,14 @@ export default function Dashboard() {
 
     useEffect(() => {
         loadData();
-    }, [selectedBaby, selectedDate]);
+    }, [selectedBaby]);
 
-    // Auto-refresh every 30 seconds for real-time sync across devices
+    // Auto-refresh every 30 seconds
     useEffect(() => {
         if (!selectedBaby) return;
-
-        const interval = setInterval(() => {
-            loadData();
-        }, 30000); // 30 seconds
-
+        const interval = setInterval(loadData, 30000);
         return () => clearInterval(interval);
-    }, [selectedBaby, selectedDate]);
+    }, [selectedBaby]);
 
     // Parse time from API (UTC) to local Date object
     const parseUTCTime = (timeStr) => {
@@ -75,7 +56,6 @@ export default function Dashboard() {
     };
 
     const handleEventLogged = () => {
-        setSelectedDate('today'); // Switch back to today after logging
         loadData();
         setFeedingModal(false);
         setDiaperModal(false);
@@ -150,36 +130,6 @@ export default function Dashboard() {
                         : null}
                     onClick={() => setPumpingModal(true)}
                 />
-            </div>
-
-            {/* Timeline */}
-            <div className="card">
-                <div className="card-header" style={{ flexDirection: 'column', gap: 'var(--space-md)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                        <h3 className="card-title" style={{ margin: 0 }}>
-                            {selectedDate === 'today' ? "Today's Timeline" : "Yesterday's Timeline"}
-                        </h3>
-                    </div>
-                    <div className="type-selector" style={{ width: '100%' }}>
-                        <button
-                            type="button"
-                            className={`type-btn ${selectedDate === 'today' ? 'active' : ''}`}
-                            onClick={() => setSelectedDate('today')}
-                            style={{ flex: 1 }}
-                        >
-                            Today
-                        </button>
-                        <button
-                            type="button"
-                            className={`type-btn ${selectedDate === 'yesterday' ? 'active' : ''}`}
-                            onClick={() => setSelectedDate('yesterday')}
-                            style={{ flex: 1 }}
-                        >
-                            Yesterday
-                        </button>
-                    </div>
-                </div>
-                <Timeline events={timeline} onRefresh={loadData} />
             </div>
 
             {/* Modals */}

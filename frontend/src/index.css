@@ -627,7 +627,177 @@ h4 {
 }
 
 /* ============================================================================
-   Timeline
+   Timeline Calendar (Visual Hour View)
+   ============================================================================ */
+
+.timeline-calendar {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  background: var(--background);
+}
+
+.timeline-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-md);
+}
+
+.timeline-nav-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--surface-hover);
+  color: var(--text);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.timeline-nav-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.timeline-date {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.timeline-date:hover {
+  color: var(--primary);
+}
+
+.timeline-calendar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+}
+
+.timeline-calendar-content {
+  position: relative;
+  min-height: calc(24 * 80px);
+  /* 24 hours * 80px */
+}
+
+.timeline-hour-row {
+  display: flex;
+  align-items: flex-start;
+  height: 80px;
+  border-bottom: 1px solid var(--border);
+}
+
+.timeline-hour-label {
+  width: 60px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.timeline-hour-line {
+  flex: 1;
+  border-top: 1px dashed var(--border);
+  margin-top: 10px;
+}
+
+.timeline-events-container {
+  position: absolute;
+  top: 0;
+  left: 70px;
+  right: 10px;
+  height: 100%;
+  pointer-events: none;
+}
+
+.timeline-event-block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  pointer-events: auto;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.timeline-event-block:hover {
+  filter: brightness(1.1);
+  transform: translateX(-2px);
+}
+
+.timeline-event-block.swiped {
+  animation: swipeLeft 0.2s ease-out forwards;
+}
+
+@keyframes swipeLeft {
+  to {
+    transform: translateX(-60px);
+  }
+}
+
+.timeline-event-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-event-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.timeline-event-time {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.timeline-event-detail {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-event-delete {
+  position: absolute;
+  right: -55px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.timeline-event-delete:hover {
+  background: #dc2626;
+}
+
+/* ============================================================================
+   Timeline (List View - Legacy)
    ============================================================================ */
 
 .timeline {

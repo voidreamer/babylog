@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider } from './hooks/useBaby';
 import Dashboard from './components/Dashboard';
+import TimelineCalendar from './components/TimelineCalendar';
 import BabySelector from './components/BabySelector';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
@@ -55,6 +56,7 @@ function AppContent() {
 
                 <main>
                     {activeTab === 'home' && <Dashboard />}
+                    {activeTab === 'timeline' && <TimelineCalendar />}
                     {activeTab === 'health' && <Health />}
                     {activeTab === 'reports' && (
                         <div className="card" style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
@@ -75,6 +77,13 @@ function AppContent() {
                     >
                         <span className="icon">🏠</span>
                         <span>Home</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('timeline')}
+                    >
+                        <span className="icon">📅</span>
+                        <span>Timeline</span>
                     </button>
                     <button
                         className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
