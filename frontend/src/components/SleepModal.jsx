@@ -63,9 +63,16 @@ export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
         }
     };
 
+    // Parse time from API (UTC) to local Date object
+    const parseUTCTime = (timeStr) => {
+        if (!timeStr) return new Date();
+        const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+        return new Date(utcTime);
+    };
+
     // If baby is currently sleeping, show wake up option
     if (currentSleep) {
-        const sleepingFor = formatDistanceToNow(new Date(currentSleep.start_time));
+        const sleepingFor = formatDistanceToNow(parseUTCTime(currentSleep.start_time));
 
         return (
             <div className="modal-overlay" onClick={onClose}>
@@ -80,7 +87,7 @@ export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
                             <div className="empty-state-icon">💤</div>
                             <h3 className="empty-state-title">Sleeping for {sleepingFor}</h3>
                             <p className="empty-state-text">
-                                Started at {new Date(currentSleep.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                Started at {parseUTCTime(currentSleep.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </p>
                         </div>
                     </div>

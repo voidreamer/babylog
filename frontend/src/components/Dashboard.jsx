@@ -43,9 +43,16 @@ export default function Dashboard() {
         loadData();
     }, [selectedBaby]);
 
+    // Parse time from API (UTC) to local Date object
+    const parseUTCTime = (timeStr) => {
+        if (!timeStr) return null;
+        const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+        return new Date(utcTime);
+    };
+
     const formatTimeAgo = (dateStr) => {
         if (!dateStr) return 'Never';
-        return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
+        return formatDistanceToNow(parseUTCTime(dateStr), { addSuffix: true });
     };
 
     const handleEventLogged = () => {

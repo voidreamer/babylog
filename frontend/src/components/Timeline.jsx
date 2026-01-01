@@ -1,9 +1,18 @@
 import { format } from 'date-fns';
 
+// Parse time from API (UTC) to local Date object
+const parseUTCTime = (timeStr) => {
+    if (!timeStr) return new Date();
+    // Add 'Z' if not present to indicate UTC
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
+
 const EVENT_CONFIG = {
     feeding: { icon: '🍼', label: 'Feeding' },
     diaper: { icon: '🧷', label: 'Diaper' },
     sleep: { icon: '😴', label: 'Sleep' },
+    pumping: { icon: '🍶', label: 'Pumping' },
 };
 
 export default function Timeline({ events, onRefresh }) {
@@ -23,11 +32,17 @@ export default function Timeline({ events, onRefresh }) {
             case 'feeding':
                 return `${config.label} - ${event.details.type}`;
             case 'diaper':
-                return `${config.label} - ${event.details.type}`;
+                let diaperLabel = `${config.label} - ${event.details.type}`;
+                if (event.details.poo_amount) diaperLabel += ` (${event.details.poo_amount})`;
+                return diaperLabel;
             case 'sleep':
                 return event.details.end_time
                     ? `${config.label} - ${event.details.duration_minutes || 0}min`
                     : `${config.label} - in progress`;
+            case 'pumping':
+                return event.details.amount_ml
+                    ? `${config.label} - ${event.details.amount_ml}ml`
+                    : config.label;
             default:
                 return config.label;
         }
@@ -42,9 +57,18 @@ export default function Timeline({ events, onRefresh }) {
                 if (event.details.notes) parts.push(event.details.notes);
                 return parts.join(' • ') || null;
             case 'diaper':
-                return event.details.notes || null;
+                const diaperParts = [];
+                if (event.details.poo_color) diaperParts.push(event.details.poo_color);
+                if (event.details.poo_consistency) diaperParts.push(event.details.poo_consistency);
+                if (event.details.notes) diaperParts.push(event.details.notes);
+                return diaperParts.join(' • ') || null;
             case 'sleep':
                 return event.details.notes || null;
+            case 'pumping':
+                const pumpParts = [];
+                if (event.details.duration_minutes) pumpParts.push(`${event.details.duration_minutes}min`);
+                if (event.details.notes) pumpParts.push(event.details.notes);
+                return pumpParts.join(' • ') || null;
             default:
                 return null;
         }
@@ -67,7 +91,7 @@ export default function Timeline({ events, onRefresh }) {
                             )}
                         </div>
                         <div className="timeline-time">
-                            {format(new Date(event.time), 'h:mm a')}
+                            {format(parseUTCTime(event.time), 'h:mm a')}
                         </div>
                     </div>
                 );
