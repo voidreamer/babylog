@@ -91,19 +91,13 @@ def get_user_email(
     For Google federated logins via Cognito, the access token doesn't include email.
     The frontend extracts email from the id_token and sends it as X-User-Email header.
     """
-    import logging
-    logger = logging.getLogger()
-    
     # Try direct email claim first (works for some auth methods)
     email = user.get("email", "")
     if email:
-        logger.info(f"get_user_email: found email in token: {email}")
         return email.lower().strip()
     
     # Use X-User-Email header (set by frontend from id_token)
     if x_user_email:
-        logger.info(f"get_user_email: using X-User-Email header: {x_user_email}")
         return x_user_email.lower().strip()
     
-    logger.warning("get_user_email: No email found in token or header")
     return ""

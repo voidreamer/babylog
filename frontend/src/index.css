@@ -1,8 +1,8 @@
 :root {
-  /* Colors - Dark theme */
-  --primary: #818cf8;
-  --primary-dark: #6366f1;
-  --primary-light: #a5b4fc;
+  /* Colors - Warm Dark Theme */
+  --primary: #8b5cf6;
+  --primary-dark: #7c3aed;
+  --primary-light: #a78bfa;
 
   --feeding: #fbbf24;
   --feeding-light: #fcd34d;
@@ -12,27 +12,27 @@
   --diaper-light: #6ee7b7;
   --diaper-bg: rgba(52, 211, 153, 0.15);
 
-  --sleep: #a78bfa;
-  --sleep-light: #c4b5fd;
-  --sleep-bg: rgba(167, 139, 250, 0.15);
+  --sleep: #60a5fa;
+  --sleep-light: #93c5fd;
+  --sleep-bg: rgba(96, 165, 250, 0.15);
 
   --pumping: #f472b6;
   --pumping-light: #f9a8d4;
   --pumping-bg: rgba(244, 114, 182, 0.15);
 
-  --background: #0f172a;
-  --surface: #1e293b;
-  --surface-hover: #334155;
-  --border: #475569;
+  --background: #18181b;
+  --surface: #27272a;
+  --surface-hover: #3f3f46;
+  --border: #52525b;
 
-  --text: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
 
-  --danger: #f87171;
-  --success: #34d399;
-  --accent: #a78bfa;
-  --secondary: #34d399;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --accent: #8b5cf6;
+  --secondary: #22c55e;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -49,7 +49,7 @@
   --radius-xl: 1rem;
   --radius-full: 9999px;
 
-  /* Shadows - darker for dark theme */
+  /* Shadows - subtle for dark theme */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);

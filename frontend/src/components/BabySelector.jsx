@@ -3,7 +3,7 @@ import { useBaby } from '../hooks/useBaby';
 import ShareModal from './ShareModal';
 
 export default function BabySelector() {
-    const { babies, selectedBaby, selectBaby, addBaby, refresh } = useBaby();
+    const { babies, selectedBaby, selectBaby, addBaby, removeBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
@@ -167,6 +167,24 @@ export default function BabySelector() {
                             }}
                         >
                             🔗 Share {selectedBaby?.name}
+                        </div>
+                    )}
+
+                    {selectedBaby?.is_owner && (
+                        <div
+                            style={{
+                                padding: 'var(--space-md)',
+                                cursor: 'pointer',
+                                color: 'var(--danger)',
+                            }}
+                            onClick={() => {
+                                if (confirm(`Are you sure you want to delete ${selectedBaby.name}? This will remove all feeding, diaper, sleep, and health records. This cannot be undone.`)) {
+                                    removeBaby(selectedBaby.id);
+                                    setShowDropdown(false);
+                                }
+                            }}
+                        >
+                            🗑️ Delete {selectedBaby?.name}
                         </div>
                     )}
 
