@@ -52,6 +52,17 @@ export default function Dashboard() {
         loadData();
     }, [selectedBaby, selectedDate]);
 
+    // Auto-refresh every 30 seconds for real-time sync across devices
+    useEffect(() => {
+        if (!selectedBaby) return;
+
+        const interval = setInterval(() => {
+            loadData();
+        }, 30000); // 30 seconds
+
+        return () => clearInterval(interval);
+    }, [selectedBaby, selectedDate]);
+
     // Parse time from API (UTC) to local Date object
     const parseUTCTime = (timeStr) => {
         if (!timeStr) return null;
