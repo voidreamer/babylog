@@ -80,10 +80,14 @@ export function AuthProvider({ children }) {
         }
 
         const data = await response.json();
-        // Use id_token for API calls - it contains the email claim needed for baby sharing
-        // access_token doesn't include email for federated (Google) logins
-        api.setToken(data.id_token);
+        // Use access_token for API auth (required for verification)
+        // But store email from id_token separately for sharing feature
+        api.setToken(data.access_token);
         const payload = JSON.parse(atob(data.id_token.split('.')[1]));
+        // Store email from id_token for the sharing feature
+        if (payload.email) {
+            localStorage.setItem('user_email', payload.email.toLowerCase());
+        }
         setUser(payload);
     };
 

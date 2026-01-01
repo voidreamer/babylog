@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 import httpx
@@ -82,36 +82,28 @@ def get_user_id(user: dict = Depends(get_current_user)) -> str:
     return user.get("sub")
 
 
-def get_user_email(user: dict = Depends(get_current_user)) -> str:
-    """Extract user email from token claims.
+def get_user_email(
+    user: dict = Depends(get_current_user),
+    x_user_email: str = Header(None, alias="X-User-Email")
+) -> str:
+    """Extract user email from token claims or X-User-Email header.
     
-    For Google federated logins, email may be in different claims:
-    - 'email' (standard)
-    - 'cognito:username' (sometimes includes email)
-    - 'username' (Google_xxx format for federated users)
+    For Google federated logins via Cognito, the access token doesn't include email.
+    The frontend extracts email from the id_token and sends it as X-User-Email header.
     """
     import logging
     logger = logging.getLogger()
     
-    # Try direct email claim first
+    # Try direct email claim first (works for some auth methods)
     email = user.get("email", "")
     if email:
-        logger.info(f"get_user_email: found email in 'email' claim: {email}")
+        logger.info(f"get_user_email: found email in token: {email}")
         return email.lower().strip()
     
-    # Try cognito:username (for some IdP configs)
-    cognito_username = user.get("cognito:username", "")
-    if "@" in cognito_username:
-        logger.info(f"get_user_email: found email in 'cognito:username' claim: {cognito_username}")
-        return cognito_username.lower().strip()
+    # Use X-User-Email header (set by frontend from id_token)
+    if x_user_email:
+        logger.info(f"get_user_email: using X-User-Email header: {x_user_email}")
+        return x_user_email.lower().strip()
     
-    # Try username (for some IdP configs)
-    username = user.get("username", "")
-    if "@" in username:
-        logger.info(f"get_user_email: found email in 'username' claim: {username}")
-        return username.lower().strip()
-    
-    # Log available claims for debugging
-    logger.warning(f"get_user_email: No email found. username={username}, cognito:username={cognito_username}")
-    
+    logger.warning("get_user_email: No email found in token or header")
     return ""

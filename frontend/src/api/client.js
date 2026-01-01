@@ -30,6 +30,12 @@ class ApiClient {
             headers['Authorization'] = `Bearer ${this.token}`;
         }
 
+        // Send user email from id_token for baby sharing feature
+        const userEmail = localStorage.getItem('user_email');
+        if (userEmail) {
+            headers['X-User-Email'] = userEmail;
+        }
+
         const response = await fetch(url, {
             ...options,
             headers,
