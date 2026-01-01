@@ -5,7 +5,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
-    database_url: str = "postgresql://user:pass@localhost:5432/huckle"
+    database_url: str = "postgresql://user:pass@localhost:5432/simplebaby"
     environment: str = "development"
     cognito_user_pool_id: str = ""
     cognito_client_id: str = ""

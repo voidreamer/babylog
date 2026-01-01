@@ -1,4 +1,4 @@
-# Huckle Frontend
+# SimpleBaby Frontend
 
 React frontend for the baby tracker app.
 

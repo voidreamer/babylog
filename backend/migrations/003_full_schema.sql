@@ -1,4 +1,4 @@
--- Huckle Baby Tracker - Full Schema (drop and recreate)
+-- SimpleBaby Baby Tracker - Full Schema (drop and recreate)
 -- Run this in Supabase SQL Editor
 
 -- Drop existing tables (in correct order due to foreign keys)

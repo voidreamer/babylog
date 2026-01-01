@@ -12,7 +12,7 @@ Base.metadata.create_all(bind=engine)
 settings = get_settings()
 
 app = FastAPI(
-    title="Huckle Baby Tracker API",
+    title="SimpleBaby Baby Tracker API",
     description="API for tracking baby sleep, feeding, and diaper changes",
     version="1.0.0",
     root_path="/api" if settings.environment == "prod" else ""
@@ -45,7 +45,7 @@ def health_check():
 @app.get("/")
 def root():
     """Root endpoint."""
-    return {"message": "Huckle Baby Tracker API", "docs": "/docs"}
+    return {"message": "SimpleBaby Baby Tracker API", "docs": "/docs"}
 
 
 # Lambda handler

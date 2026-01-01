@@ -7,7 +7,7 @@ export default function Login() {
         <div className="auth-container">
             <div className="auth-card">
                 <div className="auth-logo">👶</div>
-                <h1 className="auth-title">Huckle</h1>
+                <h1 className="auth-title">SimpleBaby</h1>
                 <p className="auth-subtitle">Track your baby's sleep, feeding, and diapers</p>
 
                 <button className="google-btn" onClick={login}>

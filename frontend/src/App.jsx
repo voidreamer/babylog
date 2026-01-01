@@ -33,7 +33,7 @@ function AppContent() {
                 <header className="page-header">
                     <div className="page-title">
                         <span style={{ fontSize: '1.5rem' }}>👶</span>
-                        <h1 style={{ fontSize: '1.25rem', margin: 0 }}>Huckle</h1>
+                        <h1 style={{ fontSize: '1.25rem', margin: 0 }}>SimpleBaby</h1>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
