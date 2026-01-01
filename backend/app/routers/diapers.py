@@ -67,7 +67,7 @@ def create_diaper(
     diaper = Diaper(
         baby_id=diaper_data.baby_id,
         time=diaper_data.time,
-        type=diaper_data.type.value if hasattr(diaper_data.type, 'value') else diaper_data.type,
+        type=diaper_data.type,
         notes=diaper_data.notes
     )
     db.add(diaper)

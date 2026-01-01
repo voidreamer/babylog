@@ -1,7 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
-from .models import FeedingType, DiaperType
+from typing import Optional, List, Literal
 
 
 # ============================================================================
@@ -27,7 +26,7 @@ class BabyResponse(BabyBase):
     user_id: str
     owner_email: Optional[str] = None
     shared_with_emails: List[str] = []
-    is_owner: bool = True  # Computed field to indicate if current user owns this baby
+    is_owner: bool = True
     created_at: datetime
 
     class Config:
@@ -44,7 +43,7 @@ class BabyShareRequest(BaseModel):
 
 class FeedingBase(BaseModel):
     time: datetime
-    type: FeedingType
+    type: Literal["formula", "breast"]
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
     notes: Optional[str] = None
@@ -56,7 +55,7 @@ class FeedingCreate(FeedingBase):
 
 class FeedingUpdate(BaseModel):
     time: Optional[datetime] = None
-    type: Optional[FeedingType] = None
+    type: Optional[Literal["formula", "breast"]] = None
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
     notes: Optional[str] = None
@@ -77,7 +76,7 @@ class FeedingResponse(FeedingBase):
 
 class DiaperBase(BaseModel):
     time: datetime
-    type: DiaperType
+    type: Literal["pee", "poo", "mixed"]
     notes: Optional[str] = None
 
 
@@ -87,7 +86,7 @@ class DiaperCreate(DiaperBase):
 
 class DiaperUpdate(BaseModel):
     time: Optional[datetime] = None
-    type: Optional[DiaperType] = None
+    type: Optional[Literal["pee", "poo", "mixed"]] = None
     notes: Optional[str] = None
 
 
@@ -131,12 +130,43 @@ class SleepResponse(SleepBase):
 
 
 # ============================================================================
+# Pumping Schemas
+# ============================================================================
+
+class PumpingBase(BaseModel):
+    time: datetime
+    duration_minutes: Optional[int] = None
+    amount_ml: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class PumpingCreate(PumpingBase):
+    baby_id: int
+
+
+class PumpingUpdate(BaseModel):
+    time: Optional[datetime] = None
+    duration_minutes: Optional[int] = None
+    amount_ml: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class PumpingResponse(PumpingBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================================
 # Timeline / Event Schemas
 # ============================================================================
 
 class TimelineEvent(BaseModel):
     id: int
-    event_type: str  # "feeding", "diaper", "sleep"
+    event_type: str  # "feeding", "diaper", "sleep", "pumping"
     time: datetime
     details: dict
 
@@ -148,4 +178,5 @@ class DashboardStats(BaseModel):
     last_feeding: Optional[FeedingResponse] = None
     last_diaper: Optional[DiaperResponse] = None
     last_sleep: Optional[SleepResponse] = None
-    current_sleep: Optional[SleepResponse] = None  # If baby is currently sleeping
+    last_pumping: Optional[PumpingResponse] = None
+    current_sleep: Optional[SleepResponse] = None

@@ -67,7 +67,7 @@ def create_feeding(
     feeding = Feeding(
         baby_id=feeding_data.baby_id,
         time=feeding_data.time,
-        type=feeding_data.type.value if hasattr(feeding_data.type, 'value') else feeding_data.type,
+        type=feeding_data.type,
         duration_minutes=feeding_data.duration_minutes,
         amount_ml=feeding_data.amount_ml,
         notes=feeding_data.notes
