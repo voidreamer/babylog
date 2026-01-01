@@ -3,6 +3,8 @@ const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https:
 class ApiClient {
     constructor() {
         this.token = localStorage.getItem('auth_token');
+        this.refreshFunction = null;
+        this.isRefreshing = false;
     }
 
     setToken(token) {
@@ -18,7 +20,11 @@ class ApiClient {
         return this.token;
     }
 
-    async request(endpoint, options = {}) {
+    setRefreshFunction(fn) {
+        this.refreshFunction = fn;
+    }
+
+    async request(endpoint, options = {}, isRetry = false) {
         const url = `${API_BASE}/api${endpoint}`;
 
         const headers = {
@@ -40,6 +46,26 @@ class ApiClient {
             ...options,
             headers,
         });
+
+        // Handle 401 - try to refresh token and retry once
+        if (response.status === 401 && !isRetry && this.refreshFunction && !this.isRefreshing) {
+            this.isRefreshing = true;
+            try {
+                const newToken = await this.refreshFunction();
+                this.isRefreshing = false;
+
+                if (newToken) {
+                    // Retry the original request with new token
+                    return this.request(endpoint, options, true);
+                }
+            } catch (e) {
+                this.isRefreshing = false;
+            }
+
+            // Refresh failed, throw unauthorized error
+            const errorBody = await response.text();
+            throw new Error('Unauthorized: ' + errorBody);
+        }
 
         if (response.status === 401) {
             const errorBody = await response.text();
