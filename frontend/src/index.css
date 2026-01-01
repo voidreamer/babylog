@@ -633,8 +633,11 @@ h4 {
 .timeline-calendar {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 160px);
+  height: calc(100vh - 220px);
+  /* Account for header + bottom nav */
   background: var(--background);
+  padding-bottom: 70px;
+  /* Space for bottom nav */
 }
 
 .timeline-calendar-header {
