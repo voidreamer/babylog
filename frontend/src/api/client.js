@@ -36,9 +36,13 @@ class ApiClient {
         });
 
         if (response.status === 401) {
-            this.setToken(null);
-            window.location.href = '/login';
-            throw new Error('Unauthorized');
+            const errorBody = await response.text();
+            console.error('API 401 error:', errorBody);
+            console.log('Token that was rejected:', this.token?.substring(0, 50) + '...');
+            // Don't auto-clear token - let the auth hook handle it
+            // this.setToken(null);
+            // window.location.href = '/login';
+            throw new Error('Unauthorized: ' + errorBody);
         }
 
         if (!response.ok) {
