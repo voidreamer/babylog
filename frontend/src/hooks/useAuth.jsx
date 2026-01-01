@@ -18,18 +18,32 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         // Check for existing token
         const token = api.getToken();
-        if (token) {
-            // In dev mode, create a mock user
-            if (!COGNITO_DOMAIN) {
-                setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
-            } else {
-                // Decode JWT to get user info (without verification - server will verify)
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    setUser(payload);
-                } catch (e) {
-                    api.setToken(null);
+        const lsToken = localStorage.getItem('auth_token');
+
+        console.log('AuthProvider init:', {
+            hasToken: !!token,
+            hasLsToken: !!lsToken,
+            cognitoDomain: COGNITO_DOMAIN?.substring(0, 30),
+            isProd: import.meta.env.PROD
+        });
+
+        // Always check localStorage directly as backup
+        const effectiveToken = token || lsToken;
+
+        if (effectiveToken) {
+            // Decode JWT to get user info (without verification - server will verify)
+            try {
+                const payload = JSON.parse(atob(effectiveToken.split('.')[1]));
+                console.log('Token decoded, setting user:', payload.email);
+                setUser(payload);
+                // Ensure api has the token
+                if (!token && lsToken) {
+                    api.setToken(lsToken);
                 }
+            } catch (e) {
+                console.error('Failed to decode token:', e);
+                api.setToken(null);
+                localStorage.removeItem('auth_token');
             }
         }
         setLoading(false);
