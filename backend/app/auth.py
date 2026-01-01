@@ -88,6 +88,7 @@ def get_user_email(user: dict = Depends(get_current_user)) -> str:
     For Google federated logins, email may be in different claims:
     - 'email' (standard)
     - 'cognito:username' (sometimes includes email)
+    - 'username' (Google_xxx format for federated users)
     """
     import logging
     logger = logging.getLogger()
@@ -99,12 +100,18 @@ def get_user_email(user: dict = Depends(get_current_user)) -> str:
         return email.lower().strip()
     
     # Try cognito:username (for some IdP configs)
-    username = user.get("cognito:username", "")
+    cognito_username = user.get("cognito:username", "")
+    if "@" in cognito_username:
+        logger.info(f"get_user_email: found email in 'cognito:username' claim: {cognito_username}")
+        return cognito_username.lower().strip()
+    
+    # Try username (for some IdP configs)
+    username = user.get("username", "")
     if "@" in username:
-        logger.info(f"get_user_email: found email in 'cognito:username' claim: {username}")
+        logger.info(f"get_user_email: found email in 'username' claim: {username}")
         return username.lower().strip()
     
     # Log available claims for debugging
-    logger.warning(f"get_user_email: No email found. Available keys: {list(user.keys())}")
+    logger.warning(f"get_user_email: No email found. username={username}, cognito:username={cognito_username}")
     
     return ""
