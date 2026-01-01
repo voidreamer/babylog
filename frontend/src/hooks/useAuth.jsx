@@ -107,12 +107,13 @@ export function AuthProvider({ children }) {
         }
 
         const data = await response.json();
-        console.log('Got tokens, hasIdToken:', !!data.id_token);
+        console.log('Got tokens, hasAccessToken:', !!data.access_token, 'hasIdToken:', !!data.id_token);
 
-        api.setToken(data.id_token);
+        // Use access_token for API calls, id_token for user info
+        api.setToken(data.access_token);
         console.log('Token saved to api, localStorage check:', !!localStorage.getItem('auth_token'));
 
-        // Decode token
+        // Decode id_token for user info (not access_token)
         const payload = JSON.parse(atob(data.id_token.split('.')[1]));
         console.log('User payload:', payload.email);
         setUser(payload);
