@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 from typing import List
 
 from .. import models, schemas
 from ..database import get_db
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_id, get_user_email
 
 router = APIRouter(
     prefix="/health",
@@ -14,16 +14,30 @@ router = APIRouter(
 )
 
 
+def get_accessible_baby(db: Session, baby_id: int, user_id: str, user_email: str):
+    """Get a baby if user owns it or it's shared with them."""
+    baby = db.query(models.Baby).filter(
+        models.Baby.id == baby_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
+    return baby
+
+
 # ============================================================================
 # Doctor Visits
 # ============================================================================
 
 @router.get("/doctor-visits/", response_model=List[schemas.DoctorVisitResponse])
-def get_doctor_visits(baby_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def get_doctor_visits(
+    baby_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -33,11 +47,13 @@ def get_doctor_visits(baby_id: int, db: Session = Depends(get_db), user_id: str 
 
 
 @router.post("/doctor-visits/", response_model=schemas.DoctorVisitResponse)
-def create_doctor_visit(visit: schemas.DoctorVisitCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == visit.baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def create_doctor_visit(
+    visit: schemas.DoctorVisitCreate, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, visit.baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -49,7 +65,11 @@ def create_doctor_visit(visit: schemas.DoctorVisitCreate, db: Session = Depends(
 
 
 @router.delete("/doctor-visits/{visit_id}")
-def delete_doctor_visit(visit_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+def delete_doctor_visit(
+    visit_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id)
+):
     visit = db.query(models.DoctorVisit).filter(models.DoctorVisit.id == visit_id).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
@@ -64,11 +84,13 @@ def delete_doctor_visit(visit_id: int, db: Session = Depends(get_db), user_id: s
 # ============================================================================
 
 @router.get("/vaccinations/", response_model=List[schemas.VaccinationResponse])
-def get_vaccinations(baby_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def get_vaccinations(
+    baby_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -78,11 +100,13 @@ def get_vaccinations(baby_id: int, db: Session = Depends(get_db), user_id: str =
 
 
 @router.post("/vaccinations/", response_model=schemas.VaccinationResponse)
-def create_vaccination(vaccination: schemas.VaccinationCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == vaccination.baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def create_vaccination(
+    vaccination: schemas.VaccinationCreate, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, vaccination.baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -94,7 +118,11 @@ def create_vaccination(vaccination: schemas.VaccinationCreate, db: Session = Dep
 
 
 @router.delete("/vaccinations/{vaccination_id}")
-def delete_vaccination(vaccination_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+def delete_vaccination(
+    vaccination_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id)
+):
     vacc = db.query(models.Vaccination).filter(models.Vaccination.id == vaccination_id).first()
     if not vacc:
         raise HTTPException(status_code=404, detail="Vaccination not found")
@@ -109,11 +137,14 @@ def delete_vaccination(vaccination_id: int, db: Session = Depends(get_db), user_
 # ============================================================================
 
 @router.get("/medications/", response_model=List[schemas.MedicationResponse])
-def get_medications(baby_id: int, active_only: bool = False, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def get_medications(
+    baby_id: int, 
+    active_only: bool = False, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -125,11 +156,13 @@ def get_medications(baby_id: int, active_only: bool = False, db: Session = Depen
 
 
 @router.post("/medications/", response_model=schemas.MedicationResponse)
-def create_medication(medication: schemas.MedicationCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == medication.baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def create_medication(
+    medication: schemas.MedicationCreate, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, medication.baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -141,7 +174,11 @@ def create_medication(medication: schemas.MedicationCreate, db: Session = Depend
 
 
 @router.delete("/medications/{medication_id}")
-def delete_medication(medication_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+def delete_medication(
+    medication_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id)
+):
     med = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
@@ -156,11 +193,13 @@ def delete_medication(medication_id: int, db: Session = Depends(get_db), user_id
 # ============================================================================
 
 @router.get("/milestones/", response_model=List[schemas.MilestoneResponse])
-def get_milestones(baby_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def get_milestones(
+    baby_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -170,11 +209,13 @@ def get_milestones(baby_id: int, db: Session = Depends(get_db), user_id: str = D
 
 
 @router.post("/milestones/", response_model=schemas.MilestoneResponse)
-def create_milestone(milestone: schemas.MilestoneCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == milestone.baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def create_milestone(
+    milestone: schemas.MilestoneCreate, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, milestone.baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -186,7 +227,11 @@ def create_milestone(milestone: schemas.MilestoneCreate, db: Session = Depends(g
 
 
 @router.delete("/milestones/{milestone_id}")
-def delete_milestone(milestone_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+def delete_milestone(
+    milestone_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id)
+):
     milestone = db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
     if not milestone:
         raise HTTPException(status_code=404, detail="Milestone not found")
@@ -201,11 +246,13 @@ def delete_milestone(milestone_id: int, db: Session = Depends(get_db), user_id: 
 # ============================================================================
 
 @router.get("/growth/", response_model=List[schemas.GrowthRecordResponse])
-def get_growth_records(baby_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def get_growth_records(
+    baby_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -215,11 +262,13 @@ def get_growth_records(baby_id: int, db: Session = Depends(get_db), user_id: str
 
 
 @router.post("/growth/", response_model=schemas.GrowthRecordResponse)
-def create_growth_record(record: schemas.GrowthRecordCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
-    baby = db.query(models.Baby).filter(
-        models.Baby.id == record.baby_id,
-        (models.Baby.user_id == user_id) | (models.Baby.shared_with_emails.any(user_id))
-    ).first()
+def create_growth_record(
+    record: schemas.GrowthRecordCreate, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, record.baby_id, user_id, user_email)
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
     
@@ -231,7 +280,11 @@ def create_growth_record(record: schemas.GrowthRecordCreate, db: Session = Depen
 
 
 @router.delete("/growth/{record_id}")
-def delete_growth_record(record_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+def delete_growth_record(
+    record_id: int, 
+    db: Session = Depends(get_db), 
+    user_id: str = Depends(get_user_id)
+):
     record = db.query(models.GrowthRecord).filter(models.GrowthRecord.id == record_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
