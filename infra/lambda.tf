@@ -107,6 +107,13 @@ resource "aws_apigatewayv2_route" "api_protected" {
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
+# Routes - OPTIONS for CORS preflight (no auth)
+resource "aws_apigatewayv2_route" "api_options" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "OPTIONS /api/{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
 # Routes - Health check (public)
 resource "aws_apigatewayv2_route" "health" {
   api_id    = aws_apigatewayv2_api.api.id
