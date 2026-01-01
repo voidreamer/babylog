@@ -92,12 +92,13 @@ export default function TimelineCalendar() {
         const eventTime = parseUTCTime(event.time);
         const dayStart = startOfDay(selectedDate);
         const startMins = differenceInMinutes(eventTime, dayStart);
+        const details = event.details || {};
 
-        if (event.event_type === 'sleep' && event.end_time) {
-            const endTime = parseUTCTime(event.end_time);
+        if (event.event_type === 'sleep' && details.end_time) {
+            const endTime = parseUTCTime(details.end_time);
             return differenceInMinutes(endTime, dayStart);
-        } else if (event.duration_minutes) {
-            return startMins + event.duration_minutes;
+        } else if (details.duration_minutes) {
+            return startMins + details.duration_minutes;
         }
         return startMins + 15; // Default 15 min for point events
     };
@@ -181,15 +182,16 @@ export default function TimelineCalendar() {
         const dayStart = startOfDay(selectedDate);
         const minutesFromStart = differenceInMinutes(eventTime, dayStart);
         const top = (minutesFromStart / 60) * 80; // 80px per hour
+        const details = event.details || {};
 
         // Duration events get height based on duration
         let height = 30; // Default for point events like diaper
-        if (event.event_type === 'sleep' && event.end_time) {
-            const endTime = parseUTCTime(event.end_time);
+        if (event.event_type === 'sleep' && details.end_time) {
+            const endTime = parseUTCTime(details.end_time);
             const durationMins = differenceInMinutes(endTime, eventTime);
             height = Math.max(30, (durationMins / 60) * 80);
-        } else if (event.duration_minutes) {
-            height = Math.max(30, (event.duration_minutes / 60) * 80);
+        } else if (details.duration_minutes) {
+            height = Math.max(30, (details.duration_minutes / 60) * 80);
         }
 
         // Calculate width and left position for overlapping events
@@ -206,15 +208,23 @@ export default function TimelineCalendar() {
     };
 
     const formatEventDetail = (event) => {
+        const details = event.details || {};
         switch (event.event_type) {
             case 'feeding':
-                return event.type ? event.type.charAt(0).toUpperCase() + event.type.slice(1) : '';
+                const feedType = details.type || '';
+                const duration = details.duration_minutes ? ` • ${details.duration_minutes}min` : '';
+                return feedType.charAt(0).toUpperCase() + feedType.slice(1) + duration;
             case 'diaper':
-                return event.type ? event.type.charAt(0).toUpperCase() + event.type.slice(1) : '';
+                return details.type ? details.type.charAt(0).toUpperCase() + details.type.slice(1) : '';
             case 'sleep':
-                return event.duration_display || '';
+                if (details.duration_minutes) {
+                    const hrs = Math.floor(details.duration_minutes / 60);
+                    const mins = details.duration_minutes % 60;
+                    return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+                }
+                return details.end_time ? '' : 'Sleeping...';
             case 'pumping':
-                return event.amount_ml ? `${event.amount_ml}ml` : '';
+                return details.amount_ml ? `${details.amount_ml}ml` : '';
             default:
                 return '';
         }
