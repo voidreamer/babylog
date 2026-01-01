@@ -47,7 +47,7 @@ def get_timeline(
             event_type="feeding",
             time=f.time,
             details={
-                "type": f.type.value,
+                "type": f.type,
                 "duration_minutes": f.duration_minutes,
                 "amount_ml": f.amount_ml,
                 "notes": f.notes
@@ -67,7 +67,7 @@ def get_timeline(
             event_type="diaper",
             time=d.time,
             details={
-                "type": d.type.value,
+                "type": d.type,
                 "notes": d.notes
             }
         ))

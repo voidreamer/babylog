@@ -1,4 +1,4 @@
-export default function QuickActions({ onFeeding, onDiaper, onSleep }) {
+export default function QuickActions({ onFeeding, onDiaper, onSleep, onPumping }) {
     return (
         <div className="quick-actions">
             <button className="action-btn feeding" onClick={onFeeding}>
@@ -14,6 +14,11 @@ export default function QuickActions({ onFeeding, onDiaper, onSleep }) {
             <button className="action-btn sleep" onClick={onSleep}>
                 <span className="icon">😴</span>
                 <span>Sleep</span>
+            </button>
+
+            <button className="action-btn pumping" onClick={onPumping}>
+                <span className="icon">🍶</span>
+                <span>Pump</span>
             </button>
         </div>
     );

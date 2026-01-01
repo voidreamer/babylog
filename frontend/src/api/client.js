@@ -163,6 +163,24 @@ class ApiClient {
         });
     }
 
+    // Pumpings
+    async getPumpings(babyId, limit = 50) {
+        return this.request(`/pumpings/?baby_id=${babyId}&limit=${limit}`);
+    }
+
+    async createPumping(data) {
+        return this.request('/pumpings/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deletePumping(id) {
+        return this.request(`/pumpings/${id}`, {
+            method: 'DELETE',
+        });
+    }
+
     // Events
     async getTimeline(babyId, date = null) {
         const params = new URLSearchParams({ baby_id: babyId });

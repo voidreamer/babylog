@@ -8,6 +8,7 @@ import Timeline from './Timeline';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
+import PumpingModal from './PumpingModal';
 
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
@@ -18,6 +19,7 @@ export default function Dashboard() {
     const [feedingModal, setFeedingModal] = useState(false);
     const [diaperModal, setDiaperModal] = useState(false);
     const [sleepModal, setSleepModal] = useState(false);
+    const [pumpingModal, setPumpingModal] = useState(false);
 
     const loadData = async () => {
         if (!selectedBaby) return;
@@ -50,6 +52,7 @@ export default function Dashboard() {
         setFeedingModal(false);
         setDiaperModal(false);
         setSleepModal(false);
+        setPumpingModal(false);
     };
 
     if (!selectedBaby) {
@@ -132,6 +135,7 @@ export default function Dashboard() {
                 onFeeding={() => setFeedingModal(true)}
                 onDiaper={() => setDiaperModal(true)}
                 onSleep={() => setSleepModal(true)}
+                onPumping={() => setPumpingModal(true)}
             />
 
             {/* Modals */}
@@ -156,6 +160,14 @@ export default function Dashboard() {
                     babyId={selectedBaby.id}
                     currentSleep={dashboard?.current_sleep}
                     onClose={() => setSleepModal(false)}
+                    onSave={handleEventLogged}
+                />
+            )}
+
+            {pumpingModal && (
+                <PumpingModal
+                    babyId={selectedBaby.id}
+                    onClose={() => setPumpingModal(false)}
                     onSave={handleEventLogged}
                 />
             )}
