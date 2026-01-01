@@ -27,12 +27,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(babies.router, prefix="/api")
-app.include_router(feedings.router, prefix="/api")
-app.include_router(diapers.router, prefix="/api")
-app.include_router(sleeps.router, prefix="/api")
-app.include_router(events.router, prefix="/api")
+# Include routers (root_path handles /api prefix in production)
+app.include_router(babies.router)
+app.include_router(feedings.router)
+app.include_router(diapers.router)
+app.include_router(sleeps.router)
+app.include_router(events.router)
 
 
 @app.get("/health")
