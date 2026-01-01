@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import Widget from './Widget';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
@@ -50,9 +50,9 @@ export default function Dashboard() {
         return new Date(utcTime);
     };
 
-    const formatTimeAgo = (dateStr) => {
+    const formatTime = (dateStr) => {
         if (!dateStr) return 'Never';
-        return formatDistanceToNow(parseUTCTime(dateStr), { addSuffix: true });
+        return format(parseUTCTime(dateStr), 'h:mm a');
     };
 
     const handleEventLogged = () => {
@@ -91,7 +91,7 @@ export default function Dashboard() {
                 <Widget
                     type="feeding"
                     label="Last feeding"
-                    value={formatTimeAgo(dashboard?.last_feeding?.time)}
+                    value={formatTime(dashboard?.last_feeding?.time)}
                     detail={dashboard?.last_feeding ?
                         `${dashboard.last_feeding.type}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
                         : null}
@@ -101,7 +101,7 @@ export default function Dashboard() {
                 <Widget
                     type="diaper"
                     label="Last diaper"
-                    value={formatTimeAgo(dashboard?.last_diaper?.time)}
+                    value={formatTime(dashboard?.last_diaper?.time)}
                     detail={dashboard?.last_diaper?.type}
                     onClick={() => setDiaperModal(true)}
                 />
@@ -110,8 +110,8 @@ export default function Dashboard() {
                     type="sleep"
                     label={dashboard?.current_sleep ? "Sleeping" : "Last sleep"}
                     value={dashboard?.current_sleep
-                        ? formatTimeAgo(dashboard.current_sleep.start_time).replace('ago', '')
-                        : formatTimeAgo(dashboard?.last_sleep?.start_time)}
+                        ? `Since ${formatTime(dashboard.current_sleep.start_time)}`
+                        : formatTime(dashboard?.last_sleep?.start_time)}
                     detail={dashboard?.current_sleep
                         ? "Currently sleeping"
                         : dashboard?.last_sleep?.duration_minutes
@@ -124,7 +124,7 @@ export default function Dashboard() {
                 <Widget
                     type="pumping"
                     label="Last pumping"
-                    value={formatTimeAgo(dashboard?.last_pumping?.time)}
+                    value={formatTime(dashboard?.last_pumping?.time)}
                     detail={dashboard?.last_pumping?.amount_ml
                         ? `${dashboard.last_pumping.amount_ml}ml`
                         : null}

@@ -87,6 +87,94 @@ export default function TimelineCalendar() {
         setSwipedEventId(null);
     };
 
+    // Calculate event end time in minutes from day start
+    const getEventEnd = (event) => {
+        const eventTime = parseUTCTime(event.time);
+        const dayStart = startOfDay(selectedDate);
+        const startMins = differenceInMinutes(eventTime, dayStart);
+
+        if (event.event_type === 'sleep' && event.end_time) {
+            const endTime = parseUTCTime(event.end_time);
+            return differenceInMinutes(endTime, dayStart);
+        } else if (event.duration_minutes) {
+            return startMins + event.duration_minutes;
+        }
+        return startMins + 15; // Default 15 min for point events
+    };
+
+    // Calculate columns for overlapping events
+    const calculateEventColumns = (events) => {
+        const sortedEvents = [...events].sort((a, b) => {
+            const timeA = parseUTCTime(a.time);
+            const timeB = parseUTCTime(b.time);
+            return timeA - timeB;
+        });
+
+        const eventColumns = new Map();
+
+        sortedEvents.forEach((event, idx) => {
+            const eventStart = differenceInMinutes(parseUTCTime(event.time), startOfDay(selectedDate));
+            const eventEnd = getEventEnd(event);
+
+            // Find overlapping events that already have columns
+            let maxColumn = -1;
+            let usedColumns = new Set();
+
+            sortedEvents.slice(0, idx).forEach(prevEvent => {
+                const prevStart = differenceInMinutes(parseUTCTime(prevEvent.time), startOfDay(selectedDate));
+                const prevEnd = getEventEnd(prevEvent);
+
+                // Check if they overlap
+                if (eventStart < prevEnd && eventEnd > prevStart) {
+                    const prevCol = eventColumns.get(`${prevEvent.event_type}-${prevEvent.id}`);
+                    if (prevCol !== undefined) {
+                        usedColumns.add(prevCol.column);
+                        maxColumn = Math.max(maxColumn, prevCol.totalColumns - 1);
+                    }
+                }
+            });
+
+            // Find first available column
+            let column = 0;
+            while (usedColumns.has(column)) {
+                column++;
+            }
+
+            eventColumns.set(`${event.event_type}-${event.id}`, {
+                column,
+                totalColumns: Math.max(maxColumn + 1, column + 1)
+            });
+        });
+
+        // Second pass: update totalColumns for overlapping groups
+        sortedEvents.forEach(event => {
+            const eventStart = differenceInMinutes(parseUTCTime(event.time), startOfDay(selectedDate));
+            const eventEnd = getEventEnd(event);
+
+            let maxCol = eventColumns.get(`${event.event_type}-${event.id}`).column;
+
+            sortedEvents.forEach(otherEvent => {
+                const otherStart = differenceInMinutes(parseUTCTime(otherEvent.time), startOfDay(selectedDate));
+                const otherEnd = getEventEnd(otherEvent);
+
+                if (eventStart < otherEnd && eventEnd > otherStart) {
+                    const otherCol = eventColumns.get(`${otherEvent.event_type}-${otherEvent.id}`);
+                    maxCol = Math.max(maxCol, otherCol.column);
+                }
+            });
+
+            const current = eventColumns.get(`${event.event_type}-${event.id}`);
+            eventColumns.set(`${event.event_type}-${event.id}`, {
+                ...current,
+                totalColumns: maxCol + 1
+            });
+        });
+
+        return eventColumns;
+    };
+
+    const eventColumns = calculateEventColumns(events);
+
     // Calculate position and height for an event
     const getEventStyle = (event) => {
         const eventTime = parseUTCTime(event.time);
@@ -104,7 +192,17 @@ export default function TimelineCalendar() {
             height = Math.max(30, (event.duration_minutes / 60) * 80);
         }
 
-        return { top: `${top}px`, height: `${height}px` };
+        // Calculate width and left position for overlapping events
+        const colInfo = eventColumns.get(`${event.event_type}-${event.id}`) || { column: 0, totalColumns: 1 };
+        const widthPercent = 100 / colInfo.totalColumns;
+        const leftPercent = colInfo.column * widthPercent;
+
+        return {
+            top: `${top}px`,
+            height: `${height}px`,
+            width: `${widthPercent}%`,
+            left: `${leftPercent}%`
+        };
     };
 
     const formatEventDetail = (event) => {

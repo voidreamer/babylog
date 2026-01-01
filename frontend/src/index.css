@@ -722,8 +722,6 @@ h4 {
 
 .timeline-event-block {
   position: absolute;
-  left: 0;
-  right: 0;
   border-radius: var(--radius-md);
   padding: var(--space-xs) var(--space-sm);
   cursor: pointer;
@@ -733,6 +731,7 @@ h4 {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .timeline-event-block:hover {
