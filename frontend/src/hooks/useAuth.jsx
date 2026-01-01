@@ -16,32 +16,18 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for existing token
         const token = api.getToken();
         const lsToken = localStorage.getItem('auth_token');
-
-        console.log('AuthProvider init:', {
-            hasToken: !!token,
-            hasLsToken: !!lsToken,
-            cognitoDomain: COGNITO_DOMAIN?.substring(0, 30),
-            isProd: import.meta.env.PROD
-        });
-
-        // Always check localStorage directly as backup
         const effectiveToken = token || lsToken;
 
         if (effectiveToken) {
-            // Decode JWT to get user info (without verification - server will verify)
             try {
                 const payload = JSON.parse(atob(effectiveToken.split('.')[1]));
-                console.log('Token decoded, setting user:', payload.email);
                 setUser(payload);
-                // Ensure api has the token
                 if (!token && lsToken) {
                     api.setToken(lsToken);
                 }
             } catch (e) {
-                console.error('Failed to decode token:', e);
                 api.setToken(null);
                 localStorage.removeItem('auth_token');
             }
@@ -51,13 +37,11 @@ export function AuthProvider({ children }) {
 
     const login = () => {
         if (!COGNITO_DOMAIN) {
-            // Dev mode - set mock token
             api.setToken('dev-token');
             setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
             return;
         }
 
-        // Redirect to Cognito hosted UI
         const params = new URLSearchParams({
             client_id: COGNITO_CLIENT_ID,
             response_type: 'code',
@@ -69,26 +53,18 @@ export function AuthProvider({ children }) {
     };
 
     const handleCallback = async (code) => {
-        console.log('handleCallback called with code:', code?.substring(0, 20) + '...');
-        console.log('Cognito domain:', COGNITO_DOMAIN);
-        console.log('Redirect URI:', REDIRECT_URI);
-
         if (!COGNITO_DOMAIN) {
-            console.log('No Cognito domain, using dev mode');
             api.setToken('dev-token');
             setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
             return;
         }
 
-        // Exchange code for tokens
         const params = new URLSearchParams({
             grant_type: 'authorization_code',
             client_id: COGNITO_CLIENT_ID,
             code,
             redirect_uri: REDIRECT_URI,
         });
-
-        console.log('Exchanging code for tokens at:', `${COGNITO_DOMAIN}/oauth2/token`);
 
         const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
             method: 'POST',
@@ -98,24 +74,14 @@ export function AuthProvider({ children }) {
             body: params,
         });
 
-        console.log('Token exchange response status:', response.status);
-
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Token exchange failed:', errorText);
             throw new Error(`Failed to exchange code for tokens: ${errorText}`);
         }
 
         const data = await response.json();
-        console.log('Got tokens, hasAccessToken:', !!data.access_token, 'hasIdToken:', !!data.id_token);
-
-        // Use access_token for API calls, id_token for user info
         api.setToken(data.access_token);
-        console.log('Token saved to api, localStorage check:', !!localStorage.getItem('auth_token'));
-
-        // Decode id_token for user info (not access_token)
         const payload = JSON.parse(atob(data.id_token.split('.')[1]));
-        console.log('User payload:', payload.email);
         setUser(payload);
     };
 

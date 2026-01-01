@@ -13,24 +13,15 @@ export default function Callback() {
         const errorParam = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
 
-        console.log('Callback received:', { code: code?.substring(0, 20) + '...', errorParam, errorDescription });
-
         if (errorParam) {
-            console.error('OAuth error:', errorParam, errorDescription);
             setError(`OAuth error: ${errorParam} - ${errorDescription}`);
             return;
         }
 
         if (code) {
             handleCallback(code)
-                .then(() => {
-                    console.log('Auth callback successful');
-                    navigate('/');
-                })
-                .catch((err) => {
-                    console.error('Auth callback failed:', err);
-                    setError(err.message);
-                });
+                .then(() => navigate('/'))
+                .catch((err) => setError(err.message));
         } else {
             navigate('/login');
         }
@@ -52,4 +43,3 @@ export default function Callback() {
         </div>
     );
 }
-
