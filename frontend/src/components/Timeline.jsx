@@ -1,25 +1,25 @@
 import { format } from 'date-fns';
+import Icon from './Icon';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
     if (!timeStr) return new Date();
-    // Add 'Z' if not present to indicate UTC
     const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
     return new Date(utcTime);
 };
 
 const EVENT_CONFIG = {
-    feeding: { icon: '🍼', label: 'Feeding' },
-    diaper: { icon: '🧷', label: 'Diaper' },
-    sleep: { icon: '😴', label: 'Sleep' },
-    pumping: { icon: '🍶', label: 'Pumping' },
+    feeding: { label: 'Feeding' },
+    diaper: { label: 'Diaper' },
+    sleep: { label: 'Sleep' },
+    pumping: { label: 'Pumping' },
 };
 
 export default function Timeline({ events, onRefresh }) {
     if (!events || events.length === 0) {
         return (
             <div className="empty-state">
-                <div className="empty-state-icon">📝</div>
+                <div className="empty-state-icon" style={{ fontSize: '2rem', opacity: 0.5 }}>📝</div>
                 <p className="empty-state-text">No events logged today</p>
             </div>
         );
@@ -76,26 +76,22 @@ export default function Timeline({ events, onRefresh }) {
 
     return (
         <div className="timeline">
-            {events.map((event) => {
-                const config = EVENT_CONFIG[event.event_type] || { icon: '📌' };
-
-                return (
-                    <div key={`${event.event_type}-${event.id}`} className="timeline-item">
-                        <div className={`timeline-icon ${event.event_type}`}>
-                            {config.icon}
-                        </div>
-                        <div className="timeline-content">
-                            <div className="timeline-title">{getEventTitle(event)}</div>
-                            {getEventSubtitle(event) && (
-                                <div className="timeline-subtitle">{getEventSubtitle(event)}</div>
-                            )}
-                        </div>
-                        <div className="timeline-time">
-                            {format(parseUTCTime(event.time), 'h:mm a')}
-                        </div>
+            {events.map((event) => (
+                <div key={`${event.event_type}-${event.id}`} className="timeline-item">
+                    <div className={`timeline-icon ${event.event_type}`}>
+                        <Icon name={event.event_type} size={28} />
                     </div>
-                );
-            })}
+                    <div className="timeline-content">
+                        <div className="timeline-title">{getEventTitle(event)}</div>
+                        {getEventSubtitle(event) && (
+                            <div className="timeline-subtitle">{getEventSubtitle(event)}</div>
+                        )}
+                    </div>
+                    <div className="timeline-time">
+                        {format(parseUTCTime(event.time), 'h:mm a')}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }

@@ -100,7 +100,6 @@ export default function Dashboard() {
             <div className="widgets-grid">
                 <Widget
                     type="feeding"
-                    icon="🍼"
                     label="Last feeding"
                     value={formatTimeAgo(dashboard?.last_feeding?.time)}
                     detail={dashboard?.last_feeding ?
@@ -111,7 +110,6 @@ export default function Dashboard() {
 
                 <Widget
                     type="diaper"
-                    icon="🧷"
                     label="Last diaper"
                     value={formatTimeAgo(dashboard?.last_diaper?.time)}
                     detail={dashboard?.last_diaper?.type}
@@ -120,7 +118,6 @@ export default function Dashboard() {
 
                 <Widget
                     type="sleep"
-                    icon={dashboard?.current_sleep ? "😴" : "🌙"}
                     label={dashboard?.current_sleep ? "Sleeping" : "Last sleep"}
                     value={dashboard?.current_sleep
                         ? formatTimeAgo(dashboard.current_sleep.start_time).replace('ago', '')
@@ -136,7 +133,6 @@ export default function Dashboard() {
 
                 <Widget
                     type="pumping"
-                    icon="🍶"
                     label="Last pumping"
                     value={formatTimeAgo(dashboard?.last_pumping?.time)}
                     detail={dashboard?.last_pumping?.amount_ml
