@@ -69,7 +69,12 @@ export function AuthProvider({ children }) {
     };
 
     const handleCallback = async (code) => {
+        console.log('handleCallback called with code:', code?.substring(0, 20) + '...');
+        console.log('Cognito domain:', COGNITO_DOMAIN);
+        console.log('Redirect URI:', REDIRECT_URI);
+
         if (!COGNITO_DOMAIN) {
+            console.log('No Cognito domain, using dev mode');
             api.setToken('dev-token');
             setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
             return;
@@ -83,6 +88,8 @@ export function AuthProvider({ children }) {
             redirect_uri: REDIRECT_URI,
         });
 
+        console.log('Exchanging code for tokens at:', `${COGNITO_DOMAIN}/oauth2/token`);
+
         const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
             method: 'POST',
             headers: {
@@ -91,15 +98,23 @@ export function AuthProvider({ children }) {
             body: params,
         });
 
+        console.log('Token exchange response status:', response.status);
+
         if (!response.ok) {
-            throw new Error('Failed to exchange code for tokens');
+            const errorText = await response.text();
+            console.error('Token exchange failed:', errorText);
+            throw new Error(`Failed to exchange code for tokens: ${errorText}`);
         }
 
         const data = await response.json();
+        console.log('Got tokens, hasIdToken:', !!data.id_token);
+
         api.setToken(data.id_token);
+        console.log('Token saved to api, localStorage check:', !!localStorage.getItem('auth_token'));
 
         // Decode token
         const payload = JSON.parse(atob(data.id_token.split('.')[1]));
+        console.log('User payload:', payload.email);
         setUser(payload);
     };
 
