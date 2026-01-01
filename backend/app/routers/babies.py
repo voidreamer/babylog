@@ -39,11 +39,11 @@ def baby_to_response(baby: Baby, user_id: str) -> dict:
 @router.get("/", response_model=List[BabyResponse])
 def get_babies(
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get all babies for the current user (owned or shared)."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     # Get babies user owns OR that are shared with their email
     if user_email:
@@ -63,11 +63,11 @@ def get_babies(
 def get_baby(
     baby_id: int,
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """Get a specific baby by ID."""
     user_id = user.get("sub")
-    user_email = user.get("email", "")
     
     baby = get_accessible_baby(db, baby_id, user_id, user_email)
     

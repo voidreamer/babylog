@@ -89,14 +89,22 @@ def get_user_email(user: dict = Depends(get_current_user)) -> str:
     - 'email' (standard)
     - 'cognito:username' (sometimes includes email)
     """
+    import logging
+    logger = logging.getLogger()
+    
     # Try direct email claim first
     email = user.get("email", "")
     if email:
+        logger.info(f"get_user_email: found email in 'email' claim: {email}")
         return email.lower().strip()
     
     # Try cognito:username (for some IdP configs)
     username = user.get("cognito:username", "")
     if "@" in username:
+        logger.info(f"get_user_email: found email in 'cognito:username' claim: {username}")
         return username.lower().strip()
+    
+    # Log available claims for debugging
+    logger.warning(f"get_user_email: No email found. Available keys: {list(user.keys())}")
     
     return ""
