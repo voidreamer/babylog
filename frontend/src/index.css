@@ -479,6 +479,154 @@ h4 {
 }
 
 /* ============================================================================
+   Time Picker (iOS-style)
+   ============================================================================ */
+
+.time-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface-hover);
+  border-radius: var(--radius-xl);
+}
+
+.time-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.time-picker-row.time-row {
+  gap: var(--space-md);
+}
+
+.time-picker-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.time-picker-btn {
+  width: 44px;
+  height: 36px;
+  border: none;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.time-picker-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.time-picker-btn:active {
+  transform: scale(0.95);
+}
+
+.time-picker-value {
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+}
+
+.time-picker-value.date {
+  font-size: 1.1rem;
+  min-width: 140px;
+}
+
+.time-picker-value.hour,
+.time-picker-value.minute {
+  font-size: 2.5rem;
+  min-width: 60px;
+  font-family: monospace;
+}
+
+.time-picker-value.ampm {
+  font-size: 1.25rem;
+  min-width: 40px;
+}
+
+.time-picker-separator {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  align-self: center;
+}
+
+.time-picker-now {
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.time-picker-now:hover {
+  background: var(--primary-dark);
+}
+
+/* ============================================================================
+   Bottom Tab Navigation
+   ============================================================================ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: var(--space-sm) 0;
+  padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 64px;
+}
+
+.bottom-nav-item .icon {
+  font-size: 1.5rem;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary);
+}
+
+.bottom-nav-item:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
    Timeline
    ============================================================================ */
 

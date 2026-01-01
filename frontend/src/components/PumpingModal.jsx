@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { api } from '../api/client';
+import TimePicker from './TimePicker';
 
 export default function PumpingModal({ babyId, onClose, onSave }) {
-    const [time, setTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date());
     const [duration, setDuration] = useState('');
     const [amount, setAmount] = useState('');
     const [notes, setNotes] = useState('');
@@ -15,7 +16,7 @@ export default function PumpingModal({ babyId, onClose, onSave }) {
         try {
             await api.createPumping({
                 baby_id: babyId,
-                time: new Date(time).toISOString(),
+                time: time.toISOString(),
                 duration_minutes: duration ? parseInt(duration) : null,
                 amount_ml: amount ? parseInt(amount) : null,
                 notes: notes || null,
@@ -41,13 +42,7 @@ export default function PumpingModal({ babyId, onClose, onSave }) {
                     <div className="modal-body">
                         <div className="form-group">
                             <label className="form-label">Time</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                                required
-                            />
+                            <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         <div className="form-row">

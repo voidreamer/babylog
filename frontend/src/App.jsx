@@ -28,7 +28,7 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
     const { user, logout } = useAuth();
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [activeTab, setActiveTab] = useState('home');
 
     return (
         <BabyProvider>
@@ -53,30 +53,44 @@ function AppContent() {
                     </div>
                 </header>
 
-                {/* Tab Navigation */}
-                <nav style={{ padding: '0 var(--space-md)', marginBottom: 'var(--space-md)' }}>
-                    <div className="type-selector">
-                        <button
-                            className={`type-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('dashboard')}
-                            style={{ flex: 1 }}
-                        >
-                            🏠 Dashboard
-                        </button>
-                        <button
-                            className={`type-btn ${activeTab === 'health' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('health')}
-                            style={{ flex: 1 }}
-                        >
-                            🏥 Health
-                        </button>
-                    </div>
-                </nav>
-
                 <main>
-                    {activeTab === 'dashboard' && <Dashboard />}
+                    {activeTab === 'home' && <Dashboard />}
                     {activeTab === 'health' && <Health />}
+                    {activeTab === 'reports' && (
+                        <div className="card" style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>📊</div>
+                            <h2 style={{ marginBottom: 'var(--space-sm)' }}>Reports Coming Soon</h2>
+                            <p style={{ color: 'var(--text-secondary)' }}>
+                                Weekly and monthly summaries with charts and insights.
+                            </p>
+                        </div>
+                    )}
                 </main>
+
+                {/* Bottom Navigation */}
+                <nav className="bottom-nav">
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('home')}
+                    >
+                        <span className="icon">🏠</span>
+                        <span>Home</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('health')}
+                    >
+                        <span className="icon">🏥</span>
+                        <span>Health</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('reports')}
+                    >
+                        <span className="icon">📊</span>
+                        <span>Reports</span>
+                    </button>
+                </nav>
             </div>
         </BabyProvider>
     );

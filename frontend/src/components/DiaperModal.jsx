@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { api } from '../api/client';
+import TimePicker from './TimePicker';
 
 export default function DiaperModal({ babyId, onClose, onSave }) {
     const [type, setType] = useState('pee');
-    const [time, setTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date());
     const [pooColor, setPooColor] = useState('');
     const [pooConsistency, setPooConsistency] = useState('');
     const [pooAmount, setPooAmount] = useState('');
@@ -19,7 +20,7 @@ export default function DiaperModal({ babyId, onClose, onSave }) {
         try {
             await api.createDiaper({
                 baby_id: babyId,
-                time: new Date(time).toISOString(),
+                time: time.toISOString(),
                 type,
                 poo_color: showPooDetails && pooColor ? pooColor : null,
                 poo_consistency: showPooDetails && pooConsistency ? pooConsistency : null,
@@ -166,13 +167,7 @@ export default function DiaperModal({ babyId, onClose, onSave }) {
 
                         <div className="form-group">
                             <label className="form-label">Time</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                                required
-                            />
+                            <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         <div className="form-group">

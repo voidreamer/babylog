@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
+import TimePicker from './TimePicker';
 
 export default function FeedingModal({ babyId, onClose, onSave }) {
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
-    const [type, setType] = useState('breast');
-    const [time, setTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
+    const [feedMethod, setFeedMethod] = useState('breast'); // 'breast' or 'bottle'
+    const [bottleType, setBottleType] = useState('breastmilk'); // 'breastmilk' or 'formula'
+    const [time, setTime] = useState(new Date());
     const [duration, setDuration] = useState('');
     const [amount, setAmount] = useState('');
     const [notes, setNotes] = useState('');
@@ -30,7 +32,7 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
         };
     }, [timerRunning]);
 
-    const formatTime = (seconds) => {
+    const formatTimerDisplay = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -49,6 +51,12 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
         }
     };
 
+    // Determine the type to save based on feeding method and bottle type
+    const getSaveType = () => {
+        if (feedMethod === 'breast') return 'breast';
+        return bottleType === 'formula' ? 'formula' : 'bottle';
+    };
+
     const handleSaveTimer = async () => {
         if (timerSeconds < 1) return;
 
@@ -57,7 +65,7 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
             await api.createFeeding({
                 baby_id: babyId,
                 time: startTime.toISOString(),
-                type,
+                type: getSaveType(),
                 duration_minutes: Math.ceil(timerSeconds / 60),
                 amount_ml: amount ? parseInt(amount) : null,
                 notes: notes || null,
@@ -77,8 +85,8 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
         try {
             await api.createFeeding({
                 baby_id: babyId,
-                time: new Date(time).toISOString(),
-                type,
+                time: time.toISOString(),
+                type: getSaveType(),
                 duration_minutes: duration ? parseInt(duration) : null,
                 amount_ml: amount ? parseInt(amount) : null,
                 notes: notes || null,
@@ -120,33 +128,49 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                         </div>
                     </div>
 
-                    {/* Type Selection */}
+                    {/* Feeding Method Selection */}
                     <div className="form-group">
-                        <label className="form-label">Type</label>
+                        <label className="form-label">Method</label>
                         <div className="type-selector">
                             <button
                                 type="button"
-                                className={`type-btn ${type === 'breast' ? 'active' : ''}`}
-                                onClick={() => setType('breast')}
+                                className={`type-btn ${feedMethod === 'breast' ? 'active' : ''}`}
+                                onClick={() => setFeedMethod('breast')}
                             >
                                 🤱 Breast
                             </button>
                             <button
                                 type="button"
-                                className={`type-btn ${type === 'bottle' ? 'active' : ''}`}
-                                onClick={() => setType('bottle')}
+                                className={`type-btn ${feedMethod === 'bottle' ? 'active' : ''}`}
+                                onClick={() => setFeedMethod('bottle')}
                             >
                                 🍼 Bottle
                             </button>
-                            <button
-                                type="button"
-                                className={`type-btn ${type === 'formula' ? 'active' : ''}`}
-                                onClick={() => setType('formula')}
-                            >
-                                🥛 Formula
-                            </button>
                         </div>
                     </div>
+
+                    {/* Bottle Type Sub-selection */}
+                    {feedMethod === 'bottle' && (
+                        <div className="form-group">
+                            <label className="form-label">Bottle Contents</label>
+                            <div className="type-selector">
+                                <button
+                                    type="button"
+                                    className={`type-btn ${bottleType === 'breastmilk' ? 'active' : ''}`}
+                                    onClick={() => setBottleType('breastmilk')}
+                                >
+                                    🥛 Breast Milk
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`type-btn ${bottleType === 'formula' ? 'active' : ''}`}
+                                    onClick={() => setBottleType('formula')}
+                                >
+                                    🍶 Formula
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {mode === 'timer' ? (
                         <>
@@ -164,7 +188,7 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                                     fontFamily: 'monospace',
                                     color: timerRunning ? 'var(--feeding)' : 'var(--text)'
                                 }}>
-                                    {formatTime(timerSeconds)}
+                                    {formatTimerDisplay(timerSeconds)}
                                 </div>
                                 {startTime && (
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 'var(--space-sm)' }}>
@@ -195,8 +219,8 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                                 )}
                             </div>
 
-                            {/* Amount for bottle/formula */}
-                            {(type === 'bottle' || type === 'formula') && (
+                            {/* Amount for bottle */}
+                            {feedMethod === 'bottle' && (
                                 <div className="form-group">
                                     <label className="form-label">Amount (ml)</label>
                                     <input
@@ -227,13 +251,7 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                         <form id="quick-form" onSubmit={handleSubmitQuick}>
                             <div className="form-group">
                                 <label className="form-label">Time</label>
-                                <input
-                                    type="datetime-local"
-                                    className="form-input"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                    required
-                                />
+                                <TimePicker value={time} onChange={setTime} />
                             </div>
 
                             <div className="form-row">
@@ -250,7 +268,7 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
                                     />
                                 </div>
 
-                                {(type === 'bottle' || type === 'formula') && (
+                                {feedMethod === 'bottle' && (
                                     <div className="form-group">
                                         <label className="form-label">Amount (ml)</label>
                                         <input

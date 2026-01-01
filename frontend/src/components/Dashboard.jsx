@@ -3,7 +3,6 @@ import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { formatDistanceToNow, format, subDays } from 'date-fns';
 import Widget from './Widget';
-import QuickActions from './QuickActions';
 import Timeline from './Timeline';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
@@ -182,14 +181,6 @@ export default function Dashboard() {
                 </div>
                 <Timeline events={timeline} onRefresh={loadData} />
             </div>
-
-            {/* Quick Actions */}
-            <QuickActions
-                onFeeding={() => setFeedingModal(true)}
-                onDiaper={() => setDiaperModal(true)}
-                onSleep={() => setSleepModal(true)}
-                onPumping={() => setPumpingModal(true)}
-            />
 
             {/* Modals */}
             {feedingModal && (
