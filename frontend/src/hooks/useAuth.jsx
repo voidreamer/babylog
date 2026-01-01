@@ -1,0 +1,115 @@
+import { useState, useEffect, createContext, useContext } from 'react';
+import { api } from '../api/client';
+
+const AuthContext = createContext(null);
+
+// Cognito configuration - will be set from environment
+const COGNITO_DOMAIN = import.meta.env.VITE_COGNITO_DOMAIN || '';
+const COGNITO_CLIENT_ID = import.meta.env.VITE_COGNITO_CLIENT_ID || '';
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || window.location.origin + '/callback';
+
+export function AuthProvider({ children }) {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Check for existing token
+        const token = api.getToken();
+        if (token) {
+            // In dev mode, create a mock user
+            if (!COGNITO_DOMAIN) {
+                setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
+            } else {
+                // Decode JWT to get user info (without verification - server will verify)
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    setUser(payload);
+                } catch (e) {
+                    api.setToken(null);
+                }
+            }
+        }
+        setLoading(false);
+    }, []);
+
+    const login = () => {
+        if (!COGNITO_DOMAIN) {
+            // Dev mode - set mock token
+            api.setToken('dev-token');
+            setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
+            return;
+        }
+
+        // Redirect to Cognito hosted UI
+        const params = new URLSearchParams({
+            client_id: COGNITO_CLIENT_ID,
+            response_type: 'code',
+            scope: 'openid email profile',
+            redirect_uri: REDIRECT_URI,
+        });
+
+        window.location.href = `${COGNITO_DOMAIN}/login?${params}`;
+    };
+
+    const handleCallback = async (code) => {
+        if (!COGNITO_DOMAIN) {
+            api.setToken('dev-token');
+            setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
+            return;
+        }
+
+        // Exchange code for tokens
+        const params = new URLSearchParams({
+            grant_type: 'authorization_code',
+            client_id: COGNITO_CLIENT_ID,
+            code,
+            redirect_uri: REDIRECT_URI,
+        });
+
+        const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params,
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to exchange code for tokens');
+        }
+
+        const data = await response.json();
+        api.setToken(data.id_token);
+
+        // Decode token
+        const payload = JSON.parse(atob(data.id_token.split('.')[1]));
+        setUser(payload);
+    };
+
+    const logout = () => {
+        api.setToken(null);
+        setUser(null);
+
+        if (COGNITO_DOMAIN) {
+            const params = new URLSearchParams({
+                client_id: COGNITO_CLIENT_ID,
+                logout_uri: window.location.origin,
+            });
+            window.location.href = `${COGNITO_DOMAIN}/logout?${params}`;
+        }
+    };
+
+    return (
+        <AuthContext.Provider value={{ user, loading, login, logout, handleCallback }}>
+            {children}
+        </AuthContext.Provider>
+    );
+}
+
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+}

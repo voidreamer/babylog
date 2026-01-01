@@ -1,0 +1,140 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+from typing import List
+from ..database import get_db
+from ..models import Baby, Feeding, Diaper, Sleep
+from ..schemas import TimelineEvent, DashboardStats, FeedingResponse, DiaperResponse, SleepResponse
+from ..auth import get_user_id
+
+router = APIRouter(prefix="/events", tags=["events"])
+
+
+def verify_baby_ownership(db: Session, baby_id: int, user_id: str):
+    """Verify the baby belongs to the user."""
+    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+    return baby
+
+
+@router.get("/timeline", response_model=List[TimelineEvent])
+def get_timeline(
+    baby_id: int,
+    date: datetime | None = None,
+    user_id: str = Depends(get_user_id),
+    db: Session = Depends(get_db)
+):
+    """Get all events for a specific day as a timeline."""
+    verify_baby_ownership(db, baby_id, user_id)
+    
+    # Default to today
+    if date is None:
+        date = datetime.utcnow()
+    
+    # Get start and end of day
+    start_of_day = date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = start_of_day + timedelta(days=1)
+    
+    events = []
+    
+    # Feedings
+    feedings = db.query(Feeding).filter(
+        Feeding.baby_id == baby_id,
+        Feeding.time >= start_of_day,
+        Feeding.time < end_of_day
+    ).all()
+    
+    for f in feedings:
+        events.append(TimelineEvent(
+            id=f.id,
+            event_type="feeding",
+            time=f.time,
+            details={
+                "type": f.type.value,
+                "duration_minutes": f.duration_minutes,
+                "amount_ml": f.amount_ml,
+                "notes": f.notes
+            }
+        ))
+    
+    # Diapers
+    diapers = db.query(Diaper).filter(
+        Diaper.baby_id == baby_id,
+        Diaper.time >= start_of_day,
+        Diaper.time < end_of_day
+    ).all()
+    
+    for d in diapers:
+        events.append(TimelineEvent(
+            id=d.id,
+            event_type="diaper",
+            time=d.time,
+            details={
+                "type": d.type.value,
+                "notes": d.notes
+            }
+        ))
+    
+    # Sleeps (using start_time)
+    sleeps = db.query(Sleep).filter(
+        Sleep.baby_id == baby_id,
+        Sleep.start_time >= start_of_day,
+        Sleep.start_time < end_of_day
+    ).all()
+    
+    for s in sleeps:
+        events.append(TimelineEvent(
+            id=s.id,
+            event_type="sleep",
+            time=s.start_time,
+            details={
+                "end_time": s.end_time.isoformat() if s.end_time else None,
+                "duration_minutes": s.duration_minutes,
+                "notes": s.notes
+            }
+        ))
+    
+    # Sort by time descending
+    events.sort(key=lambda x: x.time, reverse=True)
+    
+    return events
+
+
+@router.get("/dashboard", response_model=DashboardStats)
+def get_dashboard(
+    baby_id: int,
+    user_id: str = Depends(get_user_id),
+    db: Session = Depends(get_db)
+):
+    """Get dashboard stats with last events and current sleep status."""
+    verify_baby_ownership(db, baby_id, user_id)
+    
+    # Last feeding
+    last_feeding = db.query(Feeding).filter(
+        Feeding.baby_id == baby_id
+    ).order_by(Feeding.time.desc()).first()
+    
+    # Last diaper
+    last_diaper = db.query(Diaper).filter(
+        Diaper.baby_id == baby_id
+    ).order_by(Diaper.time.desc()).first()
+    
+    # Last completed sleep
+    last_sleep = db.query(Sleep).filter(
+        Sleep.baby_id == baby_id,
+        Sleep.end_time.isnot(None)
+    ).order_by(Sleep.start_time.desc()).first()
+    
+    # Current sleep (if baby is sleeping now)
+    current_sleep = db.query(Sleep).filter(
+        Sleep.baby_id == baby_id,
+        Sleep.end_time.is_(None)
+    ).order_by(Sleep.start_time.desc()).first()
+    
+    return DashboardStats(
+        last_feeding=FeedingResponse.model_validate(last_feeding) if last_feeding else None,
+        last_diaper=DiaperResponse.model_validate(last_diaper) if last_diaper else None,
+        last_sleep=SleepResponse.model_validate(last_sleep) if last_sleep else None,
+        current_sleep=SleepResponse.model_validate(current_sleep) if current_sleep else None
+    )

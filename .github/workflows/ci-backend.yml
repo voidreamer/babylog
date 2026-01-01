@@ -1,0 +1,45 @@
+name: CI - Backend Tests
+
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+  push:
+    branches: [develop]
+    paths:
+      - 'backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: Run linter
+        run: |
+          cd backend
+          pip install flake8
+          flake8 app --max-line-length=120 --exclude=__pycache__ || true
+
+      - name: Check imports
+        run: |
+          cd backend
+          python -c "from app.main import app; print('✓ Imports successful')"
+
+      - name: Validate models
+        run: |
+          cd backend
+          python -c "from app.models import Baby, Feeding, Diaper, Sleep; print('✓ Models valid')"
