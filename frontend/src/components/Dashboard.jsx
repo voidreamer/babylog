@@ -23,7 +23,9 @@ export default function Dashboard() {
         if (!selectedBaby) return;
 
         try {
-            const dashboardData = await api.getDashboard(selectedBaby.id);
+            // Send local date as YYYY-MM-DD to fix timezone issues
+            const localDate = format(new Date(), 'yyyy-MM-dd');
+            const dashboardData = await api.getDashboard(selectedBaby.id, localDate);
             setDashboard(dashboardData);
         } catch (error) {
             // Silent fail

@@ -215,8 +215,10 @@ class ApiClient {
         return this.request(`/events/timeline?${params}`);
     }
 
-    async getDashboard(babyId) {
-        return this.request(`/events/dashboard?baby_id=${babyId}`);
+    async getDashboard(babyId, localDate = null) {
+        const params = new URLSearchParams({ baby_id: babyId });
+        if (localDate) params.append('local_date', localDate);
+        return this.request(`/events/dashboard?${params}`);
     }
 
     // Health - Doctor Visits

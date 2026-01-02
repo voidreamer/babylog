@@ -197,6 +197,7 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime) -> Dai
 @router.get("/dashboard", response_model=DashboardStats)
 def get_dashboard(
     baby_id: int,
+    local_date: str | None = None,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
@@ -232,8 +233,17 @@ def get_dashboard(
         Pumping.baby_id == baby_id
     ).order_by(Pumping.time.desc()).first()
     
+    # Parse local date for daily summary (YYYY-MM-DD format)
+    if local_date:
+        try:
+            summary_date = datetime.strptime(local_date.split('T')[0], '%Y-%m-%d')
+        except ValueError:
+            summary_date = datetime.utcnow()
+    else:
+        summary_date = datetime.utcnow()
+    
     # Daily summary
-    daily_summary = get_daily_summary_for_baby(db, baby_id, datetime.utcnow())
+    daily_summary = get_daily_summary_for_baby(db, baby_id, summary_date)
     
     return DashboardStats(
         last_feeding=FeedingResponse.model_validate(last_feeding) if last_feeding else None,
