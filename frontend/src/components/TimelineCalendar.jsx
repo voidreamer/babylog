@@ -2,6 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, subDays, addDays, startOfDay, differenceInMinutes } from 'date-fns';
+import FeedingModal from './FeedingModal';
+import DiaperModal from './DiaperModal';
+import SleepModal from './SleepModal';
+import PumpingModal from './PumpingModal';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr) => {
@@ -23,7 +27,8 @@ export default function TimelineCalendar() {
     const [events, setEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
-    const [swipedEventId, setSwipedEventId] = useState(null);
+    const [selectedEventId, setSelectedEventId] = useState(null);
+    const [editingEvent, setEditingEvent] = useState(null);
     const scrollRef = useRef(null);
 
     const loadEvents = async () => {
@@ -65,6 +70,16 @@ export default function TimelineCalendar() {
         setSelectedDate(new Date());
     };
 
+    const handleEdit = (event) => {
+        setEditingEvent(event);
+        setSelectedEventId(null);
+    };
+
+    const handleEditComplete = () => {
+        setEditingEvent(null);
+        loadEvents();
+    };
+
     const handleDelete = async (event) => {
         if (!confirm(`Delete this ${event.event_type}?`)) return;
 
@@ -87,7 +102,7 @@ export default function TimelineCalendar() {
         } catch (error) {
             alert('Failed to delete');
         }
-        setSwipedEventId(null);
+        setSelectedEventId(null);
     };
 
     // Calculate event end time in minutes from day start
@@ -278,22 +293,22 @@ export default function TimelineCalendar() {
                             {events.map(event => {
                                 const config = EVENT_CONFIG[event.event_type] || EVENT_CONFIG.feeding;
                                 const style = getEventStyle(event);
-                                const isSwiped = swipedEventId === `${event.event_type}-${event.id}`;
+                                const isSelected = selectedEventId === `${event.event_type}-${event.id}`;
 
                                 return (
                                     <div
                                         key={`${event.event_type}-${event.id}`}
-                                        className={`timeline-event-block ${event.event_type} ${isSwiped ? 'swiped' : ''}`}
+                                        className={`timeline-event-block ${event.event_type} ${isSelected ? 'selected' : ''}`}
                                         style={{
                                             ...style,
                                             background: config.bg,
                                             borderLeft: `4px solid ${config.color}`,
                                         }}
                                         onClick={() => {
-                                            if (isSwiped) {
-                                                setSwipedEventId(null);
+                                            if (isSelected) {
+                                                setSelectedEventId(null);
                                             } else {
-                                                setSwipedEventId(`${event.event_type}-${event.id}`);
+                                                setSelectedEventId(`${event.event_type}-${event.id}`);
                                             }
                                         }}
                                     >
@@ -307,17 +322,28 @@ export default function TimelineCalendar() {
                                             </span>
                                         </div>
 
-                                        {/* Delete button (shown when swiped) */}
-                                        {isSwiped && (
-                                            <button
-                                                className="timeline-event-delete"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDelete(event);
-                                                }}
-                                            >
-                                                🗑️ Delete
-                                            </button>
+                                        {/* Action buttons (shown when selected) */}
+                                        {isSelected && (
+                                            <div className="timeline-event-actions">
+                                                <button
+                                                    className="timeline-action-btn edit"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEdit(event);
+                                                    }}
+                                                >
+                                                    ✏️ Edit
+                                                </button>
+                                                <button
+                                                    className="timeline-action-btn delete"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDelete(event);
+                                                    }}
+                                                >
+                                                    🗑️ Delete
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 );
@@ -325,6 +351,43 @@ export default function TimelineCalendar() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Edit Modals */}
+            {editingEvent?.event_type === 'feeding' && (
+                <FeedingModal
+                    babyId={selectedBaby.id}
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'diaper' && (
+                <DiaperModal
+                    babyId={selectedBaby.id}
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'sleep' && (
+                <SleepModal
+                    babyId={selectedBaby.id}
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'pumping' && (
+                <PumpingModal
+                    babyId={selectedBaby.id}
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
             )}
         </div>
     );

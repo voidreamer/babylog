@@ -734,26 +734,21 @@ h4 {
   cursor: pointer;
   transition: var(--transition);
   pointer-events: auto;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column;
   box-sizing: border-box;
+  min-height: 30px;
 }
 
 .timeline-event-block:hover {
   filter: brightness(1.1);
-  transform: translateX(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.timeline-event-block.swiped {
-  animation: swipeLeft 0.2s ease-out forwards;
-}
-
-@keyframes swipeLeft {
-  to {
-    transform: translateX(-60px);
-  }
+.timeline-event-block.selected {
+  box-shadow: 0 0 0 2px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .timeline-event-content {
@@ -783,22 +778,44 @@ h4 {
   white-space: nowrap;
 }
 
-.timeline-event-delete {
-  position: absolute;
-  right: -55px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-md);
-  font-size: 0.75rem;
-  cursor: pointer;
-  white-space: nowrap;
+.timeline-event-actions {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.timeline-event-delete:hover {
+.timeline-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.timeline-action-btn.edit {
+  background: var(--primary);
+  color: white;
+}
+
+.timeline-action-btn.edit:hover {
+  background: var(--primary-dark);
+}
+
+.timeline-action-btn.delete {
+  background: var(--danger);
+  color: white;
+}
+
+.timeline-action-btn.delete:hover {
   background: #dc2626;
 }
 

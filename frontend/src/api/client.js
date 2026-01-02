@@ -144,6 +144,13 @@ class ApiClient {
         });
     }
 
+    async updateFeeding(id, data) {
+        return this.request(`/feedings/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
     // Diapers
     async getDiapers(babyId, limit = 50) {
         return this.request(`/diapers/?baby_id=${babyId}&limit=${limit}`);
@@ -159,6 +166,13 @@ class ApiClient {
     async deleteDiaper(id) {
         return this.request(`/diapers/${id}`, {
             method: 'DELETE',
+        });
+    }
+
+    async updateDiaper(id, data) {
+        return this.request(`/diapers/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
         });
     }
 
@@ -190,6 +204,13 @@ class ApiClient {
         });
     }
 
+    async updateSleep(id, data) {
+        return this.request(`/sleeps/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
     // Pumpings
     async getPumpings(babyId, limit = 50) {
         return this.request(`/pumpings/?baby_id=${babyId}&limit=${limit}`);
@@ -205,6 +226,13 @@ class ApiClient {
     async deletePumping(id) {
         return this.request(`/pumpings/${id}`, {
             method: 'DELETE',
+        });
+    }
+
+    async updatePumping(id, data) {
+        return this.request(`/pumpings/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
         });
     }
 
