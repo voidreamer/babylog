@@ -1548,7 +1548,7 @@ h4 {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--bg);
+  background: #0f0f0f;
   z-index: 1000;
   overflow-y: auto;
 }
@@ -1557,6 +1557,7 @@ h4 {
   max-width: 700px;
   margin: 0 auto;
   min-height: 100vh;
+  background: #0f0f0f;
 }
 
 .article-view-header {

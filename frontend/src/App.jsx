@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
 import Learn from './components/Learn';
+import { Home, CalendarDays, HeartPulse, BookOpen, Baby, LogOut } from 'lucide-react';
 
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -37,7 +38,7 @@ function AppContent() {
             <div className="app-container">
                 <header className="page-header">
                     <div className="page-title">
-                        <span style={{ fontSize: '1.5rem' }}>👶</span>
+                        <Baby size={24} />
                         <h1 style={{ fontSize: '1.25rem', margin: 0 }}>SimpleBaby</h1>
                     </div>
 
@@ -47,9 +48,10 @@ function AppContent() {
                             <button
                                 className="btn btn-secondary"
                                 onClick={logout}
-                                style={{ padding: 'var(--space-sm) var(--space-md)' }}
+                                style={{ padding: 'var(--space-sm) var(--space-md)', display: 'flex', alignItems: 'center', gap: '4px' }}
                             >
-                                Logout
+                                <LogOut size={16} />
+                                <span className="hide-mobile">Logout</span>
                             </button>
                         )}
                     </div>
@@ -68,28 +70,28 @@ function AppContent() {
                         className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
                         onClick={() => setActiveTab('home')}
                     >
-                        <span className="icon">🏠</span>
+                        <Home size={20} />
                         <span>Home</span>
                     </button>
                     <button
                         className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
                         onClick={() => setActiveTab('timeline')}
                     >
-                        <span className="icon">📅</span>
+                        <CalendarDays size={20} />
                         <span>Timeline</span>
                     </button>
                     <button
                         className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
                         onClick={() => setActiveTab('health')}
                     >
-                        <span className="icon">🏥</span>
+                        <HeartPulse size={20} />
                         <span>Health</span>
                     </button>
                     <button
                         className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
                         onClick={() => setActiveTab('learn')}
                     >
-                        <span className="icon">📚</span>
+                        <BookOpen size={20} />
                         <span>Learn</span>
                     </button>
                 </nav>

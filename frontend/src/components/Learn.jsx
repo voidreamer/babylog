@@ -1,7 +1,18 @@
 import { useState, useMemo } from 'react';
 import { useBaby } from '../hooks/useBaby';
-import { articles, CATEGORIES, getArticlesForAge, calculateAgeInMonths } from '../data/articles';
+import { articles, getArticlesForAge, calculateAgeInMonths } from '../data/articles';
 import ArticleView from './ArticleView';
+import { BookOpen, Moon, Baby, Stethoscope, Sparkles, Shield } from 'lucide-react';
+
+// Category config with Lucide icons
+const CATEGORY_ICONS = {
+    all: { label: 'All', icon: BookOpen },
+    sleep: { label: 'Sleep', icon: Moon },
+    feeding: { label: 'Feeding', icon: Baby },
+    health: { label: 'Health', icon: Stethoscope },
+    development: { label: 'Development', icon: Sparkles },
+    safety: { label: 'Safety', icon: Shield },
+};
 
 export default function Learn() {
     const { selectedBaby } = useBaby();
@@ -37,14 +48,21 @@ export default function Learn() {
 
     // Get category config
     const getCategoryConfig = (category) => {
-        return CATEGORIES[category] || CATEGORIES.all;
+        return CATEGORY_ICONS[category] || CATEGORY_ICONS.all;
+    };
+
+    // Render category icon
+    const renderCategoryIcon = (category, size = 20) => {
+        const config = getCategoryConfig(category);
+        const IconComponent = config.icon;
+        return <IconComponent size={size} />;
     };
 
     return (
         <div className="learn-container">
             {/* Header */}
             <div className="learn-header">
-                <h1 className="learn-title">📚 Learn</h1>
+                <h1 className="learn-title"><BookOpen size={28} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Learn</h1>
                 <p className="learn-subtitle">
                     Evidence-based articles for new parents
                 </p>
@@ -54,7 +72,8 @@ export default function Learn() {
             {recommendedArticles.length > 0 && (
                 <div className="learn-section">
                     <h2 className="learn-section-title">
-                        ✨ Recommended for {selectedBaby?.name || 'Your Baby'}
+                        <Sparkles size={18} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                        Recommended for {selectedBaby?.name || 'Your Baby'}
                     </h2>
                     <p className="learn-section-subtitle">
                         Based on {babyAgeMonths} {babyAgeMonths === 1 ? 'month' : 'months'} old
@@ -67,7 +86,7 @@ export default function Learn() {
                                 onClick={() => setSelectedArticle(article)}
                             >
                                 <div className="article-card-icon">
-                                    {getCategoryConfig(article.category).icon}
+                                    {renderCategoryIcon(article.category, 28)}
                                 </div>
                                 <h3 className="article-card-title">{article.title}</h3>
                                 <p className="article-card-summary">{article.summary}</p>
@@ -85,16 +104,19 @@ export default function Learn() {
             <div className="learn-section">
                 <h2 className="learn-section-title">Browse by Topic</h2>
                 <div className="category-pills">
-                    {Object.entries(CATEGORIES).map(([key, config]) => (
-                        <button
-                            key={key}
-                            className={`category-pill ${selectedCategory === key ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory(key)}
-                        >
-                            <span className="category-pill-icon">{config.icon}</span>
-                            <span className="category-pill-label">{config.label}</span>
-                        </button>
-                    ))}
+                    {Object.entries(CATEGORY_ICONS).map(([key, config]) => {
+                        const IconComponent = config.icon;
+                        return (
+                            <button
+                                key={key}
+                                className={`category-pill ${selectedCategory === key ? 'active' : ''}`}
+                                onClick={() => setSelectedCategory(key)}
+                            >
+                                <span className="category-pill-icon"><IconComponent size={16} /></span>
+                                <span className="category-pill-label">{config.label}</span>
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -109,7 +131,7 @@ export default function Learn() {
                         >
                             <div className="article-card-header">
                                 <span className="article-card-icon-small">
-                                    {getCategoryConfig(article.category).icon}
+                                    {renderCategoryIcon(article.category, 18)}
                                 </span>
                                 <span className="article-tag">{getAgeLabel(article.ageRange)}</span>
                             </div>
