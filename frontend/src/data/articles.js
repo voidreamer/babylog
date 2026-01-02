@@ -1,13 +1,30 @@
 // Static article data for Learn tab
 // Articles are filtered by baby's age and category
 
+// Age stage labels for display
+export const AGE_STAGES = {
+    newborn: { label: 'NEWBORN', color: '#6b9b7a', ageRange: [0, 2] },
+    infant: { label: 'INFANT', color: '#7b8eb8', ageRange: [3, 6] },
+    baby: { label: 'BABY', color: '#b87b8e', ageRange: [7, 12] },
+    toddler: { label: 'TODDLER', color: '#b8a07b', ageRange: [13, 24] },
+};
+
+// Get stage from age range
+export const getStageFromAge = (ageRange) => {
+    const minAge = ageRange[0];
+    if (minAge <= 2) return 'newborn';
+    if (minAge <= 6) return 'infant';
+    if (minAge <= 12) return 'baby';
+    return 'toddler';
+};
+
 export const CATEGORIES = {
-    all: { label: 'All', icon: '📚' },
-    sleep: { label: 'Sleep', icon: '😴' },
-    feeding: { label: 'Feeding', icon: '🍼' },
-    health: { label: 'Health', icon: '🩺' },
-    development: { label: 'Development', icon: '🧒' },
-    safety: { label: 'Safety', icon: '🛡️' },
+    all: { label: 'All', icon: 'all' },
+    sleep: { label: 'Sleep', icon: 'sleep' },
+    feeding: { label: 'Feeding', icon: 'feeding' },
+    health: { label: 'Health', icon: 'health' },
+    development: { label: 'Development', icon: 'development' },
+    safety: { label: 'Safety', icon: 'safety' },
 };
 
 export const articles = [
@@ -20,6 +37,7 @@ export const articles = [
         tags: ['newborn', 'sleep', 'science'],
         readingTime: 4,
         source: 'AAP Guidelines',
+        image: '/articles/article_sleep_newborn.png',
         content: `
 # Understanding Newborn Sleep Patterns
 
@@ -68,6 +86,7 @@ Most babies start sleeping longer stretches (5-6+ hours) between 3-6 months. Eve
         tags: ['safety', 'sleep', 'sids'],
         readingTime: 3,
         source: 'AAP Safe Sleep Guidelines 2022',
+        image: '/articles/article_safe_sleep.png',
         content: `
 # Safe Sleep: The ABCs
 
@@ -122,6 +141,7 @@ A bare crib with a firm mattress and fitted sheet is the safest sleep environmen
         tags: ['newborn', 'feeding', 'breastfeeding'],
         readingTime: 5,
         source: 'La Leche League International',
+        image: '/articles/article_breastfeeding.png',
         content: `
 # Breastfeeding Basics
 
@@ -192,6 +212,7 @@ Reach out to a lactation consultant (IBCLC) if:
         tags: ['infant', 'feeding', 'solids'],
         readingTime: 5,
         source: 'WHO & AAP Guidelines',
+        image: '/articles/article_solid_foods.png',
         content: `
 # Starting Solid Foods
 
@@ -267,6 +288,7 @@ Both methods work! Many parents do a combo approach. Key is offering variety and
         tags: ['newborn', 'infant', 'development', 'milestones'],
         readingTime: 3,
         source: 'AAP Guidelines',
+        image: '/articles/article_tummy_time.png',
         content: `
 # Tummy Time: Building Baby's Strength
 
@@ -334,6 +356,7 @@ Start from day one! Even newborns benefit from tummy time.
         tags: ['newborn', 'infant', 'communication'],
         readingTime: 4,
         source: 'Dunstan Baby Language Research',
+        image: '/articles/article_baby_crying.png',
         content: `
 # Decoding Baby Cries
 
@@ -407,6 +430,7 @@ Contact your pediatrician if:
         tags: ['diaper', 'health', 'skin'],
         readingTime: 3,
         source: 'AAP HealthyChildren.org',
+        image: '/articles/article_diaper_rash.png',
         content: `
 # Preventing and Treating Diaper Rash
 
@@ -482,6 +506,7 @@ Ask your doctor about antifungal cream if you suspect yeast.
         tags: ['infant', 'toddler', 'teeth', 'health'],
         readingTime: 4,
         source: 'American Dental Association',
+        image: '/articles/article_teething.png',
         content: `
 # Baby's First Teeth
 
@@ -568,6 +593,7 @@ Teething is often blamed for everything, but research shows it causes only mild 
         tags: ['safety', 'emergency', 'cpr'],
         readingTime: 5,
         source: 'American Heart Association',
+        image: '/articles/article_infant_cpr.png',
         content: `
 # Infant CPR Basics
 
@@ -654,6 +680,7 @@ If baby becomes unresponsive, start CPR and look for object before giving breath
         tags: ['infant', 'sleep', 'training'],
         readingTime: 6,
         source: 'Sleep Foundation & Pediatric Research',
+        image: '/articles/article_sleep_training.png',
         content: `
 # Sleep Training Methods
 
