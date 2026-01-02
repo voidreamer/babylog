@@ -8,6 +8,7 @@ import BabySelector from './components/BabySelector';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
+import Learn from './components/Learn';
 
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -58,15 +59,7 @@ function AppContent() {
                     {activeTab === 'home' && <Dashboard />}
                     {activeTab === 'timeline' && <TimelineCalendar />}
                     {activeTab === 'health' && <Health />}
-                    {activeTab === 'reports' && (
-                        <div className="card" style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>📊</div>
-                            <h2 style={{ marginBottom: 'var(--space-sm)' }}>Reports Coming Soon</h2>
-                            <p style={{ color: 'var(--text-secondary)' }}>
-                                Weekly and monthly summaries with charts and insights.
-                            </p>
-                        </div>
-                    )}
+                    {activeTab === 'learn' && <Learn />}
                 </main>
 
                 {/* Bottom Navigation */}
@@ -93,11 +86,11 @@ function AppContent() {
                         <span>Health</span>
                     </button>
                     <button
-                        className={`bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('reports')}
+                        className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('learn')}
                     >
-                        <span className="icon">📊</span>
-                        <span>Reports</span>
+                        <span className="icon">📚</span>
+                        <span>Learn</span>
                     </button>
                 </nav>
             </div>
