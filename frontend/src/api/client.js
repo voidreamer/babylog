@@ -209,15 +209,17 @@ class ApiClient {
     }
 
     // Events
-    async getTimeline(babyId, date = null) {
+    async getTimeline(babyId, date = null, tzOffset = null) {
         const params = new URLSearchParams({ baby_id: babyId });
         if (date) params.append('date', date);
+        if (tzOffset !== null) params.append('tz_offset', tzOffset);
         return this.request(`/events/timeline?${params}`);
     }
 
-    async getDashboard(babyId, localDate = null) {
+    async getDashboard(babyId, localDate = null, tzOffset = null) {
         const params = new URLSearchParams({ baby_id: babyId });
         if (localDate) params.append('local_date', localDate);
+        if (tzOffset !== null) params.append('tz_offset', tzOffset);
         return this.request(`/events/dashboard?${params}`);
     }
 

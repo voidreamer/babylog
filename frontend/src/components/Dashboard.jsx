@@ -23,9 +23,10 @@ export default function Dashboard() {
         if (!selectedBaby) return;
 
         try {
-            // Send local date as YYYY-MM-DD to fix timezone issues
+            // Send local date and timezone offset to fix timezone issues
             const localDate = format(new Date(), 'yyyy-MM-dd');
-            const dashboardData = await api.getDashboard(selectedBaby.id, localDate);
+            const tzOffset = new Date().getTimezoneOffset(); // Minutes offset from UTC (e.g., 300 for EST)
+            const dashboardData = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
             setDashboard(dashboardData);
         } catch (error) {
             // Silent fail

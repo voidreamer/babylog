@@ -19,35 +19,43 @@ router = APIRouter(prefix="/events", tags=["events"])
 def get_timeline(
     baby_id: int,
     date: str | None = None,
+    tz_offset: int = 0,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
-    """Get all events for a specific day as a timeline."""
+    """Get all events for a specific day as a timeline.
+    
+    Args:
+        date: Local date as YYYY-MM-DD
+        tz_offset: Timezone offset in minutes (e.g., -300 for EST/UTC-5)
+    """
     user_id = user.get("sub")
     verify_baby_access(db, baby_id, user_id, user_email)
     
     # Parse date string (YYYY-MM-DD) or use today
     if date:
         try:
-            # Parse as local date string
             target_date = datetime.strptime(date.split('T')[0], '%Y-%m-%d')
         except ValueError:
             target_date = datetime.utcnow()
     else:
         target_date = datetime.utcnow()
     
-    # Get start and end of day
-    start_of_day = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_of_day = start_of_day + timedelta(days=1)
+    # Calculate day boundaries in UTC, adjusted for user's timezone
+    # tz_offset is negative for west of UTC (e.g., -300 for EST)
+    # Local midnight = UTC midnight minus the offset
+    local_midnight = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_of_day_utc = local_midnight - timedelta(minutes=tz_offset)
+    end_of_day_utc = start_of_day_utc + timedelta(days=1)
     
     events = []
     
     # Feedings
     feedings = db.query(Feeding).filter(
         Feeding.baby_id == baby_id,
-        Feeding.time >= start_of_day,
-        Feeding.time < end_of_day
+        Feeding.time >= start_of_day_utc,
+        Feeding.time < end_of_day_utc
     ).all()
     
     for f in feedings:
@@ -66,8 +74,8 @@ def get_timeline(
     # Diapers
     diapers = db.query(Diaper).filter(
         Diaper.baby_id == baby_id,
-        Diaper.time >= start_of_day,
-        Diaper.time < end_of_day
+        Diaper.time >= start_of_day_utc,
+        Diaper.time < end_of_day_utc
     ).all()
     
     for d in diapers:
@@ -87,8 +95,8 @@ def get_timeline(
     # Sleeps (using start_time)
     sleeps = db.query(Sleep).filter(
         Sleep.baby_id == baby_id,
-        Sleep.start_time >= start_of_day,
-        Sleep.start_time < end_of_day
+        Sleep.start_time >= start_of_day_utc,
+        Sleep.start_time < end_of_day_utc
     ).all()
     
     for s in sleeps:
@@ -106,8 +114,8 @@ def get_timeline(
     # Pumpings
     pumpings = db.query(Pumping).filter(
         Pumping.baby_id == baby_id,
-        Pumping.time >= start_of_day,
-        Pumping.time < end_of_day
+        Pumping.time >= start_of_day_utc,
+        Pumping.time < end_of_day_utc
     ).all()
     
     for p in pumpings:
@@ -128,9 +136,18 @@ def get_timeline(
     return events
 
 
-def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime) -> DailySummary:
-    """Calculate daily summary statistics."""
-    start_of_day = date.replace(hour=0, minute=0, second=0, microsecond=0)
+def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_offset: int = 0) -> DailySummary:
+    """Calculate daily summary statistics.
+    
+    Args:
+        db: Database session
+        baby_id: ID of the baby
+        date: Target date (parsed from local date string)
+        tz_offset: Timezone offset in minutes (e.g., -300 for EST/UTC-5)
+    """
+    # Calculate day boundaries in UTC, adjusted for user's timezone
+    local_midnight = date.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_of_day = local_midnight - timedelta(minutes=tz_offset)
     end_of_day = start_of_day + timedelta(days=1)
     
     # Feedings
@@ -176,7 +193,7 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime) -> Dai
     total_pumping_ml = sum(p.amount_ml or 0 for p in pumpings)
     
     return DailySummary(
-        date=start_of_day.strftime("%Y-%m-%d"),
+        date=local_midnight.strftime("%Y-%m-%d"),
         total_feedings=len(feedings),
         total_ml=total_ml,
         breast_count=breast_count,
@@ -198,11 +215,17 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime) -> Dai
 def get_dashboard(
     baby_id: int,
     local_date: str | None = None,
+    tz_offset: int = 0,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
-    """Get dashboard stats with last events, current sleep status, and daily summary."""
+    """Get dashboard stats with last events, current sleep status, and daily summary.
+    
+    Args:
+        local_date: Local date as YYYY-MM-DD
+        tz_offset: Timezone offset in minutes (e.g., -300 for EST/UTC-5)
+    """
     user_id = user.get("sub")
     verify_baby_access(db, baby_id, user_id, user_email)
     
@@ -242,8 +265,8 @@ def get_dashboard(
     else:
         summary_date = datetime.utcnow()
     
-    # Daily summary
-    daily_summary = get_daily_summary_for_baby(db, baby_id, summary_date)
+    # Daily summary (with timezone offset)
+    daily_summary = get_daily_summary_for_baby(db, baby_id, summary_date, tz_offset)
     
     return DashboardStats(
         last_feeding=FeedingResponse.model_validate(last_feeding) if last_feeding else None,

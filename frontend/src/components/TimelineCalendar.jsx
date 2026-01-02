@@ -30,9 +30,10 @@ export default function TimelineCalendar() {
         if (!selectedBaby) return;
         setLoading(true);
         try {
-            // Send local date as YYYY-MM-DD to preserve user's intended date
+            // Send local date and timezone offset for correct filtering
             const localDate = format(selectedDate, 'yyyy-MM-dd');
-            const data = await api.getTimeline(selectedBaby.id, localDate);
+            const tzOffset = new Date().getTimezoneOffset(); // Minutes offset from UTC
+            const data = await api.getTimeline(selectedBaby.id, localDate, tzOffset);
             setEvents(data);
         } catch (error) {
             console.error('Failed to load timeline:', error);
