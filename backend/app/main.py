@@ -15,7 +15,7 @@ app = FastAPI(
     title="SimpleBaby Baby Tracker API",
     description="API for tracking baby sleep, feeding, and diaper changes",
     version="1.0.0",
-    root_path="/api" if settings.environment == "prod" else ""
+    root_path="/api" if settings.environment in ("prod", "staging") else ""
 )
 
 # CORS - Allow all origins for now (can be restricted later)
