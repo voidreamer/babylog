@@ -1,8 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
 
-export default function DiaperModal({ babyId, onClose, onSave }) {
+// Helper to parse UTC time
+const parseUTCTime = (timeStr) => {
+    if (!timeStr) return new Date();
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
+
+export default function DiaperModal({ babyId, editEvent, onClose, onSave }) {
+    const isEditing = !!editEvent;
     const [type, setType] = useState('pee');
     const [time, setTime] = useState(new Date());
     const [pooColor, setPooColor] = useState('');
@@ -11,22 +19,41 @@ export default function DiaperModal({ babyId, onClose, onSave }) {
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
+    // Initialize from editEvent when editing
+    useEffect(() => {
+        if (editEvent && editEvent.details) {
+            const details = editEvent.details;
+            setTime(parseUTCTime(editEvent.time));
+            if (details.type) setType(details.type);
+            if (details.poo_color) setPooColor(details.poo_color);
+            if (details.poo_consistency) setPooConsistency(details.poo_consistency);
+            if (details.poo_amount) setPooAmount(details.poo_amount);
+            if (details.notes) setNotes(details.notes);
+        }
+    }, [editEvent]);
+
     const showPooDetails = type === 'poo' || type === 'mixed';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
 
+        const data = {
+            baby_id: babyId,
+            time: time.toISOString(),
+            type,
+            poo_color: showPooDetails && pooColor ? pooColor : null,
+            poo_consistency: showPooDetails && pooConsistency ? pooConsistency : null,
+            poo_amount: showPooDetails && pooAmount ? pooAmount : null,
+            notes: notes || null,
+        };
+
         try {
-            await api.createDiaper({
-                baby_id: babyId,
-                time: time.toISOString(),
-                type,
-                poo_color: showPooDetails && pooColor ? pooColor : null,
-                poo_consistency: showPooDetails && pooConsistency ? pooConsistency : null,
-                poo_amount: showPooDetails && pooAmount ? pooAmount : null,
-                notes: notes || null,
-            });
+            if (isEditing) {
+                await api.updateDiaper(editEvent.id, data);
+            } else {
+                await api.createDiaper(data);
+            }
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);
@@ -65,7 +92,7 @@ export default function DiaperModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🧷 Log Diaper Change</h2>
+                    <h2 className="modal-title">🧷 {isEditing ? 'Edit' : 'Log'} Diaper Change</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 

@@ -1,12 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { formatDistanceToNow } from 'date-fns';
 
-export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
-    const [startTime, setStartTime] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
+// Parse time from API (UTC) to local Date object
+const parseUTCTime = (timeStr) => {
+    if (!timeStr) return new Date();
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
+
+// Convert Date to local datetime-local format
+const toLocalDateTimeString = (date) => {
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+};
+
+export default function SleepModal({ babyId, currentSleep, editEvent, onClose, onSave }) {
+    const isEditing = !!editEvent;
+    const [startTime, setStartTime] = useState(toLocalDateTimeString(new Date()));
     const [endTime, setEndTime] = useState('');
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
+
+    // Initialize from editEvent when editing
+    useEffect(() => {
+        if (editEvent && editEvent.details) {
+            const details = editEvent.details;
+            setStartTime(toLocalDateTimeString(parseUTCTime(editEvent.time)));
+            if (details.end_time) {
+                setEndTime(toLocalDateTimeString(parseUTCTime(details.end_time)));
+            }
+            if (details.notes) setNotes(details.notes);
+        }
+    }, [editEvent]);
 
     const handleStartSleep = async () => {
         setSaving(true);
@@ -47,13 +72,20 @@ export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
             return;
         }
         setSaving(true);
+
+        const data = {
+            baby_id: babyId,
+            start_time: new Date(startTime).toISOString(),
+            end_time: new Date(endTime).toISOString(),
+            notes: notes || null,
+        };
+
         try {
-            await api.createSleep({
-                baby_id: babyId,
-                start_time: new Date(startTime).toISOString(),
-                end_time: new Date(endTime).toISOString(),
-                notes: notes || null,
-            });
+            if (isEditing) {
+                await api.updateSleep(editEvent.id, data);
+            } else {
+                await api.createSleep(data);
+            }
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);
@@ -63,15 +95,8 @@ export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
         }
     };
 
-    // Parse time from API (UTC) to local Date object
-    const parseUTCTime = (timeStr) => {
-        if (!timeStr) return new Date();
-        const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-        return new Date(utcTime);
-    };
-
-    // If baby is currently sleeping, show wake up option
-    if (currentSleep) {
+    // If baby is currently sleeping and not editing, show wake up option
+    if (currentSleep && !isEditing) {
         const sleepingFor = formatDistanceToNow(parseUTCTime(currentSleep.start_time));
 
         return (
@@ -114,7 +139,7 @@ export default function SleepModal({ babyId, currentSleep, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">😴 Log Sleep</h2>
+                    <h2 className="modal-title">😴 {isEditing ? 'Edit' : 'Log'} Sleep</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 

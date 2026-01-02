@@ -1,26 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
 
-export default function PumpingModal({ babyId, onClose, onSave }) {
+// Helper to parse UTC time
+const parseUTCTime = (timeStr) => {
+    if (!timeStr) return new Date();
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
+
+export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
+    const isEditing = !!editEvent;
     const [time, setTime] = useState(new Date());
     const [duration, setDuration] = useState('');
     const [amount, setAmount] = useState('');
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
+    // Initialize from editEvent when editing
+    useEffect(() => {
+        if (editEvent && editEvent.details) {
+            const details = editEvent.details;
+            setTime(parseUTCTime(editEvent.time));
+            if (details.duration_minutes) setDuration(String(details.duration_minutes));
+            if (details.amount_ml) setAmount(String(details.amount_ml));
+            if (details.notes) setNotes(details.notes);
+        }
+    }, [editEvent]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
 
+        const data = {
+            baby_id: babyId,
+            time: time.toISOString(),
+            duration_minutes: duration ? parseInt(duration) : null,
+            amount_ml: amount ? parseInt(amount) : null,
+            notes: notes || null,
+        };
+
         try {
-            await api.createPumping({
-                baby_id: babyId,
-                time: time.toISOString(),
-                duration_minutes: duration ? parseInt(duration) : null,
-                amount_ml: amount ? parseInt(amount) : null,
-                notes: notes || null,
-            });
+            if (isEditing) {
+                await api.updatePumping(editEvent.id, data);
+            } else {
+                await api.createPumping(data);
+            }
             onSave();
         } catch (error) {
             console.error('Failed to save pumping:', error);
@@ -34,7 +59,7 @@ export default function PumpingModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🍶 Log Pumping</h2>
+                    <h2 className="modal-title">🍶 {isEditing ? 'Edit' : 'Log'} Pumping</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 

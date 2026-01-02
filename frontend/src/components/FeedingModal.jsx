@@ -2,7 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
 
-export default function FeedingModal({ babyId, onClose, onSave }) {
+// Helper to parse UTC time
+const parseUTCTime = (timeStr) => {
+    if (!timeStr) return new Date();
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
+
+export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
+    const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
     const [feedMethod, setFeedMethod] = useState('breast'); // 'breast' or 'bottle'
     const [bottleType, setBottleType] = useState('breastmilk'); // 'breastmilk' or 'formula'
@@ -17,6 +25,26 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const intervalRef = useRef(null);
+
+    // Initialize from editEvent when editing
+    useEffect(() => {
+        if (editEvent && editEvent.details) {
+            const details = editEvent.details;
+            setTime(parseUTCTime(editEvent.time));
+
+            // Determine feed method and bottle type from type
+            if (details.type === 'breast') {
+                setFeedMethod('breast');
+            } else {
+                setFeedMethod('bottle');
+                setBottleType(details.type === 'formula' ? 'formula' : 'breastmilk');
+            }
+
+            if (details.duration_minutes) setDuration(String(details.duration_minutes));
+            if (details.amount_ml) setAmount(String(details.amount_ml));
+            if (details.notes) setNotes(details.notes);
+        }
+    }, [editEvent]);
 
     // Timer effect
     useEffect(() => {
@@ -82,15 +110,21 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
         e.preventDefault();
         setSaving(true);
 
+        const data = {
+            baby_id: babyId,
+            time: time.toISOString(),
+            type: getSaveType(),
+            duration_minutes: duration ? parseInt(duration) : null,
+            amount_ml: amount ? parseInt(amount) : null,
+            notes: notes || null,
+        };
+
         try {
-            await api.createFeeding({
-                baby_id: babyId,
-                time: time.toISOString(),
-                type: getSaveType(),
-                duration_minutes: duration ? parseInt(duration) : null,
-                amount_ml: amount ? parseInt(amount) : null,
-                notes: notes || null,
-            });
+            if (isEditing) {
+                await api.updateFeeding(editEvent.id, data);
+            } else {
+                await api.createFeeding(data);
+            }
             onSave();
         } catch (error) {
             alert('Failed to save feeding');
@@ -103,7 +137,7 @@ export default function FeedingModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🍼 Log Feeding</h2>
+                    <h2 className="modal-title">🍼 {isEditing ? 'Edit' : 'Log'} Feeding</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
