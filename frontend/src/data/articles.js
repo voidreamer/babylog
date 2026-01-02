@@ -775,6 +775,806 @@ If something doesn't feel right:
 
 > **Remember**: You know your baby best. Safe, consistent sleep habits are the goal, regardless of how you get there.
         `
+    },
+    {
+        id: 'postpartum-recovery',
+        title: 'Postpartum Recovery: What to Expect',
+        summary: 'Physical and emotional healing after birth for new mothers.',
+        category: 'health',
+        ageRange: [0, 3],
+        tags: ['postpartum', 'mother', 'recovery', 'health'],
+        readingTime: 5,
+        source: 'ACOG Guidelines',
+        image: '/articles/article_breastfeeding.png',
+        content: `
+# Postpartum Recovery
+
+Your body just did something amazing. Here's what to expect as it heals.
+
+## Physical Recovery Timeline
+
+**Week 1-2:**
+- Vaginal bleeding (lochia) - heaviest initially
+- Cramping as uterus contracts
+- Breast engorgement when milk comes in
+- Fatigue and soreness
+
+**Week 3-6:**
+- Bleeding decreases
+- Stitches (if any) heal
+- Energy slowly returns
+- 6-week checkup with provider
+
+## C-Section Recovery
+
+- Longer healing time (6-8 weeks)
+- Avoid lifting heavy objects
+- Support incision when coughing
+- Watch for signs of infection
+
+## Emotional Changes
+
+Baby blues (2 weeks) vs postpartum depression (longer):
+- Crying spells and mood swings are normal initially
+- If feelings persist beyond 2 weeks, talk to your doctor
+- You're not alone - 1 in 5 mothers experiences PPD
+
+## When to Call Your Doctor
+
+- Fever over 100.4°F
+- Heavy bleeding (soaking a pad in an hour)
+- Severe headache or vision changes
+- Thoughts of harming yourself or baby
+
+> **Remember**: Take care of yourself so you can take care of your baby.
+        `
+    },
+    {
+        id: 'baby-bonding',
+        title: 'Building Your Bond with Baby',
+        summary: 'Simple ways to strengthen the parent-child connection.',
+        category: 'development',
+        ageRange: [0, 12],
+        tags: ['bonding', 'attachment', 'development', 'newborn'],
+        readingTime: 4,
+        source: 'Zero to Three',
+        image: '/articles/article_baby_crying.png',
+        content: `
+# Building Your Bond
+
+Bonding happens naturally through everyday care. Here's how to strengthen it.
+
+## Skin-to-Skin Contact
+
+Benefits of holding baby against your bare chest:
+- Regulates baby's temperature and heart rate
+- Promotes breastfeeding
+- Releases oxytocin (the "love hormone")
+- Calms both parent and baby
+
+## Eye Contact and Talking
+
+- Babies can see clearly at 8-12 inches (perfect distance when feeding)
+- Talk, sing, narrate your day
+- Respond to coos and sounds
+- Mimic baby's expressions
+
+## Responsive Care
+
+When you respond to baby's needs:
+- They learn to trust you
+- Neural connections form
+- Secure attachment develops
+- This doesn't spoil them!
+
+## For Partners
+
+Bonding isn't just for birth mothers:
+- Do skin-to-skin too
+- Handle feeding, diaper changes, baths
+- Find your own special rituals
+- Bonding takes time - be patient
+
+> **Remember**: There's no "right" way to bond. Just being present and responsive is enough.
+        `
+    },
+    {
+        id: 'baby-bath-time',
+        title: 'Baby Bath Time: Step-by-Step Guide',
+        summary: 'How to safely bathe your newborn or infant.',
+        category: 'health',
+        ageRange: [0, 12],
+        tags: ['bath', 'hygiene', 'newborn', 'safety'],
+        readingTime: 4,
+        source: 'AAP Guidelines',
+        image: '/articles/article_safe_sleep.png',
+        content: `
+# Baby Bath Time
+
+Newborns only need baths 2-3 times per week. Here's how to do it safely.
+
+## Before the Bath
+
+Gather everything first:
+- Baby tub or sink with liner
+- Warm water (test with elbow)
+- Mild baby soap
+- Soft washcloth
+- Hooded towel
+- Clean diaper and clothes
+
+## Step-by-Step
+
+1. Fill tub with 2-3 inches of warm water
+2. Support baby's head and neck
+3. Lower baby in feet first
+4. Keep one hand on baby at all times
+5. Wash from cleanest to dirtiest areas
+6. Rinse thoroughly
+7. Wrap immediately in towel
+
+## Safety Rules
+
+- Never leave baby unattended
+- Water temperature 98-100°F
+- Support head and neck at all times
+- Skip submersion until cord stump falls off
+
+## Umbilical Cord Care
+
+Until it falls off (1-3 weeks):
+- Sponge baths only
+- Keep cord area dry
+- Fold diaper below it
+- Let it fall off naturally
+
+> **Remember**: Babies are slippery when wet! A secure grip is essential.
+        `
+    },
+    {
+        id: 'car-seat-safety',
+        title: 'Car Seat Safety: Installation and Use',
+        summary: 'Keeping baby safe on every car ride.',
+        category: 'safety',
+        ageRange: [0, 24],
+        tags: ['car seat', 'travel', 'safety'],
+        readingTime: 5,
+        source: 'NHTSA',
+        image: '/articles/article_infant_cpr.png',
+        content: `
+# Car Seat Safety
+
+Car crashes are a leading cause of death for children. Proper car seat use reduces risk by 71-82%.
+
+## Choosing the Right Seat
+
+**Infant Carrier (rear-facing only):**
+- Birth to 22-35 lbs
+- Convenient bucket design
+- Must face rear
+
+**Convertible Seat:**
+- Birth to 65+ lbs
+- Stays in car
+- Grows with child
+
+## Rear-Facing is Safest
+
+Keep baby rear-facing as long as possible:
+- Minimum until age 1 AND 20 lbs
+- Ideally until they outgrow rear-facing limits
+- Protects head, neck, spine in crash
+
+## Installation Tips
+
+- Read both car seat AND vehicle manuals
+- Less than 1 inch movement at belt path
+- Recline angle appropriate for age
+- Harness straps at or below shoulders (rear-facing)
+- Chest clip at armpit level
+
+## Common Mistakes
+
+- Seat installed too loosely
+- Harness straps too loose
+- Chest clip too low
+- Too many bulky clothes
+- Moving to next stage too soon
+
+## Get It Checked
+
+Free car seat inspection stations available:
+- Fire stations
+- Police departments
+- Hospitals
+- Search "car seat check near me"
+
+> **Remember**: The safest car seat is the one that fits your child, your car, and that you use correctly every time.
+        `
+    },
+    {
+        id: 'baby-massage',
+        title: 'Baby Massage: Benefits and Techniques',
+        summary: 'Gentle touch for bonding and relaxation.',
+        category: 'development',
+        ageRange: [0, 12],
+        tags: ['massage', 'bonding', 'sleep', 'colic'],
+        readingTime: 3,
+        source: 'International Association of Infant Massage',
+        image: '/articles/article_tummy_time.png',
+        content: `
+# Baby Massage
+
+Gentle massage can soothe baby, improve sleep, and strengthen your bond.
+
+## Benefits
+
+- Promotes relaxation and better sleep
+- May help with colic and gas
+- Strengthens parent-baby bond
+- Supports healthy weight gain
+- Good for baby's body awareness
+
+## When to Massage
+
+Best times:
+- 45 minutes after feeding
+- Before bath or bedtime
+- When baby is calm but alert
+- Avoid when baby is hungry, tired, or fussy
+
+## Simple Techniques
+
+**Legs and Feet:**
+- Gentle strokes from thigh to ankle
+- Roll leg between palms
+- Circle thumbs on soles of feet
+
+**Tummy (for gas):**
+- "I Love You" strokes
+- Bicycle legs gently
+- Clockwise circles
+
+**Back:**
+- Long strokes from shoulders to bottom
+- Small circles along spine (not on spine)
+
+## Tips
+
+- Use unscented, edible oil (coconut, almond)
+- Keep room warm
+- Start with 5 minutes, build up
+- Follow baby's cues
+- Stop if baby becomes fussy
+
+> **Remember**: The goal is connection, not perfection.
+        `
+    },
+    {
+        id: 'hunger-cues',
+        title: 'Reading Baby\'s Hunger Cues',
+        summary: 'Know when baby is hungry before they cry.',
+        category: 'feeding',
+        ageRange: [0, 6],
+        tags: ['feeding', 'hunger', 'newborn', 'cues'],
+        readingTime: 3,
+        source: 'La Leche League',
+        image: '/articles/article_breastfeeding.png',
+        content: `
+# Reading Hunger Cues
+
+Crying is a late hunger cue. Learning earlier signs makes feeding easier.
+
+## Early Hunger Cues
+
+- Stirring, waking up
+- Opening and closing mouth
+- Turning head side to side
+- Smacking or licking lips
+- Sucking on hands or fingers
+
+## Active Hunger Cues
+
+- Rooting (turning toward touch on cheek)
+- Trying to position for nursing
+- Fidgeting or squirming
+- Faster breathing
+- Making sounds
+
+## Late Hunger Cues
+
+- Crying
+- Agitated movements
+- Color turns red
+
+## Why Early Feeding Matters
+
+- Easier latch when calm
+- Less stressful for both
+- Better digestion
+- Helps establish milk supply
+
+## Fullness Cues
+
+Baby is done when they:
+- Turn away from breast/bottle
+- Close mouth
+- Relax body
+- Fall asleep
+- Release nipple
+
+> **Remember**: Feed on demand, not on schedule. Babies know when they're hungry.
+        `
+    },
+    {
+        id: 'pumping-tips',
+        title: 'Breast Pumping: A Complete Guide',
+        summary: 'Tips for successful pumping and milk storage.',
+        category: 'feeding',
+        ageRange: [0, 12],
+        tags: ['pumping', 'breastfeeding', 'work', 'feeding'],
+        readingTime: 6,
+        source: 'CDC Guidelines',
+        image: '/articles/article_breastfeeding.png',
+        content: `
+# Breast Pumping Guide
+
+Whether returning to work or building a stash, here's what you need to know.
+
+## Choosing a Pump
+
+| Type | Best For |
+|------|----------|
+| Hospital-grade | NICU, low supply, exclusive pumping |
+| Double electric | Regular pumping, working moms |
+| Manual | Occasional use, travel |
+| Wearable | Hands-free convenience |
+
+## Getting Started
+
+- Wait 3-4 weeks until breastfeeding is established
+- Pump after feeding or between feeds
+- Morning typically yields most milk
+- Start with 10-15 minute sessions
+
+## Increasing Output
+
+- Pump more often (supply = demand)
+- Use hands-on pumping technique
+- Try power pumping (20 on, 10 off, repeat)
+- Stay hydrated
+- Look at photos/videos of baby
+
+## Milk Storage Guidelines
+
+| Location | Duration |
+|----------|----------|
+| Room temp | 4 hours |
+| Refrigerator | 4 days |
+| Freezer | 6-12 months |
+
+## Returning to Work
+
+- Start pumping 2-3 weeks before
+- Pump at times you'd normally feed
+- Bring photos of baby
+- Know your pumping rights (most employers must provide time/space)
+
+> **Remember**: Any amount of breast milk is beneficial. Don't stress about ounces.
+        `
+    },
+    {
+        id: 'formula-feeding',
+        title: 'Formula Feeding: Safe Preparation',
+        summary: 'How to prepare and store infant formula safely.',
+        category: 'feeding',
+        ageRange: [0, 12],
+        tags: ['formula', 'feeding', 'bottle', 'safety'],
+        readingTime: 4,
+        source: 'CDC Guidelines',
+        image: '/articles/article_solid_foods.png',
+        content: `
+# Formula Feeding Safely
+
+Fed is best! Here's how to prepare formula safely.
+
+## Types of Formula
+
+- **Powder:** Most economical, requires mixing
+- **Concentrate:** Mix with equal parts water
+- **Ready-to-feed:** Most convenient, no mixing
+
+## Preparation Steps
+
+1. Wash hands thoroughly
+2. Clean and sterilize bottles
+3. Measure water first, then powder
+4. Use the scoop provided (not packed)
+5. Mix well - shake or swirl
+6. Test temperature on wrist
+
+## Water Safety
+
+- Use cold tap water (or bottled)
+- Run tap 30 seconds before using
+- Some areas require boiled water - check with pediatrician
+- Never microwave formula
+
+## Storage Guidelines
+
+| Type | Room Temp | Refrigerator |
+|------|-----------|--------------|
+| Prepared | 2 hours | 24 hours |
+| Ready-to-feed (opened) | 2 hours | 48 hours |
+| Powder (opened) | N/A | Use within 1 month |
+
+## Feeding Tips
+
+- Hold baby semi-upright (~45 degrees)
+- Keep bottle horizontal (paced feeding)
+- Let baby take breaks
+- Discard unused formula after 1 hour
+
+> **Remember**: Follow package instructions exactly. Diluting or concentrating formula is dangerous.
+        `
+    },
+    {
+        id: 'burping-baby',
+        title: 'Burping Your Baby: Tips and Positions',
+        summary: 'Help baby release trapped air comfortably.',
+        category: 'feeding',
+        ageRange: [0, 6],
+        tags: ['burping', 'feeding', 'gas', 'spit-up'],
+        readingTime: 3,
+        source: 'AAP Guidelines',
+        image: '/articles/article_baby_crying.png',
+        content: `
+# Burping Baby
+
+Babies swallow air while feeding. Burping helps release it before it causes discomfort.
+
+## When to Burp
+
+- After every 2-3 ounces (bottle)
+- When switching breasts
+- After feeding is complete
+- If baby seems uncomfortable during feeding
+
+## Burping Positions
+
+### Over the Shoulder
+- Support baby's bottom
+- Pat or rub back gently
+- Protect clothes with burp cloth!
+
+### Sitting Up
+- Sit baby on your lap
+- Support chin and chest with hand
+- Lean baby slightly forward
+- Pat or rub back
+
+### Face Down on Lap
+- Lay baby across your knees
+- Support head higher than chest
+- Pat or rub back
+
+## Tips for Success
+
+- Be patient - can take a few minutes
+- Gentle but firm pats
+- Try a different position if one doesn't work
+- Some babies burp easily, others rarely need it
+- Spitting up a little is normal
+
+## When to Worry
+
+Contact doctor if baby:
+- Projectile vomits
+- Seems in pain after eating
+- Refuses to eat
+- Shows signs of reflux
+
+> **Remember**: Not every baby needs to burp. If nothing comes up after a few minutes, they may be fine.
+        `
+    },
+    {
+        id: 'sleep-regressions',
+        title: 'Sleep Regressions: When and Why',
+        summary: 'Understanding sleep disruptions at common ages.',
+        category: 'sleep',
+        ageRange: [3, 24],
+        tags: ['sleep', 'regression', 'development'],
+        readingTime: 4,
+        source: 'Sleep Foundation',
+        image: '/articles/article_sleep_training.png',
+        content: `
+# Sleep Regressions
+
+Just when you think you've got it figured out... sleep regressions are temporary disruptions in sleep patterns.
+
+## Common Regression Ages
+
+### 4 Months
+- Most significant - permanent sleep changes
+- Baby's sleep cycles mature
+- Increased night waking
+- Shorter naps
+
+### 8-10 Months
+- Separation anxiety peaks
+- Learning to crawl/stand
+- May practice skills in crib
+- Lasts 3-6 weeks
+
+### 12 Months
+- Transition from 2 naps to 1
+- Walking development
+- Increased independence
+
+### 18-24 Months
+- Language explosion
+- Nightmares may begin
+- Testing boundaries
+
+## Survival Tips
+
+- Stick to routines
+- Offer extra comfort temporarily
+- Avoid creating new habits you'll need to break
+- Remember: it's temporary!
+
+## What Doesn't Help
+
+- Bed sharing suddenly
+- Night weaning during regression
+- Changing everything at once
+- Panicking
+
+> **Remember**: Regressions are actually signs of developmental progress. They pass!
+        `
+    },
+    {
+        id: 'developmental-play',
+        title: 'Play Ideas for Every Age',
+        summary: 'Simple activities to support baby\'s development.',
+        category: 'development',
+        ageRange: [0, 12],
+        tags: ['play', 'development', 'activities', 'milestones'],
+        readingTime: 4,
+        source: 'Zero to Three',
+        image: '/articles/article_tummy_time.png',
+        content: `
+# Developmental Play by Age
+
+The best toy for your baby? You! Here are age-appropriate play ideas.
+
+## 0-3 Months
+
+**Focus:** Vision, hearing, neck strength
+- High-contrast black/white images
+- Face-to-face interaction
+- Tummy time (start with 1-2 minutes)
+- Gentle songs and talking
+- Touch different textures
+
+## 4-6 Months
+
+**Focus:** Reaching, grasping, rolling
+- Toys to grab and mouth
+- Rattles and crinkly toys
+- Mirror play
+- Peek-a-boo
+- Reading board books together
+
+## 7-9 Months
+
+**Focus:** Sitting, crawling, object permanence
+- Containers to fill and empty
+- Stacking toys
+- "Where did it go?" games
+- Crawling obstacle courses
+- Musical instruments
+
+## 10-12 Months
+
+**Focus:** Standing, cruising, cause and effect
+- Push toys for walking
+- Shape sorters
+- Simple puzzles
+- Ball rolling back and forth
+- Water play (supervised!)
+
+## Play Tips
+
+- Follow baby's lead
+- Short sessions are fine
+- Less is more with toys
+- Narrate what you're doing
+- Let them explore safely
+
+> **Remember**: Play is learning! There's no wrong way as long as baby is safe and engaged.
+        `
+    },
+    {
+        id: 'baby-skin-care',
+        title: 'Baby Skin Care Basics',
+        summary: 'Keeping baby\'s delicate skin healthy.',
+        category: 'health',
+        ageRange: [0, 12],
+        tags: ['skin', 'health', 'eczema', 'bath'],
+        readingTime: 3,
+        source: 'AAP Guidelines',
+        image: '/articles/article_diaper_rash.png',
+        content: `
+# Baby Skin Care
+
+Baby skin is 30% thinner than adult skin. Here's how to protect it.
+
+## General Tips
+
+- Less is more - don't overdo products
+- Fragrance-free is best
+- Pat dry, don't rub
+- Short baths (5-10 minutes)
+- Moisturize while skin is damp
+
+## Common Skin Conditions
+
+### Cradle Cap
+- Scaly patches on scalp
+- Harmless but common
+- Gentle brushing and oil helps
+- Usually resolves by 12 months
+
+### Baby Acne
+- Small bumps on face
+- Appears 2-4 weeks
+- No treatment needed
+- Clears on its own
+
+### Eczema
+- Dry, red, itchy patches
+- Often on cheeks, creases
+- Moisturize frequently
+- May need prescription cream
+
+## What to Avoid
+
+- Too-frequent baths
+- Harsh soaps
+- Scented products
+- Overly warm water
+- Scratchy fabrics
+
+## When to See a Doctor
+
+- Rash with fever
+- Spreading rapidly
+- Oozing or crusted
+- Baby seems uncomfortable
+
+> **Remember**: Most baby skin issues are harmless and temporary.
+        `
+    },
+    {
+        id: 'when-to-call-doctor',
+        title: 'When to Call the Pediatrician',
+        summary: 'Know which symptoms need immediate attention.',
+        category: 'health',
+        ageRange: [0, 24],
+        tags: ['health', 'emergency', 'fever', 'illness'],
+        readingTime: 4,
+        source: 'AAP Guidelines',
+        image: '/articles/article_infant_cpr.png',
+        content: `
+# When to Call the Pediatrician
+
+Trust your instincts - you know your baby best. Here are definite reasons to call.
+
+## Call Immediately (or Go to ER)
+
+- Fever 100.4°F+ in baby under 3 months
+- Difficulty breathing
+- Blue lips or skin
+- Unresponsive or very difficult to wake
+- Seizure
+- Signs of dehydration (no wet diapers 6+ hours)
+
+## Call Same Day
+
+- Fever in baby 3+ months
+- Persistent vomiting
+- Diarrhea with blood or mucus
+- Ear pulling with fussiness
+- Rash with fever
+- Cough lasting over a week
+- Refusing to eat
+
+## Can Wait for Office Hours
+
+- Mild cold symptoms
+- Minor diaper rash
+- Questions about development
+- Spitting up (if gaining weight)
+- Mild fussiness
+
+## What to Have Ready
+
+When you call, know:
+- Baby's temperature
+- Symptoms and when they started
+- Eating and diaper output
+- Any medications given
+- Your pharmacy info
+
+## Trust Yourself
+
+If something feels wrong, call. Doctors would rather hear from a concerned parent than miss something serious.
+
+> **Remember**: You don't need to have all the answers. That's what your pediatrician is for.
+        `
+    },
+    {
+        id: 'baby-language',
+        title: 'Baby\'s First Words: Language Development',
+        summary: 'How babies learn to communicate and how to help.',
+        category: 'development',
+        ageRange: [0, 24],
+        tags: ['language', 'speech', 'milestones', 'development'],
+        readingTime: 4,
+        source: 'AAP Guidelines',
+        image: '/articles/article_baby_crying.png',
+        content: `
+# Language Development
+
+First words are exciting! Here's what to expect and how to encourage language.
+
+## Timeline
+
+| Age | What to Expect |
+|-----|----------------|
+| 0-3 months | Coos, gurgles |
+| 4-6 months | Babbling (ba-ba, ma-ma) |
+| 7-12 months | Responds to name, simple words |
+| 12-18 months | First words, follows commands |
+| 18-24 months | 50+ words, 2-word phrases |
+
+## How to Encourage Language
+
+### Talk Constantly
+- Narrate your day
+- Describe what you see
+- Name objects
+- Use simple words first
+
+### Read Together
+- Start from birth!
+- Point to pictures
+- Let baby touch pages
+- Make reading fun
+
+### Respond
+- Answer coos and babbles
+- Expand on what they say
+- Celebrate attempts
+- Make eye contact
+
+### Sing
+- Nursery rhymes
+- Simple songs
+- Repetition is good
+- Add hand motions
+
+## Warning Signs
+
+Talk to your pediatrician if baby:
+- Doesn't babble by 9 months
+- No words by 16 months
+- Doesn't respond to name
+- Loses language skills
+
+> **Remember**: All babies develop differently. But early intervention helps if there are concerns.
+        `
     }
 ];
 

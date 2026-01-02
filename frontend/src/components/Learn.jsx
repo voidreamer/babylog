@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { articles, getArticlesForAge, calculateAgeInMonths, AGE_STAGES, getStageFromAge, CATEGORIES } from '../data/articles';
 import ArticleView from './ArticleView';
-import { BookOpen, Moon, Utensils, Stethoscope, Baby, Shield, Sparkles, ChevronLeft } from 'lucide-react';
+import { BookOpen, Moon, Utensils, Stethoscope, Baby, Shield, Sparkles, Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Category icons map
@@ -19,6 +19,7 @@ export default function Learn() {
     const { selectedBaby } = useBaby();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [selectedArticle, setSelectedArticle] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Calculate baby age in months
     const babyAgeMonths = useMemo(() => {
@@ -32,11 +33,27 @@ export default function Learn() {
         return getArticlesForAge(babyAgeMonths).slice(0, 5);
     }, [babyAgeMonths]);
 
-    // Filter articles by category
+    // Filter articles by category and search
     const filteredArticles = useMemo(() => {
-        if (selectedCategory === 'all') return articles;
-        return articles.filter(a => a.category === selectedCategory);
-    }, [selectedCategory]);
+        let filtered = articles;
+
+        // Filter by category
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(a => a.category === selectedCategory);
+        }
+
+        // Filter by search query
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(a =>
+                a.title.toLowerCase().includes(query) ||
+                a.summary.toLowerCase().includes(query) ||
+                a.tags.some(tag => tag.toLowerCase().includes(query))
+            );
+        }
+
+        return filtered;
+    }, [selectedCategory, searchQuery]);
 
     // Get stage info for an article
     const getArticleStage = (article) => {
@@ -108,6 +125,31 @@ export default function Learn() {
                                     <Sparkles size={14} /> For {selectedBaby.name}, {babyAgeMonths} {babyAgeMonths === 1 ? 'month' : 'months'} old
                                 </p>
                             )}
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="learn-search">
+                            <div className="learn-search-input-wrapper">
+                                <Search size={18} className="learn-search-icon" />
+                                <input
+                                    type="text"
+                                    className="learn-search-input"
+                                    placeholder="Search articles..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                {searchQuery && (
+                                    <button
+                                        className="learn-search-clear"
+                                        onClick={() => setSearchQuery('')}
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
+                            <span className="learn-article-count">
+                                {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''}
+                            </span>
                         </div>
 
                         {/* Featured/Recommended Section */}
