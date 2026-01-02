@@ -1,0 +1,91 @@
+name: Deploy Frontend (Staging)
+
+# This workflow deploys to STAGING environment only
+# Triggers on push to 'staging' branch
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend-staging.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ca-central-1
+  # STAGING resources - will need to be created in AWS
+  # Using placeholders until infrastructure is set up
+  S3_BUCKET: ${{ vars.S3_BUCKET_STAGING || 'huckle-frontend-staging' }}
+  CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_ID_STAGING }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build (Staging)
+        env:
+          # Use staging-specific environment variables
+          VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING || secrets.VITE_API_URL }}
+          VITE_COGNITO_DOMAIN: ${{ secrets.VITE_COGNITO_DOMAIN }}
+          VITE_COGNITO_CLIENT_ID: ${{ secrets.VITE_COGNITO_CLIENT_ID }}
+          VITE_REDIRECT_URI: ${{ secrets.VITE_REDIRECT_URI_STAGING || secrets.VITE_REDIRECT_URI }}
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check S3 bucket exists
+        id: check_bucket
+        run: |
+          if aws s3 ls "s3://${{ env.S3_BUCKET }}" 2>&1 | grep -q 'NoSuchBucket'; then
+            echo "::warning::Staging S3 bucket does not exist yet. Please create: ${{ env.S3_BUCKET }}"
+            echo "bucket_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "bucket_exists=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to S3 (Staging)
+        if: steps.check_bucket.outputs.bucket_exists == 'true'
+        run: |
+          aws s3 sync frontend/dist/ s3://${{ env.S3_BUCKET }}/ \
+            --delete \
+            --no-cli-pager
+
+      - name: Invalidate CloudFront cache (Staging)
+        if: steps.check_bucket.outputs.bucket_exists == 'true' && env.CLOUDFRONT_DISTRIBUTION_ID != ''
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*" \
+            --no-cli-pager
+
+      - name: Output staging URL
+        run: |
+          echo "🚀 Staging deployment complete!"
+          echo "📍 S3 Bucket: ${{ env.S3_BUCKET }}"
+          if [ -n "${{ env.CLOUDFRONT_DISTRIBUTION_ID }}" ]; then
+            echo "🌐 CloudFront ID: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}"
+          fi

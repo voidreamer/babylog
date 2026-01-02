@@ -1,0 +1,86 @@
+name: Deploy Backend (Staging)
+
+# This workflow deploys to STAGING environment only
+# Triggers on push to 'staging' branch
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend-staging.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ca-central-1
+  # STAGING Lambda - will need to be created in AWS
+  LAMBDA_FUNCTION_NAME: ${{ vars.LAMBDA_NAME_STAGING || 'huckle-api-staging' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt -t package/
+          cp -r app package/
+
+      - name: Create deployment package
+        run: |
+          cd backend/package
+          zip -r ../lambda.zip . -q
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check Lambda exists
+        id: check_lambda
+        run: |
+          if aws lambda get-function --function-name ${{ env.LAMBDA_FUNCTION_NAME }} 2>&1 | grep -q 'ResourceNotFoundException'; then
+            echo "::warning::Staging Lambda does not exist yet. Please create: ${{ env.LAMBDA_FUNCTION_NAME }}"
+            echo "lambda_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "lambda_exists=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to Lambda (Staging)
+        if: steps.check_lambda.outputs.lambda_exists == 'true'
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --zip-file fileb://backend/lambda.zip \
+            --no-cli-pager
+
+      - name: Wait for update to complete
+        if: steps.check_lambda.outputs.lambda_exists == 'true'
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
+
+      - name: Verify deployment
+        if: steps.check_lambda.outputs.lambda_exists == 'true'
+        run: |
+          aws lambda get-function \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --query 'Configuration.[FunctionName,LastModified,State]' \
+            --output table
+
+      - name: Output staging info
+        run: |
+          echo "🚀 Staging backend deployment complete!"
+          echo "📍 Lambda Function: ${{ env.LAMBDA_FUNCTION_NAME }}"
