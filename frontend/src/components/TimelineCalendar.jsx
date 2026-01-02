@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
-import { format, subDays, addDays, startOfDay, differenceInMinutes } from 'date-fns';
+import { format, subDays, addDays, startOfDay, differenceInMinutes, isToday } from 'date-fns';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
@@ -290,6 +290,25 @@ export default function TimelineCalendar() {
 
                         {/* Events */}
                         <div className="timeline-events-container">
+                            {/* Current Time Indicator - only show for today */}
+                            {isToday(selectedDate) && (() => {
+                                const now = new Date();
+                                const dayStart = startOfDay(selectedDate);
+                                const currentMinutes = differenceInMinutes(now, dayStart);
+                                const topPosition = (currentMinutes / (24 * 60)) * 100;
+
+                                return (
+                                    <div
+                                        className="timeline-current-time"
+                                        style={{ top: `${topPosition}%` }}
+                                    >
+                                        <span className="timeline-current-time-label">
+                                            {format(now, 'h:mm a')}
+                                        </span>
+                                    </div>
+                                );
+                            })()}
+
                             {events.map(event => {
                                 const config = EVENT_CONFIG[event.event_type] || EVENT_CONFIG.feeding;
                                 const style = getEventStyle(event);

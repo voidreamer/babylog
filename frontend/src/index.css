@@ -819,6 +819,40 @@ h4 {
   background: #dc2626;
 }
 
+/* Current Time Indicator */
+.timeline-current-time {
+  position: absolute;
+  left: 50px;
+  right: 8px;
+  height: 2px;
+  background: var(--danger);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.timeline-current-time::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--danger);
+  border-radius: 50%;
+}
+
+.timeline-current-time-label {
+  position: absolute;
+  right: 0;
+  top: -8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--danger);
+  background: var(--card-bg);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
 /* ============================================================================
    Timeline (List View - Legacy)
    ============================================================================ */
