@@ -3,7 +3,7 @@
 # ============================================================================
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "${var.project_name}-frontend-${random_string.bucket_suffix.result}"
+  bucket = "${var.project_name}-frontend-${var.environment}-${random_string.bucket_suffix.result}"
 }
 
 resource "random_string" "bucket_suffix" {
@@ -28,8 +28,8 @@ resource "aws_s3_bucket_policy" "frontend" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowCloudFrontAccess"
-        Effect    = "Allow"
+        Sid    = "AllowCloudFrontAccess"
+        Effect = "Allow"
         Principal = {
           Service = "cloudfront.amazonaws.com"
         }
@@ -50,7 +50,7 @@ resource "aws_s3_bucket_policy" "frontend" {
 # ============================================================================
 
 resource "aws_cloudfront_origin_access_control" "frontend" {
-  name                              = "${var.project_name}-frontend-oac"
+  name                              = "${var.project_name}-frontend-oac-${var.environment}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  price_class         = "PriceClass_100"  # US, Canada, Europe only (cheapest)
+  price_class         = "PriceClass_100" # US, Canada, Europe only (cheapest)
 
   # S3 Origin
   origin {

@@ -3,7 +3,7 @@
 # ============================================================================
 
 resource "aws_cognito_user_pool" "main" {
-  name = "${var.project_name}-users"
+  name = "${var.project_name}-users-${var.environment}"
 
   # Username settings
   username_attributes      = ["email"]
@@ -45,7 +45,7 @@ resource "aws_cognito_user_pool" "main" {
 # ============================================================================
 
 resource "aws_cognito_user_pool_domain" "main" {
-  domain       = "${var.project_name}-${random_string.cognito_domain_suffix.result}"
+  domain       = "${var.project_name}-${var.environment}-${random_string.cognito_domain_suffix.result}"
   user_pool_id = aws_cognito_user_pool.main.id
 }
 
@@ -83,13 +83,13 @@ resource "aws_cognito_identity_provider" "google" {
 # ============================================================================
 
 resource "aws_cognito_user_pool_client" "main" {
-  name         = "${var.project_name}-client"
+  name         = "${var.project_name}-client-${var.environment}"
   user_pool_id = aws_cognito_user_pool.main.id
 
   # Token validity
-  access_token_validity  = 1   # hours
-  id_token_validity      = 1   # hours
-  refresh_token_validity = 30  # days
+  access_token_validity  = 1  # hours
+  id_token_validity      = 1  # hours
+  refresh_token_validity = 30 # days
 
   token_validity_units {
     access_token  = "hours"
@@ -101,12 +101,12 @@ resource "aws_cognito_user_pool_client" "main" {
   allowed_oauth_flows                  = ["code"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  
+
   callback_urls = [
     "http://localhost:5173/callback",
     "https://${aws_cloudfront_distribution.frontend.domain_name}/callback"
   ]
-  
+
   logout_urls = [
     "http://localhost:5173",
     "https://${aws_cloudfront_distribution.frontend.domain_name}"

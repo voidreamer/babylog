@@ -3,7 +3,7 @@
 # ============================================================================
 
 resource "aws_iam_role" "lambda" {
-  name = "${var.project_name}-lambda-role"
+  name = "${var.project_name}-lambda-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 # ============================================================================
 
 resource "aws_lambda_function" "api" {
-  function_name = "${var.project_name}-api"
+  function_name = "${var.project_name}-api-${var.environment}"
   role          = aws_iam_role.lambda.arn
   handler       = "app.main.handler"
   runtime       = "python3.11"
@@ -41,8 +41,8 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      DATABASE_URL       = var.database_url
-      ENVIRONMENT        = var.environment
+      DATABASE_URL         = var.database_url
+      ENVIRONMENT          = var.environment
       COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
       COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.main.id
       COGNITO_REGION       = var.aws_region
@@ -66,7 +66,7 @@ data "archive_file" "lambda_placeholder" {
 # ============================================================================
 
 resource "aws_apigatewayv2_api" "api" {
-  name          = "${var.project_name}-api"
+  name          = "${var.project_name}-api-${var.environment}"
   protocol_type = "HTTP"
 
   cors_configuration {
@@ -142,7 +142,7 @@ resource "aws_apigatewayv2_stage" "default" {
 }
 
 resource "aws_cloudwatch_log_group" "api_gateway" {
-  name              = "/aws/apigateway/${var.project_name}-api"
+  name              = "/aws/apigateway/${var.project_name}-api-${var.environment}"
   retention_in_days = 7
 }
 
