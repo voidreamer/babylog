@@ -43,10 +43,11 @@ def get_timeline(
         target_date = datetime.utcnow()
     
     # Calculate day boundaries in UTC, adjusted for user's timezone
-    # tz_offset is negative for west of UTC (e.g., -300 for EST)
-    # Local midnight = UTC midnight minus the offset
+    # getTimezoneOffset() returns positive for west of UTC (e.g., 300 for EST/UTC-5)
+    # To convert local midnight to UTC: add the offset
+    # Jan 1 00:00 EST + 300min = Jan 1 05:00 UTC
     local_midnight = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    start_of_day_utc = local_midnight - timedelta(minutes=tz_offset)
+    start_of_day_utc = local_midnight + timedelta(minutes=tz_offset)
     end_of_day_utc = start_of_day_utc + timedelta(days=1)
     
     events = []
@@ -143,11 +144,12 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         db: Database session
         baby_id: ID of the baby
         date: Target date (parsed from local date string)
-        tz_offset: Timezone offset in minutes (e.g., -300 for EST/UTC-5)
+        tz_offset: Timezone offset in minutes (e.g., 300 for EST/UTC-5)
     """
     # Calculate day boundaries in UTC, adjusted for user's timezone
+    # Add offset to convert local midnight to UTC
     local_midnight = date.replace(hour=0, minute=0, second=0, microsecond=0)
-    start_of_day = local_midnight - timedelta(minutes=tz_offset)
+    start_of_day = local_midnight + timedelta(minutes=tz_offset)
     end_of_day = start_of_day + timedelta(days=1)
     
     # Feedings
