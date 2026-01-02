@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Droplets } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr) => {
@@ -58,7 +59,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }) {
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);
-            alert('Failed to save diaper change');
+            toast.error('Failed to save diaper change');
         } finally {
             setSaving(false);
         }

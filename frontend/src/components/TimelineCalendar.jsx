@@ -7,6 +7,7 @@ import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
 import { Baby, Droplets, Moon, Milk, Pencil, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr) => {
@@ -101,7 +102,7 @@ export default function TimelineCalendar() {
             }
             loadEvents();
         } catch (error) {
-            alert('Failed to delete');
+            toast.error('Failed to delete');
         }
         setSelectedEventId(null);
     };

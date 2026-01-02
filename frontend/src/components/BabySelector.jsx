@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import ShareModal from './ShareModal';
+import { toast } from 'sonner';
 
 export default function BabySelector() {
     const { babies, selectedBaby, selectBaby, addBaby, removeBaby, refresh } = useBaby();
@@ -25,7 +26,7 @@ export default function BabySelector() {
             setShowDropdown(false);
         } catch (error) {
             console.error('Failed to add baby:', error);
-            alert('Failed to add baby');
+            toast.error('Failed to add baby');
         }
     };
 

@@ -3,6 +3,7 @@ import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, formatDistanceToNow } from 'date-fns';
 import Icon from '../components/Icon';
+import { toast } from 'sonner';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -467,7 +468,7 @@ function VisitModal({ babyId, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            alert('Failed to save');
+            toast.error('Failed to save');
         } finally {
             setSaving(false);
         }
@@ -551,7 +552,7 @@ function VaccModal({ babyId, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            alert('Failed to save');
+            toast.error('Failed to save');
         } finally {
             setSaving(false);
         }
@@ -622,7 +623,7 @@ function MedModal({ babyId, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            alert('Failed to save');
+            toast.error('Failed to save');
         } finally {
             setSaving(false);
         }
@@ -689,7 +690,7 @@ function MilestoneModal({ babyId, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            alert('Failed to save');
+            toast.error('Failed to save');
         } finally {
             setSaving(false);
         }
@@ -760,7 +761,7 @@ function GrowthModal({ babyId, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            alert('Failed to save');
+            toast.error('Failed to save');
         } finally {
             setSaving(false);
         }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { formatDistanceToNow } from 'date-fns';
 import { Moon } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -46,7 +47,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
             onSave();
         } catch (error) {
             console.error('Failed to start sleep:', error);
-            alert('Failed to start sleep');
+            toast.error('Failed to start sleep');
         } finally {
             setSaving(false);
         }
@@ -60,7 +61,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
             onSave();
         } catch (error) {
             console.error('Failed to end sleep:', error);
-            alert('Failed to end sleep');
+            toast.error('Failed to end sleep');
         } finally {
             setSaving(false);
         }
@@ -69,7 +70,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
     const handleLogCompletedSleep = async (e) => {
         e.preventDefault();
         if (!endTime) {
-            alert('Please enter an end time');
+            toast.error('Please enter an end time');
             return;
         }
         setSaving(true);
@@ -90,7 +91,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);
-            alert('Failed to log sleep');
+            toast.error('Failed to log sleep');
         } finally {
             setSaving(false);
         }

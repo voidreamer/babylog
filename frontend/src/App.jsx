@@ -10,6 +10,7 @@ import Callback from './pages/Callback';
 import Health from './pages/Health';
 import Learn from './components/Learn';
 import { Home, CalendarDays, HeartPulse, BookOpen, Baby, LogOut } from 'lucide-react';
+import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -103,6 +104,17 @@ function AppContent() {
 export default function App() {
     return (
         <AuthProvider>
+            <Toaster
+                theme="dark"
+                position="top-center"
+                toastOptions={{
+                    style: {
+                        background: '#1a1a2e',
+                        border: '1px solid #2d2d44',
+                        color: '#fff',
+                    },
+                }}
+            />
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/callback" element={<Callback />} />

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Baby, Pencil, Timer, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr) => {
@@ -101,7 +102,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
             });
             onSave();
         } catch (error) {
-            alert('Failed to save feeding');
+            toast.error('Failed to save feeding');
         } finally {
             setSaving(false);
         }
@@ -128,7 +129,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
             }
             onSave();
         } catch (error) {
-            alert('Failed to save feeding');
+            toast.error('Failed to save feeding');
         } finally {
             setSaving(false);
         }
