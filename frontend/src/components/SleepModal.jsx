@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { formatDistanceToNow } from 'date-fns';
-import { Moon } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Parse time from API (UTC) to local Date object
@@ -129,7 +129,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
                             onClick={handleEndSleep}
                             disabled={saving}
                         >
-                            {saving ? 'Waking...' : '☀️ Wake Up'}
+                            {saving ? 'Waking...' : <><Sun size={16} /> Wake Up</>}
                         </button>
                     </div>
                 </div>
@@ -155,7 +155,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
                             onClick={handleStartSleep}
                             disabled={saving}
                         >
-                            {saving ? 'Starting...' : '🌙 Baby is Falling Asleep'}
+                            {saving ? 'Starting...' : <><Moon size={16} /> Baby is Falling Asleep</>}
                         </button>
                     </div>
 

@@ -4,6 +4,7 @@ import { useBaby } from '../hooks/useBaby';
 import { format, formatDistanceToNow } from 'date-fns';
 import Icon from '../components/Icon';
 import { toast } from 'sonner';
+import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -83,39 +84,42 @@ export default function Health() {
     }
 
     const sections = [
-        { id: 'visits', icon: '📋', label: 'Doctor Visits', count: visits.length },
-        { id: 'vaccinations', icon: '💉', label: 'Vaccinations', count: vaccinations.length },
-        { id: 'medications', icon: '💊', label: 'Medications', count: medications.filter(m => m.is_active).length },
-        { id: 'milestones', icon: '⭐', label: 'Milestones', count: milestones.length },
-        { id: 'growth', icon: '📈', label: 'Growth', count: growth.length },
+        { id: 'visits', icon: ClipboardList, label: 'Visits', count: visits.length },
+        { id: 'vaccinations', icon: Syringe, label: 'Vaccines', count: vaccinations.length },
+        { id: 'medications', icon: Pill, label: 'Meds', count: medications.filter(m => m.is_active).length },
+        { id: 'milestones', icon: Star, label: 'Milestones', count: milestones.length },
+        { id: 'growth', icon: TrendingUp, label: 'Growth', count: growth.length },
     ];
 
     return (
         <div>
             {/* Section Tabs */}
             <div className="type-selector" style={{ marginBottom: 'var(--space-lg)', flexWrap: 'wrap' }}>
-                {sections.map(section => (
-                    <button
-                        key={section.id}
-                        className={`type-btn ${activeSection === section.id ? 'active' : ''}`}
-                        onClick={() => setActiveSection(section.id)}
-                        style={{ flex: '1 1 auto', minWidth: '80px' }}
-                    >
-                        <span>{section.icon}</span>
-                        <span style={{ fontSize: '0.85rem' }}>{section.label}</span>
-                        {section.count > 0 && (
-                            <span style={{
-                                background: 'var(--primary)',
-                                color: 'white',
-                                padding: '2px 6px',
-                                borderRadius: '10px',
-                                fontSize: '0.75rem'
-                            }}>
-                                {section.count}
-                            </span>
-                        )}
-                    </button>
-                ))}
+                {sections.map(section => {
+                    const IconComponent = section.icon;
+                    return (
+                        <button
+                            key={section.id}
+                            className={`type-btn ${activeSection === section.id ? 'active' : ''}`}
+                            onClick={() => setActiveSection(section.id)}
+                            style={{ flex: '1 1 auto', minWidth: '80px' }}
+                        >
+                            <IconComponent size={16} />
+                            <span style={{ fontSize: '0.85rem' }}>{section.label}</span>
+                            {section.count > 0 && (
+                                <span style={{
+                                    background: 'var(--primary)',
+                                    color: 'white',
+                                    padding: '2px 6px',
+                                    borderRadius: '10px',
+                                    fontSize: '0.75rem'
+                                }}>
+                                    {section.count}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Content */}
@@ -209,7 +213,7 @@ function VisitsSection({ visits, onAdd, onRefresh }) {
     return (
         <div className="card">
             <div className="card-header">
-                <h3 className="card-title">📋 Doctor Visits</h3>
+                <h3 className="card-title"><ClipboardList size={18} style={{ marginRight: '6px' }} /> Doctor Visits</h3>
                 <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
             </div>
             {visits.length === 0 ? (
@@ -220,7 +224,7 @@ function VisitsSection({ visits, onAdd, onRefresh }) {
                 <div className="timeline">
                     {visits.map(visit => (
                         <div key={visit.id} className="timeline-item">
-                            <div className="timeline-icon feeding">📋</div>
+                            <div className="timeline-icon feeding"><ClipboardList size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">
                                     {visit.visit_type?.charAt(0).toUpperCase() + visit.visit_type?.slice(1) || 'Visit'}
@@ -255,7 +259,7 @@ function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
     return (
         <div className="card">
             <div className="card-header">
-                <h3 className="card-title">💉 Vaccinations</h3>
+                <h3 className="card-title"><Syringe size={18} style={{ marginRight: '6px' }} /> Vaccinations</h3>
                 <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
             </div>
             {vaccinations.length === 0 ? (
@@ -266,7 +270,7 @@ function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
                 <div className="timeline">
                     {vaccinations.map(vacc => (
                         <div key={vacc.id} className="timeline-item">
-                            <div className="timeline-icon diaper">💉</div>
+                            <div className="timeline-icon diaper"><Syringe size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">
                                     {vacc.vaccine_name}
@@ -302,7 +306,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
     return (
         <div className="card">
             <div className="card-header">
-                <h3 className="card-title">💊 Medications</h3>
+                <h3 className="card-title"><Pill size={18} style={{ marginRight: '6px' }} /> Medications</h3>
                 <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
             </div>
             {medications.length === 0 ? (
@@ -317,7 +321,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                             <div className="timeline">
                                 {active.map(med => (
                                     <div key={med.id} className="timeline-item">
-                                        <div className="timeline-icon sleep">💊</div>
+                                        <div className="timeline-icon sleep"><Pill size={16} /></div>
                                         <div className="timeline-content">
                                             <div className="timeline-title">{med.medication_name}</div>
                                             <div className="timeline-subtitle">
@@ -340,7 +344,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                             <div className="timeline" style={{ opacity: 0.6 }}>
                                 {past.map(med => (
                                     <div key={med.id} className="timeline-item">
-                                        <div className="timeline-icon">💊</div>
+                                        <div className="timeline-icon"><Pill size={16} /></div>
                                         <div className="timeline-content">
                                             <div className="timeline-title">{med.medication_name}</div>
                                         </div>
@@ -368,7 +372,7 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
     return (
         <div className="card">
             <div className="card-header">
-                <h3 className="card-title">⭐ Milestones</h3>
+                <h3 className="card-title"><Star size={18} style={{ marginRight: '6px' }} /> Milestones</h3>
                 <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
             </div>
             {milestones.length === 0 ? (
@@ -379,7 +383,7 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
                 <div className="timeline">
                     {milestones.map(m => (
                         <div key={m.id} className="timeline-item">
-                            <div className="timeline-icon pumping">⭐</div>
+                            <div className="timeline-icon pumping"><Star size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">{m.milestone_type}</div>
                                 {m.notes && <div className="timeline-subtitle">{m.notes}</div>}
@@ -406,7 +410,7 @@ function GrowthSection({ records, onAdd, onRefresh }) {
     return (
         <div className="card">
             <div className="card-header">
-                <h3 className="card-title">📈 Growth Records</h3>
+                <h3 className="card-title"><TrendingUp size={18} style={{ marginRight: '6px' }} /> Growth Records</h3>
                 <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
             </div>
             {records.length === 0 ? (
@@ -478,7 +482,7 @@ function VisitModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">📋 Log Doctor Visit</h2>
+                    <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> Log Doctor Visit</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -562,7 +566,7 @@ function VaccModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">💉 Log Vaccination</h2>
+                    <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> Log Vaccination</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -633,7 +637,7 @@ function MedModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">💊 Add Medication</h2>
+                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> Add Medication</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -700,7 +704,7 @@ function MilestoneModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">⭐ Log Milestone</h2>
+                    <h2 className="modal-title"><Star size={20} style={{ marginRight: '8px' }} /> Log Milestone</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -771,7 +775,7 @@ function GrowthModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">📈 Log Growth</h2>
+                    <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> Log Growth</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>

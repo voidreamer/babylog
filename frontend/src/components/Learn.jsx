@@ -3,6 +3,7 @@ import { useBaby } from '../hooks/useBaby';
 import { articles, getArticlesForAge, calculateAgeInMonths } from '../data/articles';
 import ArticleView from './ArticleView';
 import { BookOpen, Moon, Baby, Stethoscope, Sparkles, Shield } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Category config with Lucide icons
 const CATEGORY_ICONS = {
@@ -59,14 +60,24 @@ export default function Learn() {
     };
 
     return (
-        <div className="learn-container">
+        <motion.div
+            className="learn-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+        >
             {/* Header */}
-            <div className="learn-header">
+            <motion.div
+                className="learn-header"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+            >
                 <h1 className="learn-title"><BookOpen size={28} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Learn</h1>
                 <p className="learn-subtitle">
                     Evidence-based articles for new parents
                 </p>
-            </div>
+            </motion.div>
 
             {/* Recommended Section - Only show if we have baby age */}
             {recommendedArticles.length > 0 && (
@@ -153,6 +164,6 @@ export default function Learn() {
                     onClose={() => setSelectedArticle(null)}
                 />
             )}
-        </div>
+        </motion.div>
     );
 }

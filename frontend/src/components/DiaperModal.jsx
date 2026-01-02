@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
-import { Droplets } from 'lucide-react';
+import { Droplets, CircleDot, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Helper to parse UTC time
@@ -108,21 +108,21 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }) {
                                     className={`type-btn ${type === 'pee' ? 'active' : ''}`}
                                     onClick={() => setType('pee')}
                                 >
-                                    💧 Pee
+                                    <Droplets size={16} /> Pee
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'poo' ? 'active' : ''}`}
                                     onClick={() => setType('poo')}
                                 >
-                                    💩 Poo
+                                    <CircleDot size={16} /> Poo
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'mixed' ? 'active' : ''}`}
                                     onClick={() => setType('mixed')}
                                 >
-                                    🔄 Both
+                                    <RefreshCw size={16} /> Both
                                 </button>
                             </div>
                         </div>

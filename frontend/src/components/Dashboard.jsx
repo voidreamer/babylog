@@ -8,6 +8,8 @@ import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
 import DailySummary from './DailySummary';
+import { motion } from 'framer-motion';
+import { Baby } from 'lucide-react';
 
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
@@ -68,11 +70,16 @@ export default function Dashboard() {
 
     if (!selectedBaby) {
         return (
-            <div className="empty-state">
-                <div className="empty-state-icon">👶</div>
+            <motion.div
+                className="empty-state"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+            >
+                <div className="empty-state-icon"><Baby size={48} /></div>
                 <h2 className="empty-state-title">No baby added yet</h2>
                 <p className="empty-state-text">Add your baby to start tracking</p>
-            </div>
+            </motion.div>
         );
     }
 
