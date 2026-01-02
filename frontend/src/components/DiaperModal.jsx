@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
+import { Droplets } from 'lucide-react';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr) => {
@@ -92,7 +93,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🧷 {isEditing ? 'Edit' : 'Log'} Diaper Change</h2>
+                    <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Diaper Change</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 

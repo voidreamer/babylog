@@ -6,6 +6,7 @@ import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2 } from 'lucide-react';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr) => {
@@ -14,12 +15,12 @@ const parseUTCTime = (timeStr) => {
     return new Date(utcTime);
 };
 
-// Event type config
+// Event type config with Lucide icons
 const EVENT_CONFIG = {
-    feeding: { icon: '🍼', color: 'var(--feeding)', bg: 'var(--feeding-bg)', label: 'Feeding' },
-    diaper: { icon: '🧷', color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: 'Diaper' },
-    sleep: { icon: '😴', color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: 'Sleep' },
-    pumping: { icon: '🍶', color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: 'Pumping' },
+    feeding: { icon: Baby, color: 'var(--feeding)', bg: 'var(--feeding-bg)', label: 'Feeding' },
+    diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: 'Diaper' },
+    sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: 'Sleep' },
+    pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: 'Pumping' },
 };
 
 export default function TimelineCalendar() {
@@ -332,7 +333,7 @@ export default function TimelineCalendar() {
                                         }}
                                     >
                                         <div className="timeline-event-content">
-                                            <span className="timeline-event-icon">{config.icon}</span>
+                                            <span className="timeline-event-icon"><config.icon size={14} /></span>
                                             <span className="timeline-event-time">
                                                 {format(parseUTCTime(event.time), 'h:mm a')}
                                             </span>
@@ -351,7 +352,7 @@ export default function TimelineCalendar() {
                                                         handleEdit(event);
                                                     }}
                                                 >
-                                                    ✏️ Edit
+                                                    <Pencil size={14} /> Edit
                                                 </button>
                                                 <button
                                                     className="timeline-action-btn delete"
@@ -360,7 +361,7 @@ export default function TimelineCalendar() {
                                                         handleDelete(event);
                                                     }}
                                                 >
-                                                    🗑️ Delete
+                                                    <Trash2 size={14} /> Delete
                                                 </button>
                                             </div>
                                         )}

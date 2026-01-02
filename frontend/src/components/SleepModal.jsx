@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { formatDistanceToNow } from 'date-fns';
+import { Moon } from 'lucide-react';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -103,7 +104,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
             <div className="modal-overlay" onClick={onClose}>
                 <div className="modal" onClick={(e) => e.stopPropagation()}>
                     <div className="modal-header">
-                        <h2 className="modal-title">😴 Baby is Sleeping</h2>
+                        <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> Baby is Sleeping</h2>
                         <button className="modal-close" onClick={onClose}>×</button>
                     </div>
 
@@ -139,7 +140,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">😴 {isEditing ? 'Edit' : 'Log'} Sleep</h2>
+                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Sleep</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 

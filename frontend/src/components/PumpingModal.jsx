@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
+import { Milk, Pencil, Timer } from 'lucide-react';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr) => {
@@ -119,7 +120,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🍶 {isEditing ? 'Edit' : 'Log'} Pumping</h2>
+                    <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Pumping</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -133,14 +134,14 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
                                     className={`type-btn ${mode === 'quick' ? 'active' : ''}`}
                                     onClick={() => { setMode('quick'); handleStopTimer(); }}
                                 >
-                                    ✏️ Quick Log
+                                    <Pencil size={16} /> Quick Log
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${mode === 'timer' ? 'active' : ''}`}
                                     onClick={() => setMode('timer')}
                                 >
-                                    ⏱️ Timer
+                                    <Timer size={16} /> Timer
                                 </button>
                             </div>
                         </div>

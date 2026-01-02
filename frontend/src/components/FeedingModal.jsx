@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
+import { Baby, Pencil, Timer, User } from 'lucide-react';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr) => {
@@ -137,7 +138,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🍼 {isEditing ? 'Edit' : 'Log'} Feeding</h2>
+                    <h2 className="modal-title"><Baby size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Feeding</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -150,14 +151,14 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                                 className={`type-btn ${mode === 'quick' ? 'active' : ''}`}
                                 onClick={() => { setMode('quick'); handleStopTimer(); }}
                             >
-                                ✏️ Quick Log
+                                <Pencil size={16} /> Quick Log
                             </button>
                             <button
                                 type="button"
                                 className={`type-btn ${mode === 'timer' ? 'active' : ''}`}
                                 onClick={() => setMode('timer')}
                             >
-                                ⏱️ Timer
+                                <Timer size={16} /> Timer
                             </button>
                         </div>
                     </div>
@@ -171,14 +172,14 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                                 className={`type-btn ${feedMethod === 'breast' ? 'active' : ''}`}
                                 onClick={() => setFeedMethod('breast')}
                             >
-                                🤱 Breast
+                                <User size={16} /> Breast
                             </button>
                             <button
                                 type="button"
                                 className={`type-btn ${feedMethod === 'bottle' ? 'active' : ''}`}
                                 onClick={() => setFeedMethod('bottle')}
                             >
-                                🍼 Bottle
+                                <Baby size={16} /> Bottle
                             </button>
                         </div>
                     </div>
