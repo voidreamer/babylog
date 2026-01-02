@@ -30,7 +30,9 @@ export default function TimelineCalendar() {
         if (!selectedBaby) return;
         setLoading(true);
         try {
-            const data = await api.getTimeline(selectedBaby.id, selectedDate.toISOString());
+            // Send local date as YYYY-MM-DD to preserve user's intended date
+            const localDate = format(selectedDate, 'yyyy-MM-dd');
+            const data = await api.getTimeline(selectedBaby.id, localDate);
             setEvents(data);
         } catch (error) {
             console.error('Failed to load timeline:', error);

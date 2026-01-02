@@ -18,7 +18,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 @router.get("/timeline", response_model=List[TimelineEvent])
 def get_timeline(
     baby_id: int,
-    date: datetime | None = None,
+    date: str | None = None,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
@@ -27,12 +27,18 @@ def get_timeline(
     user_id = user.get("sub")
     verify_baby_access(db, baby_id, user_id, user_email)
     
-    # Default to today
-    if date is None:
-        date = datetime.utcnow()
+    # Parse date string (YYYY-MM-DD) or use today
+    if date:
+        try:
+            # Parse as local date string
+            target_date = datetime.strptime(date.split('T')[0], '%Y-%m-%d')
+        except ValueError:
+            target_date = datetime.utcnow()
+    else:
+        target_date = datetime.utcnow()
     
     # Get start and end of day
-    start_of_day = date.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_of_day = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
     end_of_day = start_of_day + timedelta(days=1)
     
     events = []
