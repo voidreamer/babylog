@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
-import { Baby, Sparkles } from 'lucide-react';
+import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check } from 'lucide-react';
+import ShareModal from './ShareModal';
+import { toast } from 'sonner';
 
 // Get time-based greeting
 function getGreeting() {
@@ -59,7 +62,54 @@ function getAvatarColor(name) {
 }
 
 export default function BabyGreeting({ summary }) {
-    const { selectedBaby } = useBaby();
+    const { babies, selectedBaby, selectBaby, addBaby, removeBaby, refresh } = useBaby();
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [newBabyName, setNewBabyName] = useState('');
+    const [newBabyDob, setNewBabyDob] = useState('');
+
+    const handleAddBaby = async (e) => {
+        e.preventDefault();
+        if (!newBabyName.trim()) return;
+
+        try {
+            await addBaby({
+                name: newBabyName.trim(),
+                birth_date: newBabyDob ? new Date(newBabyDob).toISOString() : null,
+            });
+            setNewBabyName('');
+            setNewBabyDob('');
+            setShowAddForm(false);
+        } catch (error) {
+            console.error('Failed to add baby:', error);
+            toast.error('Failed to add baby');
+        }
+    };
+
+    // Show add baby prompt if no babies
+    if (!selectedBaby && babies.length === 0) {
+        return (
+            <div className="baby-greeting baby-greeting-empty">
+                <div className="baby-greeting-header">
+                    <span className="greeting-icon">👶</span>
+                    <span className="greeting-text">Welcome!</span>
+                </div>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>
+                    Add your first baby to get started
+                </p>
+                <button
+                    className="btn btn-primary"
+                    onClick={() => setShowAddForm(true)}
+                >
+                    <Plus size={18} />
+                    Add Baby
+                </button>
+
+                {showAddForm && renderAddBabyModal()}
+            </div>
+        );
+    }
 
     if (!selectedBaby) return null;
 
@@ -68,32 +118,164 @@ export default function BabyGreeting({ summary }) {
     const encouragement = getEncouragement(summary);
     const avatarColor = getAvatarColor(selectedBaby.name);
 
-    return (
-        <div className="baby-greeting">
-            <div className="baby-greeting-header">
-                <span className="greeting-icon">{greeting.icon}</span>
-                <span className="greeting-text">{greeting.text}!</span>
-            </div>
-
-            <div className="baby-greeting-content">
-                <div
-                    className="baby-greeting-avatar"
-                    style={{ background: avatarColor }}
-                >
-                    {selectedBaby.name.charAt(0).toUpperCase()}
+    const renderAddBabyModal = () => (
+        <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2 className="modal-title">Add Baby</h2>
+                    <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                 </div>
-
-                <div className="baby-greeting-info">
-                    <div className="baby-greeting-name">{selectedBaby.name}</div>
-                    {age && <div className="baby-greeting-age">{age}</div>}
-                </div>
-            </div>
-
-            <div className="baby-greeting-encouragement">
-                <Sparkles size={14} />
-                <span>{encouragement}</span>
+                <form onSubmit={handleAddBaby}>
+                    <div className="modal-body">
+                        <div className="form-group">
+                            <label className="form-label">Baby's Name</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Enter name..."
+                                value={newBabyName}
+                                onChange={(e) => setNewBabyName(e.target.value)}
+                                autoFocus
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Birth Date (optional)</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={newBabyDob}
+                                onChange={(e) => setNewBabyDob(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setShowAddForm(false)}>
+                            Cancel
+                        </button>
+                        <button type="submit" className="btn btn-primary">
+                            Add Baby
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+    );
+
+    return (
+        <>
+            <div className="baby-greeting">
+                <div className="baby-greeting-header">
+                    <span className="greeting-icon">{greeting.icon}</span>
+                    <span className="greeting-text">{greeting.text}!</span>
+                </div>
+
+                {/* Tappable baby selector */}
+                <div
+                    className="baby-greeting-content baby-greeting-selector"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                >
+                    <div
+                        className="baby-greeting-avatar"
+                        style={{ background: avatarColor }}
+                    >
+                        {selectedBaby.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div className="baby-greeting-info">
+                        <div className="baby-greeting-name">
+                            {selectedBaby.name}
+                            <ChevronDown size={20} className="baby-greeting-chevron" />
+                        </div>
+                        {age && <div className="baby-greeting-age">{age}</div>}
+                    </div>
+                </div>
+
+                {/* Dropdown menu */}
+                {showDropdown && (
+                    <div className="baby-dropdown">
+                        {babies.map((baby) => (
+                            <div
+                                key={baby.id}
+                                className={`baby-dropdown-item ${baby.id === selectedBaby?.id ? 'active' : ''}`}
+                                onClick={() => {
+                                    selectBaby(baby);
+                                    setShowDropdown(false);
+                                }}
+                            >
+                                <div
+                                    className="baby-dropdown-avatar"
+                                    style={{ background: getAvatarColor(baby.name) }}
+                                >
+                                    {baby.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="baby-dropdown-name">{baby.name}</span>
+                                {!baby.is_owner && (
+                                    <span className="baby-dropdown-shared">Shared</span>
+                                )}
+                                {baby.id === selectedBaby?.id && <Check size={16} />}
+                            </div>
+                        ))}
+
+                        <div className="baby-dropdown-divider" />
+
+                        {selectedBaby?.is_owner && (
+                            <div
+                                className="baby-dropdown-item"
+                                onClick={() => {
+                                    setShowShareModal(true);
+                                    setShowDropdown(false);
+                                }}
+                            >
+                                <Share2 size={16} />
+                                <span>Share {selectedBaby.name}</span>
+                            </div>
+                        )}
+
+                        <div
+                            className="baby-dropdown-item"
+                            onClick={() => {
+                                setShowAddForm(true);
+                                setShowDropdown(false);
+                            }}
+                        >
+                            <Plus size={16} />
+                            <span>Add Baby</span>
+                        </div>
+
+                        {selectedBaby?.is_owner && (
+                            <div
+                                className="baby-dropdown-item danger"
+                                onClick={() => {
+                                    if (confirm(`Delete ${selectedBaby.name}? This removes all data and cannot be undone.`)) {
+                                        removeBaby(selectedBaby.id);
+                                        setShowDropdown(false);
+                                    }
+                                }}
+                            >
+                                <Trash2 size={16} />
+                                <span>Delete {selectedBaby.name}</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div className="baby-greeting-encouragement">
+                    <Sparkles size={14} />
+                    <span>{encouragement}</span>
+                </div>
+            </div>
+
+            {showAddForm && renderAddBabyModal()}
+
+            {showShareModal && selectedBaby && (
+                <ShareModal
+                    baby={selectedBaby}
+                    onClose={() => setShowShareModal(false)}
+                    onShare={() => refresh()}
+                />
+            )}
+        </>
     );
 }
 

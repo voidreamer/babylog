@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider } from './hooks/useBaby';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
-import BabySelector from './components/BabySelector';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
@@ -62,10 +61,6 @@ function AppContent() {
     return (
         <BabyProvider>
             <div className="app-container">
-                <header className="page-header">
-                    {/* Baby selector takes center stage */}
-                    <BabySelector />
-                </header>
 
                 <main>
                     {activeTab === 'home' && <Dashboard />}
