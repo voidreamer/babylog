@@ -9,7 +9,7 @@ import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Baby, LogOut } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -34,28 +34,37 @@ function AppContent() {
     const { user, logout } = useAuth();
     const [activeTab, setActiveTab] = useState('home');
 
+    // Settings page content
+    const SettingsPage = () => (
+        <div className="settings-page">
+            <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
+
+            <div className="settings-section">
+                <h3 className="settings-section-title">Account</h3>
+                {user && (
+                    <div className="settings-item">
+                        <span className="settings-item-label">Signed in as</span>
+                        <span className="settings-item-value">{user.email || 'User'}</span>
+                    </div>
+                )}
+                <button
+                    className="btn btn-secondary btn-block"
+                    onClick={logout}
+                    style={{ marginTop: 'var(--space-md)', justifyContent: 'center' }}
+                >
+                    <LogOut size={18} />
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    );
+
     return (
         <BabyProvider>
             <div className="app-container">
                 <header className="page-header">
-                    <div className="page-title">
-                        <Baby size={24} />
-                        <h1 style={{ fontSize: '1.25rem', margin: 0 }}>SimpleBaby</h1>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-                        <BabySelector />
-                        {user && (
-                            <button
-                                className="btn btn-secondary"
-                                onClick={logout}
-                                style={{ padding: 'var(--space-sm) var(--space-md)', display: 'flex', alignItems: 'center', gap: '4px' }}
-                            >
-                                <LogOut size={16} />
-                                <span className="hide-mobile">Logout</span>
-                            </button>
-                        )}
-                    </div>
+                    {/* Baby selector takes center stage */}
+                    <BabySelector />
                 </header>
 
                 <main>
@@ -63,6 +72,7 @@ function AppContent() {
                     {activeTab === 'timeline' && <TimelineCalendar />}
                     {activeTab === 'health' && <Health />}
                     {activeTab === 'learn' && <Learn />}
+                    {activeTab === 'settings' && <SettingsPage />}
                 </main>
 
                 {/* Bottom Navigation */}
@@ -94,6 +104,13 @@ function AppContent() {
                     >
                         <BookOpen size={20} />
                         <span>Learn</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        <Settings size={20} />
+                        <span>Settings</span>
                     </button>
                 </nav>
             </div>

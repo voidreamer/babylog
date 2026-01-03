@@ -131,15 +131,57 @@ h4 {
 .page-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: var(--space-lg);
+  padding: var(--space-sm) 0;
+}
+
+/* ============================================================================
+   Settings Page
+   ============================================================================ */
+
+.settings-page {
   padding: var(--space-md) 0;
 }
 
-.page-title {
+.settings-section {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-lg);
+}
+
+.settings-section-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-md);
+}
+
+.settings-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-item:last-of-type {
+  border-bottom: none;
+}
+
+.settings-item-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.settings-item-value {
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
 /* ============================================================================
