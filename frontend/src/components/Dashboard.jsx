@@ -93,15 +93,13 @@ export default function Dashboard() {
 
     return (
         <div>
-            {/* Daily Summary */}
-            <DailySummary summary={dashboard?.daily_summary} />
-
-            {/* Widgets */}
+            {/* Widgets First - Primary Actions */}
             <div className="widgets-grid">
                 <Widget
                     type="feeding"
-                    label="Last feeding"
+                    label="Feeding"
                     value={formatTime(dashboard?.last_feeding?.time)}
+                    lastTime={dashboard?.last_feeding?.time}
                     detail={dashboard?.last_feeding ?
                         `${dashboard.last_feeding.type}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
                         : null}
@@ -110,20 +108,22 @@ export default function Dashboard() {
 
                 <Widget
                     type="diaper"
-                    label="Last diaper"
+                    label="Diaper"
                     value={formatTime(dashboard?.last_diaper?.time)}
+                    lastTime={dashboard?.last_diaper?.time}
                     detail={dashboard?.last_diaper?.type}
                     onClick={() => setDiaperModal(true)}
                 />
 
                 <Widget
                     type="sleep"
-                    label={dashboard?.current_sleep ? "Sleeping" : "Last sleep"}
+                    label={dashboard?.current_sleep ? "Sleeping" : "Sleep"}
                     value={dashboard?.current_sleep
                         ? `Since ${formatTime(dashboard.current_sleep.start_time)}`
                         : formatTime(dashboard?.last_sleep?.start_time)}
+                    lastTime={dashboard?.current_sleep?.start_time || dashboard?.last_sleep?.start_time}
                     detail={dashboard?.current_sleep
-                        ? "Currently sleeping"
+                        ? "Currently sleeping 💤"
                         : dashboard?.last_sleep?.duration_minutes
                             ? `${dashboard.last_sleep.duration_minutes}min`
                             : null}
@@ -133,14 +133,18 @@ export default function Dashboard() {
 
                 <Widget
                     type="pumping"
-                    label="Last pumping"
+                    label="Pumping"
                     value={formatTime(dashboard?.last_pumping?.time)}
+                    lastTime={dashboard?.last_pumping?.time}
                     detail={dashboard?.last_pumping?.amount_ml
                         ? `${dashboard.last_pumping.amount_ml}ml`
                         : null}
                     onClick={() => setPumpingModal(true)}
                 />
             </div>
+
+            {/* Daily Summary - Below widgets */}
+            <DailySummary summary={dashboard?.daily_summary} />
 
             {/* Modals */}
             {feedingModal && (
