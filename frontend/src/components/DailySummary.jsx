@@ -1,6 +1,9 @@
-import Icon from './Icon';
+import { useState } from 'react';
+import { Baby, Droplets, Moon, Heart, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 
 export default function DailySummary({ summary }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     if (!summary) return null;
 
     const formatTime = (minutes) => {
@@ -10,90 +13,66 @@ export default function DailySummary({ summary }) {
         return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
     };
 
-    const statStyle = {
-        background: 'var(--surface)',
-        borderRadius: 'var(--radius-md)',
-        padding: 'var(--space-md)',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 'var(--space-xs)'
-    };
+    const stats = [
+        {
+            icon: Baby,
+            value: summary.total_feedings,
+            label: 'feedings',
+            color: 'var(--feeding)',
+            extra: summary.total_ml > 0 ? `${summary.total_ml}ml` : null
+        },
+        {
+            icon: Droplets,
+            value: summary.total_diapers,
+            label: 'diapers',
+            color: 'var(--diaper)',
+            extra: `${summary.pee_count}💧 ${summary.poo_count}💩`
+        },
+        {
+            icon: Moon,
+            value: formatTime(summary.total_sleep_minutes),
+            label: 'sleep',
+            color: 'var(--sleep)',
+            extra: `${summary.sleep_count} naps`
+        },
+        ...(summary.pumping_count > 0 ? [{
+            icon: Heart,
+            value: summary.pumping_count,
+            label: 'pumps',
+            color: 'var(--pumping)',
+            extra: summary.total_pumping_ml > 0 ? `${summary.total_pumping_ml}ml` : null
+        }] : [])
+    ];
 
     return (
-        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-            <div className="card-header">
-                <h3 className="card-title">📊 Today's Summary</h3>
-            </div>
-            <div style={{
-                padding: 'var(--space-md)',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                gap: 'var(--space-md)'
-            }}>
-                {/* Feedings */}
-                <div style={statStyle}>
-                    <Icon name="feeding" size={32} />
-                    <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--feeding)' }}>
-                        {summary.total_feedings}
-                    </div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        feedings
-                    </div>
-                    {summary.total_ml > 0 && (
-                        <div style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                            {summary.total_ml} ml
-                        </div>
-                    )}
+        <div className="daily-summary">
+            <button
+                className="daily-summary-header"
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
+                <div className="daily-summary-title">
+                    <BarChart3 size={18} />
+                    <span>Today's Summary</span>
                 </div>
+                {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </button>
 
-                {/* Diapers */}
-                <div style={statStyle}>
-                    <Icon name="diaper" size={32} />
-                    <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--diaper)' }}>
-                        {summary.total_diapers}
-                    </div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        diapers
-                    </div>
-                    <div style={{ fontSize: '0.8rem' }}>
-                        💧{summary.pee_count} 💩{summary.poo_count} 🔄{summary.mixed_count}
-                    </div>
-                </div>
-
-                {/* Sleep */}
-                <div style={statStyle}>
-                    <Icon name="sleep" size={32} />
-                    <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--sleep)' }}>
-                        {formatTime(summary.total_sleep_minutes)}
-                    </div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        sleep
-                    </div>
-                    <div style={{ fontSize: '0.8rem' }}>
-                        {summary.sleep_count} naps
-                    </div>
-                </div>
-
-                {/* Pumping */}
-                {summary.pumping_count > 0 && (
-                    <div style={statStyle}>
-                        <Icon name="pumping" size={32} />
-                        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--pumping)' }}>
-                            {summary.pumping_count}
-                        </div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            pumps
-                        </div>
-                        {summary.total_pumping_ml > 0 && (
-                            <div style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                                {summary.total_pumping_ml} ml
+            {isExpanded && (
+                <div className="daily-summary-content">
+                    {stats.map((stat, index) => (
+                        <div key={index} className="daily-summary-stat">
+                            <stat.icon size={24} style={{ color: stat.color }} />
+                            <div className="daily-summary-stat-value" style={{ color: stat.color }}>
+                                {stat.value}
                             </div>
-                        )}
-                    </div>
-                )}
-            </div>
+                            <div className="daily-summary-stat-label">{stat.label}</div>
+                            {stat.extra && (
+                                <div className="daily-summary-stat-extra">{stat.extra}</div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
