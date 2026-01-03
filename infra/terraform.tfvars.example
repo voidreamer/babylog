@@ -11,3 +11,6 @@ supabase_jwt_secret = "fBKCscwieFb6CS1zZcDr+djAahu6mqhCiOwJfTolI8t82F9/AwdeGafxD
 # Google OAuth (optional - leave empty to disable)
 google_client_id     = ""
 google_client_secret = ""
+
+# CORS allowed origins (comma-separated)
+cors_origins = "https://d3nsr7lzhub0bz.cloudfront.net"

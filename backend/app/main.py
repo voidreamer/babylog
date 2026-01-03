@@ -18,11 +18,13 @@ app = FastAPI(
     root_path="/api" if settings.environment in ("prod", "staging") else ""
 )
 
-# CORS - Allow all origins for now (can be restricted later)
+# CORS - Restrict to allowed origins from settings
+# Parse comma-separated origins from environment
+allowed_origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,  # Must be False when using allow_origins=["*"]
+    allow_origins=allowed_origins,
+    allow_credentials=True,  # Can be True now that we have specific origins
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -34,3 +34,9 @@ variable "google_client_secret" {
   sensitive   = true
   default     = ""
 }
+
+variable "cors_origins" {
+  description = "Comma-separated list of allowed CORS origins"
+  type        = string
+  default     = "http://localhost:5173"
+}

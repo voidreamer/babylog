@@ -36,23 +36,7 @@ function MainApp() {
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
 
-    // Check if we should show onboarding (no babies yet)
-    useEffect(() => {
-        if (!babiesLoading && babies.length === 0) {
-            setShowOnboarding(true);
-        }
-    }, [babies, babiesLoading]);
-
-    // Show onboarding for first-time users
-    if (showOnboarding && !babiesLoading && babies.length === 0) {
-        return (
-            <Onboarding
-                onComplete={() => setShowOnboarding(false)}
-            />
-        );
-    }
-
-    // Widget visibility settings
+    // Widget visibility settings - MUST be before any early returns (React hooks rule)
     const [visibleWidgets, setVisibleWidgets] = useState(() => {
         const saved = localStorage.getItem('visibleWidgets');
         return saved ? JSON.parse(saved) : ['feeding', 'diaper', 'sleep', 'pumping'];
@@ -79,6 +63,22 @@ function MainApp() {
             return updated;
         });
     };
+
+    // Check if we should show onboarding (no babies yet)
+    useEffect(() => {
+        if (!babiesLoading && babies.length === 0) {
+            setShowOnboarding(true);
+        }
+    }, [babies, babiesLoading]);
+
+    // Show onboarding for first-time users
+    if (showOnboarding && !babiesLoading && babies.length === 0) {
+        return (
+            <Onboarding
+                onComplete={() => setShowOnboarding(false)}
+            />
+        );
+    }
 
     // Settings page content
     const SettingsPage = () => (

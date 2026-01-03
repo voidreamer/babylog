@@ -30,6 +30,7 @@ def baby_to_response(baby: Baby, user_id: str) -> dict:
         "owner_email": baby.owner_email,
         "name": baby.name,
         "birth_date": baby.birth_date,
+        "gender": baby.gender,
         "shared_with_emails": baby.shared_with_emails or [],
         "is_owner": baby.user_id == user_id,
         "created_at": baby.created_at,
@@ -92,6 +93,7 @@ def create_baby(
         owner_email=user_email,
         name=baby_data.name,
         birth_date=baby_data.birth_date,
+        gender=baby_data.gender,
         shared_with_emails=[]
     )
     db.add(baby)

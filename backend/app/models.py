@@ -1,8 +1,13 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Numeric
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from .database import Base
+
+
+# Helper for timezone-aware UTC timestamps (datetime.utcnow is deprecated in Python 3.12+)
+def utc_now():
+    return datetime.now(timezone.utc)
 
 
 class Baby(Base):
@@ -15,7 +20,7 @@ class Baby(Base):
     birth_date = Column(DateTime, nullable=True)
     gender = Column(String, nullable=True)  # 'boy', 'girl', or null
     shared_with_emails = Column(ARRAY(String), default=list)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     # Relationships
     feedings = relationship("Feeding", back_populates="baby", cascade="all, delete-orphan")
@@ -44,7 +49,7 @@ class Feeding(Base):
     duration_minutes = Column(Integer, nullable=True)
     amount_ml = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="feedings")
 
@@ -61,7 +66,7 @@ class Diaper(Base):
     poo_consistency = Column(String, nullable=True)  # 'liquid', 'soft', 'formed', 'hard', 'pellets'
     poo_amount = Column(String, nullable=True)  # 'small', 'medium', 'large', 'blowout'
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="diapers")
 
@@ -74,7 +79,7 @@ class Sleep(Base):
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="sleeps")
     
@@ -94,7 +99,7 @@ class Pumping(Base):
     duration_minutes = Column(Integer, nullable=True)
     amount_ml = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="pumpings")
 
@@ -115,7 +120,7 @@ class DoctorVisit(Base):
     height_cm = Column(Numeric(5, 2), nullable=True)
     head_cm = Column(Numeric(5, 2), nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="doctor_visits")
 
@@ -131,7 +136,7 @@ class Vaccination(Base):
     next_due_date = Column(DateTime, nullable=True)
     administered_by = Column(String(200), nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="vaccinations")
 
@@ -148,7 +153,7 @@ class Medication(Base):
     end_date = Column(DateTime, nullable=True)
     is_active = Column(Boolean, default=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="medications")
 
@@ -161,7 +166,7 @@ class Milestone(Base):
     milestone_type = Column(String(100), nullable=False)
     achieved_date = Column(DateTime, nullable=False)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="milestones")
 
@@ -176,7 +181,7 @@ class GrowthRecord(Base):
     height_cm = Column(Numeric(5, 2), nullable=True)
     head_cm = Column(Numeric(5, 2), nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="growth_records")
 
@@ -194,7 +199,7 @@ class Potty(Base):
     result = Column(String, nullable=False)  # 'success', 'accident', 'attempt'
     potty_type = Column(String, nullable=True)  # 'pee', 'poo', 'both'
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="potty_logs")
 
@@ -207,7 +212,7 @@ class TummyTime(Base):
     start_time = Column(DateTime, nullable=False)
     duration_minutes = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="tummy_times")
 
@@ -219,6 +224,6 @@ class Bath(Base):
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
     notes = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="baths")

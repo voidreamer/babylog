@@ -278,6 +278,16 @@ class DoctorVisitResponse(DoctorVisitBase):
     )
 
 
+class DoctorVisitUpdate(BaseModel):
+    visit_date: Optional[datetime] = None
+    doctor_name: Optional[str] = None
+    visit_type: Optional[VisitTypeEnum] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    head_cm: Optional[float] = None
+    notes: Optional[str] = None
+
+
 class VaccinationBase(BaseModel):
     vaccine_name: str
     dose_number: int = 1
@@ -300,6 +310,15 @@ class VaccinationResponse(VaccinationBase):
         from_attributes=True,
         json_encoders={datetime: serialize_datetime}
     )
+
+
+class VaccinationUpdate(BaseModel):
+    vaccine_name: Optional[str] = None
+    dose_number: Optional[int] = None
+    given_date: Optional[datetime] = None
+    next_due_date: Optional[datetime] = None
+    administered_by: Optional[str] = None
+    notes: Optional[str] = None
 
 
 class MedicationBase(BaseModel):
@@ -327,6 +346,16 @@ class MedicationResponse(MedicationBase):
     )
 
 
+class MedicationUpdate(BaseModel):
+    medication_name: Optional[str] = None
+    dosage: Optional[str] = None
+    frequency: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    is_active: Optional[bool] = None
+    notes: Optional[str] = None
+
+
 class MilestoneBase(BaseModel):
     milestone_type: str
     achieved_date: datetime
@@ -346,6 +375,12 @@ class MilestoneResponse(MilestoneBase):
         from_attributes=True,
         json_encoders={datetime: serialize_datetime}
     )
+
+
+class MilestoneUpdate(BaseModel):
+    milestone_type: Optional[str] = None
+    achieved_date: Optional[datetime] = None
+    notes: Optional[str] = None
 
 
 class GrowthRecordBase(BaseModel):
@@ -369,6 +404,14 @@ class GrowthRecordResponse(GrowthRecordBase):
         from_attributes=True,
         json_encoders={datetime: serialize_datetime}
     )
+
+
+class GrowthRecordUpdate(BaseModel):
+    recorded_date: Optional[datetime] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    head_cm: Optional[float] = None
+    notes: Optional[str] = None
 
 
 # ============================================================================
