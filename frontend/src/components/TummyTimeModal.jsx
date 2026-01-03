@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Sun } from 'lucide-react';
+
+// Parse UTC time string to local Date
+const parseUTCTime = (timeStr) => {
+    if (!timeStr) return new Date();
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
 
 const durationOptions = [
     { value: 1, label: '1 min' },
@@ -13,12 +20,23 @@ const durationOptions = [
     { value: 15, label: '15 min' },
 ];
 
-export default function TummyTimeModal({ onClose, onSave }) {
+export default function TummyTimeModal({ editEvent, onClose, onSave }) {
     const { selectedBaby } = useBaby();
+    const isEditing = !!editEvent;
     const [duration, setDuration] = useState(5);
     const [time, setTime] = useState(new Date());
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
+
+    // Initialize from editEvent when editing
+    useEffect(() => {
+        if (editEvent && editEvent.details) {
+            const details = editEvent.details;
+            setTime(parseUTCTime(editEvent.time));
+            if (details.duration_minutes) setDuration(details.duration_minutes);
+            if (details.notes) setNotes(details.notes);
+        }
+    }, [editEvent]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,16 +44,22 @@ export default function TummyTimeModal({ onClose, onSave }) {
 
         setSaving(true);
         try {
-            await api.createTummyTime({
+            const data = {
                 baby_id: selectedBaby.id,
                 start_time: time.toISOString(),
                 duration_minutes: duration,
                 notes: notes || null,
-            });
+            };
+
+            if (isEditing) {
+                await api.updateTummyTime(editEvent.id, data);
+            } else {
+                await api.createTummyTime(data);
+            }
             onSave();
         } catch (error) {
             console.error('Failed to log tummy time:', error);
-            toast.error('Failed to log tummy time');
+            toast.error('Failed to save tummy time');
         } finally {
             setSaving(false);
         }
@@ -45,7 +69,7 @@ export default function TummyTimeModal({ onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> Log Tummy Time</h2>
+                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Tummy Time</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 

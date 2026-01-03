@@ -347,6 +347,13 @@ class ApiClient {
         return this.request(`/activities/potty/${id}`, { method: 'DELETE' });
     }
 
+    async updatePottyLog(id, data) {
+        return this.request(`/activities/potty/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
     // Activities - Tummy Time
     async getTummyTimes(babyId, limit = 50) {
         return this.request(`/activities/tummy-time?baby_id=${babyId}&limit=${limit}`);
@@ -363,6 +370,13 @@ class ApiClient {
         return this.request(`/activities/tummy-time/${id}`, { method: 'DELETE' });
     }
 
+    async updateTummyTime(id, data) {
+        return this.request(`/activities/tummy-time/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
     // Activities - Bath
     async getBaths(babyId, limit = 50) {
         return this.request(`/activities/baths?baby_id=${babyId}&limit=${limit}`);
@@ -377,6 +391,13 @@ class ApiClient {
 
     async deleteBath(id) {
         return this.request(`/activities/baths/${id}`, { method: 'DELETE' });
+    }
+
+    async updateBath(id, data) {
+        return this.request(`/activities/baths/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
     }
 }
 

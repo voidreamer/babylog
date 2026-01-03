@@ -6,7 +6,10 @@ import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
-import { Baby, Droplets, Moon, Milk, Pencil, Trash2 } from 'lucide-react';
+import PottyModal from './PottyModal';
+import TummyTimeModal from './TummyTimeModal';
+import BathModal from './BathModal';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Parse UTC time string to local Date
@@ -22,6 +25,9 @@ const EVENT_CONFIG = {
     diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: 'Diaper' },
     sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: 'Sleep' },
     pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: 'Pumping' },
+    potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: 'Potty' },
+    tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: 'Tummy Time' },
+    bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: 'Bath' },
 };
 
 export default function TimelineCalendar() {
@@ -98,6 +104,15 @@ export default function TimelineCalendar() {
                     break;
                 case 'pumping':
                     await api.deletePumping(event.id);
+                    break;
+                case 'potty':
+                    await api.deletePottyLog(event.id);
+                    break;
+                case 'tummy':
+                    await api.deleteTummyTime(event.id);
+                    break;
+                case 'bath':
+                    await api.deleteBath(event.id);
                     break;
             }
             loadEvents();
@@ -245,6 +260,12 @@ export default function TimelineCalendar() {
                 return details.end_time ? '' : 'Sleeping...';
             case 'pumping':
                 return details.amount_ml ? `${details.amount_ml}ml` : '';
+            case 'potty':
+                return details.result ? details.result.charAt(0).toUpperCase() + details.result.slice(1) : '';
+            case 'tummy':
+                return details.duration_minutes ? `${details.duration_minutes}min` : '';
+            case 'bath':
+                return 'Bath';
             default:
                 return '';
         }
@@ -405,6 +426,30 @@ export default function TimelineCalendar() {
             {editingEvent?.event_type === 'pumping' && (
                 <PumpingModal
                     babyId={selectedBaby.id}
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'potty' && (
+                <PottyModal
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'tummy' && (
+                <TummyTimeModal
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'bath' && (
+                <BathModal
                     editEvent={editingEvent}
                     onClose={() => setEditingEvent(null)}
                     onSave={handleEditComplete}

@@ -87,6 +87,37 @@ def delete_potty_log(
     return None
 
 
+@router.put("/potty/{potty_id}", response_model=PottyResponse)
+def update_potty_log(
+    potty_id: int,
+    potty_data: PottyCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Update a potty log."""
+    user_id = user.get("sub")
+    
+    potty = db.query(Potty).join(Baby).filter(
+        Potty.id == potty_id,
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
+    
+    if not potty:
+        raise HTTPException(status_code=404, detail="Potty log not found")
+    
+    potty.time = potty_data.time
+    potty.result = potty_data.result
+    potty.potty_type = potty_data.potty_type
+    potty.notes = potty_data.notes
+    db.commit()
+    db.refresh(potty)
+    return potty
+
+
 # ============================================================================
 # Tummy Time
 # ============================================================================
@@ -158,6 +189,36 @@ def delete_tummy_time(
     return None
 
 
+@router.put("/tummy-time/{tummy_id}", response_model=TummyTimeResponse)
+def update_tummy_time(
+    tummy_id: int,
+    tummy_data: TummyTimeCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Update a tummy time log."""
+    user_id = user.get("sub")
+    
+    tummy = db.query(TummyTime).join(Baby).filter(
+        TummyTime.id == tummy_id,
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
+    
+    if not tummy:
+        raise HTTPException(status_code=404, detail="Tummy time not found")
+    
+    tummy.start_time = tummy_data.start_time
+    tummy.duration_minutes = tummy_data.duration_minutes
+    tummy.notes = tummy_data.notes
+    db.commit()
+    db.refresh(tummy)
+    return tummy
+
+
 # ============================================================================
 # Bath Time
 # ============================================================================
@@ -226,3 +287,32 @@ def delete_bath(
     db.delete(bath)
     db.commit()
     return None
+
+
+@router.put("/baths/{bath_id}", response_model=BathResponse)
+def update_bath(
+    bath_id: int,
+    bath_data: BathCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Update a bath log."""
+    user_id = user.get("sub")
+    
+    bath = db.query(Bath).join(Baby).filter(
+        Bath.id == bath_id,
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
+    
+    if not bath:
+        raise HTTPException(status_code=404, detail="Bath not found")
+    
+    bath.time = bath_data.time
+    bath.notes = bath_data.notes
+    db.commit()
+    db.refresh(bath)
+    return bath
