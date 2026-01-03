@@ -240,6 +240,9 @@ class DashboardStats(BaseModel):
     last_diaper: Optional[DiaperResponse] = None
     last_sleep: Optional[SleepResponse] = None
     last_pumping: Optional[PumpingResponse] = None
+    last_potty: Optional['PottyResponse'] = None
+    last_tummy: Optional['TummyTimeResponse'] = None
+    last_bath: Optional['BathResponse'] = None
     current_sleep: Optional[SleepResponse] = None
     daily_summary: Optional[DailySummary] = None
 

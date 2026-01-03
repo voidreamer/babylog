@@ -13,13 +13,28 @@ import BathModal from './BathModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import { motion } from 'framer-motion';
-import { Baby } from 'lucide-react';
+import { Baby, Plus, Settings } from 'lucide-react';
+
+// Default visible widgets
+const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
+
+// All available widgets
+const ALL_WIDGETS = [
+    { id: 'feeding', label: 'Feeding' },
+    { id: 'diaper', label: 'Diaper' },
+    { id: 'sleep', label: 'Sleep' },
+    { id: 'pumping', label: 'Pumping' },
+    { id: 'potty', label: 'Potty' },
+    { id: 'tummy', label: 'Tummy Time' },
+    { id: 'bath', label: 'Bath' },
+];
 
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Modal states
     const [feedingModal, setFeedingModal] = useState(false);
     const [diaperModal, setDiaperModal] = useState(false);
     const [sleepModal, setSleepModal] = useState(false);
@@ -28,13 +43,24 @@ export default function Dashboard() {
     const [tummyModal, setTummyModal] = useState(false);
     const [bathModal, setBathModal] = useState(false);
 
+    // Widget customization
+    const [visibleWidgets, setVisibleWidgets] = useState(() => {
+        const saved = localStorage.getItem('visibleWidgets');
+        return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_WIDGETS;
+    });
+    const [showWidgetPicker, setShowWidgetPicker] = useState(false);
+
+    // Save widget preferences
+    useEffect(() => {
+        localStorage.setItem('visibleWidgets', JSON.stringify(visibleWidgets));
+    }, [visibleWidgets]);
+
     const loadData = async () => {
         if (!selectedBaby) return;
 
         try {
-            // Send local date and timezone offset to fix timezone issues
             const localDate = format(new Date(), 'yyyy-MM-dd');
-            const tzOffset = new Date().getTimezoneOffset(); // Minutes offset from UTC (e.g., 300 for EST)
+            const tzOffset = new Date().getTimezoneOffset();
             const dashboardData = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
             setDashboard(dashboardData);
         } catch (error) {
@@ -48,14 +74,12 @@ export default function Dashboard() {
         loadData();
     }, [selectedBaby]);
 
-    // Auto-refresh every 30 seconds
     useEffect(() => {
         if (!selectedBaby) return;
         const interval = setInterval(loadData, 30000);
         return () => clearInterval(interval);
     }, [selectedBaby]);
 
-    // Parse time from API (UTC) to local Date object
     const parseUTCTime = (timeStr) => {
         if (!timeStr) return null;
         const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
@@ -69,11 +93,27 @@ export default function Dashboard() {
 
     const handleEventLogged = () => {
         loadData();
+        // Close all modals
         setFeedingModal(false);
         setDiaperModal(false);
         setSleepModal(false);
         setPumpingModal(false);
+        setPottyModal(false);
+        setTummyModal(false);
+        setBathModal(false);
     };
+
+    const toggleWidget = (widgetId) => {
+        setVisibleWidgets(prev => {
+            if (prev.includes(widgetId)) {
+                return prev.filter(id => id !== widgetId);
+            } else {
+                return [...prev, widgetId];
+            }
+        });
+    };
+
+    const hiddenWidgets = ALL_WIDGETS.filter(w => !visibleWidgets.includes(w.id));
 
     if (!selectedBaby) {
         return (
@@ -100,79 +140,142 @@ export default function Dashboard() {
 
     return (
         <div>
-            {/* Baby Greeting Card */}
             <BabyGreeting summary={dashboard?.daily_summary} />
 
-            {/* Widgets - Primary Actions */}
+            {/* Widgets Grid */}
             <div className="widgets-grid">
-                <Widget
-                    type="feeding"
-                    label="Feeding"
-                    value={formatTime(dashboard?.last_feeding?.time)}
-                    lastTime={dashboard?.last_feeding?.time}
-                    detail={dashboard?.last_feeding ?
-                        `${dashboard.last_feeding.type}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
-                        : null}
-                    onClick={() => setFeedingModal(true)}
-                />
-
-                <Widget
-                    type="diaper"
-                    label="Diaper"
-                    value={formatTime(dashboard?.last_diaper?.time)}
-                    lastTime={dashboard?.last_diaper?.time}
-                    detail={dashboard?.last_diaper?.type}
-                    onClick={() => setDiaperModal(true)}
-                />
-
-                <Widget
-                    type="sleep"
-                    label={dashboard?.current_sleep ? "Sleeping" : "Sleep"}
-                    value={dashboard?.current_sleep
-                        ? `Since ${formatTime(dashboard.current_sleep.start_time)}`
-                        : formatTime(dashboard?.last_sleep?.start_time)}
-                    lastTime={dashboard?.current_sleep?.start_time || dashboard?.last_sleep?.start_time}
-                    detail={dashboard?.current_sleep
-                        ? "Currently sleeping 💤"
-                        : dashboard?.last_sleep?.duration_minutes
-                            ? `${dashboard.last_sleep.duration_minutes}min`
+                {visibleWidgets.includes('feeding') && (
+                    <Widget
+                        type="feeding"
+                        label="Feeding"
+                        value={formatTime(dashboard?.last_feeding?.time)}
+                        lastTime={dashboard?.last_feeding?.time}
+                        detail={dashboard?.last_feeding ?
+                            `${dashboard.last_feeding.type}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
                             : null}
-                    isSleeping={!!dashboard?.current_sleep}
-                    onClick={() => setSleepModal(true)}
-                />
+                        onClick={() => setFeedingModal(true)}
+                    />
+                )}
 
-                <Widget
-                    type="pumping"
-                    label="Pumping"
-                    value={formatTime(dashboard?.last_pumping?.time)}
-                    lastTime={dashboard?.last_pumping?.time}
-                    detail={dashboard?.last_pumping?.amount_ml
-                        ? `${dashboard.last_pumping.amount_ml}ml`
-                        : null}
-                    onClick={() => setPumpingModal(true)}
-                />
+                {visibleWidgets.includes('diaper') && (
+                    <Widget
+                        type="diaper"
+                        label="Diaper"
+                        value={formatTime(dashboard?.last_diaper?.time)}
+                        lastTime={dashboard?.last_diaper?.time}
+                        detail={dashboard?.last_diaper?.type}
+                        onClick={() => setDiaperModal(true)}
+                    />
+                )}
 
-                <Widget
-                    type="potty"
-                    label="Potty"
-                    onClick={() => setPottyModal(true)}
-                />
+                {visibleWidgets.includes('sleep') && (
+                    <Widget
+                        type="sleep"
+                        label={dashboard?.current_sleep ? "Sleeping" : "Sleep"}
+                        value={dashboard?.current_sleep
+                            ? `Since ${formatTime(dashboard.current_sleep.start_time)}`
+                            : formatTime(dashboard?.last_sleep?.start_time)}
+                        lastTime={dashboard?.current_sleep?.start_time || dashboard?.last_sleep?.start_time}
+                        detail={dashboard?.current_sleep
+                            ? "Currently sleeping 💤"
+                            : dashboard?.last_sleep?.duration_minutes
+                                ? `${dashboard.last_sleep.duration_minutes}min`
+                                : null}
+                        isSleeping={!!dashboard?.current_sleep}
+                        onClick={() => setSleepModal(true)}
+                    />
+                )}
 
-                <Widget
-                    type="tummy"
-                    label="Tummy Time"
-                    onClick={() => setTummyModal(true)}
-                />
+                {visibleWidgets.includes('pumping') && (
+                    <Widget
+                        type="pumping"
+                        label="Pumping"
+                        value={formatTime(dashboard?.last_pumping?.time)}
+                        lastTime={dashboard?.last_pumping?.time}
+                        detail={dashboard?.last_pumping?.amount_ml
+                            ? `${dashboard.last_pumping.amount_ml}ml`
+                            : null}
+                        onClick={() => setPumpingModal(true)}
+                    />
+                )}
 
-                <Widget
-                    type="bath"
-                    label="Bath"
-                    onClick={() => setBathModal(true)}
-                />
+                {visibleWidgets.includes('potty') && (
+                    <Widget
+                        type="potty"
+                        label="Potty"
+                        value={formatTime(dashboard?.last_potty?.time)}
+                        lastTime={dashboard?.last_potty?.time}
+                        detail={dashboard?.last_potty?.result}
+                        onClick={() => setPottyModal(true)}
+                    />
+                )}
+
+                {visibleWidgets.includes('tummy') && (
+                    <Widget
+                        type="tummy"
+                        label="Tummy Time"
+                        value={formatTime(dashboard?.last_tummy?.start_time)}
+                        lastTime={dashboard?.last_tummy?.start_time}
+                        detail={dashboard?.last_tummy?.duration_minutes
+                            ? `${dashboard.last_tummy.duration_minutes}min`
+                            : null}
+                        onClick={() => setTummyModal(true)}
+                    />
+                )}
+
+                {visibleWidgets.includes('bath') && (
+                    <Widget
+                        type="bath"
+                        label="Bath"
+                        value={formatTime(dashboard?.last_bath?.time)}
+                        lastTime={dashboard?.last_bath?.time}
+                        onClick={() => setBathModal(true)}
+                    />
+                )}
+
+                {/* Add Widget Button - shows if there are hidden widgets */}
+                {hiddenWidgets.length > 0 && (
+                    <div
+                        className="widget widget-add"
+                        onClick={() => setShowWidgetPicker(!showWidgetPicker)}
+                    >
+                        <div className="widget-content">
+                            <div className="widget-add-content">
+                                <Plus size={32} />
+                                <span>Add Widget</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {/* Daily Summary - Below widgets */}
-            <DailySummary summary={dashboard?.daily_summary} />
+            {/* Widget Picker Dropdown */}
+            {showWidgetPicker && hiddenWidgets.length > 0 && (
+                <div className="widget-picker">
+                    <div className="widget-picker-header">
+                        <span>Add a widget</span>
+                        <button onClick={() => setShowWidgetPicker(false)}>×</button>
+                    </div>
+                    <div className="widget-picker-list">
+                        {hiddenWidgets.map(widget => (
+                            <button
+                                key={widget.id}
+                                className="widget-picker-item"
+                                onClick={() => {
+                                    toggleWidget(widget.id);
+                                    setShowWidgetPicker(false);
+                                }}
+                            >
+                                <Plus size={16} />
+                                {widget.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Daily Summary */}
+            <DailySummary summary={dashboard?.daily_summary} visibleWidgets={visibleWidgets} />
 
             {/* Modals */}
             {feedingModal && (

@@ -4,10 +4,11 @@ from sqlalchemy import or_, func
 from datetime import datetime, timedelta
 from typing import List
 from ..database import get_db
-from ..models import Baby, Feeding, Diaper, Sleep, Pumping
+from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath
 from ..schemas import (
     TimelineEvent, DashboardStats, DailySummary,
-    FeedingResponse, DiaperResponse, SleepResponse, PumpingResponse
+    FeedingResponse, DiaperResponse, SleepResponse, PumpingResponse,
+    PottyResponse, TummyTimeResponse, BathResponse
 )
 from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
@@ -258,6 +259,21 @@ def get_dashboard(
         Pumping.baby_id == baby_id
     ).order_by(Pumping.time.desc()).first()
     
+    # Last potty
+    last_potty = db.query(Potty).filter(
+        Potty.baby_id == baby_id
+    ).order_by(Potty.time.desc()).first()
+    
+    # Last tummy time
+    last_tummy = db.query(TummyTime).filter(
+        TummyTime.baby_id == baby_id
+    ).order_by(TummyTime.start_time.desc()).first()
+    
+    # Last bath
+    last_bath = db.query(Bath).filter(
+        Bath.baby_id == baby_id
+    ).order_by(Bath.time.desc()).first()
+    
     # Parse local date for daily summary (YYYY-MM-DD format)
     if local_date:
         try:
@@ -275,6 +291,9 @@ def get_dashboard(
         last_diaper=DiaperResponse.model_validate(last_diaper) if last_diaper else None,
         last_sleep=SleepResponse.model_validate(last_sleep) if last_sleep else None,
         last_pumping=PumpingResponse.model_validate(last_pumping) if last_pumping else None,
+        last_potty=PottyResponse.model_validate(last_potty) if last_potty else None,
+        last_tummy=TummyTimeResponse.model_validate(last_tummy) if last_tummy else None,
+        last_bath=BathResponse.model_validate(last_bath) if last_bath else None,
         current_sleep=SleepResponse.model_validate(current_sleep) if current_sleep else None,
         daily_summary=daily_summary
     )

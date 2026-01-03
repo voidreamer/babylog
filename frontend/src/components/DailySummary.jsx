@@ -4,7 +4,7 @@ import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, subDays } from 'date-fns';
 
-export default function DailySummary({ summary }) {
+export default function DailySummary({ summary, visibleWidgets = ['feeding', 'diaper', 'sleep', 'pumping'] }) {
     const { selectedBaby } = useBaby();
     const [activeTab, setActiveTab] = useState('today');
     const [yesterdaySummary, setYesterdaySummary] = useState(null);
@@ -41,8 +41,9 @@ export default function DailySummary({ summary }) {
 
     const buildStats = (data) => {
         if (!data) return [];
-        return [
+        const allStats = [
             {
+                id: 'feeding',
                 icon: Baby,
                 value: data.total_feedings || 0,
                 label: 'feedings',
@@ -50,6 +51,7 @@ export default function DailySummary({ summary }) {
                 extra: data.total_ml > 0 ? `${data.total_ml}ml` : null
             },
             {
+                id: 'diaper',
                 icon: Droplets,
                 value: data.total_diapers || 0,
                 label: 'diapers',
@@ -57,6 +59,7 @@ export default function DailySummary({ summary }) {
                 extra: `${data.pee_count || 0} wet, ${data.poo_count || 0} dirty`
             },
             {
+                id: 'sleep',
                 icon: Moon,
                 value: formatTime(data.total_sleep_minutes),
                 label: 'sleep',
@@ -64,6 +67,7 @@ export default function DailySummary({ summary }) {
                 extra: `${data.sleep_count || 0} naps`
             },
             ...(data.pumping_count > 0 ? [{
+                id: 'pumping',
                 icon: Heart,
                 value: data.pumping_count,
                 label: 'pumps',
@@ -71,6 +75,8 @@ export default function DailySummary({ summary }) {
                 extra: data.total_pumping_ml > 0 ? `${data.total_pumping_ml}ml` : null
             }] : [])
         ];
+        // Filter to only show visible widgets
+        return allStats.filter(stat => visibleWidgets.includes(stat.id));
     };
 
     const currentData = activeTab === 'today' ? summary : yesterdaySummary;

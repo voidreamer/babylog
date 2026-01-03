@@ -605,6 +605,85 @@ h4 {
   font-weight: 500;
 }
 
+/* Add Widget Button */
+.widget.widget-add {
+  background: var(--background);
+  border: 2px dashed var(--border);
+  cursor: pointer;
+}
+
+.widget.widget-add:hover {
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.widget-add-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  gap: var(--space-xs);
+}
+
+.widget-add-content span {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Widget Picker */
+.widget-picker {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin: var(--space-md) 0;
+  overflow: hidden;
+}
+
+.widget-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.widget-picker-header button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.widget-picker-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+.widget-picker-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.widget-picker-item:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 /* ============================================================================
    Daily Summary (Collapsible)
    ============================================================================ */
