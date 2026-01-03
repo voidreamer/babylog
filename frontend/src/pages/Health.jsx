@@ -3,7 +3,8 @@ import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
-import { ClipboardList, Syringe, Pill, Star, TrendingUp, Trash2, Ruler, Baby } from 'lucide-react';
+import { ClipboardList, Syringe, Pill, Star, TrendingUp, Trash2, Ruler, Baby, BarChart2 } from 'lucide-react';
+import GrowthChart from '../components/GrowthChart';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -144,6 +145,7 @@ export default function Health() {
             {activeSection === 'growth' && (
                 <GrowthSection
                     records={growth}
+                    birthDate={selectedBaby?.birth_date}
                     onAdd={() => setShowGrowthModal(true)}
                     onRefresh={loadData}
                 />
@@ -390,7 +392,10 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
     );
 }
 
-function GrowthSection({ records, onAdd, onRefresh }) {
+function GrowthSection({ records, birthDate, onAdd, onRefresh }) {
+    const [showChart, setShowChart] = useState(false);
+    const [chartMetric, setChartMetric] = useState('weight');
+
     const handleDelete = async (id) => {
         if (!confirm('Delete this record?')) return;
         await api.deleteGrowthRecord(id);
@@ -401,8 +406,41 @@ function GrowthSection({ records, onAdd, onRefresh }) {
         <div className="card">
             <div className="card-header">
                 <h3 className="card-title"><TrendingUp size={18} style={{ marginRight: '6px' }} /> Growth Records</h3>
-                <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
+                <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+                    <button
+                        className={`btn btn-sm ${showChart ? 'btn-primary' : 'btn-secondary'}`}
+                        onClick={() => setShowChart(!showChart)}
+                    >
+                        <BarChart2 size={14} /> Chart
+                    </button>
+                    <button className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
+                </div>
             </div>
+
+            {showChart && (
+                <div className="growth-chart-section">
+                    <div className="growth-chart-tabs">
+                        <button
+                            className={`growth-chart-tab ${chartMetric === 'weight' ? 'active' : ''}`}
+                            onClick={() => setChartMetric('weight')}
+                        >
+                            Weight
+                        </button>
+                        <button
+                            className={`growth-chart-tab ${chartMetric === 'height' ? 'active' : ''}`}
+                            onClick={() => setChartMetric('height')}
+                        >
+                            Height
+                        </button>
+                    </div>
+                    <GrowthChart
+                        records={records}
+                        birthDate={birthDate}
+                        metric={chartMetric}
+                    />
+                </div>
+            )}
+
             {records.length === 0 ? (
                 <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
                     <p className="empty-state-text">No growth records yet</p>

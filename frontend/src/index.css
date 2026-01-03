@@ -1408,6 +1408,132 @@ h4 {
 }
 
 /* ============================================================================
+   Growth Chart
+   ============================================================================ */
+
+.growth-chart-section {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.growth-chart-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.growth-chart-tab {
+  padding: var(--space-xs) var(--space-md);
+  border: none;
+  background: var(--background);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.growth-chart-tab:hover {
+  color: var(--text-secondary);
+}
+
+.growth-chart-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.growth-chart {
+  background: var(--background);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.growth-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.growth-chart-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.growth-chart-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.growth-chart-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.8rem;
+  box-shadow: var(--shadow);
+}
+
+.growth-chart-tooltip-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-xs);
+}
+
+.growth-chart-tooltip-baby {
+  color: var(--primary);
+}
+
+.growth-chart-tooltip-ref {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.growth-chart-legend {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+  margin-top: var(--space-md);
+}
+
+.growth-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.growth-chart-legend-dot.baby {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.growth-chart-legend-line {
+  width: 20px;
+  height: 2px;
+  background: rgba(139, 92, 246, 0.6);
+}
+
+.growth-chart-legend-range {
+  width: 20px;
+  height: 10px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 2px;
+}
+
+.growth-chart-empty {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
    Baby Selector
    ============================================================================ */
 
