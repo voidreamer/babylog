@@ -498,17 +498,8 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   padding: var(--space-md) var(--space-lg);
-  background: transparent;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.daily-summary-header:hover {
-  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border);
 }
 
 .daily-summary-title {
@@ -520,12 +511,41 @@ h4 {
   color: var(--text-secondary);
 }
 
+/* Tab Switcher */
+.summary-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  background: var(--background);
+  padding: 3px;
+  border-radius: var(--radius-lg);
+}
+
+.summary-tab {
+  padding: var(--space-xs) var(--space-md);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.summary-tab:hover {
+  color: var(--text-secondary);
+}
+
+.summary-tab.active {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
 .daily-summary-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
-  padding-top: 0;
 }
 
 .daily-summary-stat {
@@ -554,6 +574,15 @@ h4 {
 .daily-summary-stat-extra {
   font-size: 0.8rem;
   color: var(--text-secondary);
+}
+
+.daily-summary-loading,
+.daily-summary-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-lg);
+  font-size: 0.9rem;
 }
 
 /* ============================================================================
