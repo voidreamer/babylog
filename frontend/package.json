@@ -9,6 +9,9 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@capacitor/cli": "^8.0.0",
+        "@capacitor/core": "^8.0.0",
+        "@capacitor/ios": "^8.0.0",
         "date-fns": "^3.0.0",
         "framer-motion": "^12.23.26",
         "lucide-react": "^0.562.0",

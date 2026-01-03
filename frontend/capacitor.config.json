@@ -1,0 +1,17 @@
+{
+  "appId": "com.simplebaby.app",
+  "appName": "Simple Baby",
+  "webDir": "dist",
+  "server": {
+    "allowNavigation": [
+      "*.cloudfront.net",
+      "*.amazonaws.com",
+      "*.amazoncognito.com"
+    ]
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "preferredContentMode": "mobile",
+    "backgroundColor": "#18181b"
+  }
+}
