@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Baby, Droplets, Moon, Heart, BarChart3, ArrowLeftRight } from 'lucide-react';
+import { Baby, Droplets, Moon, Heart, BarChart3, Toilet, Timer, Bath as BathIcon } from 'lucide-react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, subDays } from 'date-fns';
@@ -39,6 +39,15 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
         return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
     };
 
+    // Build diaper detail string including mixed
+    const buildDiaperDetail = (data) => {
+        const parts = [];
+        if (data.pee_count > 0) parts.push(`${data.pee_count} wet`);
+        if (data.poo_count > 0) parts.push(`${data.poo_count} dirty`);
+        if (data.mixed_count > 0) parts.push(`${data.mixed_count} mixed`);
+        return parts.length > 0 ? parts.join(', ') : null;
+    };
+
     const buildStats = (data) => {
         if (!data) return [];
         const allStats = [
@@ -56,7 +65,7 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 value: data.total_diapers || 0,
                 label: 'diapers',
                 color: 'var(--diaper)',
-                extra: `${data.pee_count || 0} wet, ${data.poo_count || 0} dirty`
+                extra: buildDiaperDetail(data)
             },
             {
                 id: 'sleep',
@@ -73,6 +82,30 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 label: 'pumps',
                 color: 'var(--pumping)',
                 extra: data.total_pumping_ml > 0 ? `${data.total_pumping_ml}ml` : null
+            }] : []),
+            ...(data.potty_count > 0 ? [{
+                id: 'potty',
+                icon: Toilet,
+                value: data.potty_count,
+                label: 'potty',
+                color: 'var(--potty)',
+                extra: data.potty_success_count > 0 ? `${data.potty_success_count} success` : null
+            }] : []),
+            ...(data.tummy_count > 0 ? [{
+                id: 'tummy',
+                icon: Timer,
+                value: data.tummy_count,
+                label: 'tummy time',
+                color: 'var(--tummy)',
+                extra: data.tummy_minutes > 0 ? formatTime(data.tummy_minutes) : null
+            }] : []),
+            ...(data.bath_count > 0 ? [{
+                id: 'bath',
+                icon: BathIcon,
+                value: data.bath_count,
+                label: data.bath_count === 1 ? 'bath' : 'baths',
+                color: 'var(--bath)',
+                extra: null
             }] : [])
         ];
         // Filter to only show visible widgets

@@ -233,6 +233,12 @@ class DailySummary(BaseModel):
     sleep_count: int
     total_pumping_ml: int
     pumping_count: int
+    # Activity counts
+    potty_count: int = 0
+    potty_success_count: int = 0
+    tummy_count: int = 0
+    tummy_minutes: int = 0
+    bath_count: int = 0
 
 
 class DashboardStats(BaseModel):

@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format } from 'date-fns';
 import Widget from './Widget';
+import WidgetSettings from './WidgetSettings';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
@@ -50,6 +51,18 @@ export default function Dashboard() {
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
+
+    // Toggle widget visibility
+    const toggleWidget = (widgetId) => {
+        setVisibleWidgets(prev => {
+            const updated = prev.includes(widgetId)
+                ? prev.filter(id => id !== widgetId)
+                : [...prev, widgetId];
+            localStorage.setItem('visibleWidgets', JSON.stringify(updated));
+            window.dispatchEvent(new Event('storage'));
+            return updated;
+        });
+    };
 
     const loadData = async () => {
         if (!selectedBaby) return;
@@ -219,6 +232,12 @@ export default function Dashboard() {
                         onClick={() => setBathModal(true)}
                     />
                 )}
+
+                {/* Widget Settings Button */}
+                <WidgetSettings
+                    visibleWidgets={visibleWidgets}
+                    onToggle={toggleWidget}
+                />
             </div>
 
             {/* Daily Summary */}

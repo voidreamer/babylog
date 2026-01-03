@@ -249,6 +249,31 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
     
     total_pumping_ml = sum(p.amount_ml or 0 for p in pumpings)
     
+    # Potty
+    potty_logs = db.query(Potty).filter(
+        Potty.baby_id == baby_id,
+        Potty.time >= start_of_day,
+        Potty.time < end_of_day
+    ).all()
+    
+    potty_success_count = sum(1 for p in potty_logs if p.result == 'success')
+    
+    # Tummy Time
+    tummy_times = db.query(TummyTime).filter(
+        TummyTime.baby_id == baby_id,
+        TummyTime.start_time >= start_of_day,
+        TummyTime.start_time < end_of_day
+    ).all()
+    
+    tummy_minutes = sum(t.duration_minutes or 0 for t in tummy_times)
+    
+    # Baths
+    baths = db.query(Bath).filter(
+        Bath.baby_id == baby_id,
+        Bath.time >= start_of_day,
+        Bath.time < end_of_day
+    ).all()
+    
     return DailySummary(
         date=local_midnight.strftime("%Y-%m-%d"),
         total_feedings=len(feedings),
@@ -264,7 +289,12 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         total_sleep_minutes=total_sleep_minutes,
         sleep_count=len(sleeps),
         total_pumping_ml=total_pumping_ml,
-        pumping_count=len(pumpings)
+        pumping_count=len(pumpings),
+        potty_count=len(potty_logs),
+        potty_success_count=potty_success_count,
+        tummy_count=len(tummy_times),
+        tummy_minutes=tummy_minutes,
+        bath_count=len(baths)
     )
 
 
