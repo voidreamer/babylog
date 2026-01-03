@@ -537,6 +537,33 @@ h4 {
   color: var(--pumping);
 }
 
+.widget.potty {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.25) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.widget.potty .widget-icon-row svg {
+  color: #8b5cf6;
+}
+
+.widget.tummy {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.25) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.widget.tummy .widget-icon-row svg {
+  color: #fbbf24;
+}
+
+.widget.bath {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0.25) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+.widget.bath .widget-icon-row svg {
+  color: #22d3ee;
+}
+
 .widget-label {
   font-size: 0.85rem;
   font-weight: 600;

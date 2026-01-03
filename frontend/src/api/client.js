@@ -330,6 +330,54 @@ class ApiClient {
     async deleteGrowthRecord(id) {
         return this.request(`/health/growth/${id}`, { method: 'DELETE' });
     }
+
+    // Activities - Potty
+    async getPottyLogs(babyId, limit = 50) {
+        return this.request(`/activities/potty?baby_id=${babyId}&limit=${limit}`);
+    }
+
+    async createPottyLog(data) {
+        return this.request('/activities/potty', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deletePottyLog(id) {
+        return this.request(`/activities/potty/${id}`, { method: 'DELETE' });
+    }
+
+    // Activities - Tummy Time
+    async getTummyTimes(babyId, limit = 50) {
+        return this.request(`/activities/tummy-time?baby_id=${babyId}&limit=${limit}`);
+    }
+
+    async createTummyTime(data) {
+        return this.request('/activities/tummy-time', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteTummyTime(id) {
+        return this.request(`/activities/tummy-time/${id}`, { method: 'DELETE' });
+    }
+
+    // Activities - Bath
+    async getBaths(babyId, limit = 50) {
+        return this.request(`/activities/baths?baby_id=${babyId}&limit=${limit}`);
+    }
+
+    async createBath(data) {
+        return this.request('/activities/baths', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteBath(id) {
+        return this.request(`/activities/baths/${id}`, { method: 'DELETE' });
+    }
 }
 
 export const api = new ApiClient();

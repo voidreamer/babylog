@@ -366,3 +366,73 @@ class GrowthRecordResponse(GrowthRecordBase):
         from_attributes=True,
         json_encoders={datetime: serialize_datetime}
     )
+
+
+# ============================================================================
+# Activity Tracking Schemas
+# ============================================================================
+
+PottyResultEnum = Literal["success", "accident", "attempt"]
+PottyTypeEnum = Literal["pee", "poo", "both"]
+
+class PottyBase(BaseModel):
+    time: datetime
+    result: PottyResultEnum
+    potty_type: Optional[PottyTypeEnum] = None
+    notes: Optional[str] = None
+
+
+class PottyCreate(PottyBase):
+    baby_id: int
+
+
+class PottyResponse(PottyBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class TummyTimeBase(BaseModel):
+    start_time: datetime
+    duration_minutes: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class TummyTimeCreate(TummyTimeBase):
+    baby_id: int
+
+
+class TummyTimeResponse(TummyTimeBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class BathBase(BaseModel):
+    time: datetime
+    notes: Optional[str] = None
+
+
+class BathCreate(BathBase):
+    baby_id: int
+
+
+class BathResponse(BathBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )

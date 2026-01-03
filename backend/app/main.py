@@ -4,7 +4,7 @@ from mangum import Mangum
 
 from .config import get_settings
 from .database import engine, Base
-from .routers import babies, feedings, diapers, sleeps, events, pumpings, health
+from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -35,6 +35,7 @@ app.include_router(sleeps.router)
 app.include_router(events.router)
 app.include_router(health.router)
 app.include_router(pumpings.router)
+app.include_router(activities.router)
 
 
 @app.get("/health")

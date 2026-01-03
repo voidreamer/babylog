@@ -7,6 +7,9 @@ import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
+import PottyModal from './PottyModal';
+import TummyTimeModal from './TummyTimeModal';
+import BathModal from './BathModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import { motion } from 'framer-motion';
@@ -21,6 +24,9 @@ export default function Dashboard() {
     const [diaperModal, setDiaperModal] = useState(false);
     const [sleepModal, setSleepModal] = useState(false);
     const [pumpingModal, setPumpingModal] = useState(false);
+    const [pottyModal, setPottyModal] = useState(false);
+    const [tummyModal, setTummyModal] = useState(false);
+    const [bathModal, setBathModal] = useState(false);
 
     const loadData = async () => {
         if (!selectedBaby) return;
@@ -145,6 +151,24 @@ export default function Dashboard() {
                         : null}
                     onClick={() => setPumpingModal(true)}
                 />
+
+                <Widget
+                    type="potty"
+                    label="Potty"
+                    onClick={() => setPottyModal(true)}
+                />
+
+                <Widget
+                    type="tummy"
+                    label="Tummy Time"
+                    onClick={() => setTummyModal(true)}
+                />
+
+                <Widget
+                    type="bath"
+                    label="Bath"
+                    onClick={() => setBathModal(true)}
+                />
             </div>
 
             {/* Daily Summary - Below widgets */}
@@ -180,6 +204,27 @@ export default function Dashboard() {
                 <PumpingModal
                     babyId={selectedBaby.id}
                     onClose={() => setPumpingModal(false)}
+                    onSave={handleEventLogged}
+                />
+            )}
+
+            {pottyModal && (
+                <PottyModal
+                    onClose={() => setPottyModal(false)}
+                    onSave={handleEventLogged}
+                />
+            )}
+
+            {tummyModal && (
+                <TummyTimeModal
+                    onClose={() => setTummyModal(false)}
+                    onSave={handleEventLogged}
+                />
+            )}
+
+            {bathModal && (
+                <BathModal
+                    onClose={() => setBathModal(false)}
                     onSave={handleEventLogged}
                 />
             )}

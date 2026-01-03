@@ -28,6 +28,10 @@ class Baby(Base):
     medications = relationship("Medication", back_populates="baby", cascade="all, delete-orphan")
     milestones = relationship("Milestone", back_populates="baby", cascade="all, delete-orphan")
     growth_records = relationship("GrowthRecord", back_populates="baby", cascade="all, delete-orphan")
+    # Activity relationships
+    potty_logs = relationship("Potty", back_populates="baby", cascade="all, delete-orphan")
+    tummy_times = relationship("TummyTime", back_populates="baby", cascade="all, delete-orphan")
+    baths = relationship("Bath", back_populates="baby", cascade="all, delete-orphan")
 
 
 class Feeding(Base):
@@ -175,3 +179,46 @@ class GrowthRecord(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     baby = relationship("Baby", back_populates="growth_records")
+
+
+# ============================================================================
+# Activity Tracking Models
+# ============================================================================
+
+class Potty(Base):
+    __tablename__ = "potty"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    time = Column(DateTime, nullable=False)
+    result = Column(String, nullable=False)  # 'success', 'accident', 'attempt'
+    potty_type = Column(String, nullable=True)  # 'pee', 'poo', 'both'
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    baby = relationship("Baby", back_populates="potty_logs")
+
+
+class TummyTime(Base):
+    __tablename__ = "tummy_time"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    start_time = Column(DateTime, nullable=False)
+    duration_minutes = Column(Integer, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    baby = relationship("Baby", back_populates="tummy_times")
+
+
+class Bath(Base):
+    __tablename__ = "baths"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    time = Column(DateTime, nullable=False)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    baby = relationship("Baby", back_populates="baths")

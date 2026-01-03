@@ -1,4 +1,4 @@
-import { Baby, Droplets, Moon, Heart, Plus } from 'lucide-react';
+import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead } from 'lucide-react';
 
 // Map widget types to Lucide icons
 const iconMap = {
@@ -6,6 +6,9 @@ const iconMap = {
     diaper: Droplets,
     sleep: Moon,
     pumping: Heart,
+    potty: CircleDot,
+    tummy: Sun,
+    bath: ShowerHead,
 };
 
 // Format time ago from a date
