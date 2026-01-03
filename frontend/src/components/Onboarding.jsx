@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
+import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';
-import { Baby, ArrowRight, Sparkles, Scale, Ruler } from 'lucide-react';
+import { Baby, ArrowRight, Sparkles, Scale, Ruler, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Onboarding({ onComplete }) {
     const { refresh } = useBaby();
+    const { logout, user } = useAuth();
     const [step, setStep] = useState(1);
     const [saving, setSaving] = useState(false);
 
@@ -76,6 +78,20 @@ export default function Onboarding({ onComplete }) {
                     >
                         Get Started <ArrowRight size={18} />
                     </button>
+
+                    {/* Logout option */}
+                    <div className="onboarding-footer">
+                        {user?.email && (
+                            <span className="onboarding-email">{user.email}</span>
+                        )}
+                        <button
+                            className="btn-link"
+                            onClick={logout}
+                            style={{ marginTop: 'var(--space-md)' }}
+                        >
+                            <LogOut size={14} /> Sign out
+                        </button>
+                    </div>
                 </div>
             </div>
         );

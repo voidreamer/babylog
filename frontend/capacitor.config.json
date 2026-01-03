@@ -12,6 +12,12 @@
   "ios": {
     "contentInset": "automatic",
     "preferredContentMode": "mobile",
-    "backgroundColor": "#18181b"
+    "backgroundColor": "#18181b",
+    "scheme": "simplebaby"
+  },
+  "plugins": {
+    "Browser": {
+      "presentationStyle": "popover"
+    }
   }
 }
