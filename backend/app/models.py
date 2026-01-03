@@ -84,7 +84,7 @@ class Sleep(Base):
     baby = relationship("Baby", back_populates="sleeps")
     
     @property
-    def duration_minutes(self) -> int | None:
+    def duration_minutes(self) -> "int | None":
         if self.end_time and self.start_time:
             return int((self.end_time - self.start_time).total_seconds() / 60)
         return None

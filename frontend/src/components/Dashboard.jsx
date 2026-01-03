@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format } from 'date-fns';
@@ -59,7 +60,10 @@ export default function Dashboard() {
             const dashboardData = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
             setDashboard(dashboardData);
         } catch (error) {
-            // Silent fail
+            console.error('Failed to load dashboard:', error);
+            toast.error('Failed to load dashboard', {
+                description: 'Please check your connection and try again.'
+            });
         } finally {
             setLoading(false);
         }

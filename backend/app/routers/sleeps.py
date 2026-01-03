@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 from ..database import get_db
 from ..models import Sleep, Baby
@@ -30,7 +30,7 @@ def get_sleeps(
     ).order_by(Sleep.start_time.desc()).offset(skip).limit(limit).all()
 
 
-@router.get("/current", response_model=SleepResponse | None)
+@router.get("/current", response_model=Optional[SleepResponse])
 def get_current_sleep(
     baby_id: int,
     user: dict = Depends(get_current_user),

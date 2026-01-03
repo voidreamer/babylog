@@ -5,13 +5,32 @@ on:
     paths:
       - 'backend/**'
   push:
-    branches: [develop]
+    branches: [develop, staging, main]
     paths:
       - 'backend/**'
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_simplebaby
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/test_simplebaby
+      ENVIRONMENT: test
     
     steps:
       - name: Checkout code
@@ -26,7 +45,6 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          pip install pytest pytest-asyncio httpx
 
       - name: Run linter
         run: |
@@ -43,3 +61,8 @@ jobs:
         run: |
           cd backend
           python -c "from app.models import Baby, Feeding, Diaper, Sleep; print('✓ Models valid')"
+
+      - name: Run tests
+        run: |
+          cd backend
+          python -m pytest tests/ -v --tb=short

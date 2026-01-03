@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 from ..database import get_db
 from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath
 from ..schemas import (
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 @router.get("/timeline", response_model=List[TimelineEvent])
 def get_timeline(
     baby_id: int,
-    date: str | None = None,
+    date: Optional[str] = None,
     tz_offset: int = 0,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -271,7 +271,7 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
 @router.get("/dashboard", response_model=DashboardStats)
 def get_dashboard(
     baby_id: int,
-    local_date: str | None = None,
+    local_date: Optional[str] = None,
     tz_offset: int = 0,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),

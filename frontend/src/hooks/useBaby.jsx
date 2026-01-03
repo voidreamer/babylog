@@ -1,4 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import { toast } from 'sonner';
 import { api } from '../api/client';
 
 const BabyContext = createContext(null);
@@ -7,9 +8,11 @@ export function BabyProvider({ children }) {
     const [babies, setBabies] = useState([]);
     const [selectedBaby, setSelectedBaby] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const loadBabies = async () => {
         try {
+            setError(null);
             const data = await api.getBabies();
             setBabies(data);
 
@@ -21,6 +24,10 @@ export function BabyProvider({ children }) {
             }
         } catch (error) {
             console.error('Failed to load babies:', error);
+            setError('Failed to load babies. Please try again.');
+            toast.error('Failed to load babies', {
+                description: error.message || 'Please check your connection and try again.'
+            });
         } finally {
             setLoading(false);
         }
@@ -36,20 +43,43 @@ export function BabyProvider({ children }) {
     };
 
     const addBaby = async (data) => {
-        const newBaby = await api.createBaby(data);
-        setBabies([...babies, newBaby]);
-        if (!selectedBaby) {
-            selectBaby(newBaby);
+        try {
+            const newBaby = await api.createBaby(data);
+            setBabies([...babies, newBaby]);
+            if (!selectedBaby) {
+                selectBaby(newBaby);
+            }
+            toast.success(`${newBaby.name} added!`, {
+                description: 'Baby profile created successfully.'
+            });
+            return newBaby;
+        } catch (error) {
+            console.error('Failed to add baby:', error);
+            toast.error('Failed to add baby', {
+                description: error.message || 'Please try again.'
+            });
+            throw error;
         }
-        return newBaby;
     };
 
     const removeBaby = async (id) => {
-        await api.deleteBaby(id);
-        const updated = babies.filter(b => b.id !== id);
-        setBabies(updated);
-        if (selectedBaby?.id === id) {
-            setSelectedBaby(updated[0] || null);
+        try {
+            const babyName = babies.find(b => b.id === id)?.name || 'Baby';
+            await api.deleteBaby(id);
+            const updated = babies.filter(b => b.id !== id);
+            setBabies(updated);
+            if (selectedBaby?.id === id) {
+                setSelectedBaby(updated[0] || null);
+            }
+            toast.success(`${babyName} removed`, {
+                description: 'Baby profile deleted successfully.'
+            });
+        } catch (error) {
+            console.error('Failed to remove baby:', error);
+            toast.error('Failed to remove baby', {
+                description: error.message || 'Please try again.'
+            });
+            throw error;
         }
     };
 
@@ -58,6 +88,7 @@ export function BabyProvider({ children }) {
             babies,
             selectedBaby,
             loading,
+            error,
             selectBaby,
             addBaby,
             removeBaby,
@@ -75,3 +106,4 @@ export function useBaby() {
     }
     return context;
 }
+
