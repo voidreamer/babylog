@@ -1,7 +1,18 @@
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead } from 'lucide-react';
 
-// Map widget types to Lucide icons
-const iconMap = {
+// Map widget types to PNG icons (null means use Lucide fallback)
+const pngIcons = {
+    feeding: '/icons/feeding.png',
+    diaper: '/icons/diaper.png',
+    sleep: '/icons/sleep.png',
+    pumping: '/icons/pumping.png',
+    potty: null,  // No PNG available, use Lucide
+    tummy: null,  // No PNG available, use Lucide
+    bath: null,   // No PNG available, use Lucide
+};
+
+// Lucide fallback icons
+const lucideIcons = {
     feeding: Baby,
     diaper: Droplets,
     sleep: Moon,
@@ -34,8 +45,26 @@ function formatTimeAgo(dateStr) {
     return `${diffDays}d ago`;
 }
 
+// Icon component that uses PNG if available, otherwise Lucide
+function WidgetIcon({ type, size, className, strokeWidth }) {
+    const pngSrc = pngIcons[type];
+    const LucideIcon = lucideIcons[type] || Baby;
+
+    if (pngSrc) {
+        return (
+            <img
+                src={pngSrc}
+                alt={type}
+                className={className}
+                style={{ width: size, height: size, objectFit: 'contain' }}
+            />
+        );
+    }
+
+    return <LucideIcon size={size} strokeWidth={strokeWidth} />;
+}
+
 export default function Widget({ type, label, value, detail, isSleeping, onClick, lastTime }) {
-    const IconComponent = iconMap[type] || Baby;
     const timeAgo = formatTimeAgo(lastTime);
     const isEmpty = !lastTime && value === 'Never';
 
@@ -49,7 +78,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
 
             {/* Large semi-transparent background icon */}
             <div className="widget-bg-icon">
-                <IconComponent size={80} strokeWidth={1} />
+                <WidgetIcon type={type} size={80} strokeWidth={1} />
             </div>
 
             {/* Plus icon to indicate tappable */}
@@ -59,7 +88,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
 
             <div className="widget-content">
                 <div className="widget-icon-row">
-                    <IconComponent size={24} strokeWidth={2} />
+                    <WidgetIcon type={type} size={24} strokeWidth={2} />
                     <span className="widget-label">{label}</span>
                 </div>
 

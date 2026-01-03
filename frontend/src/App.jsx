@@ -36,34 +36,6 @@ function MainApp() {
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
 
-    // Widget visibility settings - MUST be before any early returns (React hooks rule)
-    const [visibleWidgets, setVisibleWidgets] = useState(() => {
-        const saved = localStorage.getItem('visibleWidgets');
-        return saved ? JSON.parse(saved) : ['feeding', 'diaper', 'sleep', 'pumping'];
-    });
-
-    const allWidgets = [
-        { id: 'feeding', label: 'Feeding' },
-        { id: 'diaper', label: 'Diaper' },
-        { id: 'sleep', label: 'Sleep' },
-        { id: 'pumping', label: 'Pumping' },
-        { id: 'potty', label: 'Potty Training' },
-        { id: 'tummy', label: 'Tummy Time' },
-        { id: 'bath', label: 'Bath' },
-    ];
-
-    const toggleWidget = (widgetId) => {
-        setVisibleWidgets(prev => {
-            const updated = prev.includes(widgetId)
-                ? prev.filter(id => id !== widgetId)
-                : [...prev, widgetId];
-            localStorage.setItem('visibleWidgets', JSON.stringify(updated));
-            // Dispatch storage event for Dashboard to pick up
-            window.dispatchEvent(new Event('storage'));
-            return updated;
-        });
-    };
-
     // Check if we should show onboarding (no babies yet)
     useEffect(() => {
         if (!babiesLoading && babies.length === 0) {
@@ -84,26 +56,6 @@ function MainApp() {
     const SettingsPage = () => (
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
-
-            <div className="settings-section">
-                <h3 className="settings-section-title">Dashboard Widgets</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 'var(--space-md)' }}>
-                    Choose which widgets appear on your dashboard
-                </p>
-                <div className="settings-widget-list">
-                    {allWidgets.map(widget => (
-                        <label key={widget.id} className="settings-toggle">
-                            <input
-                                type="checkbox"
-                                checked={visibleWidgets.includes(widget.id)}
-                                onChange={() => toggleWidget(widget.id)}
-                            />
-                            <span className="settings-toggle-slider"></span>
-                            <span className="settings-toggle-label">{widget.label}</span>
-                        </label>
-                    ))}
-                </div>
-            </div>
 
             <div className="settings-section">
                 <h3 className="settings-section-title">Account</h3>
