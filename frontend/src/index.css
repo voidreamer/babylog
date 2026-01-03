@@ -1323,6 +1323,9 @@ h4 {
   font-size: 0.875rem;
   color: var(--text-muted);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .timeline-date-header {
@@ -1332,6 +1335,76 @@ h4 {
   padding: var(--space-md) 0 var(--space-sm);
   border-bottom: 1px solid var(--border);
   margin-bottom: var(--space-sm);
+}
+
+/* ============================================================================
+   Health Page Tabs
+   ============================================================================ */
+
+.health-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-lg);
+  overflow-x: auto;
+}
+
+.health-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.health-tab:hover {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+}
+
+.health-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.health-tab-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+}
+
+.health-tab.active .health-tab-badge {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Delete button icon */
+.btn-icon-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
 }
 
 /* ============================================================================

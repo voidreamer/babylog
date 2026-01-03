@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, formatDistanceToNow } from 'date-fns';
-import Icon from '../components/Icon';
 import { toast } from 'sonner';
-import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
+import { ClipboardList, Syringe, Pill, Star, TrendingUp, Trash2, Ruler, Baby } from 'lucide-react';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -69,7 +68,7 @@ export default function Health() {
     if (!selectedBaby) {
         return (
             <div className="empty-state">
-                <div className="empty-state-icon">👶</div>
+                <Baby size={48} style={{ opacity: 0.5, marginBottom: 'var(--space-md)' }} />
                 <h2 className="empty-state-title">No baby selected</h2>
             </div>
         );
@@ -94,28 +93,19 @@ export default function Health() {
     return (
         <div>
             {/* Section Tabs */}
-            <div className="type-selector" style={{ marginBottom: 'var(--space-lg)', flexWrap: 'wrap' }}>
+            <div className="health-tabs">
                 {sections.map(section => {
                     const IconComponent = section.icon;
                     return (
                         <button
                             key={section.id}
-                            className={`type-btn ${activeSection === section.id ? 'active' : ''}`}
+                            className={`health-tab ${activeSection === section.id ? 'active' : ''}`}
                             onClick={() => setActiveSection(section.id)}
-                            style={{ flex: '1 1 auto', minWidth: '80px' }}
                         >
                             <IconComponent size={16} />
-                            <span style={{ fontSize: '0.85rem' }}>{section.label}</span>
+                            <span>{section.label}</span>
                             {section.count > 0 && (
-                                <span style={{
-                                    background: 'var(--primary)',
-                                    color: 'white',
-                                    padding: '2px 6px',
-                                    borderRadius: '10px',
-                                    fontSize: '0.75rem'
-                                }}>
-                                    {section.count}
-                                </span>
+                                <span className="health-tab-badge">{section.count}</span>
                             )}
                         </button>
                     );
@@ -239,7 +229,7 @@ function VisitsSection({ visits, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(visit.visit_date), 'MMM d, yyyy')}
-                                <button className="btn-icon" onClick={() => handleDelete(visit.id)} style={{ marginLeft: '8px' }}>🗑️</button>
+                                <button className="btn-icon-delete" onClick={() => handleDelete(visit.id)}><Trash2 size={14} /></button>
                             </div>
                         </div>
                     ))}
@@ -283,7 +273,7 @@ function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(vacc.given_date), 'MMM d, yyyy')}
-                                <button className="btn-icon" onClick={() => handleDelete(vacc.id)} style={{ marginLeft: '8px' }}>🗑️</button>
+                                <button className="btn-icon-delete" onClick={() => handleDelete(vacc.id)}><Trash2 size={14} /></button>
                             </div>
                         </div>
                     ))}
@@ -331,7 +321,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                                         </div>
                                         <div className="timeline-time">
                                             Since {format(parseUTCTime(med.start_date), 'MMM d')}
-                                            <button className="btn-icon" onClick={() => handleDelete(med.id)} style={{ marginLeft: '8px' }}>🗑️</button>
+                                            <button className="btn-icon-delete" onClick={() => handleDelete(med.id)}><Trash2 size={14} /></button>
                                         </div>
                                     </div>
                                 ))}
@@ -349,7 +339,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                                             <div className="timeline-title">{med.medication_name}</div>
                                         </div>
                                         <div className="timeline-time">
-                                            <button className="btn-icon" onClick={() => handleDelete(med.id)}>🗑️</button>
+                                            <button className="btn-icon-delete" onClick={() => handleDelete(med.id)}><Trash2 size={14} /></button>
                                         </div>
                                     </div>
                                 ))}
@@ -390,7 +380,7 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(m.achieved_date), 'MMM d, yyyy')}
-                                <button className="btn-icon" onClick={() => handleDelete(m.id)} style={{ marginLeft: '8px' }}>🗑️</button>
+                                <button className="btn-icon-delete" onClick={() => handleDelete(m.id)}><Trash2 size={14} /></button>
                             </div>
                         </div>
                     ))}
@@ -421,7 +411,7 @@ function GrowthSection({ records, onAdd, onRefresh }) {
                 <div className="timeline">
                     {records.map(r => (
                         <div key={r.id} className="timeline-item">
-                            <div className="timeline-icon feeding">📏</div>
+                            <div className="timeline-icon feeding"><Ruler size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">
                                     {r.weight_kg && `${r.weight_kg} kg`}
@@ -432,7 +422,7 @@ function GrowthSection({ records, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(r.recorded_date), 'MMM d, yyyy')}
-                                <button className="btn-icon" onClick={() => handleDelete(r.id)} style={{ marginLeft: '8px' }}>🗑️</button>
+                                <button className="btn-icon-delete" onClick={() => handleDelete(r.id)}><Trash2 size={14} /></button>
                             </div>
                         </div>
                     ))}
