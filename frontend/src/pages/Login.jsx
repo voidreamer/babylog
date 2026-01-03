@@ -1,14 +1,26 @@
 import { useAuth } from '../hooks/useAuth';
+import { Baby, Utensils, Moon, Droplets, TrendingUp } from 'lucide-react';
 
 export default function Login() {
     const { login } = useAuth();
 
+    const features = [
+        { icon: Utensils, text: 'Track feedings' },
+        { icon: Moon, text: 'Monitor sleep' },
+        { icon: Droplets, text: 'Log diapers' },
+        { icon: TrendingUp, text: 'View growth charts' },
+    ];
+
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <div className="auth-logo">👶</div>
+                <div className="auth-logo">
+                    <Baby size={48} />
+                </div>
                 <h1 className="auth-title">SimpleBaby</h1>
-                <p className="auth-subtitle">Track your baby's sleep, feeding, and diapers</p>
+                <p className="auth-subtitle">
+                    The simple way to track your baby's daily activities
+                </p>
 
                 <button className="google-btn" onClick={login}>
                     <svg width="20" height="20" viewBox="0 0 24 24">
@@ -19,6 +31,19 @@ export default function Login() {
                     </svg>
                     Sign in with Google
                 </button>
+
+                <div className="auth-features">
+                    {features.map((feature, i) => (
+                        <div key={i} className="auth-feature">
+                            <feature.icon size={16} />
+                            <span>{feature.text}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <p className="auth-footer">
+                    Free forever • No credit card required
+                </p>
             </div>
         </div>
     );

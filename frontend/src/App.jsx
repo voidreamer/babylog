@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
-import { BabyProvider } from './hooks/useBaby';
+import { BabyProvider, useBaby } from './hooks/useBaby';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
+import Onboarding from './components/Onboarding';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
@@ -16,7 +17,7 @@ function ProtectedRoute({ children }) {
 
     if (loading) {
         return (
-            <div className="loading" style={{ minHeight: '100vh' }}>
+            <div className="loading">
                 <div className="spinner"></div>
             </div>
         );
@@ -29,9 +30,27 @@ function ProtectedRoute({ children }) {
     return children;
 }
 
-function AppContent() {
+function MainApp() {
     const { user, logout } = useAuth();
+    const { babies, loading: babiesLoading } = useBaby();
     const [activeTab, setActiveTab] = useState('home');
+    const [showOnboarding, setShowOnboarding] = useState(false);
+
+    // Check if we should show onboarding (no babies yet)
+    useEffect(() => {
+        if (!babiesLoading && babies.length === 0) {
+            setShowOnboarding(true);
+        }
+    }, [babies, babiesLoading]);
+
+    // Show onboarding for first-time users
+    if (showOnboarding && !babiesLoading && babies.length === 0) {
+        return (
+            <Onboarding
+                onComplete={() => setShowOnboarding(false)}
+            />
+        );
+    }
 
     // Settings page content
     const SettingsPage = () => (
@@ -43,13 +62,15 @@ function AppContent() {
                 {user && (
                     <div className="settings-item">
                         <span className="settings-item-label">Signed in as</span>
-                        <span className="settings-item-value">{user.email || 'User'}</span>
+                        <span className="settings-item-value">{user.email}</span>
                     </div>
                 )}
+            </div>
+
+            <div className="settings-section">
                 <button
-                    className="btn btn-secondary btn-block"
+                    className="settings-logout-btn"
                     onClick={logout}
-                    style={{ marginTop: 'var(--space-md)', justifyContent: 'center' }}
                 >
                     <LogOut size={18} />
                     <span>Sign Out</span>
@@ -58,88 +79,104 @@ function AppContent() {
         </div>
     );
 
+    if (babiesLoading) {
+        return (
+            <div className="loading">
+                <div className="spinner"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="app-container">
+            <main>
+                {activeTab === 'home' && <Dashboard />}
+                {activeTab === 'timeline' && <TimelineCalendar />}
+                {activeTab === 'health' && <Health />}
+                {activeTab === 'learn' && <Learn />}
+                {activeTab === 'settings' && <SettingsPage />}
+            </main>
+
+            {/* Bottom Navigation */}
+            <nav className="bottom-nav">
+                <button
+                    className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('home')}
+                >
+                    <Home size={20} />
+                    <span>Home</span>
+                </button>
+                <button
+                    className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('timeline')}
+                >
+                    <CalendarDays size={20} />
+                    <span>Timeline</span>
+                </button>
+                <button
+                    className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('health')}
+                >
+                    <HeartPulse size={20} />
+                    <span>Health</span>
+                </button>
+                <button
+                    className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('learn')}
+                >
+                    <BookOpen size={20} />
+                    <span>Learn</span>
+                </button>
+                <button
+                    className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('settings')}
+                >
+                    <Settings size={20} />
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </div>
+    );
+}
+
+function AppContent() {
     return (
         <BabyProvider>
-            <div className="app-container">
-
-                <main>
-                    {activeTab === 'home' && <Dashboard />}
-                    {activeTab === 'timeline' && <TimelineCalendar />}
-                    {activeTab === 'health' && <Health />}
-                    {activeTab === 'learn' && <Learn />}
-                    {activeTab === 'settings' && <SettingsPage />}
-                </main>
-
-                {/* Bottom Navigation */}
-                <nav className="bottom-nav">
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('home')}
-                    >
-                        <Home size={20} />
-                        <span>Home</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('timeline')}
-                    >
-                        <CalendarDays size={20} />
-                        <span>Timeline</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('health')}
-                    >
-                        <HeartPulse size={20} />
-                        <span>Health</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('learn')}
-                    >
-                        <BookOpen size={20} />
-                        <span>Learn</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('settings')}
-                    >
-                        <Settings size={20} />
-                        <span>Settings</span>
-                    </button>
-                </nav>
-            </div>
+            <MainApp />
         </BabyProvider>
     );
 }
 
-export default function App() {
+function App() {
     return (
         <AuthProvider>
             <Toaster
-                theme="dark"
                 position="top-center"
+                richColors
+                closeButton
                 toastOptions={{
                     style: {
-                        background: '#1a1a2e',
-                        border: '1px solid #2d2d44',
-                        color: '#fff',
+                        background: 'var(--surface)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text)',
                     },
                 }}
             />
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/callback" element={<Callback />} />
+                <Route path="/health-check" element={<Health />} />
                 <Route
-                    path="/"
+                    path="/*"
                     element={
                         <ProtectedRoute>
                             <AppContent />
                         </ProtectedRoute>
                     }
                 />
-                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </AuthProvider>
     );
 }
+
+export default App;

@@ -17,9 +17,12 @@ def serialize_datetime(dt: datetime) -> str:
 # Baby Schemas
 # ============================================================================
 
+GenderEnum = Literal["boy", "girl"]
+
 class BabyBase(BaseModel):
     name: str
     birth_date: Optional[datetime] = None
+    gender: Optional[GenderEnum] = None
 
 
 class BabyCreate(BabyBase):
@@ -29,6 +32,7 @@ class BabyCreate(BabyBase):
 class BabyUpdate(BaseModel):
     name: Optional[str] = None
     birth_date: Optional[datetime] = None
+    gender: Optional[GenderEnum] = None
 
 
 class BabyResponse(BabyBase):

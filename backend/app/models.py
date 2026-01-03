@@ -13,6 +13,7 @@ class Baby(Base):
     owner_email = Column(String, nullable=True)
     name = Column(String, nullable=False)
     birth_date = Column(DateTime, nullable=True)
+    gender = Column(String, nullable=True)  # 'boy', 'girl', or null
     shared_with_emails = Column(ARRAY(String), default=list)
     created_at = Column(DateTime, default=datetime.utcnow)
     
