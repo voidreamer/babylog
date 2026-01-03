@@ -68,6 +68,9 @@ def create_diaper(
         baby_id=diaper_data.baby_id,
         time=diaper_data.time,
         type=diaper_data.type,
+        poo_color=diaper_data.poo_color,
+        poo_consistency=diaper_data.poo_consistency,
+        poo_amount=diaper_data.poo_amount,
         notes=diaper_data.notes
     )
     db.add(diaper)
