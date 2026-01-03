@@ -25,16 +25,16 @@ export default function WidgetSettings({ visibleWidgets, onToggle }) {
         <>
             {/* Add/Edit Button - styled as a widget */}
             <motion.button
-                className="widget widget-add"
+                className="widget widget-settings-btn"
                 onClick={() => setIsOpen(true)}
                 whileTap={{ scale: 0.98 }}
             >
-                <div className="widget-add-icon">
+                <div className="widget-settings-btn-icon">
                     <Settings size={24} />
                 </div>
-                <div className="widget-add-text">
-                    <span className="widget-add-title">Edit Widgets</span>
-                    <span className="widget-add-subtitle">
+                <div className="widget-settings-btn-text">
+                    <span className="widget-settings-btn-title">Edit Activities</span>
+                    <span className="widget-settings-btn-subtitle">
                         {disabledCount > 0 ? `${disabledCount} hidden` : 'All visible'}
                     </span>
                 </div>
@@ -58,7 +58,7 @@ export default function WidgetSettings({ visibleWidgets, onToggle }) {
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         >
                             <div className="modal-header">
-                                <h3>Dashboard Widgets</h3>
+                                <h3>Dashboard Activities</h3>
                                 <button
                                     className="modal-close"
                                     onClick={() => setIsOpen(false)}
@@ -68,7 +68,7 @@ export default function WidgetSettings({ visibleWidgets, onToggle }) {
                             </div>
 
                             <p className="widget-settings-hint">
-                                Tap to show or hide widgets on your dashboard
+                                Tap to show or hide activities on your dashboard
                             </p>
 
                             <div className="widget-settings-grid">

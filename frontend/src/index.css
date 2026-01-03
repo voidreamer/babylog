@@ -2774,7 +2774,7 @@ h4 {
    Widget Settings (Home Page)
    ============================================================================ */
 
-.widget-add {
+.widget-settings-btn {
   display: flex;
   align-items: center;
   gap: var(--space-md);
@@ -2787,12 +2787,12 @@ h4 {
   text-align: left;
 }
 
-.widget-add:hover {
+.widget-settings-btn:hover {
   border-color: var(--primary);
   background: var(--surface-hover);
 }
 
-.widget-add-icon {
+.widget-settings-btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2803,24 +2803,31 @@ h4 {
   color: var(--background);
 }
 
-.widget-add-text {
+.widget-settings-btn-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.widget-add-title {
+.widget-settings-btn-title {
   font-weight: 600;
   color: var(--text);
 }
 
-.widget-add-subtitle {
+.widget-settings-btn-subtitle {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
 
 .widget-settings-modal {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   max-width: 400px;
+  width: 100%;
+  z-index: 201;
+  padding: var(--space-lg);
 }
 
 .widget-settings-hint {
