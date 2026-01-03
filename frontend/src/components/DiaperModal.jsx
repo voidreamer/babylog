@@ -66,28 +66,28 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }) {
     };
 
     const colorOptions = [
-        { value: 'yellow', label: '🟡 Yellow', color: '#f4d03f' },
-        { value: 'brown', label: '🟤 Brown', color: '#8b4513' },
-        { value: 'green', label: '🟢 Green', color: '#27ae60' },
-        { value: 'orange', label: '🟠 Orange', color: '#e67e22' },
-        { value: 'black', label: '⚫ Black', color: '#2c3e50' },
-        { value: 'red', label: '🔴 Red', color: '#e74c3c' },
-        { value: 'white', label: '⚪ White', color: '#ecf0f1' },
+        { value: 'yellow', label: 'Yellow', color: '#f4d03f' },
+        { value: 'brown', label: 'Brown', color: '#8b4513' },
+        { value: 'green', label: 'Green', color: '#27ae60' },
+        { value: 'orange', label: 'Orange', color: '#e67e22' },
+        { value: 'black', label: 'Black', color: '#2c3e50' },
+        { value: 'red', label: 'Red', color: '#e74c3c' },
+        { value: 'white', label: 'White', color: '#ecf0f1' },
     ];
 
     const consistencyOptions = [
-        { value: 'liquid', label: '💧 Liquid' },
-        { value: 'soft', label: '🍦 Soft' },
-        { value: 'formed', label: '🍌 Formed' },
-        { value: 'hard', label: '🪨 Hard' },
-        { value: 'pellets', label: '⚫ Pellets' },
+        { value: 'liquid', label: 'Liquid' },
+        { value: 'soft', label: 'Soft' },
+        { value: 'formed', label: 'Formed' },
+        { value: 'hard', label: 'Hard' },
+        { value: 'pellets', label: 'Pellets' },
     ];
 
     const amountOptions = [
         { value: 'small', label: 'S' },
         { value: 'medium', label: 'M' },
         { value: 'large', label: 'L' },
-        { value: 'blowout', label: '💥' },
+        { value: 'blowout', label: 'XL' },
     ];
 
     return (
@@ -141,9 +141,19 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }) {
                                                 style={{
                                                     fontSize: '0.85rem',
                                                     padding: '0.4rem 0.6rem',
-                                                    minWidth: 'auto'
+                                                    minWidth: 'auto',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.4rem'
                                                 }}
                                             >
+                                                <span style={{
+                                                    width: '12px',
+                                                    height: '12px',
+                                                    borderRadius: '50%',
+                                                    background: opt.color,
+                                                    border: opt.value === 'white' ? '1px solid var(--border)' : 'none'
+                                                }} />
                                                 {opt.label}
                                             </button>
                                         ))}

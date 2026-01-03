@@ -8,6 +8,7 @@ import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
 import PumpingModal from './PumpingModal';
 import DailySummary from './DailySummary';
+import BabyGreeting from './BabyGreeting';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
 
@@ -93,7 +94,10 @@ export default function Dashboard() {
 
     return (
         <div>
-            {/* Widgets First - Primary Actions */}
+            {/* Baby Greeting Card */}
+            <BabyGreeting summary={dashboard?.daily_summary} />
+
+            {/* Widgets - Primary Actions */}
             <div className="widgets-grid">
                 <Widget
                     type="feeding"
