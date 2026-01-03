@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
+import TimePicker from './TimePicker';
+import { ShowerHead } from 'lucide-react';
 
 export default function BathModal({ onClose, onSave }) {
     const { selectedBaby } = useBaby();
-    const [time, setTime] = useState(new Date().toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date());
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
@@ -17,10 +19,9 @@ export default function BathModal({ onClose, onSave }) {
         try {
             await api.createBath({
                 baby_id: selectedBaby.id,
-                time: new Date(time).toISOString(),
+                time: time.toISOString(),
                 notes: notes || null,
             });
-            toast.success('Bath logged!');
             onSave();
         } catch (error) {
             console.error('Failed to log bath:', error);
@@ -34,7 +35,7 @@ export default function BathModal({ onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🛁 Log Bath</h2>
+                    <h2 className="modal-title"><ShowerHead size={20} style={{ marginRight: '8px' }} /> Log Bath</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -43,12 +44,7 @@ export default function BathModal({ onClose, onSave }) {
                         {/* Time */}
                         <div className="form-group">
                             <label className="form-label">Time</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                            />
+                            <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}

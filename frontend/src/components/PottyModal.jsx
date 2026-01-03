@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
+import TimePicker from './TimePicker';
+import { CircleDot } from 'lucide-react';
 
 const resultOptions = [
     { value: 'success', label: '✓ Success', color: '#10b981' },
@@ -19,7 +21,7 @@ export default function PottyModal({ onClose, onSave }) {
     const { selectedBaby } = useBaby();
     const [result, setResult] = useState('success');
     const [pottyType, setPottyType] = useState('');
-    const [time, setTime] = useState(new Date().toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date());
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
@@ -31,12 +33,11 @@ export default function PottyModal({ onClose, onSave }) {
         try {
             await api.createPottyLog({
                 baby_id: selectedBaby.id,
-                time: new Date(time).toISOString(),
+                time: time.toISOString(),
                 result,
                 potty_type: pottyType || null,
                 notes: notes || null,
             });
-            toast.success('Potty logged!');
             onSave();
         } catch (error) {
             console.error('Failed to log potty:', error);
@@ -50,7 +51,7 @@ export default function PottyModal({ onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🚽 Log Potty</h2>
+                    <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> Log Potty</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -94,12 +95,7 @@ export default function PottyModal({ onClose, onSave }) {
                         {/* Time */}
                         <div className="form-group">
                             <label className="form-label">Time</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                            />
+                            <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}

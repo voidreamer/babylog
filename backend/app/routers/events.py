@@ -132,6 +132,60 @@ def get_timeline(
             }
         ))
     
+    # Potty
+    potty_logs = db.query(Potty).filter(
+        Potty.baby_id == baby_id,
+        Potty.time >= start_of_day_utc,
+        Potty.time < end_of_day_utc
+    ).all()
+    
+    for pt in potty_logs:
+        events.append(TimelineEvent(
+            id=pt.id,
+            event_type="potty",
+            time=pt.time,
+            details={
+                "result": pt.result,
+                "potty_type": pt.potty_type,
+                "notes": pt.notes
+            }
+        ))
+    
+    # Tummy Time
+    tummy_times = db.query(TummyTime).filter(
+        TummyTime.baby_id == baby_id,
+        TummyTime.start_time >= start_of_day_utc,
+        TummyTime.start_time < end_of_day_utc
+    ).all()
+    
+    for tt in tummy_times:
+        events.append(TimelineEvent(
+            id=tt.id,
+            event_type="tummy",
+            time=tt.start_time,
+            details={
+                "duration_minutes": tt.duration_minutes,
+                "notes": tt.notes
+            }
+        ))
+    
+    # Baths
+    baths = db.query(Bath).filter(
+        Bath.baby_id == baby_id,
+        Bath.time >= start_of_day_utc,
+        Bath.time < end_of_day_utc
+    ).all()
+    
+    for b in baths:
+        events.append(TimelineEvent(
+            id=b.id,
+            event_type="bath",
+            time=b.time,
+            details={
+                "notes": b.notes
+            }
+        ))
+    
     # Sort by time descending
     events.sort(key=lambda x: x.time, reverse=True)
     

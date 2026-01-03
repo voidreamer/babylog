@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
+import TimePicker from './TimePicker';
+import { Sun } from 'lucide-react';
 
 const durationOptions = [
     { value: 1, label: '1 min' },
@@ -14,7 +16,7 @@ const durationOptions = [
 export default function TummyTimeModal({ onClose, onSave }) {
     const { selectedBaby } = useBaby();
     const [duration, setDuration] = useState(5);
-    const [time, setTime] = useState(new Date().toISOString().slice(0, 16));
+    const [time, setTime] = useState(new Date());
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
@@ -26,11 +28,10 @@ export default function TummyTimeModal({ onClose, onSave }) {
         try {
             await api.createTummyTime({
                 baby_id: selectedBaby.id,
-                start_time: new Date(time).toISOString(),
+                start_time: time.toISOString(),
                 duration_minutes: duration,
                 notes: notes || null,
             });
-            toast.success('Tummy time logged!');
             onSave();
         } catch (error) {
             console.error('Failed to log tummy time:', error);
@@ -44,7 +45,7 @@ export default function TummyTimeModal({ onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title">🐣 Log Tummy Time</h2>
+                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> Log Tummy Time</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -82,12 +83,7 @@ export default function TummyTimeModal({ onClose, onSave }) {
                         {/* Time */}
                         <div className="form-group">
                             <label className="form-label">Time</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                            />
+                            <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}

@@ -13,21 +13,10 @@ import BathModal from './BathModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import { motion } from 'framer-motion';
-import { Baby, Plus, Settings } from 'lucide-react';
+import { Baby } from 'lucide-react';
 
-// Default visible widgets
+// Default visible widgets - stored in localStorage
 const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
-
-// All available widgets
-const ALL_WIDGETS = [
-    { id: 'feeding', label: 'Feeding' },
-    { id: 'diaper', label: 'Diaper' },
-    { id: 'sleep', label: 'Sleep' },
-    { id: 'pumping', label: 'Pumping' },
-    { id: 'potty', label: 'Potty' },
-    { id: 'tummy', label: 'Tummy Time' },
-    { id: 'bath', label: 'Bath' },
-];
 
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
@@ -43,17 +32,23 @@ export default function Dashboard() {
     const [tummyModal, setTummyModal] = useState(false);
     const [bathModal, setBathModal] = useState(false);
 
-    // Widget customization
+    // Widget visibility from localStorage
     const [visibleWidgets, setVisibleWidgets] = useState(() => {
         const saved = localStorage.getItem('visibleWidgets');
         return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_WIDGETS;
     });
-    const [showWidgetPicker, setShowWidgetPicker] = useState(false);
 
-    // Save widget preferences
+    // Sync with localStorage changes (from Settings page)
     useEffect(() => {
-        localStorage.setItem('visibleWidgets', JSON.stringify(visibleWidgets));
-    }, [visibleWidgets]);
+        const handleStorageChange = () => {
+            const saved = localStorage.getItem('visibleWidgets');
+            if (saved) {
+                setVisibleWidgets(JSON.parse(saved));
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     const loadData = async () => {
         if (!selectedBaby) return;
@@ -102,18 +97,6 @@ export default function Dashboard() {
         setTummyModal(false);
         setBathModal(false);
     };
-
-    const toggleWidget = (widgetId) => {
-        setVisibleWidgets(prev => {
-            if (prev.includes(widgetId)) {
-                return prev.filter(id => id !== widgetId);
-            } else {
-                return [...prev, widgetId];
-            }
-        });
-    };
-
-    const hiddenWidgets = ALL_WIDGETS.filter(w => !visibleWidgets.includes(w.id));
 
     if (!selectedBaby) {
         return (
@@ -232,47 +215,7 @@ export default function Dashboard() {
                         onClick={() => setBathModal(true)}
                     />
                 )}
-
-                {/* Add Widget Button - shows if there are hidden widgets */}
-                {hiddenWidgets.length > 0 && (
-                    <div
-                        className="widget widget-add"
-                        onClick={() => setShowWidgetPicker(!showWidgetPicker)}
-                    >
-                        <div className="widget-content">
-                            <div className="widget-add-content">
-                                <Plus size={32} />
-                                <span>Add Widget</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
-
-            {/* Widget Picker Dropdown */}
-            {showWidgetPicker && hiddenWidgets.length > 0 && (
-                <div className="widget-picker">
-                    <div className="widget-picker-header">
-                        <span>Add a widget</span>
-                        <button onClick={() => setShowWidgetPicker(false)}>×</button>
-                    </div>
-                    <div className="widget-picker-list">
-                        {hiddenWidgets.map(widget => (
-                            <button
-                                key={widget.id}
-                                className="widget-picker-item"
-                                onClick={() => {
-                                    toggleWidget(widget.id);
-                                    setShowWidgetPicker(false);
-                                }}
-                            >
-                                <Plus size={16} />
-                                {widget.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {/* Daily Summary */}
             <DailySummary summary={dashboard?.daily_summary} visibleWidgets={visibleWidgets} />
