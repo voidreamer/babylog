@@ -2451,6 +2451,11 @@ h4 {
     grid-template-columns: repeat(4, 1fr);
   }
 
+  .widget {
+    height: 180px;
+    /* Taller height for narrower 4-column cards */
+  }
+
   .quick-actions {
     justify-content: center;
     gap: var(--space-lg);
