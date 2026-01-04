@@ -478,20 +478,67 @@ h4 {
 
 .widget {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
-  box-shadow: var(--shadow);
-  border: none;
   transition: var(--transition);
   cursor: pointer;
   min-height: 140px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Sketchy border - hand-drawn effect */
+.widget.sketchy {
+  transform: rotate(var(--widget-rotate, 0deg));
+}
+
+.widget.sketchy:nth-child(1) {
+  --widget-rotate: -0.5deg;
+}
+
+.widget.sketchy:nth-child(2) {
+  --widget-rotate: 0.8deg;
+}
+
+.widget.sketchy:nth-child(3) {
+  --widget-rotate: -0.6deg;
+}
+
+.widget.sketchy:nth-child(4) {
+  --widget-rotate: 0.4deg;
+}
+
+.widget.sketchy:nth-child(5) {
+  --widget-rotate: -0.7deg;
+}
+
+.widget.sketchy:nth-child(6) {
+  --widget-rotate: 0.5deg;
+}
+
+.sketchy-shadow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: translate(4px, 4px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.sketchy-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .widget:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  filter: brightness(1.1);
+  transform: translateY(-4px) rotate(var(--widget-rotate, 0deg)) scale(1.02);
 }
 
 .widget:hover .widget-add-icon {
@@ -499,29 +546,20 @@ h4 {
   transform: scale(1.1);
 }
 
-.widget.feeding {
-  background: linear-gradient(135deg, var(--feeding-bg) 0%, rgba(251, 191, 36, 0.25) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-}
-
-.widget.diaper {
-  background: linear-gradient(135deg, var(--diaper-bg) 0%, rgba(52, 211, 153, 0.25) 100%);
-  border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-.widget.sleep {
-  background: linear-gradient(135deg, var(--sleep-bg) 0%, rgba(96, 165, 250, 0.25) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-}
-
-.widget.pumping {
-  background: linear-gradient(135deg, var(--pumping-bg) 0%, rgba(244, 114, 182, 0.25) 100%);
-  border: 1px solid rgba(244, 114, 182, 0.3);
+/* Override old color schemes - now handled by sketchy SVG */
+.widget.feeding,
+.widget.diaper,
+.widget.sleep,
+.widget.pumping,
+.widget.potty,
+.widget.tummy,
+.widget.bath {
+  background: transparent;
+  border: none;
 }
 
 .widget.sleeping {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(96, 165, 250, 0.5));
-  border: 2px solid var(--sleep);
+  background: transparent;
   animation: sleeping-glow 2s ease-in-out infinite;
 }
 
@@ -601,23 +639,17 @@ h4 {
 }
 
 .widget-icon-row svg {
-  color: var(--text-secondary);
+  color: var(--widget-stroke, var(--text-secondary));
 }
 
-.widget.feeding .widget-icon-row svg {
-  color: var(--feeding);
+/* Widget type specific colors - use stroke from CSS var */
+.widget.sketchy .widget-icon-row svg {
+  color: var(--widget-stroke);
 }
 
-.widget.diaper .widget-icon-row svg {
-  color: var(--diaper);
-}
-
-.widget.sleep .widget-icon-row svg {
-  color: var(--sleep);
-}
-
-.widget.pumping .widget-icon-row svg {
-  color: var(--pumping);
+.widget.sketchy .widget-bg-icon {
+  color: var(--widget-stroke);
+  opacity: 0.15;
 }
 
 .widget.potty {
