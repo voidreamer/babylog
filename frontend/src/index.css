@@ -90,7 +90,7 @@
 html,
 body {
   font-family: 'Patrick Hand', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.5;
   color: var(--text);
   background: var(--background);
@@ -104,7 +104,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Kalam', cursive;
+  font-family: 'Patrick Hand', cursive;
   font-weight: 700;
   line-height: 1.2;
   color: var(--text);
@@ -338,10 +338,10 @@ h4 {
 }
 
 .greeting-text {
-  font-family: 'Kalam', cursive;
-  font-size: 1.5rem;
-  color: var(--text);
-  font-weight: 700;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 30px;
+  color: #374151;
+  font-weight: 400;
 }
 
 .baby-greeting-content {
@@ -707,7 +707,7 @@ h4 {
 }
 
 .widget-label {
-  font-family: 'Kalam', cursive;
+  font-family: 'Patrick Hand', cursive;
   font-size: 17px;
   font-weight: 700;
   color: var(--widget-text, var(--text-secondary));
@@ -717,8 +717,8 @@ h4 {
 
 /* Time ago - primary display */
 .widget-time-ago {
-  font-family: 'Kalam', cursive;
-  font-size: 2rem;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 48px;
   font-weight: 700;
   color: var(--widget-text, var(--text));
   margin-bottom: var(--space-xs);
@@ -2960,16 +2960,16 @@ h4 {
 }
 
 .widget-settings-btn-title {
-  font-family: 'Kalam', cursive;
-  font-size: 1.3rem;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 28px;
   font-weight: 700;
-  color: var(--text);
+  color: #1f2937;
 }
 
 .widget-settings-btn-subtitle {
   font-family: 'Patrick Hand', cursive;
-  font-size: 1rem;
-  color: var(--text-muted);
+  font-size: 17px;
+  color: #6b7280;
 }
 
 .widget-settings-modal {
