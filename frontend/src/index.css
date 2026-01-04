@@ -113,6 +113,7 @@ h6 {
 body {
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 #root {
@@ -160,6 +161,7 @@ h4 {
   margin: 0 auto;
   padding: var(--space-md);
   padding-bottom: 100px;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -2296,14 +2298,16 @@ h4 {
 
   /* Timeline Calendar - mobile height fix */
   .timeline-calendar {
-    height: calc(100dvh - 180px);
-    height: calc(100vh - 180px);
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    height: calc(100dvh - 140px);
+    height: calc(100vh - 140px);
+    padding-bottom: 0;
   }
 
   .timeline-calendar-scroll {
-    margin-bottom: 60px;
-    /* Space for bottom nav */
+    flex: 1;
+    margin-bottom: 0;
+    padding-bottom: 80px;
+    /* Space for bottom nav inside scroll */
   }
 
   /* Cards */
