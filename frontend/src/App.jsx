@@ -61,7 +61,7 @@ function MainApp() {
                 <h3 className="settings-section-title">Account</h3>
                 {user && (
                     <div className="settings-item">
-                        <span className="settings-item-label">Signed in as</span>
+                        <span className="settings-item-label">Signed in as:  </span>
                         <span className="settings-item-value">{user.email}</span>
                     </div>
                 )}
