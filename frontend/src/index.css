@@ -1271,7 +1271,7 @@ h4 {
   flex-direction: column;
   height: calc(100vh - 140px);
   background: var(--background);
-  padding-bottom: 80px;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
   /* Break out of narrow container */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
