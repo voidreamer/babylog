@@ -694,35 +694,39 @@ h4 {
 }
 
 .widget-label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-family: 'Kalam', cursive;
+  font-size: 17px;
+  font-weight: 700;
   color: var(--widget-text, var(--text-secondary));
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
 }
 
 /* Time ago - primary display */
 .widget-time-ago {
-  font-size: 1.5rem;
+  font-family: 'Kalam', cursive;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--widget-text, var(--text));
   margin-bottom: var(--space-xs);
+  line-height: 1.1;
 }
 
 /* Absolute time - secondary */
 .widget-value {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--widget-text, var(--text-secondary));
-  opacity: 0.8;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 17px;
+  font-weight: 400;
+  color: #6b7280;
 }
 
 .widget-detail {
-  font-size: 0.85rem;
-  color: var(--widget-text, var(--text-muted));
+  font-family: 'Patrick Hand', cursive;
+  font-size: 19px;
+  color: #4b5563;
   margin-top: var(--space-xs);
-  font-weight: 500;
-  opacity: 0.7;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 /* Empty state */
@@ -731,9 +735,10 @@ h4 {
 }
 
 .widget-empty-text {
-  font-size: 1rem;
-  color: var(--widget-text, var(--text-secondary));
-  font-weight: 500;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 19px;
+  color: #6b7280;
+  font-weight: 400;
 }
 
 /* Add Widget Button */
