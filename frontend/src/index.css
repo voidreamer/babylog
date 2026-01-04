@@ -1,50 +1,60 @@
 :root {
-  /* Colors - Warm Dark Theme */
+  /* Colors - Warm Pastel Light Theme */
   --primary: #8b5cf6;
   --primary-dark: #7c3aed;
   --primary-light: #a78bfa;
 
-  --feeding: #fbbf24;
-  --feeding-light: #fcd34d;
-  --feeding-bg: rgba(251, 191, 36, 0.15);
+  --feeding: #ea580c;
+  --feeding-light: #f97316;
+  --feeding-bg: #fff7ed;
+  --feeding-text: #9a3412;
 
-  --diaper: #34d399;
-  --diaper-light: #6ee7b7;
-  --diaper-bg: rgba(52, 211, 153, 0.15);
+  --diaper: #059669;
+  --diaper-light: #10b981;
+  --diaper-bg: #ecfdf5;
+  --diaper-text: #065f46;
 
-  --sleep: #60a5fa;
-  --sleep-light: #93c5fd;
-  --sleep-bg: rgba(96, 165, 250, 0.15);
+  --sleep: #4f46e5;
+  --sleep-light: #6366f1;
+  --sleep-bg: #eef2ff;
+  --sleep-text: #3730a3;
 
-  --pumping: #f472b6;
-  --pumping-light: #f9a8d4;
-  --pumping-bg: rgba(244, 114, 182, 0.15);
+  --pumping: #db2777;
+  --pumping-light: #ec4899;
+  --pumping-bg: #fdf2f8;
+  --pumping-text: #9d174d;
 
-  --potty: #a78bfa;
-  --potty-light: #c4b5fd;
-  --potty-bg: rgba(167, 139, 250, 0.15);
+  --potty: #7c3aed;
+  --potty-light: #8b5cf6;
+  --potty-bg: #f5f3ff;
+  --potty-text: #5b21b6;
 
-  --tummy: #fb923c;
-  --tummy-light: #fdba74;
-  --tummy-bg: rgba(251, 146, 60, 0.15);
+  --tummy: #ca8a04;
+  --tummy-light: #eab308;
+  --tummy-bg: #fefce8;
+  --tummy-text: #854d0e;
 
-  --bath: #22d3ee;
-  --bath-light: #67e8f9;
-  --bath-bg: rgba(34, 211, 238, 0.15);
+  --bath: #0891b2;
+  --bath-light: #06b6d4;
+  --bath-bg: #ecfeff;
+  --bath-text: #155e75;
 
-  --background: #18181b;
-  --surface: #27272a;
-  --surface-hover: #3f3f46;
-  --border: #52525b;
+  /* App background - warm cream/peach gradient */
+  --background: #fef7ed;
+  --bg: #fef7ed;
+  --surface: #ffffff;
+  --surface-hover: #fdf4e8;
+  --border: #fed7aa;
 
-  --text: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  /* Text - dark for readability */
+  --text: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #a8a29e;
 
-  --danger: #ef4444;
-  --success: #22c55e;
+  --danger: #dc2626;
+  --success: #16a34a;
   --accent: #8b5cf6;
-  --secondary: #22c55e;
+  --secondary: #16a34a;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -61,11 +71,11 @@
   --radius-xl: 1rem;
   --radius-full: 9999px;
 
-  /* Shadows - subtle for dark theme */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  /* Shadows - soft for light theme */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Transitions */
   --transition: all 0.2s ease;
@@ -682,7 +692,7 @@ h4 {
 .widget-label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--widget-text, var(--text-secondary));
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -691,7 +701,7 @@ h4 {
 .widget-time-ago {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--widget-text, var(--text));
   margin-bottom: var(--space-xs);
 }
 
@@ -699,14 +709,16 @@ h4 {
 .widget-value {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--widget-text, var(--text-secondary));
+  opacity: 0.8;
 }
 
 .widget-detail {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--widget-text, var(--text-muted));
   margin-top: var(--space-xs);
   font-weight: 500;
+  opacity: 0.7;
 }
 
 /* Empty state */
@@ -716,7 +728,7 @@ h4 {
 
 .widget-empty-text {
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: var(--widget-text, var(--text-secondary));
   font-weight: 500;
 }
 

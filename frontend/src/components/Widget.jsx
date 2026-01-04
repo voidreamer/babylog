@@ -23,15 +23,15 @@ const lucideIcons = {
     bath: ShowerHead,
 };
 
-// Sketchy color scheme - warm baby-friendly pastels
+// Sketchy color scheme - warm baby-friendly pastels with dark text for readability
 const sketchyColors = {
-    feeding: { stroke: '#f97316', bg: '#fff7ed' },   // Orange
-    diaper: { stroke: '#10b981', bg: '#ecfdf5' },    // Emerald
-    sleep: { stroke: '#6366f1', bg: '#eef2ff' },     // Indigo
-    pumping: { stroke: '#ec4899', bg: '#fdf2f8' },   // Pink
-    potty: { stroke: '#8b5cf6', bg: '#f5f3ff' },     // Violet
-    tummy: { stroke: '#eab308', bg: '#fefce8' },     // Yellow
-    bath: { stroke: '#06b6d4', bg: '#ecfeff' },      // Cyan
+    feeding: { stroke: '#ea580c', bg: '#fff7ed', text: '#9a3412' },   // Orange
+    diaper: { stroke: '#059669', bg: '#ecfdf5', text: '#065f46' },    // Emerald
+    sleep: { stroke: '#4f46e5', bg: '#eef2ff', text: '#3730a3' },     // Indigo
+    pumping: { stroke: '#db2777', bg: '#fdf2f8', text: '#9d174d' },   // Pink
+    potty: { stroke: '#7c3aed', bg: '#f5f3ff', text: '#5b21b6' },     // Violet
+    tummy: { stroke: '#ca8a04', bg: '#fefce8', text: '#854d0e' },     // Yellow
+    bath: { stroke: '#0891b2', bg: '#ecfeff', text: '#155e75' },      // Cyan
 };
 
 // Generate a wobbly path that looks hand-drawn
@@ -196,7 +196,11 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
         <div
             className={`widget sketchy ${type} ${isSleeping ? 'sleeping' : ''}`}
             onClick={onClick}
-            style={{ '--widget-stroke': colors.stroke, '--widget-bg': colors.bg }}
+            style={{
+                '--widget-stroke': colors.stroke,
+                '--widget-bg': colors.bg,
+                '--widget-text': colors.text
+            }}
         >
             {/* Sketchy border */}
             <SketchyBorder width={200} height={150} type={type} seed={seed} />
