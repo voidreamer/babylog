@@ -338,8 +338,8 @@ h4 {
 }
 
 .greeting-text {
-  font-family: 'Patrick Hand', cursive;
-  font-size: 24px;
+  font-family: 'Neucha', cursive;
+  font-size: 28px;
   color: #374151;
   font-weight: 400;
 }
@@ -369,8 +369,8 @@ h4 {
 }
 
 .baby-greeting-name {
-  font-family: 'Patrick Hand', cursive;
-  font-size: 1.75rem;
+  font-family: 'Neucha', cursive;
+  font-size: 2rem;
   font-weight: 700;
   color: #1f2937;
   line-height: 1.2;
@@ -708,20 +708,20 @@ h4 {
 }
 
 .widget-label {
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Neucha', cursive;
   font-size: 17px;
   font-weight: 700;
-  color: var(--widget-text, var(--text-secondary));
+  color: var(--widget-stroke, var(--text-secondary));
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
 
 /* Time ago - primary display */
 .widget-time-ago {
-  font-family: 'Patrick Hand', cursive;
-  font-size: 32px;
+  font-family: 'Neucha', cursive;
+  font-size: 42px;
   font-weight: 700;
-  color: var(--widget-text, var(--text));
+  color: var(--widget-stroke, var(--text));
   margin-bottom: var(--space-xs);
   line-height: 1.1;
 }
@@ -2242,15 +2242,19 @@ h4 {
   }
 
   .widget-label {
-    font-size: 0.65rem;
+    font-size: 15px;
+  }
+
+  .widget-time-ago {
+    font-size: 36px;
   }
 
   .widget-value {
-    font-size: 1.25rem;
+    font-size: 15px;
   }
 
   .widget-detail {
-    font-size: 0.75rem;
+    font-size: 18px;
   }
 
   /* Quick actions bottom bar */
