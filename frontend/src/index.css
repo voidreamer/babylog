@@ -718,7 +718,7 @@ h4 {
 /* Time ago - primary display */
 .widget-time-ago {
   font-family: 'Patrick Hand', cursive;
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--widget-text, var(--text));
   margin-bottom: var(--space-xs);
