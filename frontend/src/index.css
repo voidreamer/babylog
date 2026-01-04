@@ -482,8 +482,12 @@ h4 {
 .widgets-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
+  gap: var(--space-lg);
   margin-bottom: var(--space-xl);
+  padding: var(--space-sm);
+  /* Prevent sketchy borders from clipping */
+  margin-left: calc(-1 * var(--space-sm));
+  margin-right: calc(-1 * var(--space-sm));
 }
 
 .widget {
