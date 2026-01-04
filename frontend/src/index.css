@@ -719,7 +719,7 @@ h4 {
 /* Time ago - primary display */
 .widget-time-ago {
   font-family: 'Neucha', cursive;
-  font-size: 42px;
+  font-size: 21px;
   font-weight: 700;
   color: var(--widget-stroke, var(--text));
   margin-bottom: var(--space-xs);
@@ -2246,7 +2246,7 @@ h4 {
   }
 
   .widget-time-ago {
-    font-size: 36px;
+    font-size: 18px;
   }
 
   .widget-value {
