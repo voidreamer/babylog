@@ -161,7 +161,6 @@ h4 {
   margin: 0 auto;
   padding: var(--space-md);
   padding-bottom: 100px;
-  overflow-x: hidden;
 }
 
 .page-header {
