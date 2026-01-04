@@ -338,9 +338,10 @@ h4 {
 }
 
 .greeting-text {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-family: 'Kalam', cursive;
+  font-size: 1.5rem;
+  color: var(--text);
+  font-weight: 700;
 }
 
 .baby-greeting-content {
@@ -856,8 +857,9 @@ h4 {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.1rem;
+  font-weight: 400;
   color: var(--text-secondary);
 }
 
@@ -2958,12 +2960,15 @@ h4 {
 }
 
 .widget-settings-btn-title {
-  font-weight: 600;
+  font-family: 'Kalam', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: var(--text);
 }
 
 .widget-settings-btn-subtitle {
-  font-size: 0.8rem;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
   color: var(--text-muted);
 }
 
