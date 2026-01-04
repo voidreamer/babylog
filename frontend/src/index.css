@@ -2660,11 +2660,14 @@ h4 {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 80px;
+  /* Leave room for bottom nav */
   background: var(--bg);
-  z-index: 1000;
+  z-index: 200;
+  /* Below modals (1000) but above content */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .article-hero {
