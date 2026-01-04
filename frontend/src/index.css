@@ -499,10 +499,7 @@ h4 {
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   margin-bottom: var(--space-xl);
-  padding: var(--space-md);
-  /* Prevent sketchy borders from clipping */
-  margin-left: calc(-1 * var(--space-md));
-  margin-right: calc(-1 * var(--space-md));
+  padding: var(--space-sm);
 }
 
 .widget {
