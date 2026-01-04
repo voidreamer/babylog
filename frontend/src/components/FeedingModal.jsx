@@ -39,6 +39,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                 setFeedMethod('breast');
             } else {
                 setFeedMethod('bottle');
+                // Handle both old 'bottle' and new 'breastmilk_bottle' types
                 setBottleType(details.type === 'formula' ? 'formula' : 'breastmilk');
             }
 
@@ -84,7 +85,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
     // Determine the type to save based on feeding method and bottle type
     const getSaveType = () => {
         if (feedMethod === 'breast') return 'breast';
-        return bottleType === 'formula' ? 'formula' : 'bottle';
+        return bottleType === 'formula' ? 'formula' : 'breastmilk_bottle';
     };
 
     const handleSaveTimer = async () => {

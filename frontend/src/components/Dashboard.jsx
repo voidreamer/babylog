@@ -151,7 +151,9 @@ export default function Dashboard() {
                         value={formatTime(dashboard?.last_feeding?.time)}
                         lastTime={dashboard?.last_feeding?.time}
                         detail={dashboard?.last_feeding ?
-                            `${dashboard.last_feeding.type}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
+                            `${dashboard.last_feeding.type === 'breastmilk_bottle' || dashboard.last_feeding.type === 'bottle'
+                                ? 'Breastmilk Bottle'
+                                : dashboard.last_feeding.type.charAt(0).toUpperCase() + dashboard.last_feeding.type.slice(1)}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
                             : null}
                         onClick={() => setFeedingModal(true)}
                     />

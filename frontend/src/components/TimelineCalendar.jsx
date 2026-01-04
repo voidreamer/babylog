@@ -246,9 +246,18 @@ export default function TimelineCalendar() {
         const details = event.details || {};
         switch (event.event_type) {
             case 'feeding':
-                const feedType = details.type || '';
+                let feedType = details.type || '';
+                // Format the type for display
+                if (feedType === 'breastmilk_bottle') {
+                    feedType = 'Breastmilk Bottle';
+                } else if (feedType === 'bottle') {
+                    // Legacy data - treat as breastmilk bottle
+                    feedType = 'Breastmilk Bottle';
+                } else {
+                    feedType = feedType.charAt(0).toUpperCase() + feedType.slice(1);
+                }
                 const duration = details.duration_minutes ? ` • ${details.duration_minutes}min` : '';
-                return feedType.charAt(0).toUpperCase() + feedType.slice(1) + duration;
+                return feedType + duration;
             case 'diaper':
                 return details.type ? details.type.charAt(0).toUpperCase() + details.type.slice(1) : '';
             case 'sleep':
@@ -261,11 +270,12 @@ export default function TimelineCalendar() {
             case 'pumping':
                 return details.amount_ml ? `${details.amount_ml}ml` : '';
             case 'potty':
-                return details.result ? details.result.charAt(0).toUpperCase() + details.result.slice(1) : '';
+                const result = details.result ? details.result.charAt(0).toUpperCase() + details.result.slice(1) : '';
+                return result || 'Potty';
             case 'tummy':
-                return details.duration_minutes ? `${details.duration_minutes}min` : '';
+                return details.duration_minutes ? `${details.duration_minutes}min` : 'Tummy Time';
             case 'bath':
-                return 'Bath';
+                return details.notes || 'Bath';
             default:
                 return '';
         }
