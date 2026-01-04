@@ -177,7 +177,7 @@ export default function Dashboard() {
                             : formatTime(dashboard?.last_sleep?.start_time)}
                         lastTime={dashboard?.current_sleep?.start_time || dashboard?.last_sleep?.start_time}
                         detail={dashboard?.current_sleep
-                            ? "Currently sleeping 💤"
+                            ? "Sleeping 💤"
                             : dashboard?.last_sleep?.duration_minutes
                                 ? `${dashboard.last_sleep.duration_minutes}min`
                                 : null}

@@ -53,9 +53,9 @@ export default function WidgetSettings({ visibleWidgets, onToggle }) {
                         />
                         <motion.div
                             className="modal widget-settings-modal"
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                         >
                             <div className="modal-header">
                                 <h3>Dashboard Activities</h3>
