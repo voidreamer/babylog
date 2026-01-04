@@ -1275,7 +1275,7 @@ h4 {
   flex-direction: column;
   height: calc(100vh - 140px);
   background: var(--background);
-  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  padding-bottom: calc(160px + env(safe-area-inset-bottom));
   /* Break out of narrow container */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
@@ -2952,13 +2952,15 @@ h4 {
 
 .widget-settings-modal {
   position: fixed;
-  bottom: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   max-width: 400px;
-  width: 100%;
-  z-index: 201;
+  width: calc(100% - var(--space-xl));
+  z-index: 1001;
   padding: var(--space-lg);
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .widget-settings-hint {

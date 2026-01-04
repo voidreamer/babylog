@@ -34,13 +34,13 @@ const sketchyColors = {
     bath: { stroke: '#0891b2', bg: '#ecfeff', text: '#155e75' },      // Cyan
 };
 
-// Generate a wobbly path that looks hand-drawn
-function generateSketchyPath(width, height, seed, roughness = 2) {
-    const points = 40;
+// Generate a subtle wobbly path for hand-drawn effect
+function generateSketchyPath(width, height, seed, roughness = 1.5) {
+    const points = 60; // More points = smoother edges
     let path = 'M ';
 
     const wobble = (base, index) => {
-        return base + Math.sin(seed + index * 0.5) * roughness + Math.cos(seed * 1.3 + index * 0.7) * roughness * 0.5;
+        return base + Math.sin(seed + index * 0.4) * roughness + Math.cos(seed * 1.2 + index * 0.6) * roughness * 0.4;
     };
 
     // Top edge
@@ -154,26 +154,23 @@ function SketchyBorder({ width, height, type, seed }) {
                     d={paths.main}
                     fill={colors.bg}
                 />
-                {/* Multiple border lines for hand-drawn effect */}
+                {/* Two subtle border lines - cleaner hand-drawn effect */}
                 <path
                     d={paths.main}
                     fill="none"
                     stroke={colors.stroke}
-                    strokeWidth="2"
-                    opacity="0.7"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.5"
                 />
                 <path
                     d={paths.second}
                     fill="none"
                     stroke={colors.stroke}
-                    strokeWidth="1.5"
-                    opacity="0.4"
-                />
-                <path
-                    d={paths.third}
-                    fill="none"
-                    stroke={colors.stroke}
-                    strokeWidth="1"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     opacity="0.25"
                 />
             </svg>
