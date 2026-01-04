@@ -511,7 +511,7 @@ h4 {
   padding: var(--space-lg);
   transition: var(--transition);
   cursor: pointer;
-  min-height: 140px;
+  height: 150px;
   background: transparent;
   border: none;
   box-shadow: none;
