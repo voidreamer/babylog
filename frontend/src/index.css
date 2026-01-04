@@ -2272,6 +2272,86 @@ h4 {
   .baby-name {
     font-size: 0.9rem;
   }
+
+  /* Health tabs on mobile - smaller, scrollable */
+  .health-tabs {
+    padding: var(--space-xs);
+    gap: 2px;
+    margin-bottom: var(--space-md);
+  }
+
+  .health-tab {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.7rem;
+    gap: 4px;
+  }
+
+  .health-tab svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .health-tab span:not(.health-tab-badge) {
+    display: none;
+    /* Hide label text on very small screens, show icon only */
+  }
+
+  .health-tab-badge {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+  }
+
+  /* Timeline items - stack vertically on mobile */
+  .timeline-item {
+    flex-wrap: wrap;
+  }
+
+  .timeline-time {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-xs);
+    padding-left: 44px;
+    /* Align with content after icon */
+  }
+
+  /* Modal - full screen on mobile */
+  .modal {
+    max-height: 90vh;
+    margin: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  /* Form rows - single column on mobile */
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  /* Growth chart section */
+  .growth-chart-section {
+    padding: var(--space-sm);
+  }
+
+  .growth-chart-tabs {
+    gap: var(--space-xs);
+  }
+
+  .growth-chart-tab {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.8rem;
+  }
 }
 
 /* iPad and larger (768px+) */
