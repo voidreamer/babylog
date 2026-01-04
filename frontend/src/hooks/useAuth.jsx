@@ -139,13 +139,15 @@ export function AuthProvider({ children }) {
             setUser(payload);
             console.log('[Auth] User logged in:', payload.email);
 
-            // Close browser on native
+            // Close browser on native and force reload to refresh UI
             if (Capacitor.isNativePlatform()) {
                 try {
                     await Browser.close();
                 } catch (e) {
                     // Browser might already be closed
                 }
+                // Force reload to ensure UI picks up new auth state
+                window.location.reload();
             }
         } catch (error) {
             console.error('[Auth] Callback failed:', error);
