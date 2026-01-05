@@ -1,5 +1,33 @@
+/* ============================================================================
+   THEME SYSTEM
+   ============================================================================ */
+
+/* Base variables (shared between themes) */
 :root {
-  /* Colors - Warm Pastel Light Theme */
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition: all 0.2s ease;
+}
+
+/* ============================================================================
+   HANDWRITTEN THEME (Default) - Light cream background with cursive fonts
+   ============================================================================ */
+:root,
+[data-theme="handwritten"] {
   --primary: #8b5cf6;
   --primary-dark: #7c3aed;
   --primary-light: #a78bfa;
@@ -39,7 +67,7 @@
   --bath-bg: #ecfeff;
   --bath-text: #155e75;
 
-  /* App background - warm cream/peach gradient */
+  /* App background - warm cream/peach */
   --background: #fef7ed;
   --bg: #fef7ed;
   --surface: #ffffff;
@@ -56,29 +84,86 @@
   --accent: #8b5cf6;
   --secondary: #16a34a;
 
-  /* Spacing */
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
-
-  /* Border radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-full: 9999px;
-
   /* Shadows - soft for light theme */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-  /* Transitions */
-  --transition: all 0.2s ease;
+  /* Typography */
+  --font-family: 'Patrick Hand', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-heading: 'Neucha', cursive;
+}
+
+/* ============================================================================
+   CLASSIC DARK THEME - Dark background with system fonts
+   ============================================================================ */
+[data-theme="classic"] {
+  --primary: #8b5cf6;
+  --primary-dark: #7c3aed;
+  --primary-light: #a78bfa;
+
+  --feeding: #fbbf24;
+  --feeding-light: #fcd34d;
+  --feeding-bg: rgba(251, 191, 36, 0.15);
+  --feeding-text: #fbbf24;
+
+  --diaper: #34d399;
+  --diaper-light: #6ee7b7;
+  --diaper-bg: rgba(52, 211, 153, 0.15);
+  --diaper-text: #34d399;
+
+  --sleep: #60a5fa;
+  --sleep-light: #93c5fd;
+  --sleep-bg: rgba(96, 165, 250, 0.15);
+  --sleep-text: #60a5fa;
+
+  --pumping: #f472b6;
+  --pumping-light: #f9a8d4;
+  --pumping-bg: rgba(244, 114, 182, 0.15);
+  --pumping-text: #f472b6;
+
+  --potty: #a78bfa;
+  --potty-light: #c4b5fd;
+  --potty-bg: rgba(167, 139, 250, 0.15);
+  --potty-text: #a78bfa;
+
+  --tummy: #fb923c;
+  --tummy-light: #fdba74;
+  --tummy-bg: rgba(251, 146, 60, 0.15);
+  --tummy-text: #fb923c;
+
+  --bath: #22d3ee;
+  --bath-light: #67e8f9;
+  --bath-bg: rgba(34, 211, 238, 0.15);
+  --bath-text: #22d3ee;
+
+  /* App background - dark */
+  --background: #18181b;
+  --bg: #18181b;
+  --surface: #27272a;
+  --surface-hover: #3f3f46;
+  --border: #52525b;
+
+  /* Text - light for dark theme */
+  --text: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --danger: #ef4444;
+  --success: #22c55e;
+  --accent: #8b5cf6;
+  --secondary: #22c55e;
+
+  /* Shadows - stronger for dark theme */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+
+  /* Typography - system fonts */
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -89,7 +174,7 @@
 
 html,
 body {
-  font-family: 'Patrick Hand', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-family);
   font-size: 17px;
   line-height: 1.5;
   color: var(--text);
@@ -104,7 +189,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Patrick Hand', cursive;
+  font-family: var(--font-family-heading);
   font-weight: 700;
   line-height: 1.2;
   color: var(--text);
@@ -223,6 +308,22 @@ h4 {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+}
+
+.settings-select {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
 .settings-toggle {

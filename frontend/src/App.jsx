@@ -36,6 +36,17 @@ function MainApp() {
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
 
+    // Theme state
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem('theme') || 'handwritten';
+    });
+
+    // Apply theme on mount and when it changes
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
     // Check if we should show onboarding (no babies yet)
     useEffect(() => {
         if (!babiesLoading && babies.length === 0) {
@@ -56,6 +67,21 @@ function MainApp() {
     const SettingsPage = () => (
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
+
+            <div className="settings-section">
+                <h3 className="settings-section-title">Appearance</h3>
+                <div className="settings-item">
+                    <span className="settings-item-label">Theme</span>
+                    <select
+                        className="settings-select"
+                        value={theme}
+                        onChange={(e) => setTheme(e.target.value)}
+                    >
+                        <option value="handwritten">✏️ Handwritten</option>
+                        <option value="classic">🌙 Classic Dark</option>
+                    </select>
+                </div>
+            </div>
 
             <div className="settings-section">
                 <h3 className="settings-section-title">Account</h3>
