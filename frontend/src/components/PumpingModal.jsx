@@ -37,11 +37,14 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
         }
     }, [editEvent]);
 
-    // Timer effect
+    // Timer effect - calculates elapsed time from startTime for screen-off persistence
     useEffect(() => {
-        if (timerRunning) {
+        if (timerRunning && startTime) {
             intervalRef.current = setInterval(() => {
-                setTimerSeconds(prev => prev + 1);
+                // Calculate elapsed seconds from startTime instead of incrementing
+                // This ensures timer is accurate even if screen was off
+                const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
+                setTimerSeconds(elapsed);
             }, 1000);
         }
         return () => {
@@ -49,7 +52,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [timerRunning]);
+    }, [timerRunning, startTime]);
 
     const formatTimerDisplay = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -150,17 +153,38 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
 
                     {/* Timer Mode */}
                     {mode === 'timer' && !isEditing ? (
-                        <div className="timer-section">
-                            <div className="timer-display">
-                                {formatTimerDisplay(timerSeconds)}
+                        <>
+                            {/* Timer Display */}
+                            <div style={{
+                                textAlign: 'center',
+                                padding: 'var(--space-xl)',
+                                background: timerRunning ? 'var(--pumping-bg)' : 'var(--surface)',
+                                borderRadius: 'var(--radius-xl)',
+                                marginBottom: 'var(--space-lg)'
+                            }}>
+                                <div style={{
+                                    fontSize: '3rem',
+                                    fontWeight: 'bold',
+                                    fontFamily: 'monospace',
+                                    color: timerRunning ? 'var(--pumping)' : 'var(--text)'
+                                }}>
+                                    {formatTimerDisplay(timerSeconds)}
+                                </div>
+                                {startTime && (
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 'var(--space-sm)' }}>
+                                        Started at {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="timer-controls">
+                            {/* Timer Controls */}
+                            <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
                                 {!timerRunning ? (
                                     <button
                                         type="button"
-                                        className="btn btn-primary btn-lg"
+                                        className="btn btn-primary btn-block btn-lg"
                                         onClick={handleStartTimer}
+                                        style={{ background: 'var(--pumping)' }}
                                         disabled={saving}
                                     >
                                         ▶️ Start Pumping
@@ -168,7 +192,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
                                 ) : (
                                     <button
                                         type="button"
-                                        className="btn btn-danger btn-lg"
+                                        className="btn btn-secondary btn-block btn-lg"
                                         onClick={handleStopTimer}
                                     >
                                         ⏹️ Stop
@@ -176,10 +200,10 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
                                 )}
                             </div>
 
-                            {/* Amount and notes during timer */}
+                            {/* Amount and notes during/after timer */}
                             {(timerRunning || timerSeconds > 0) && (
                                 <>
-                                    <div className="form-group" style={{ marginTop: 'var(--space-lg)' }}>
+                                    <div className="form-group">
                                         <label className="form-label">Amount (ml)</label>
                                         <input
                                             type="number"
@@ -221,7 +245,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }) {
                                     </button>
                                 </div>
                             )}
-                        </div>
+                        </>
                     ) : (
                         /* Quick Log Mode */
                         <form onSubmit={handleSubmitQuick}>

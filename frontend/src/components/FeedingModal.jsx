@@ -49,11 +49,14 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
         }
     }, [editEvent]);
 
-    // Timer effect
+    // Timer effect - calculates elapsed time from startTime for screen-off persistence
     useEffect(() => {
-        if (timerRunning) {
+        if (timerRunning && startTime) {
             intervalRef.current = setInterval(() => {
-                setTimerSeconds(prev => prev + 1);
+                // Calculate elapsed seconds from startTime instead of incrementing
+                // This ensures timer is accurate even if screen was off
+                const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
+                setTimerSeconds(elapsed);
             }, 1000);
         }
         return () => {
@@ -61,7 +64,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [timerRunning]);
+    }, [timerRunning, startTime]);
 
     const formatTimerDisplay = (seconds) => {
         const mins = Math.floor(seconds / 60);
