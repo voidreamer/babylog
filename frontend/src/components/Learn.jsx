@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { articles, getArticlesForAge, calculateAgeInMonths, AGE_STAGES, getStageFromAge, CATEGORIES } from '../data/articles';
 import ArticleView from './ArticleView';
-import { BookOpen, Moon, Utensils, Stethoscope, Baby, Shield, Sparkles, Search, X } from 'lucide-react';
+import BabyInsights from './BabyInsights';
+import { BookOpen, Moon, Utensils, Stethoscope, Baby, Shield, Sparkles, Search, X, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Category icons map
@@ -17,14 +18,15 @@ const CATEGORY_ICONS = {
 
 export default function Learn() {
     const { selectedBaby } = useBaby();
+    const [activeTab, setActiveTab] = useState('insights'); // 'insights' or 'articles'
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     // Calculate baby age in months
     const babyAgeMonths = useMemo(() => {
-        if (!selectedBaby?.date_of_birth) return null;
-        return calculateAgeInMonths(selectedBaby.date_of_birth);
+        if (!selectedBaby?.birth_date) return null;
+        return calculateAgeInMonths(selectedBaby.birth_date);
     }, [selectedBaby]);
 
     // Get age-relevant articles
@@ -98,6 +100,78 @@ export default function Learn() {
         );
     };
 
+    // Articles content
+    const ArticlesContent = () => (
+        <>
+            {/* Search Bar */}
+            <div className="learn-search">
+                <div className="learn-search-input-wrapper">
+                    <Search size={18} className="learn-search-icon" />
+                    <input
+                        type="text"
+                        className="learn-search-input"
+                        placeholder="Search articles..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                        <button
+                            className="learn-search-clear"
+                            onClick={() => setSearchQuery('')}
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
+                </div>
+                <span className="learn-article-count">
+                    {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''}
+                </span>
+            </div>
+
+            {/* Featured/Recommended Section */}
+            {recommendedArticles.length > 0 && (
+                <section className="learn-featured">
+                    <h2 className="learn-section-title">
+                        <Sparkles size={18} /> Recommended for You
+                    </h2>
+                    <div className="learn-featured-scroll">
+                        {recommendedArticles.map(article => (
+                            <ArticleCard key={article.id} article={article} featured />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* Category Filter */}
+            <div className="learn-categories">
+                {Object.entries(CATEGORIES).map(([key, cat]) => (
+                    <button
+                        key={key}
+                        className={`learn-category-btn ${selectedCategory === key ? 'active' : ''}`}
+                        onClick={() => setSelectedCategory(key)}
+                    >
+                        {renderCategoryIcon(key, 14)}
+                        <span>{cat.label}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Articles Grid */}
+            <section className="learn-grid">
+                {filteredArticles.map((article, index) => (
+                    <motion.div
+                        key={article.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                    >
+                        <ArticleCard article={article} />
+                    </motion.div>
+                ))}
+            </section>
+        </>
+    );
+
     return (
         <div className="learn-page">
             <AnimatePresence mode="wait">
@@ -127,72 +201,48 @@ export default function Learn() {
                             )}
                         </div>
 
-                        {/* Search Bar */}
-                        <div className="learn-search">
-                            <div className="learn-search-input-wrapper">
-                                <Search size={18} className="learn-search-icon" />
-                                <input
-                                    type="text"
-                                    className="learn-search-input"
-                                    placeholder="Search articles..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                {searchQuery && (
-                                    <button
-                                        className="learn-search-clear"
-                                        onClick={() => setSearchQuery('')}
-                                    >
-                                        <X size={16} />
-                                    </button>
-                                )}
-                            </div>
-                            <span className="learn-article-count">
-                                {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''}
-                            </span>
+                        {/* Tab Navigation */}
+                        <div className="learn-tabs">
+                            <button
+                                className={`learn-tab ${activeTab === 'insights' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('insights')}
+                            >
+                                <TrendingUp size={16} />
+                                <span>Your Baby</span>
+                            </button>
+                            <button
+                                className={`learn-tab ${activeTab === 'articles' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('articles')}
+                            >
+                                <BookOpen size={16} />
+                                <span>Articles</span>
+                            </button>
                         </div>
 
-                        {/* Featured/Recommended Section */}
-                        {recommendedArticles.length > 0 && (
-                            <section className="learn-featured">
-                                <h2 className="learn-section-title">
-                                    <Sparkles size={18} /> Recommended for You
-                                </h2>
-                                <div className="learn-featured-scroll">
-                                    {recommendedArticles.map(article => (
-                                        <ArticleCard key={article.id} article={article} featured />
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Category Filter */}
-                        <div className="learn-categories">
-                            {Object.entries(CATEGORIES).map(([key, cat]) => (
-                                <button
-                                    key={key}
-                                    className={`learn-category-btn ${selectedCategory === key ? 'active' : ''}`}
-                                    onClick={() => setSelectedCategory(key)}
-                                >
-                                    {renderCategoryIcon(key, 14)}
-                                    <span>{cat.label}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Articles Grid */}
-                        <section className="learn-grid">
-                            {filteredArticles.map((article, index) => (
+                        {/* Tab Content */}
+                        <AnimatePresence mode="wait">
+                            {activeTab === 'insights' ? (
                                 <motion.div
-                                    key={article.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                                    key="insights"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ duration: 0.2 }}
                                 >
-                                    <ArticleCard article={article} />
+                                    <BabyInsights isPremium={false} />
                                 </motion.div>
-                            ))}
-                        </section>
+                            ) : (
+                                <motion.div
+                                    key="articles"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <ArticlesContent />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 )}
             </AnimatePresence>

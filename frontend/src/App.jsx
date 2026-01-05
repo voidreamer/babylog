@@ -11,7 +11,7 @@ import Callback from './pages/Callback';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -81,7 +81,10 @@ function MainApp() {
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
 
             <div className="settings-section">
-                <h3 className="settings-section-title">Appearance</h3>
+                <div className="settings-section-header">
+                    <Palette size={18} className="settings-section-icon" />
+                    <h3 className="settings-section-title">Appearance</h3>
+                </div>
                 <div className="settings-item">
                     <span className="settings-item-label">Theme</span>
                     <select
@@ -89,14 +92,17 @@ function MainApp() {
                         value={theme}
                         onChange={(e) => setTheme(e.target.value)}
                     >
-                        <option value="handwritten">✏️ Handwritten</option>
-                        <option value="classic">🌙 Classic Dark</option>
+                        <option value="handwritten">Handwritten</option>
+                        <option value="classic">Classic Dark</option>
                     </select>
                 </div>
             </div>
 
             <div className="settings-section">
-                <h3 className="settings-section-title">Account</h3>
+                <div className="settings-section-header">
+                    <User size={18} className="settings-section-icon" />
+                    <h3 className="settings-section-title">Account</h3>
+                </div>
                 {user && (
                     <div className="settings-item">
                         <span className="settings-item-label">Signed in as:  </span>
@@ -106,7 +112,10 @@ function MainApp() {
             </div>
 
             <div className="settings-section">
-                <h3 className="settings-section-title">Legal</h3>
+                <div className="settings-section-header">
+                    <FileText size={18} className="settings-section-icon" />
+                    <h3 className="settings-section-title">Legal</h3>
+                </div>
                 <button
                     className="settings-item settings-link-btn"
                     onClick={() => setShowPrivacyPolicy(true)}

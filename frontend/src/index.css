@@ -3518,3 +3518,387 @@ h4 {
 .settings-link-btn:hover {
   color: var(--text);
 }
+
+/* ============================================================================
+   Learn Page Tabs
+   ============================================================================ */
+
+.learn-tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+}
+
+.learn-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.learn-tab:hover {
+  color: var(--text-secondary);
+  background: var(--surface-hover);
+}
+
+.learn-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* ============================================================================
+   Baby Insights Component
+   ============================================================================ */
+
+.insights-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.insights-section {
+  position: relative;
+}
+
+.insights-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-md);
+}
+
+.insights-section-title .premium-lock {
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.age-badge {
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* Prediction Cards */
+.insights-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+.insight-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.insight-card-icon {
+  flex-shrink: 0;
+}
+
+.insight-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.insight-card-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.insight-card-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.insight-card-alert {
+  font-size: 0.75rem;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+/* Patterns Section */
+.insights-patterns {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.pattern-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.pattern-item:last-child {
+  border-bottom: none;
+}
+
+.pattern-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.pattern-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Benchmarks Section */
+.insights-benchmarks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.benchmark-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+}
+
+.benchmark-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.benchmark-comparison {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.benchmark-actual,
+.benchmark-expected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.benchmark-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.benchmark-range {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.benchmark-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.benchmark-status {
+  margin-left: auto;
+}
+
+.benchmark-status.good {
+  color: var(--success);
+}
+
+.benchmark-status.low,
+.benchmark-status.high {
+  color: var(--danger);
+}
+
+.benchmark-status.neutral {
+  color: var(--text-muted);
+}
+
+.benchmark-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Comparison Grid */
+.insights-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.comparison-item {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.comparison-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.comparison-values {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.comparison-today {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comparison-vs {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.comparison-avg {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Premium Blur Effect */
+.premium-blur {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.premium-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--surface);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 10;
+}
+
+/* Empty/Loading/Error States */
+.insights-empty,
+.insights-loading,
+.insights-error,
+.insights-collecting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  text-align: center;
+  color: var(--text-muted);
+  gap: var(--space-md);
+}
+
+.insights-collecting {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  padding: var(--space-xl);
+}
+
+.insights-collecting-icon {
+  color: var(--primary);
+}
+
+.insights-collecting h3 {
+  color: var(--text);
+  margin: 0;
+}
+
+.insights-collecting p {
+  color: var(--text-secondary);
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.insights-collecting-progress {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Settings Icons */
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.settings-section-icon {
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   Classic Theme - Insights Overrides
+   ============================================================================ */
+
+[data-theme="classic"] .learn-tabs {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="classic"] .learn-tab.active {
+  background: var(--primary);
+}
+
+[data-theme="classic"] .insight-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="classic"] .benchmark-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="classic"] .comparison-item {
+  background: var(--surface);
+  border-color: var(--border);
+}

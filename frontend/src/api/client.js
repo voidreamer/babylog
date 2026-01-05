@@ -399,6 +399,12 @@ class ApiClient {
             body: JSON.stringify(data),
         });
     }
+
+    // Analytics
+    async getAnalytics(babyId, days = 7) {
+        const tzOffset = new Date().getTimezoneOffset();
+        return this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`);
+    }
 }
 
 export const api = new ApiClient();
