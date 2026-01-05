@@ -294,12 +294,20 @@
 
 [data-theme="classic"] .widget-settings-btn-title {
   font-family: var(--font-family-heading);
+  font-size: 1.1rem;
   color: var(--text);
 }
 
 [data-theme="classic"] .widget-settings-btn-subtitle {
   font-family: var(--font-family);
+  font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+/* Classic theme: Widget add icon - transparent background, just the plus */
+[data-theme="classic"] .widget-add-icon {
+  background: transparent;
+  color: var(--text-secondary);
 }
 
 /* Hide sketchy borders in classic theme */
