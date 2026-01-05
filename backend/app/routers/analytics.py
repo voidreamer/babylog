@@ -15,20 +15,24 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 
 from ..database import get_db
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from ..models import Baby, Feeding, Sleep, Diaper
 from ..benchmarks import get_all_benchmarks, calculate_age_weeks
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
-def get_baby_or_404(db: Session, baby_id: int, user_id: str) -> Baby:
+def get_baby_or_404(db: Session, baby_id: int, user_id: str, user_email: str) -> Baby:
     """Get baby by ID, ensuring user has access."""
     baby = db.query(Baby).filter(Baby.id == baby_id).first()
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
-    # Check ownership or sharing
-    if baby.user_id != user_id and user_id not in (baby.shared_with_emails or []):
+    # Check ownership or sharing (by user_id or email)
+    has_access = (
+        baby.user_id == user_id or 
+        (user_email and user_email in (baby.shared_with_emails or []))
+    )
+    if not has_access:
         raise HTTPException(status_code=403, detail="Not authorized")
     return baby
 
@@ -99,14 +103,16 @@ async def get_baby_analytics(
     days: int = Query(default=7, ge=3, le=30, description="Days of data to analyze"),
     tz_offset: int = Query(default=0, description="Timezone offset in minutes"),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
 ):
     """
     Get comprehensive analytics for a baby.
     
     Returns patterns, predictions, benchmarks, and comparisons.
     """
-    baby = get_baby_or_404(db, baby_id, user_id)
+    user_id = user.get("sub")
+    baby = get_baby_or_404(db, baby_id, user_id, user_email)
     
     # Calculate date range
     now = datetime.now(timezone.utc)
