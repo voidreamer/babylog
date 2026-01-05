@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
+import { api } from '../api/client';
 import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check } from 'lucide-react';
 import ShareModal from './ShareModal';
+import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 
 // Get time-based greeting
@@ -62,28 +64,47 @@ function getAvatarColor(name) {
 }
 
 export default function BabyGreeting({ summary }) {
-    const { babies, selectedBaby, selectBaby, addBaby, removeBaby, refresh } = useBaby();
+    const { babies, selectedBaby, selectBaby, removeBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
-    const [newBabyName, setNewBabyName] = useState('');
-    const [newBabyDob, setNewBabyDob] = useState('');
+    const [saving, setSaving] = useState(false);
 
-    const handleAddBaby = async (e) => {
-        e.preventDefault();
-        if (!newBabyName.trim()) return;
-
+    const handleAddBaby = async (formData) => {
+        setSaving(true);
         try {
-            await addBaby({
-                name: newBabyName.trim(),
-                birth_date: newBabyDob ? new Date(newBabyDob).toISOString() : null,
+            // Create baby
+            const baby = await api.createBaby({
+                name: formData.name,
+                birth_date: formData.birthDate ? new Date(formData.birthDate).toISOString() : null,
+                gender: formData.gender,
             });
-            setNewBabyName('');
-            setNewBabyDob('');
+
+            // If birth weight or height provided, create initial growth record
+            if ((formData.birthWeight || formData.birthHeight) && baby?.id) {
+                try {
+                    await api.createGrowthRecord({
+                        baby_id: baby.id,
+                        recorded_date: formData.birthDate
+                            ? new Date(formData.birthDate).toISOString()
+                            : new Date().toISOString(),
+                        weight_kg: formData.birthWeight,
+                        height_cm: formData.birthHeight,
+                        notes: 'Birth measurements',
+                    });
+                } catch (err) {
+                    console.error('Failed to save birth measurements:', err);
+                }
+            }
+
+            await refresh();
             setShowAddForm(false);
+            toast.success(`${formData.name} added!`);
         } catch (error) {
             console.error('Failed to add baby:', error);
             toast.error('Failed to add baby');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -106,7 +127,23 @@ export default function BabyGreeting({ summary }) {
                     Add Baby
                 </button>
 
-                {showAddForm && renderAddBabyModal()}
+                {showAddForm && (
+                    <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
+                        <div className="modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h2 className="modal-title">Add Baby</h2>
+                                <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
+                            </div>
+                            <div className="modal-body">
+                                <AddBabyForm
+                                    onSubmit={handleAddBaby}
+                                    onCancel={() => setShowAddForm(false)}
+                                    saving={saving}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -117,50 +154,6 @@ export default function BabyGreeting({ summary }) {
     const age = calculateAge(selectedBaby.birth_date);
     const encouragement = getEncouragement(summary);
     const avatarColor = getAvatarColor(selectedBaby.name);
-
-    const renderAddBabyModal = () => (
-        <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2 className="modal-title">Add Baby</h2>
-                    <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
-                </div>
-                <form onSubmit={handleAddBaby}>
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label className="form-label">Baby's Name</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="Enter name..."
-                                value={newBabyName}
-                                onChange={(e) => setNewBabyName(e.target.value)}
-                                autoFocus
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Birth Date (optional)</label>
-                            <input
-                                type="date"
-                                className="form-input"
-                                value={newBabyDob}
-                                onChange={(e) => setNewBabyDob(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowAddForm(false)}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn btn-primary">
-                            Add Baby
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
 
     return (
         <>
@@ -266,7 +259,23 @@ export default function BabyGreeting({ summary }) {
                 </div>
             </div>
 
-            {showAddForm && renderAddBabyModal()}
+            {showAddForm && (
+                <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">Add Baby</h2>
+                            <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <AddBabyForm
+                                onSubmit={handleAddBaby}
+                                onCancel={() => setShowAddForm(false)}
+                                saving={saving}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {showShareModal && selectedBaby && (
                 <ShareModal
