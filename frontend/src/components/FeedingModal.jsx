@@ -83,9 +83,11 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
     };
 
     // Determine the type to save based on feeding method and bottle type
+    // Note: Backend only accepts 'formula', 'breast', 'bottle', 'solid'
+    // Display logic handles showing 'bottle' as 'Breastmilk Bottle'
     const getSaveType = () => {
         if (feedMethod === 'breast') return 'breast';
-        return bottleType === 'formula' ? 'formula' : 'breastmilk_bottle';
+        return bottleType === 'formula' ? 'formula' : 'bottle';
     };
 
     const handleSaveTimer = async () => {
