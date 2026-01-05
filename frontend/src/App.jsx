@@ -5,11 +5,13 @@ import { BabyProvider, useBaby } from './hooks/useBaby';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -35,6 +37,7 @@ function MainApp() {
     const { babies, loading: babiesLoading } = useBaby();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
     // Theme state
     const [theme, setTheme] = useState(() => {
@@ -60,6 +63,15 @@ function MainApp() {
             <Onboarding
                 onComplete={() => setShowOnboarding(false)}
             />
+        );
+    }
+
+    // Show privacy policy if requested
+    if (showPrivacyPolicy) {
+        return (
+            <div className="app-container" style={{ paddingBottom: 'var(--space-xl)' }}>
+                <PrivacyPolicy onBack={() => setShowPrivacyPolicy(false)} />
+            </div>
         );
     }
 
@@ -91,6 +103,17 @@ function MainApp() {
                         <span className="settings-item-value">{user.email}</span>
                     </div>
                 )}
+            </div>
+
+            <div className="settings-section">
+                <h3 className="settings-section-title">Legal</h3>
+                <button
+                    className="settings-item settings-link-btn"
+                    onClick={() => setShowPrivacyPolicy(true)}
+                >
+                    <span className="settings-item-label">Privacy Policy</span>
+                    <ChevronRight size={18} />
+                </button>
             </div>
 
             <div className="settings-section">
@@ -175,33 +198,35 @@ function AppContent() {
 
 function App() {
     return (
-        <AuthProvider>
-            <Toaster
-                position="top-center"
-                richColors
-                closeButton
-                toastOptions={{
-                    style: {
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        color: 'var(--text)',
-                    },
-                }}
-            />
-            <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/callback" element={<Callback />} />
-                <Route path="/health-check" element={<Health />} />
-                <Route
-                    path="/*"
-                    element={
-                        <ProtectedRoute>
-                            <AppContent />
-                        </ProtectedRoute>
-                    }
+        <ErrorBoundary>
+            <AuthProvider>
+                <Toaster
+                    position="top-center"
+                    richColors
+                    closeButton
+                    toastOptions={{
+                        style: {
+                            background: 'var(--surface)',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text)',
+                        },
+                    }}
                 />
-            </Routes>
-        </AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/callback" element={<Callback />} />
+                    <Route path="/health-check" element={<Health />} />
+                    <Route
+                        path="/*"
+                        element={
+                            <ProtectedRoute>
+                                <AppContent />
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </AuthProvider>
+        </ErrorBoundary>
     );
 }
 

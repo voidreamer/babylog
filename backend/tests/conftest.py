@@ -23,9 +23,9 @@ if DATABASE_URL and "postgresql" in DATABASE_URL:
     USE_POSTGRES = True
 else:
     # Local development - use in-memory SQLite
-    # Need to patch ARRAY column for SQLite compatibility
+    # The ARRAY column issue is handled by using a different SQLite-compatible approach
+    # We don't need to patch the model - just use the engine without PostgreSQL features
     USE_POSTGRES = False
-    models.Baby.shared_with_emails = Column(Text, default='[]')
     
     engine = create_engine(
         "sqlite:///:memory:",
@@ -112,3 +112,95 @@ def sample_sleep_data():
         "end_time": "2024-06-15T15:00:00Z",
         "notes": "Afternoon nap"
     }
+
+
+@pytest.fixture
+def sample_potty_data():
+    """Sample potty training data for testing."""
+    return {
+        "time": "2024-06-15T09:00:00Z",
+        "result": "success",
+        "potty_type": "pee",
+        "notes": "Morning potty"
+    }
+
+
+@pytest.fixture
+def sample_tummy_time_data():
+    """Sample tummy time data for testing."""
+    return {
+        "start_time": "2024-06-15T10:00:00Z",
+        "duration_minutes": 15,
+        "notes": "Good head control today"
+    }
+
+
+@pytest.fixture
+def sample_bath_data():
+    """Sample bath data for testing."""
+    return {
+        "time": "2024-06-15T18:00:00Z",
+        "notes": "Evening bath"
+    }
+
+
+@pytest.fixture
+def sample_doctor_visit_data():
+    """Sample doctor visit data for testing."""
+    return {
+        "visit_date": "2024-06-15T10:00:00Z",
+        "doctor_name": "Dr. Smith",
+        "visit_type": "checkup",
+        "weight_kg": 7.5,
+        "height_cm": 65.0,
+        "head_cm": 42.0,
+        "notes": "Healthy checkup"
+    }
+
+
+@pytest.fixture
+def sample_vaccination_data():
+    """Sample vaccination data for testing."""
+    return {
+        "vaccine_name": "DTaP",
+        "dose_number": 1,
+        "given_date": "2024-06-15T11:00:00Z",
+        "administered_by": "Dr. Smith",
+        "notes": "First dose"
+    }
+
+
+@pytest.fixture
+def sample_medication_data():
+    """Sample medication data for testing."""
+    return {
+        "medication_name": "Vitamin D",
+        "dosage": "400 IU",
+        "frequency": "daily",
+        "start_date": "2024-06-15T00:00:00Z",
+        "is_active": True,
+        "notes": "Daily supplement"
+    }
+
+
+@pytest.fixture
+def sample_milestone_data():
+    """Sample milestone data for testing."""
+    return {
+        "milestone_type": "First smile",
+        "achieved_date": "2024-06-15T12:00:00Z",
+        "notes": "Such a cute smile!"
+    }
+
+
+@pytest.fixture
+def sample_growth_data():
+    """Sample growth record data for testing."""
+    return {
+        "recorded_date": "2024-06-15T10:00:00Z",
+        "weight_kg": 7.5,
+        "height_cm": 65.0,
+        "head_cm": 42.0,
+        "notes": "Monthly measurement"
+    }
+
