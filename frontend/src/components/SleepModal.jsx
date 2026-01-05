@@ -3,6 +3,7 @@ import { api } from '../api/client';
 import { formatDistanceToNow } from 'date-fns';
 import { Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
+import TimePicker from './TimePicker';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr) => {
@@ -11,15 +12,10 @@ const parseUTCTime = (timeStr) => {
     return new Date(utcTime);
 };
 
-// Convert Date to local datetime-local format
-const toLocalDateTimeString = (date) => {
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-};
-
 export default function SleepModal({ babyId, currentSleep, editEvent, onClose, onSave }) {
     const isEditing = !!editEvent;
-    const [startTime, setStartTime] = useState(toLocalDateTimeString(new Date()));
-    const [endTime, setEndTime] = useState('');
+    const [startTime, setStartTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(null);
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
@@ -27,9 +23,9 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
     useEffect(() => {
         if (editEvent && editEvent.details) {
             const details = editEvent.details;
-            setStartTime(toLocalDateTimeString(parseUTCTime(editEvent.time)));
+            setStartTime(parseUTCTime(editEvent.time));
             if (details.end_time) {
-                setEndTime(toLocalDateTimeString(parseUTCTime(details.end_time)));
+                setEndTime(parseUTCTime(details.end_time));
             }
             if (details.notes) setNotes(details.notes);
         }
@@ -40,7 +36,7 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
         try {
             await api.createSleep({
                 baby_id: babyId,
-                start_time: new Date(startTime).toISOString(),
+                start_time: startTime.toISOString(),
                 end_time: null,
                 notes: notes || null,
             });
@@ -77,8 +73,8 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
 
         const data = {
             baby_id: babyId,
-            start_time: new Date(startTime).toISOString(),
-            end_time: new Date(endTime).toISOString(),
+            start_time: startTime.toISOString(),
+            end_time: endTime.toISOString(),
             notes: notes || null,
         };
 
@@ -165,27 +161,14 @@ export default function SleepModal({ babyId, currentSleep, editEvent, onClose, o
 
                     {/* Log Completed Sleep */}
                     <form onSubmit={handleLogCompletedSleep}>
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label className="form-label">Start Time</label>
-                                <input
-                                    type="datetime-local"
-                                    className="form-input"
-                                    value={startTime}
-                                    onChange={(e) => setStartTime(e.target.value)}
-                                    required
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label className="form-label">Start Time</label>
+                            <TimePicker value={startTime} onChange={setStartTime} />
+                        </div>
 
-                            <div className="form-group">
-                                <label className="form-label">End Time</label>
-                                <input
-                                    type="datetime-local"
-                                    className="form-input"
-                                    value={endTime}
-                                    onChange={(e) => setEndTime(e.target.value)}
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label className="form-label">End Time</label>
+                            <TimePicker value={endTime || new Date()} onChange={setEndTime} />
                         </div>
 
                         <div className="form-group">
