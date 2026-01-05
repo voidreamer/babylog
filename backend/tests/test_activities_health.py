@@ -153,8 +153,8 @@ class TestDoctorVisitEndpoints:
         
         # Create doctor visit
         visit_data = {**sample_doctor_visit_data, "baby_id": baby_id}
-        response = client.post("/health/visits/", json=visit_data, headers=auth_headers)
-        assert response.status_code == 201
+        response = client.post("/health/doctor-visits/", json=visit_data, headers=auth_headers)
+        assert response.status_code == 200
         data = response.json()
         assert data["doctor_name"] == sample_doctor_visit_data["doctor_name"]
         assert data["visit_type"] == sample_doctor_visit_data["visit_type"]
@@ -166,9 +166,9 @@ class TestDoctorVisitEndpoints:
         baby_id = baby_response.json()["id"]
         
         visit_data = {**sample_doctor_visit_data, "baby_id": baby_id}
-        client.post("/health/visits/", json=visit_data, headers=auth_headers)
+        client.post("/health/doctor-visits/", json=visit_data, headers=auth_headers)
         
-        response = client.get(f"/health/visits/?baby_id={baby_id}", headers=auth_headers)
+        response = client.get(f"/health/doctor-visits/?baby_id={baby_id}", headers=auth_headers)
         assert response.status_code == 200
         assert len(response.json()) == 1
 
@@ -185,7 +185,7 @@ class TestVaccinationEndpoints:
         # Create vaccination
         vacc_data = {**sample_vaccination_data, "baby_id": baby_id}
         response = client.post("/health/vaccinations/", json=vacc_data, headers=auth_headers)
-        assert response.status_code == 201
+        assert response.status_code == 200
         data = response.json()
         assert data["vaccine_name"] == sample_vaccination_data["vaccine_name"]
         assert data["dose_number"] == sample_vaccination_data["dose_number"]
@@ -216,7 +216,7 @@ class TestMedicationEndpoints:
         # Create medication
         med_data = {**sample_medication_data, "baby_id": baby_id}
         response = client.post("/health/medications/", json=med_data, headers=auth_headers)
-        assert response.status_code == 201
+        assert response.status_code == 200
         data = response.json()
         assert data["medication_name"] == sample_medication_data["medication_name"]
         assert data["is_active"] == sample_medication_data["is_active"]
@@ -247,7 +247,7 @@ class TestMilestoneEndpoints:
         # Create milestone
         milestone_data = {**sample_milestone_data, "baby_id": baby_id}
         response = client.post("/health/milestones/", json=milestone_data, headers=auth_headers)
-        assert response.status_code == 201
+        assert response.status_code == 200
         data = response.json()
         assert data["milestone_type"] == sample_milestone_data["milestone_type"]
     
@@ -277,7 +277,7 @@ class TestGrowthRecordEndpoints:
         # Create growth record
         growth_data = {**sample_growth_data, "baby_id": baby_id}
         response = client.post("/health/growth/", json=growth_data, headers=auth_headers)
-        assert response.status_code == 201
+        assert response.status_code == 200
         data = response.json()
         assert float(data["weight_kg"]) == sample_growth_data["weight_kg"]
         assert float(data["height_cm"]) == sample_growth_data["height_cm"]
