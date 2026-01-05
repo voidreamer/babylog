@@ -16,7 +16,7 @@ const CATEGORY_ICONS = {
     safety: Shield,
 };
 
-export default function Learn() {
+export default function Learn({ isPremium = false }) {
     const { selectedBaby } = useBaby();
     const [activeTab, setActiveTab] = useState('insights'); // 'insights' or 'articles'
     const [selectedCategory, setSelectedCategory] = useState('all');
@@ -229,7 +229,7 @@ export default function Learn() {
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <BabyInsights isPremium={false} />
+                                    <BabyInsights isPremium={isPremium} />
                                 </motion.div>
                             ) : (
                                 <motion.div

@@ -11,7 +11,7 @@ import Callback from './pages/Callback';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -38,6 +38,23 @@ function MainApp() {
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+    const [promoCode, setPromoCode] = useState('');
+
+    // Premium state
+    const [isPremium, setIsPremium] = useState(() => {
+        return localStorage.getItem('isPremium') === 'true';
+    });
+
+    const handlePromoCode = () => {
+        if (promoCode.toUpperCase() === 'SIMPLEBABY2026') {
+            setIsPremium(true);
+            localStorage.setItem('isPremium', 'true');
+            setPromoCode('');
+            alert('Premium unlocked! Enjoy all features.');
+        } else {
+            alert('Invalid code');
+        }
+    };
 
     // Theme state
     const [theme, setTheme] = useState(() => {
@@ -113,6 +130,40 @@ function MainApp() {
 
             <div className="settings-section">
                 <div className="settings-section-header">
+                    <Star size={18} className="settings-section-icon" />
+                    <h3 className="settings-section-title">Premium</h3>
+                </div>
+                {isPremium ? (
+                    <div className="settings-item" style={{ color: 'var(--success)' }}>
+                        <span className="settings-item-label">Status</span>
+                        <span className="settings-item-value" style={{ color: 'var(--success)' }}>Active</span>
+                    </div>
+                ) : (
+                    <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-sm)' }}>
+                        <label className="settings-item-label">Enter promo code</label>
+                        <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Enter code..."
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                style={{ flex: 1 }}
+                            />
+                            <button
+                                className="btn btn-primary"
+                                onClick={handlePromoCode}
+                                disabled={!promoCode.trim()}
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="settings-section">
+                <div className="settings-section-header">
                     <FileText size={18} className="settings-section-icon" />
                     <h3 className="settings-section-title">Legal</h3>
                 </div>
@@ -151,7 +202,7 @@ function MainApp() {
                 {activeTab === 'home' && <Dashboard />}
                 {activeTab === 'timeline' && <TimelineCalendar />}
                 {activeTab === 'health' && <Health />}
-                {activeTab === 'learn' && <Learn />}
+                {activeTab === 'learn' && <Learn isPremium={isPremium} />}
                 {activeTab === 'settings' && <SettingsPage />}
             </main>
 
