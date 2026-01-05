@@ -233,23 +233,57 @@
   font-family: var(--font-family);
   font-size: 1.5rem;
   font-weight: 700;
+  color: var(--text);
 }
 
 [data-theme="classic"] .widget-value {
   font-family: var(--font-family);
   font-size: 0.9rem;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
 [data-theme="classic"] .widget-detail {
   font-family: var(--font-family);
   font-size: 0.85rem;
   font-weight: 500;
+  color: var(--text-muted);
 }
 
-[data-theme="classic"] .greeting-text,
+/* Classic theme: Greeting/Header text color fixes */
+[data-theme="classic"] .greeting-text {
+  font-family: var(--font-family-heading);
+  color: var(--text);
+}
+
 [data-theme="classic"] .baby-greeting-name {
   font-family: var(--font-family-heading);
+  color: var(--text);
+}
+
+[data-theme="classic"] .baby-greeting-age {
+  color: var(--text-secondary);
+}
+
+[data-theme="classic"] .baby-greeting-encouragement {
+  background: rgba(139, 92, 246, 0.25);
+  color: var(--primary-light);
+}
+
+/* Classic theme: Widget empty state */
+[data-theme="classic"] .widget-empty-text {
+  color: var(--text-muted);
+}
+
+/* Classic theme: Daily summary */
+[data-theme="classic"] .daily-summary-title {
+  color: var(--text-secondary);
+}
+
+/* Classic theme: Baby greeting card background */
+[data-theme="classic"] .baby-greeting {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-color: var(--border);
 }
 
 /* Hide sketchy borders in classic theme */
