@@ -286,6 +286,22 @@
   border-color: var(--border);
 }
 
+/* Classic theme: Edit Activities button */
+[data-theme="classic"] .widget-settings-btn {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="classic"] .widget-settings-btn-title {
+  font-family: var(--font-family-heading);
+  color: var(--text);
+}
+
+[data-theme="classic"] .widget-settings-btn-subtitle {
+  font-family: var(--font-family);
+  color: var(--text-muted);
+}
+
 /* Hide sketchy borders in classic theme */
 [data-theme="classic"] .sketchy-border,
 [data-theme="classic"] .sketchy-shadow {
