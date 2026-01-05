@@ -166,6 +166,98 @@
   --font-family-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* ============================================================================
+   CLASSIC THEME - Style Overrides
+   ============================================================================ */
+
+/* Classic theme: Widget overrides - restore original gradient style */
+[data-theme="classic"] .widget {
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: none;
+  height: auto;
+  min-height: 140px;
+}
+
+[data-theme="classic"] .widget:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  filter: brightness(1.1);
+}
+
+[data-theme="classic"] .widget.feeding {
+  background: linear-gradient(135deg, var(--feeding-bg) 0%, rgba(251, 191, 36, 0.25) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+[data-theme="classic"] .widget.diaper {
+  background: linear-gradient(135deg, var(--diaper-bg) 0%, rgba(52, 211, 153, 0.25) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+[data-theme="classic"] .widget.sleep {
+  background: linear-gradient(135deg, var(--sleep-bg) 0%, rgba(96, 165, 250, 0.25) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+[data-theme="classic"] .widget.pumping {
+  background: linear-gradient(135deg, var(--pumping-bg) 0%, rgba(244, 114, 182, 0.25) 100%);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+}
+
+[data-theme="classic"] .widget.potty {
+  background: linear-gradient(135deg, var(--potty-bg) 0%, rgba(167, 139, 250, 0.25) 100%);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+[data-theme="classic"] .widget.tummy {
+  background: linear-gradient(135deg, var(--tummy-bg) 0%, rgba(251, 146, 60, 0.25) 100%);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+[data-theme="classic"] .widget.bath {
+  background: linear-gradient(135deg, var(--bath-bg) 0%, rgba(34, 211, 238, 0.25) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+/* Classic theme: Typography overrides */
+[data-theme="classic"] .widget-label {
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="classic"] .widget-time-ago {
+  font-family: var(--font-family);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+[data-theme="classic"] .widget-value {
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+[data-theme="classic"] .widget-detail {
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+[data-theme="classic"] .greeting-text,
+[data-theme="classic"] .baby-greeting-name {
+  font-family: var(--font-family-heading);
+}
+
+/* Hide sketchy borders in classic theme */
+[data-theme="classic"] .sketchy-border,
+[data-theme="classic"] .sketchy-shadow {
+  display: none;
+}
+
 * {
   margin: 0;
   padding: 0;
