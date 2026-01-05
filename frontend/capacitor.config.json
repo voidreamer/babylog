@@ -15,6 +15,14 @@
     "backgroundColor": "#18181b",
     "scheme": "simplebaby"
   },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#18181b",
+    "buildOptions": {
+      "keystorePath": null,
+      "keystoreAlias": null
+    }
+  },
   "plugins": {
     "Browser": {
       "presentationStyle": "popover"
