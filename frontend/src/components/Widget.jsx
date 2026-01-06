@@ -122,8 +122,6 @@ function WidgetIcon({ type, size, className, strokeWidth }) {
 
 // Sketchy border SVG component
 function SketchyBorder({ width, height, type, seed }) {
-    const colors = sketchyColors[type] || sketchyColors.feeding;
-
     const paths = useMemo(() => ({
         main: generateSketchyPath(width, height, seed),
         second: generateSketchyPath(width, height, seed + 0.1),
@@ -141,7 +139,7 @@ function SketchyBorder({ width, height, type, seed }) {
             >
                 <path
                     d={paths.shadow}
-                    fill={colors.stroke}
+                    fill="var(--widget-stroke)"
                     opacity="0.15"
                 />
             </svg>
@@ -155,13 +153,13 @@ function SketchyBorder({ width, height, type, seed }) {
                 {/* Background fill */}
                 <path
                     d={paths.main}
-                    fill={colors.bg}
+                    fill="var(--widget-bg)"
                 />
                 {/* Two subtle border lines - cleaner hand-drawn effect */}
                 <path
                     d={paths.main}
                     fill="none"
-                    stroke={colors.stroke}
+                    stroke="var(--widget-stroke)"
                     strokeWidth="1.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -170,7 +168,7 @@ function SketchyBorder({ width, height, type, seed }) {
                 <path
                     d={paths.second}
                     fill="none"
-                    stroke={colors.stroke}
+                    stroke="var(--widget-stroke)"
                     strokeWidth="1.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"

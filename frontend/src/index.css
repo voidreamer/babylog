@@ -525,6 +525,47 @@
   border-color: var(--border);
 }
 
+/* Handwritten Dark - Override widget background colors to dark versions */
+[data-theme="handwritten-dark"] .widget.feeding {
+  --widget-bg: rgba(251, 146, 60, 0.15);
+  --widget-stroke: #fb923c;
+}
+
+[data-theme="handwritten-dark"] .widget.diaper {
+  --widget-bg: rgba(74, 222, 128, 0.15);
+  --widget-stroke: #4ade80;
+}
+
+[data-theme="handwritten-dark"] .widget.sleep {
+  --widget-bg: rgba(129, 140, 248, 0.15);
+  --widget-stroke: #818cf8;
+}
+
+[data-theme="handwritten-dark"] .widget.pumping {
+  --widget-bg: rgba(244, 114, 182, 0.15);
+  --widget-stroke: #f472b6;
+}
+
+[data-theme="handwritten-dark"] .widget.potty {
+  --widget-bg: rgba(192, 132, 252, 0.15);
+  --widget-stroke: #c084fc;
+}
+
+[data-theme="handwritten-dark"] .widget.tummy {
+  --widget-bg: rgba(251, 191, 36, 0.15);
+  --widget-stroke: #fbbf24;
+}
+
+[data-theme="handwritten-dark"] .widget.bath {
+  --widget-bg: rgba(34, 211, 238, 0.15);
+  --widget-stroke: #22d3ee;
+}
+
+[data-theme="handwritten-dark"] .widget.supplement {
+  --widget-bg: rgba(74, 222, 128, 0.15);
+  --widget-stroke: #4ade80;
+}
+
 * {
   margin: 0;
   padding: 0;
