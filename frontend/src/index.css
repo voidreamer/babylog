@@ -3876,6 +3876,80 @@ h4 {
 }
 
 /* ============================================================================
+   Insights Responsive Layout (Tablet & Desktop)
+   ============================================================================ */
+
+@media (min-width: 768px) {
+  .insights-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .insights-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .insight-card {
+    padding: var(--space-lg);
+  }
+
+  .insights-benchmarks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+
+  .comparison-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+
+  .comparison-item {
+    padding: var(--space-lg);
+  }
+
+  .comparison-today {
+    font-size: 1.5rem;
+  }
+
+  .patterns-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .patterns-list .pattern-item {
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+  }
+
+  .patterns-list .pattern-item:nth-child(2n) {
+    border-right: none;
+  }
+
+  .patterns-list .pattern-item:nth-child(n+3) {
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (min-width: 1024px) {
+  .insights-container {
+    max-width: 1100px;
+  }
+
+  .insights-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+
+  .insights-benchmarks {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================================================
    Classic Theme - Insights Overrides
    ============================================================================ */
 

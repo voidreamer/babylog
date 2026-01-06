@@ -11,7 +11,7 @@ import Callback from './pages/Callback';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -233,8 +233,8 @@ function MainApp() {
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
                     onClick={() => setActiveTab('learn')}
                 >
-                    <BookOpen size={20} />
-                    <span>Learn</span>
+                    <Sparkles size={20} />
+                    <span>Insights</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
