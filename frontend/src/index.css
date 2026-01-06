@@ -387,13 +387,142 @@
   --font-family-heading: 'Neucha', cursive;
 }
 
-/* Handwritten Dark - keep sketchy borders but adjust colors */
+/* Handwritten Dark - Widget styling */
 [data-theme="handwritten-dark"] .widget {
   background: var(--surface);
 }
 
 [data-theme="handwritten-dark"] .sketchy-shadow path {
-  fill: rgba(0, 0, 0, 0.3);
+  fill: rgba(0, 0, 0, 0.4);
+}
+
+/* Handwritten Dark - Widget text colors for visibility */
+[data-theme="handwritten-dark"] .widget-label {
+  color: var(--text);
+}
+
+[data-theme="handwritten-dark"] .widget-time-ago {
+  color: var(--text-secondary);
+}
+
+[data-theme="handwritten-dark"] .widget-value {
+  color: var(--text);
+}
+
+[data-theme="handwritten-dark"] .widget-detail {
+  color: var(--text-muted);
+}
+
+[data-theme="handwritten-dark"] .widget-empty-text {
+  color: var(--text-muted);
+}
+
+/* Handwritten Dark - Greeting/Header */
+[data-theme="handwritten-dark"] .greeting-text {
+  color: var(--text);
+}
+
+[data-theme="handwritten-dark"] .baby-greeting-name {
+  color: var(--text);
+}
+
+[data-theme="handwritten-dark"] .baby-greeting-age {
+  color: var(--text-secondary);
+}
+
+[data-theme="handwritten-dark"] .baby-greeting-encouragement {
+  background: rgba(167, 139, 250, 0.2);
+  color: var(--primary-light);
+}
+
+[data-theme="handwritten-dark"] .baby-greeting {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(167, 139, 250, 0.1) 100%);
+  border-color: var(--border);
+}
+
+/* Handwritten Dark - Daily summary */
+[data-theme="handwritten-dark"] .daily-summary-title {
+  color: var(--text-secondary);
+}
+
+[data-theme="handwritten-dark"] .daily-summary {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+/* Handwritten Dark - Edit Activities button */
+[data-theme="handwritten-dark"] .widget-settings-btn {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="handwritten-dark"] .widget-settings-btn-title {
+  color: var(--text);
+}
+
+[data-theme="handwritten-dark"] .widget-settings-btn-subtitle {
+  color: var(--text-muted);
+}
+
+[data-theme="handwritten-dark"] .widget-add-icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
+/* Handwritten Dark - Modal styling */
+[data-theme="handwritten-dark"] .modal {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="handwritten-dark"] .modal-header {
+  border-color: var(--border);
+}
+
+[data-theme="handwritten-dark"] .modal-title {
+  color: var(--text);
+}
+
+/* Handwritten Dark - Form inputs */
+[data-theme="handwritten-dark"] .form-input,
+[data-theme="handwritten-dark"] .form-select,
+[data-theme="handwritten-dark"] .settings-select {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* Handwritten Dark - Settings page */
+[data-theme="handwritten-dark"] .settings-section {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="handwritten-dark"] .settings-section-title {
+  color: var(--text-muted);
+}
+
+[data-theme="handwritten-dark"] .settings-item-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="handwritten-dark"] .settings-item-value {
+  color: var(--text);
+}
+
+/* Handwritten Dark - Timeline */
+[data-theme="handwritten-dark"] .timeline-calendar {
+  background: var(--bg);
+}
+
+[data-theme="handwritten-dark"] .timeline-hour-label {
+  color: var(--text-muted);
+}
+
+/* Handwritten Dark - Nav bar */
+[data-theme="handwritten-dark"] .bottom-nav {
+  background: var(--surface);
+  border-color: var(--border);
 }
 
 * {
