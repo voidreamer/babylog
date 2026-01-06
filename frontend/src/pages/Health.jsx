@@ -146,6 +146,7 @@ export default function Health() {
                 <GrowthSection
                     records={growth}
                     birthDate={selectedBaby?.birth_date}
+                    gender={selectedBaby?.gender}
                     onAdd={() => setShowGrowthModal(true)}
                     onRefresh={loadData}
                 />
@@ -392,7 +393,7 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
     );
 }
 
-function GrowthSection({ records, birthDate, onAdd, onRefresh }) {
+function GrowthSection({ records, birthDate, gender, onAdd, onRefresh }) {
     const [showChart, setShowChart] = useState(false);
     const [chartMetric, setChartMetric] = useState('weight');
 
@@ -437,6 +438,7 @@ function GrowthSection({ records, birthDate, onAdd, onRefresh }) {
                         records={records}
                         birthDate={birthDate}
                         metric={chartMetric}
+                        gender={gender}
                     />
                 </div>
             )}
