@@ -1,5 +1,29 @@
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+
+// Hook to detect if current theme is a dark theme
+function useIsDarkTheme() {
+    const [isDark, setIsDark] = useState(() => {
+        const theme = document.documentElement.getAttribute('data-theme');
+        return theme === 'handwritten-dark' || theme === 'classic';
+    });
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            const theme = document.documentElement.getAttribute('data-theme');
+            setIsDark(theme === 'handwritten-dark' || theme === 'classic');
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    return isDark;
+}
 
 // Map widget types to PNG icons (null means use Lucide fallback)
 const pngIcons = {
@@ -183,6 +207,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
     const timeAgo = formatTimeAgo(lastTime);
     const isEmpty = !lastTime && value === 'Never';
     const colors = sketchyColors[type] || sketchyColors.feeding;
+    const isDarkTheme = useIsDarkTheme();
 
     // Use a unique seed based on type for consistent but different wobbles
     const seed = useMemo(() => {
@@ -190,15 +215,18 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
         return (typeIndex + 1) * 7.3;
     }, [type]);
 
+    // Only apply inline styles in light theme; dark themes use CSS variables
+    const widgetStyle = isDarkTheme ? {} : {
+        '--widget-stroke': colors.stroke,
+        '--widget-bg': colors.bg,
+        '--widget-text': colors.text
+    };
+
     return (
         <div
             className={`widget sketchy ${type} ${isSleeping ? 'sleeping' : ''}`}
             onClick={onClick}
-            style={{
-                '--widget-stroke': colors.stroke,
-                '--widget-bg': colors.bg,
-                '--widget-text': colors.text
-            }}
+            style={widgetStyle}
         >
             {/* Sketchy border */}
             <SketchyBorder width={200} height={150} type={type} seed={seed} />
