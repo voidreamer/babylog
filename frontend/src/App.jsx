@@ -109,7 +109,8 @@ function MainApp() {
                         value={theme}
                         onChange={(e) => setTheme(e.target.value)}
                     >
-                        <option value="handwritten">Handwritten</option>
+                        <option value="handwritten">Handwritten Light</option>
+                        <option value="handwritten-dark">Handwritten Dark</option>
                         <option value="classic">Classic Dark</option>
                     </select>
                 </div>

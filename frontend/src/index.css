@@ -316,6 +316,86 @@
   display: none;
 }
 
+/* ============================================================================
+   HANDWRITTEN DARK THEME - Dark background with handwritten fonts
+   ============================================================================ */
+[data-theme="handwritten-dark"] {
+  --primary: #a78bfa;
+  --primary-dark: #8b5cf6;
+  --primary-light: #c4b5fd;
+
+  --feeding: #fb923c;
+  --feeding-light: #fdba74;
+  --feeding-bg: rgba(251, 146, 60, 0.15);
+  --feeding-text: #fb923c;
+
+  --diaper: #4ade80;
+  --diaper-light: #86efac;
+  --diaper-bg: rgba(74, 222, 128, 0.15);
+  --diaper-text: #4ade80;
+
+  --sleep: #818cf8;
+  --sleep-light: #a5b4fc;
+  --sleep-bg: rgba(129, 140, 248, 0.15);
+  --sleep-text: #818cf8;
+
+  --pumping: #f472b6;
+  --pumping-light: #f9a8d4;
+  --pumping-bg: rgba(244, 114, 182, 0.15);
+  --pumping-text: #f472b6;
+
+  --potty: #c084fc;
+  --potty-light: #d8b4fe;
+  --potty-bg: rgba(192, 132, 252, 0.15);
+  --potty-text: #c084fc;
+
+  --tummy: #fbbf24;
+  --tummy-light: #fcd34d;
+  --tummy-bg: rgba(251, 191, 36, 0.15);
+  --tummy-text: #fbbf24;
+
+  --bath: #22d3ee;
+  --bath-light: #67e8f9;
+  --bath-bg: rgba(34, 211, 238, 0.15);
+  --bath-text: #22d3ee;
+
+  /* App background - warm dark */
+  --background: #1a1815;
+  --bg: #1a1815;
+  --surface: #2d2a25;
+  --surface-hover: #3d3830;
+  --border: #4d473e;
+
+  /* Text - warm cream for dark theme */
+  --text: #f5f0e8;
+  --text-secondary: #c9c0b3;
+  --text-muted: #8c857a;
+
+  --danger: #f87171;
+  --success: #4ade80;
+  --accent: #a78bfa;
+  --secondary: #4ade80;
+
+  /* Shadows - stronger for dark theme */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+
+  /* Typography - handwritten fonts */
+  --font-family: 'Patrick Hand', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-heading: 'Neucha', cursive;
+}
+
+/* Handwritten Dark - keep sketchy borders but adjust colors */
+[data-theme="handwritten-dark"] .widget {
+  background: var(--surface);
+}
+
+[data-theme="handwritten-dark"] .sketchy-shadow path {
+  fill: rgba(0, 0, 0, 0.3);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -539,6 +619,64 @@ h4 {
 
 .settings-logout-btn:hover {
   background: rgba(239, 68, 68, 0.2);
+}
+
+/* Responsive Settings for larger screens */
+@media (min-width: 768px) {
+  .settings-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-xl);
+  }
+
+  .settings-page h2 {
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  .settings-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .settings-section-header {
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-section-title {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+
+  .settings-select {
+    min-width: 200px;
+    padding: var(--space-sm) var(--space-lg);
+  }
+
+  .settings-link-btn {
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s;
+  }
+
+  .settings-link-btn:hover {
+    background: var(--surface-hover);
+  }
+}
+
+@media (min-width: 1024px) {
+  .settings-page {
+    max-width: 700px;
+    padding: var(--space-2xl);
+  }
+
+  .settings-section {
+    padding: var(--space-xl);
+  }
 }
 
 /* ============================================================================
@@ -4026,6 +4164,12 @@ h4 {
 .theme-preview-handwritten {
   background: linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%);
   color: #1c1917;
+}
+
+.theme-preview-handwritten-dark {
+  background: linear-gradient(135deg, #1a1815 0%, #2d2a25 100%);
+  color: #f5f0e8;
+  border: 1px solid #4d473e;
 }
 
 .theme-preview-classic {

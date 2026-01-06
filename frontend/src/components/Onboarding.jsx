@@ -120,8 +120,19 @@ export default function Onboarding({ onComplete }) {
                             <div className="theme-preview theme-preview-handwritten">
                                 <Pencil size={24} />
                             </div>
-                            <span className="theme-name">Handwritten</span>
+                            <span className="theme-name">Handwritten Light</span>
                             <span className="theme-desc">Warm, cozy, personal</span>
+                        </button>
+
+                        <button
+                            className={`theme-option ${selectedTheme === 'handwritten-dark' ? 'active' : ''}`}
+                            onClick={() => setSelectedTheme('handwritten-dark')}
+                        >
+                            <div className="theme-preview theme-preview-handwritten-dark">
+                                <Pencil size={24} />
+                            </div>
+                            <span className="theme-name">Handwritten Dark</span>
+                            <span className="theme-desc">Cozy dark mode</span>
                         </button>
 
                         <button
@@ -132,7 +143,7 @@ export default function Onboarding({ onComplete }) {
                                 <Moon size={24} />
                             </div>
                             <span className="theme-name">Classic Dark</span>
-                            <span className="theme-desc">Modern, sleek, easy on eyes</span>
+                            <span className="theme-desc">Modern, sleek</span>
                         </button>
                     </div>
 
