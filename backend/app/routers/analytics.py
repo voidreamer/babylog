@@ -130,7 +130,13 @@ async def get_baby_analytics(
         # Calculate date range
         now = datetime.now(timezone.utc)
         start_date = now - timedelta(days=days)
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Calculate user's local "today" start using their timezone offset
+        # tz_offset is minutes behind UTC (e.g., EST = 300 means UTC-5)
+        user_now = now - timedelta(minutes=tz_offset)
+        today_start = user_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        # Convert back to UTC for comparison
+        today_start_utc = today_start + timedelta(minutes=tz_offset)
         
         # ==========================================================================
         # Fetch data
@@ -145,7 +151,7 @@ async def get_baby_analytics(
         feedings = [f for f in feedings if make_aware(f.time) >= start_date]
         
         # Today's feedings
-        todays_feedings = [f for f in feedings if make_aware(f.time) >= today_start]
+        todays_feedings = [f for f in feedings if make_aware(f.time) >= today_start_utc]
         
         # Sleep records in analysis window
         sleeps = db.query(Sleep).filter(
@@ -158,7 +164,7 @@ async def get_baby_analytics(
         # Today's completed sleeps
         todays_sleeps = [
             s for s in sleeps 
-            if make_aware(s.start_time) >= today_start and s.end_time
+            if make_aware(s.start_time) >= today_start_utc and s.end_time
         ]
         
         # Diapers in analysis window
@@ -170,7 +176,7 @@ async def get_baby_analytics(
         diapers = [d for d in diapers if make_aware(d.time) >= start_date]
         
         # Today's diapers
-        todays_diapers = [d for d in diapers if make_aware(d.time) >= today_start]
+        todays_diapers = [d for d in diapers if make_aware(d.time) >= today_start_utc]
         
         # ==========================================================================
         # Calculate patterns
