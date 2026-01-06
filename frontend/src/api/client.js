@@ -405,6 +405,29 @@ class ApiClient {
         const tzOffset = new Date().getTimezoneOffset();
         return this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`);
     }
+
+    // Activities - Supplements
+    async getSupplements(babyId, limit = 50) {
+        return this.request(`/activities/supplements?baby_id=${babyId}&limit=${limit}`);
+    }
+
+    async createSupplement(data) {
+        return this.request('/activities/supplements', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteSupplement(id) {
+        return this.request(`/activities/supplements/${id}`, { method: 'DELETE' });
+    }
+
+    async updateSupplement(id, data) {
+        return this.request(`/activities/supplements/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
 }
 
 export const api = new ApiClient();

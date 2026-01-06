@@ -9,7 +9,8 @@ import PumpingModal from './PumpingModal';
 import PottyModal from './PottyModal';
 import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
-import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead } from 'lucide-react';
+import SupplementModal from './SupplementModal';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Parse UTC time string to local Date
@@ -28,6 +29,7 @@ const EVENT_CONFIG = {
     potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: 'Potty' },
     tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: 'Tummy Time' },
     bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: 'Bath' },
+    supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: 'Supplement' },
 };
 
 export default function TimelineCalendar() {
@@ -113,6 +115,9 @@ export default function TimelineCalendar() {
                     break;
                 case 'bath':
                     await api.deleteBath(event.id);
+                    break;
+                case 'supplement':
+                    await api.deleteSupplement(event.id);
                     break;
             }
             loadEvents();
@@ -276,6 +281,9 @@ export default function TimelineCalendar() {
                 return details.duration_minutes ? `${details.duration_minutes}min` : 'Tummy Time';
             case 'bath':
                 return details.notes || 'Bath';
+            case 'supplement':
+                const supName = details.name ? details.name.replace('_', ' ') : 'Supplement';
+                return details.dosage ? `${supName} • ${details.dosage}` : supName;
             default:
                 return '';
         }
@@ -460,6 +468,14 @@ export default function TimelineCalendar() {
 
             {editingEvent?.event_type === 'bath' && (
                 <BathModal
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'supplement' && (
+                <SupplementModal
                     editEvent={editingEvent}
                     onClose={() => setEditingEvent(null)}
                     onSave={handleEditComplete}

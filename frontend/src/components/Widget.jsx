@@ -1,4 +1,4 @@
-import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead } from 'lucide-react';
+import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
 import { useMemo } from 'react';
 
 // Map widget types to PNG icons (null means use Lucide fallback)
@@ -10,6 +10,7 @@ const pngIcons = {
     potty: null,
     tummy: null,
     bath: null,
+    supplement: null,
 };
 
 // Lucide fallback icons
@@ -21,6 +22,7 @@ const lucideIcons = {
     potty: CircleDot,
     tummy: Sun,
     bath: ShowerHead,
+    supplement: Pill,
 };
 
 // Sketchy color scheme - warm baby-friendly pastels with dark text for readability
@@ -32,6 +34,7 @@ const sketchyColors = {
     potty: { stroke: '#7c3aed', bg: '#f5f3ff', text: '#5b21b6' },     // Violet
     tummy: { stroke: '#ca8a04', bg: '#fefce8', text: '#854d0e' },     // Yellow
     bath: { stroke: '#0891b2', bg: '#ecfeff', text: '#155e75' },      // Cyan
+    supplement: { stroke: '#16a34a', bg: '#f0fdf4', text: '#166534' }, // Green
 };
 
 // Generate a subtle wobbly path for hand-drawn effect

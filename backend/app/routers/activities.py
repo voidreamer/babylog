@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import List
 from ..database import get_db
-from ..models import Potty, TummyTime, Bath, Baby
+from ..models import Potty, TummyTime, Bath, Baby, Supplement
 from ..schemas import (
     PottyCreate, PottyResponse,
     TummyTimeCreate, TummyTimeResponse,
-    BathCreate, BathResponse
+    BathCreate, BathResponse,
+    SupplementCreate, SupplementResponse
 )
 from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
@@ -316,3 +317,106 @@ def update_bath(
     db.commit()
     db.refresh(bath)
     return bath
+
+
+# ============================================================================
+# Supplements (Vitamin D, Iron, etc.)
+# ============================================================================
+
+@router.get("/supplements", response_model=List[SupplementResponse])
+def get_supplements(
+    baby_id: int,
+    skip: int = 0,
+    limit: int = 50,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Get all supplement logs for a baby."""
+    user_id = user.get("sub")
+    verify_baby_access(db, baby_id, user_id, user_email)
+    
+    return db.query(Supplement).filter(
+        Supplement.baby_id == baby_id
+    ).order_by(Supplement.time.desc()).offset(skip).limit(limit).all()
+
+
+@router.post("/supplements", response_model=SupplementResponse, status_code=status.HTTP_201_CREATED)
+def create_supplement(
+    supplement_data: SupplementCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Log a supplement given to baby."""
+    user_id = user.get("sub")
+    verify_baby_access(db, supplement_data.baby_id, user_id, user_email)
+    
+    supplement = Supplement(
+        baby_id=supplement_data.baby_id,
+        time=supplement_data.time,
+        name=supplement_data.name,
+        dosage=supplement_data.dosage,
+        notes=supplement_data.notes
+    )
+    db.add(supplement)
+    db.commit()
+    db.refresh(supplement)
+    return supplement
+
+
+@router.delete("/supplements/{supplement_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_supplement(
+    supplement_id: int,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Delete a supplement log."""
+    user_id = user.get("sub")
+    
+    supplement = db.query(Supplement).join(Baby).filter(
+        Supplement.id == supplement_id,
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
+    
+    if not supplement:
+        raise HTTPException(status_code=404, detail="Supplement log not found")
+    
+    db.delete(supplement)
+    db.commit()
+    return None
+
+
+@router.put("/supplements/{supplement_id}", response_model=SupplementResponse)
+def update_supplement(
+    supplement_id: int,
+    supplement_data: SupplementCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Update a supplement log."""
+    user_id = user.get("sub")
+    
+    supplement = db.query(Supplement).join(Baby).filter(
+        Supplement.id == supplement_id,
+        or_(
+            Baby.user_id == user_id,
+            Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
+    
+    if not supplement:
+        raise HTTPException(status_code=404, detail="Supplement log not found")
+    
+    supplement.time = supplement_data.time
+    supplement.name = supplement_data.name
+    supplement.dosage = supplement_data.dosage
+    supplement.notes = supplement_data.notes
+    db.commit()
+    db.refresh(supplement)
+    return supplement

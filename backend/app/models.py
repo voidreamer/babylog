@@ -37,6 +37,7 @@ class Baby(Base):
     potty_logs = relationship("Potty", back_populates="baby", cascade="all, delete-orphan")
     tummy_times = relationship("TummyTime", back_populates="baby", cascade="all, delete-orphan")
     baths = relationship("Bath", back_populates="baby", cascade="all, delete-orphan")
+    supplements = relationship("Supplement", back_populates="baby", cascade="all, delete-orphan")
 
 
 class Feeding(Base):
@@ -227,3 +228,18 @@ class Bath(Base):
     created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="baths")
+
+
+class Supplement(Base):
+    """Track daily supplements like Vitamin D, Iron, etc."""
+    __tablename__ = "supplements"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    time = Column(DateTime, nullable=False)
+    name = Column(String, nullable=False)  # 'vitamin_d', 'iron', 'dha', 'probiotic', 'other'
+    dosage = Column(String, nullable=True)  # e.g., "400 IU", "1ml"
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=utc_now)
+    
+    baby = relationship("Baby", back_populates="supplements")

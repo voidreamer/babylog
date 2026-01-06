@@ -239,6 +239,7 @@ class DailySummary(BaseModel):
     tummy_count: int = 0
     tummy_minutes: int = 0
     bath_count: int = 0
+    supplement_count: int = 0
 
 
 class DashboardStats(BaseModel):
@@ -249,6 +250,7 @@ class DashboardStats(BaseModel):
     last_potty: Optional['PottyResponse'] = None
     last_tummy: Optional['TummyTimeResponse'] = None
     last_bath: Optional['BathResponse'] = None
+    last_supplement: Optional['SupplementResponse'] = None
     current_sleep: Optional[SleepResponse] = None
     daily_summary: Optional[DailySummary] = None
 
@@ -488,3 +490,38 @@ class BathResponse(BathBase):
         from_attributes=True,
         json_encoders={datetime: serialize_datetime}
     )
+
+
+# ============================================================================
+# Supplement Schemas (Daily vitamins like Vitamin D, Iron, etc.)
+# ============================================================================
+
+SupplementNameEnum = Literal["vitamin_d", "iron", "dha", "probiotic", "multivitamin", "other"]
+
+class SupplementBase(BaseModel):
+    time: datetime
+    name: SupplementNameEnum
+    dosage: Optional[str] = None  # e.g., "400 IU", "1ml"
+    notes: Optional[str] = None
+
+
+class SupplementCreate(SupplementBase):
+    baby_id: int
+
+
+class SupplementResponse(SupplementBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class SupplementUpdate(BaseModel):
+    time: Optional[datetime] = None
+    name: Optional[SupplementNameEnum] = None
+    dosage: Optional[str] = None
+    notes: Optional[str] = None

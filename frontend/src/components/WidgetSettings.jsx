@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Settings, X, Baby, Droplets, Moon, Heart,
-    Toilet, Timer, Bath as BathIcon, Check, Plus
+    Toilet, Timer, Bath as BathIcon, Check, Plus, Pill
 } from 'lucide-react';
 
 const ALL_WIDGETS = [
@@ -13,6 +13,7 @@ const ALL_WIDGETS = [
     { id: 'potty', label: 'Potty', icon: Toilet, color: 'var(--potty)' },
     { id: 'tummy', label: 'Tummy Time', icon: Timer, color: 'var(--tummy)' },
     { id: 'bath', label: 'Bath', icon: BathIcon, color: 'var(--bath)' },
+    { id: 'supplement', label: 'Supplement', icon: Pill, color: '#16a34a' },
 ];
 
 export default function WidgetSettings({ visibleWidgets, onToggle }) {

@@ -12,6 +12,7 @@ import PumpingModal from './PumpingModal';
 import PottyModal from './PottyModal';
 import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
+import SupplementModal from './SupplementModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import { motion } from 'framer-motion';
@@ -33,6 +34,7 @@ export default function Dashboard() {
     const [pottyModal, setPottyModal] = useState(false);
     const [tummyModal, setTummyModal] = useState(false);
     const [bathModal, setBathModal] = useState(false);
+    const [supplementModal, setSupplementModal] = useState(false);
 
     // Widget visibility from localStorage
     const [visibleWidgets, setVisibleWidgets] = useState(() => {
@@ -113,6 +115,7 @@ export default function Dashboard() {
         setPottyModal(false);
         setTummyModal(false);
         setBathModal(false);
+        setSupplementModal(false);
     };
 
     if (!selectedBaby) {
@@ -235,6 +238,19 @@ export default function Dashboard() {
                     />
                 )}
 
+                {visibleWidgets.includes('supplement') && (
+                    <Widget
+                        type="supplement"
+                        label="Supplement"
+                        value={formatTime(dashboard?.last_supplement?.time)}
+                        lastTime={dashboard?.last_supplement?.time}
+                        detail={dashboard?.last_supplement?.name
+                            ? dashboard.last_supplement.name.replace('_', ' ')
+                            : null}
+                        onClick={() => setSupplementModal(true)}
+                    />
+                )}
+
                 {/* Widget Settings Button */}
                 <WidgetSettings
                     visibleWidgets={visibleWidgets}
@@ -296,6 +312,13 @@ export default function Dashboard() {
             {bathModal && (
                 <BathModal
                     onClose={() => setBathModal(false)}
+                    onSave={handleEventLogged}
+                />
+            )}
+
+            {supplementModal && (
+                <SupplementModal
+                    onClose={() => setSupplementModal(false)}
                     onSave={handleEventLogged}
                 />
             )}

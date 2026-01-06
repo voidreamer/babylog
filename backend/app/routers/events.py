@@ -4,11 +4,11 @@ from sqlalchemy import or_, func
 from datetime import datetime, timedelta
 from typing import List, Optional
 from ..database import get_db
-from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath
+from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement
 from ..schemas import (
     TimelineEvent, DashboardStats, DailySummary,
     FeedingResponse, DiaperResponse, SleepResponse, PumpingResponse,
-    PottyResponse, TummyTimeResponse, BathResponse
+    PottyResponse, TummyTimeResponse, BathResponse, SupplementResponse
 )
 from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
@@ -186,6 +186,25 @@ def get_timeline(
             }
         ))
     
+    # Supplements
+    supplements = db.query(Supplement).filter(
+        Supplement.baby_id == baby_id,
+        Supplement.time >= start_of_day_utc,
+        Supplement.time < end_of_day_utc
+    ).all()
+    
+    for sup in supplements:
+        events.append(TimelineEvent(
+            id=sup.id,
+            event_type="supplement",
+            time=sup.time,
+            details={
+                "name": sup.name,
+                "dosage": sup.dosage,
+                "notes": sup.notes
+            }
+        ))
+    
     # Sort by time descending
     events.sort(key=lambda x: x.time, reverse=True)
     
@@ -274,6 +293,13 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         Bath.time < end_of_day
     ).all()
     
+    # Supplements
+    supplements = db.query(Supplement).filter(
+        Supplement.baby_id == baby_id,
+        Supplement.time >= start_of_day,
+        Supplement.time < end_of_day
+    ).all()
+    
     return DailySummary(
         date=local_midnight.strftime("%Y-%m-%d"),
         total_feedings=len(feedings),
@@ -294,7 +320,8 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         potty_success_count=potty_success_count,
         tummy_count=len(tummy_times),
         tummy_minutes=tummy_minutes,
-        bath_count=len(baths)
+        bath_count=len(baths),
+        supplement_count=len(supplements)
     )
 
 
@@ -358,6 +385,11 @@ def get_dashboard(
         Bath.baby_id == baby_id
     ).order_by(Bath.time.desc()).first()
     
+    # Last supplement
+    last_supplement = db.query(Supplement).filter(
+        Supplement.baby_id == baby_id
+    ).order_by(Supplement.time.desc()).first()
+    
     # Parse local date for daily summary (YYYY-MM-DD format)
     if local_date:
         try:
@@ -378,6 +410,7 @@ def get_dashboard(
         last_potty=PottyResponse.model_validate(last_potty) if last_potty else None,
         last_tummy=TummyTimeResponse.model_validate(last_tummy) if last_tummy else None,
         last_bath=BathResponse.model_validate(last_bath) if last_bath else None,
+        last_supplement=SupplementResponse.model_validate(last_supplement) if last_supplement else None,
         current_sleep=SleepResponse.model_validate(current_sleep) if current_sleep else None,
         daily_summary=daily_summary
     )
