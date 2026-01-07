@@ -15,7 +15,7 @@ const parseUTCTime = (timeStr) => {
 export default function SleepModal({ babyId, currentSleep, editEvent, onClose, onSave }) {
     const isEditing = !!editEvent;
     const [startTime, setStartTime] = useState(new Date());
-    const [endTime, setEndTime] = useState(null);
+    const [endTime, setEndTime] = useState(new Date()); // Initialize to now instead of null
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
 
