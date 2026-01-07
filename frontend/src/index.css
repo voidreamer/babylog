@@ -3210,6 +3210,35 @@ h4 {
     /* Taller height for narrower 4-column cards */
   }
 
+  /* Responsive widget buttons - prevent overflow on larger screens */
+  .sleep-start-btn,
+  .sleep-wake-btn,
+  .feeding-start-btn,
+  .feeding-stop-btn {
+    font-size: 0.8rem;
+    padding: var(--space-xs) var(--space-sm);
+    white-space: nowrap;
+  }
+
+  .diaper-quick-btns {
+    flex-wrap: wrap;
+  }
+
+  .diaper-quick-btn {
+    font-size: 0.7rem;
+    padding: var(--space-xs);
+    min-width: 0;
+  }
+
+  .feeding-timer,
+  .sleep-elapsed {
+    font-size: 1rem;
+  }
+
+  .widget-content {
+    overflow: hidden;
+  }
+
   .quick-actions {
     justify-content: center;
     gap: var(--space-lg);
