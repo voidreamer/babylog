@@ -142,6 +142,14 @@ export async function getCachedFeedings(babyId) {
 }
 
 /**
+ * Add a single feeding to the cache (for optimistic updates)
+ */
+export async function addCachedFeeding(feeding) {
+    const db = await getDB();
+    await db.put(STORES.FEEDINGS, feeding);
+}
+
+/**
  * Cache sleeps for a baby
  */
 export async function cacheSleeps(babyId, sleeps) {
@@ -169,6 +177,14 @@ export async function getCachedSleeps(babyId) {
     const db = await getDB();
     const index = db.transaction(STORES.SLEEPS).objectStore(STORES.SLEEPS).index('baby_id');
     return index.getAll(babyId);
+}
+
+/**
+ * Add a single sleep to the cache (for optimistic updates)
+ */
+export async function addCachedSleep(sleep) {
+    const db = await getDB();
+    await db.put(STORES.SLEEPS, sleep);
 }
 
 /**
@@ -202,6 +218,14 @@ export async function getCachedDiapers(babyId) {
 }
 
 /**
+ * Add a single diaper to the cache (for optimistic updates)
+ */
+export async function addCachedDiaper(diaper) {
+    const db = await getDB();
+    await db.put(STORES.DIAPERS, diaper);
+}
+
+/**
  * Cache pumpings for a baby
  */
 export async function cachePumpings(babyId, pumpings) {
@@ -229,6 +253,14 @@ export async function getCachedPumpings(babyId) {
     const db = await getDB();
     const index = db.transaction(STORES.PUMPINGS).objectStore(STORES.PUMPINGS).index('baby_id');
     return index.getAll(babyId);
+}
+
+/**
+ * Add a single pumping to the cache (for optimistic updates)
+ */
+export async function addCachedPumping(pumping) {
+    const db = await getDB();
+    await db.put(STORES.PUMPINGS, pumping);
 }
 
 /**
@@ -324,12 +356,16 @@ export default {
     getCachedBabies,
     cacheFeedings,
     getCachedFeedings,
+    addCachedFeeding,
     cacheSleeps,
     getCachedSleeps,
+    addCachedSleep,
     cacheDiapers,
     getCachedDiapers,
+    addCachedDiaper,
     cachePumpings,
     getCachedPumpings,
+    addCachedPumping,
     queueForSync,
     getPendingSyncActions,
     removeSyncAction,

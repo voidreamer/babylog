@@ -106,18 +106,41 @@ function MainApp() {
     }, [theme]);
 
     // Check if we should show onboarding (no babies yet)
+    // Only show onboarding when online - if offline with no cached babies, show offline message instead
     useEffect(() => {
-        if (!babiesLoading && babies.length === 0) {
+        if (!babiesLoading && babies.length === 0 && online) {
             setShowOnboarding(true);
         }
-    }, [babies, babiesLoading]);
+    }, [babies, babiesLoading, online]);
 
-    // Show onboarding for first-time users
-    if (showOnboarding && !babiesLoading && babies.length === 0) {
+    // Show onboarding for first-time users (only when online)
+    if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (
             <Onboarding
                 onComplete={() => setShowOnboarding(false)}
             />
+        );
+    }
+
+    // Show offline message if offline with no cached babies
+    if (!babiesLoading && babies.length === 0 && !online) {
+        return (
+            <div className="app-container">
+                <OfflineIndicator
+                    online={online}
+                    syncing={syncing}
+                    pendingCount={pendingCount}
+                    onSync={syncPendingChanges}
+                />
+                <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
+                    <div className="empty-state-icon">📡</div>
+                    <h2 className="empty-state-title">You're Offline</h2>
+                    <p className="empty-state-text">
+                        Connect to the internet to load your baby data.
+                        Your data will sync automatically when you're back online.
+                    </p>
+                </div>
+            </div>
         );
     }
 

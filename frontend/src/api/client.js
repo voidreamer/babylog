@@ -12,6 +12,10 @@ import {
     cacheSleeps,
     cacheDiapers,
     cachePumpings,
+    addCachedFeeding,
+    addCachedSleep,
+    addCachedDiaper,
+    addCachedPumping,
     queueForSync
 } from '../utils/offlineStorage.js';
 
@@ -187,8 +191,10 @@ class ApiClient {
                     method: 'POST',
                     data
                 });
-                // Return optimistic response
-                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                // Create optimistic response and add to cache
+                const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                await addCachedFeeding(optimisticEntry);
+                return optimisticEntry;
             }
             throw error;
         }
@@ -238,7 +244,9 @@ class ApiClient {
                     method: 'POST',
                     data
                 });
-                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                await addCachedDiaper(optimisticEntry);
+                return optimisticEntry;
             }
             throw error;
         }
@@ -292,7 +300,9 @@ class ApiClient {
                     method: 'POST',
                     data
                 });
-                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                await addCachedSleep(optimisticEntry);
+                return optimisticEntry;
             }
             throw error;
         }
@@ -348,7 +358,9 @@ class ApiClient {
                     method: 'POST',
                     data
                 });
-                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+                await addCachedPumping(optimisticEntry);
+                return optimisticEntry;
             }
             throw error;
         }
