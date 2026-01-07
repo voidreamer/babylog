@@ -95,6 +95,14 @@
   --font-family-heading: 'Neucha', cursive;
 }
 
+[data-theme="handwritten"] .widget-settings-btn-title {
+  font-size: 1.1rem;
+}
+
+[data-theme="handwritten"] .widget-settings-btn-subtitle {
+  font-size: 0.85rem;
+}
+
 /* ============================================================================
    CLASSIC DARK THEME - Dark background with system fonts
    ============================================================================ */
@@ -457,10 +465,12 @@
 }
 
 [data-theme="handwritten-dark"] .widget-settings-btn-title {
+  font-size: 1.1rem;
   color: var(--text);
 }
 
 [data-theme="handwritten-dark"] .widget-settings-btn-subtitle {
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 

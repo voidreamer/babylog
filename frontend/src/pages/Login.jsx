@@ -42,7 +42,7 @@ export default function Login() {
                 </div>
 
                 <p className="auth-footer">
-                    Free forever • No credit card required
+                    Free with premium features
                 </p>
             </div>
         </div>
