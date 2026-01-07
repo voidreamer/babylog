@@ -5,6 +5,8 @@ import { useBaby } from '../hooks/useBaby';
 import { format } from 'date-fns';
 import Widget from './Widget';
 import SleepWidget from './SleepWidget';
+import FeedingWidget from './FeedingWidget';
+import DiaperWidget from './DiaperWidget';
 import WidgetSettings from './WidgetSettings';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
@@ -149,28 +151,20 @@ export default function Dashboard() {
             {/* Widgets Grid */}
             <div className="widgets-grid">
                 {visibleWidgets.includes('feeding') && (
-                    <Widget
-                        type="feeding"
-                        label="Feeding"
-                        value={formatTime(dashboard?.last_feeding?.time)}
-                        lastTime={dashboard?.last_feeding?.time}
-                        detail={dashboard?.last_feeding ?
-                            `${dashboard.last_feeding.type === 'breastmilk_bottle' || dashboard.last_feeding.type === 'bottle'
-                                ? 'Breastmilk Bottle'
-                                : dashboard.last_feeding.type.charAt(0).toUpperCase() + dashboard.last_feeding.type.slice(1)}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
-                            : null}
-                        onClick={() => setFeedingModal(true)}
+                    <FeedingWidget
+                        babyId={selectedBaby.id}
+                        lastFeeding={dashboard?.last_feeding}
+                        onFeedingChange={loadData}
+                        onOpenModal={() => setFeedingModal(true)}
                     />
                 )}
 
                 {visibleWidgets.includes('diaper') && (
-                    <Widget
-                        type="diaper"
-                        label="Diaper"
-                        value={formatTime(dashboard?.last_diaper?.time)}
-                        lastTime={dashboard?.last_diaper?.time}
-                        detail={dashboard?.last_diaper?.type}
-                        onClick={() => setDiaperModal(true)}
+                    <DiaperWidget
+                        babyId={selectedBaby.id}
+                        lastDiaper={dashboard?.last_diaper}
+                        onDiaperChange={loadData}
+                        onOpenModal={() => setDiaperModal(true)}
                     />
                 )}
 

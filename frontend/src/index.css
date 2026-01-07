@@ -1476,6 +1476,121 @@ h4 {
   color: var(--widget-text, var(--sleep));
 }
 
+/* Feeding Widget - Stateful */
+.feeding-widget-idle,
+.feeding-widget-active {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.feeding-start-btn,
+.feeding-stop-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.feeding-start-btn {
+  background: var(--widget-stroke, var(--feeding));
+  color: white;
+}
+
+.feeding-start-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.feeding-stop-btn {
+  background: var(--success);
+  color: white;
+}
+
+.feeding-stop-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.feeding-start-btn:disabled,
+.feeding-stop-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.feeding-timer {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--widget-text, var(--feeding));
+  text-align: center;
+}
+
+.widget.active-timer {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Diaper Widget - Quick Actions */
+.diaper-quick-btns {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.diaper-quick-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  background: var(--widget-stroke, var(--diaper));
+  color: white;
+}
+
+.diaper-quick-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.diaper-quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.diaper-quick-btn.pee {
+  background: #0891b2;
+}
+
+.diaper-quick-btn.poo {
+  background: #92400e;
+}
+
+.diaper-quick-btn.mixed {
+  background: var(--widget-stroke, var(--diaper));
+}
+
 /* ============================================================================
    Daily Summary (Collapsible)
    ============================================================================ */
