@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format } from 'date-fns';
 import Widget from './Widget';
+import SleepWidget from './SleepWidget';
 import WidgetSettings from './WidgetSettings';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
@@ -174,20 +175,12 @@ export default function Dashboard() {
                 )}
 
                 {visibleWidgets.includes('sleep') && (
-                    <Widget
-                        type="sleep"
-                        label={dashboard?.current_sleep ? "Sleeping" : "Sleep"}
-                        value={dashboard?.current_sleep
-                            ? `Since ${formatTime(dashboard.current_sleep.start_time)}`
-                            : formatTime(dashboard?.last_sleep?.start_time)}
-                        lastTime={dashboard?.current_sleep?.start_time || dashboard?.last_sleep?.start_time}
-                        detail={dashboard?.current_sleep
-                            ? "Sleeping 💤"
-                            : dashboard?.last_sleep?.duration_minutes
-                                ? `${dashboard.last_sleep.duration_minutes}min`
-                                : null}
-                        isSleeping={!!dashboard?.current_sleep}
-                        onClick={() => setSleepModal(true)}
+                    <SleepWidget
+                        babyId={selectedBaby.id}
+                        currentSleep={dashboard?.current_sleep}
+                        lastSleep={dashboard?.last_sleep}
+                        onSleepChange={loadData}
+                        onOpenModal={() => setSleepModal(true)}
                     />
                 )}
 
@@ -281,7 +274,6 @@ export default function Dashboard() {
             {sleepModal && (
                 <SleepModal
                     babyId={selectedBaby.id}
-                    currentSleep={dashboard?.current_sleep}
                     onClose={() => setSleepModal(false)}
                     onSave={handleEventLogged}
                 />

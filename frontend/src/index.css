@@ -1415,6 +1415,67 @@ h4 {
   color: var(--primary);
 }
 
+/* Sleep Widget - Stateful */
+.sleep-widget-awake,
+.sleep-widget-sleeping {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.sleep-start-btn,
+.sleep-wake-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.sleep-start-btn {
+  background: var(--widget-stroke, var(--sleep));
+  color: white;
+}
+
+.sleep-start-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.sleep-wake-btn {
+  background: var(--warning);
+  color: white;
+}
+
+.sleep-wake-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.sleep-start-btn:disabled,
+.sleep-wake-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sleep-elapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--widget-text, var(--sleep));
+}
+
 /* ============================================================================
    Daily Summary (Collapsible)
    ============================================================================ */
