@@ -64,16 +64,36 @@ def create_doctor_visit(
     return db_visit
 
 
-@router.delete("/doctor-visits/{visit_id}")
-def delete_doctor_visit(
-    visit_id: int, 
-    db: Session = Depends(get_db), 
+@router.put("/doctor-visits/{visit_id}", response_model=schemas.DoctorVisitResponse)
+def update_doctor_visit(
+    visit_id: int,
+    visit_data: schemas.DoctorVisitCreate,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id)
 ):
     visit = db.query(models.DoctorVisit).filter(models.DoctorVisit.id == visit_id).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
-    
+
+    for key, value in visit_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(visit, key, value)
+
+    db.commit()
+    db.refresh(visit)
+    return visit
+
+
+@router.delete("/doctor-visits/{visit_id}")
+def delete_doctor_visit(
+    visit_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    visit = db.query(models.DoctorVisit).filter(models.DoctorVisit.id == visit_id).first()
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+
     db.delete(visit)
     db.commit()
     return {"message": "Deleted"}
@@ -115,6 +135,26 @@ def create_vaccination(
     db.commit()
     db.refresh(db_vacc)
     return db_vacc
+
+
+@router.put("/vaccinations/{vaccination_id}", response_model=schemas.VaccinationResponse)
+def update_vaccination(
+    vaccination_id: int,
+    vaccination_data: schemas.VaccinationCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    vacc = db.query(models.Vaccination).filter(models.Vaccination.id == vaccination_id).first()
+    if not vacc:
+        raise HTTPException(status_code=404, detail="Vaccination not found")
+
+    for key, value in vaccination_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(vacc, key, value)
+
+    db.commit()
+    db.refresh(vacc)
+    return vacc
 
 
 @router.delete("/vaccinations/{vaccination_id}")
@@ -173,6 +213,42 @@ def create_medication(
     return db_med
 
 
+@router.put("/medications/{medication_id}", response_model=schemas.MedicationResponse)
+def update_medication(
+    medication_id: int,
+    medication_data: schemas.MedicationCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    med = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    if not med:
+        raise HTTPException(status_code=404, detail="Medication not found")
+
+    for key, value in medication_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(med, key, value)
+
+    db.commit()
+    db.refresh(med)
+    return med
+
+
+@router.patch("/medications/{medication_id}/toggle", response_model=schemas.MedicationResponse)
+def toggle_medication_active(
+    medication_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    med = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    if not med:
+        raise HTTPException(status_code=404, detail="Medication not found")
+
+    med.is_active = not med.is_active
+    db.commit()
+    db.refresh(med)
+    return med
+
+
 @router.delete("/medications/{medication_id}")
 def delete_medication(
     medication_id: int, 
@@ -226,6 +302,26 @@ def create_milestone(
     return db_milestone
 
 
+@router.put("/milestones/{milestone_id}", response_model=schemas.MilestoneResponse)
+def update_milestone(
+    milestone_id: int,
+    milestone_data: schemas.MilestoneCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    milestone = db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
+    if not milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+
+    for key, value in milestone_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(milestone, key, value)
+
+    db.commit()
+    db.refresh(milestone)
+    return milestone
+
+
 @router.delete("/milestones/{milestone_id}")
 def delete_milestone(
     milestone_id: int, 
@@ -277,6 +373,26 @@ def create_growth_record(
     db.commit()
     db.refresh(db_record)
     return db_record
+
+
+@router.put("/growth/{record_id}", response_model=schemas.GrowthRecordResponse)
+def update_growth_record(
+    record_id: int,
+    record_data: schemas.GrowthRecordCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    record = db.query(models.GrowthRecord).filter(models.GrowthRecord.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Record not found")
+
+    for key, value in record_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(record, key, value)
+
+    db.commit()
+    db.refresh(record)
+    return record
 
 
 @router.delete("/growth/{record_id}")

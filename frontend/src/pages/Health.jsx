@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { ClipboardList, Syringe, Pill, Star, TrendingUp, Trash2, Ruler, Baby, BarChart2 } from 'lucide-react';
+import { ClipboardList, Syringe, Pill, Star, TrendingUp, Trash2, Ruler, Baby, BarChart2, Pencil, X, Power } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import GrowthChart from '../components/GrowthChart';
 
 // Parse time from API (UTC) to local Date object
@@ -39,6 +40,16 @@ export default function Health() {
     const [showMilestoneModal, setShowMilestoneModal] = useState(false);
     const [showGrowthModal, setShowGrowthModal] = useState(false);
 
+    // Editing states
+    const [editingVisit, setEditingVisit] = useState(null);
+    const [editingVacc, setEditingVacc] = useState(null);
+    const [editingMed, setEditingMed] = useState(null);
+    const [editingMilestone, setEditingMilestone] = useState(null);
+    const [editingGrowth, setEditingGrowth] = useState(null);
+
+    // Confirm delete modal
+    const [confirmDelete, setConfirmDelete] = useState(null);
+
     const loadData = async () => {
         if (!selectedBaby) return;
         setLoading(true);
@@ -56,7 +67,7 @@ export default function Health() {
             setMilestones(mi);
             setGrowth(g);
         } catch (error) {
-            // Silent fail
+            toast.error('Failed to load health data');
         } finally {
             setLoading(false);
         }
@@ -65,6 +76,37 @@ export default function Health() {
     useEffect(() => {
         loadData();
     }, [selectedBaby]);
+
+    // Handle confirm delete
+    const handleDeleteConfirm = async () => {
+        if (!confirmDelete) return;
+        const { type, id, label } = confirmDelete;
+
+        try {
+            switch (type) {
+                case 'visit':
+                    await api.deleteDoctorVisit(id);
+                    break;
+                case 'vaccination':
+                    await api.deleteVaccination(id);
+                    break;
+                case 'medication':
+                    await api.deleteMedication(id);
+                    break;
+                case 'milestone':
+                    await api.deleteMilestone(id);
+                    break;
+                case 'growth':
+                    await api.deleteGrowthRecord(id);
+                    break;
+            }
+            toast.success(`${label} deleted`);
+            loadData();
+        } catch (error) {
+            toast.error(`Failed to delete ${label.toLowerCase()}`);
+        }
+        setConfirmDelete(null);
+    };
 
     if (!selectedBaby) {
         return (
@@ -118,28 +160,41 @@ export default function Health() {
                 <VisitsSection
                     visits={visits}
                     onAdd={() => setShowVisitModal(true)}
-                    onRefresh={loadData}
+                    onEdit={(visit) => { setEditingVisit(visit); setShowVisitModal(true); }}
+                    onDelete={(visit) => setConfirmDelete({ type: 'visit', id: visit.id, label: 'Doctor visit' })}
                 />
             )}
             {activeSection === 'vaccinations' && (
                 <VaccinationsSection
                     vaccinations={vaccinations}
                     onAdd={() => setShowVaccModal(true)}
-                    onRefresh={loadData}
+                    onEdit={(vacc) => { setEditingVacc(vacc); setShowVaccModal(true); }}
+                    onDelete={(vacc) => setConfirmDelete({ type: 'vaccination', id: vacc.id, label: 'Vaccination' })}
                 />
             )}
             {activeSection === 'medications' && (
                 <MedicationsSection
                     medications={medications}
                     onAdd={() => setShowMedModal(true)}
-                    onRefresh={loadData}
+                    onEdit={(med) => { setEditingMed(med); setShowMedModal(true); }}
+                    onDelete={(med) => setConfirmDelete({ type: 'medication', id: med.id, label: 'Medication' })}
+                    onToggle={async (med) => {
+                        try {
+                            await api.toggleMedicationActive(med.id);
+                            toast.success(med.is_active ? 'Medication stopped' : 'Medication resumed');
+                            loadData();
+                        } catch (error) {
+                            toast.error('Failed to update medication');
+                        }
+                    }}
                 />
             )}
             {activeSection === 'milestones' && (
                 <MilestonesSection
                     milestones={milestones}
                     onAdd={() => setShowMilestoneModal(true)}
-                    onRefresh={loadData}
+                    onEdit={(m) => { setEditingMilestone(m); setShowMilestoneModal(true); }}
+                    onDelete={(m) => setConfirmDelete({ type: 'milestone', id: m.id, label: 'Milestone' })}
                 />
             )}
             {activeSection === 'growth' && (
@@ -148,7 +203,8 @@ export default function Health() {
                     birthDate={selectedBaby?.birth_date}
                     gender={selectedBaby?.gender}
                     onAdd={() => setShowGrowthModal(true)}
-                    onRefresh={loadData}
+                    onEdit={(r) => { setEditingGrowth(r); setShowGrowthModal(true); }}
+                    onDelete={(r) => setConfirmDelete({ type: 'growth', id: r.id, label: 'Growth record' })}
                 />
             )}
 
@@ -156,38 +212,87 @@ export default function Health() {
             {showVisitModal && (
                 <VisitModal
                     babyId={selectedBaby.id}
-                    onClose={() => setShowVisitModal(false)}
-                    onSave={() => { setShowVisitModal(false); loadData(); }}
+                    editData={editingVisit}
+                    onClose={() => { setShowVisitModal(false); setEditingVisit(null); }}
+                    onSave={() => { setShowVisitModal(false); setEditingVisit(null); loadData(); }}
                 />
             )}
             {showVaccModal && (
                 <VaccModal
                     babyId={selectedBaby.id}
-                    onClose={() => setShowVaccModal(false)}
-                    onSave={() => { setShowVaccModal(false); loadData(); }}
+                    editData={editingVacc}
+                    onClose={() => { setShowVaccModal(false); setEditingVacc(null); }}
+                    onSave={() => { setShowVaccModal(false); setEditingVacc(null); loadData(); }}
                 />
             )}
             {showMedModal && (
                 <MedModal
                     babyId={selectedBaby.id}
-                    onClose={() => setShowMedModal(false)}
-                    onSave={() => { setShowMedModal(false); loadData(); }}
+                    editData={editingMed}
+                    onClose={() => { setShowMedModal(false); setEditingMed(null); }}
+                    onSave={() => { setShowMedModal(false); setEditingMed(null); loadData(); }}
                 />
             )}
             {showMilestoneModal && (
                 <MilestoneModal
                     babyId={selectedBaby.id}
-                    onClose={() => setShowMilestoneModal(false)}
-                    onSave={() => { setShowMilestoneModal(false); loadData(); }}
+                    editData={editingMilestone}
+                    onClose={() => { setShowMilestoneModal(false); setEditingMilestone(null); }}
+                    onSave={() => { setShowMilestoneModal(false); setEditingMilestone(null); loadData(); }}
                 />
             )}
             {showGrowthModal && (
                 <GrowthModal
                     babyId={selectedBaby.id}
-                    onClose={() => setShowGrowthModal(false)}
-                    onSave={() => { setShowGrowthModal(false); loadData(); }}
+                    editData={editingGrowth}
+                    onClose={() => { setShowGrowthModal(false); setEditingGrowth(null); }}
+                    onSave={() => { setShowGrowthModal(false); setEditingGrowth(null); loadData(); }}
                 />
             )}
+
+            {/* Confirm Delete Modal */}
+            <AnimatePresence>
+                {confirmDelete && (
+                    <motion.div
+                        className="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setConfirmDelete(null)}
+                    >
+                        <motion.div
+                            className="confirm-modal"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button className="modal-close" onClick={() => setConfirmDelete(null)}>
+                                <X size={20} />
+                            </button>
+                            <div className="confirm-modal-content">
+                                <Trash2 size={32} className="confirm-icon" />
+                                <h3>Delete {confirmDelete.label}?</h3>
+                                <p>This action cannot be undone.</p>
+                                <div className="confirm-modal-actions">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => setConfirmDelete(null)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={handleDeleteConfirm}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -196,13 +301,7 @@ export default function Health() {
 // Section Components
 // ============================================================================
 
-function VisitsSection({ visits, onAdd, onRefresh }) {
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this visit?')) return;
-        await api.deleteDoctorVisit(id);
-        onRefresh();
-    };
-
+function VisitsSection({ visits, onAdd, onEdit, onDelete }) {
     return (
         <div className="card">
             <div className="card-header">
@@ -217,7 +316,7 @@ function VisitsSection({ visits, onAdd, onRefresh }) {
                 <div className="timeline">
                     {visits.map(visit => (
                         <div key={visit.id} className="timeline-item">
-                            <div className="timeline-icon feeding"><ClipboardList size={16} /></div>
+                            <div className="timeline-icon health-visit"><ClipboardList size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">
                                     {visit.visit_type?.charAt(0).toUpperCase() + visit.visit_type?.slice(1) || 'Visit'}
@@ -232,7 +331,10 @@ function VisitsSection({ visits, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(visit.visit_date), 'MMM d, yyyy')}
-                                <button className="btn-icon-delete" onClick={() => handleDelete(visit.id)}><Trash2 size={14} /></button>
+                                <div className="timeline-actions">
+                                    <button className="btn-icon-edit" onClick={() => onEdit(visit)}><Pencil size={14} /></button>
+                                    <button className="btn-icon-delete" onClick={() => onDelete(visit)}><Trash2 size={14} /></button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -242,13 +344,7 @@ function VisitsSection({ visits, onAdd, onRefresh }) {
     );
 }
 
-function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this vaccination record?')) return;
-        await api.deleteVaccination(id);
-        onRefresh();
-    };
-
+function VaccinationsSection({ vaccinations, onAdd, onEdit, onDelete }) {
     return (
         <div className="card">
             <div className="card-header">
@@ -263,7 +359,7 @@ function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
                 <div className="timeline">
                     {vaccinations.map(vacc => (
                         <div key={vacc.id} className="timeline-item">
-                            <div className="timeline-icon diaper"><Syringe size={16} /></div>
+                            <div className="timeline-icon health-vaccine"><Syringe size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">
                                     {vacc.vaccine_name}
@@ -276,7 +372,10 @@ function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(vacc.given_date), 'MMM d, yyyy')}
-                                <button className="btn-icon-delete" onClick={() => handleDelete(vacc.id)}><Trash2 size={14} /></button>
+                                <div className="timeline-actions">
+                                    <button className="btn-icon-edit" onClick={() => onEdit(vacc)}><Pencil size={14} /></button>
+                                    <button className="btn-icon-delete" onClick={() => onDelete(vacc)}><Trash2 size={14} /></button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -286,13 +385,7 @@ function VaccinationsSection({ vaccinations, onAdd, onRefresh }) {
     );
 }
 
-function MedicationsSection({ medications, onAdd, onRefresh }) {
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this medication?')) return;
-        await api.deleteMedication(id);
-        onRefresh();
-    };
-
+function MedicationsSection({ medications, onAdd, onEdit, onDelete, onToggle }) {
     const active = medications.filter(m => m.is_active);
     const past = medications.filter(m => !m.is_active);
 
@@ -314,7 +407,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                             <div className="timeline">
                                 {active.map(med => (
                                     <div key={med.id} className="timeline-item">
-                                        <div className="timeline-icon sleep"><Pill size={16} /></div>
+                                        <div className="timeline-icon health-med"><Pill size={16} /></div>
                                         <div className="timeline-content">
                                             <div className="timeline-title">{med.medication_name}</div>
                                             <div className="timeline-subtitle">
@@ -324,7 +417,11 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                                         </div>
                                         <div className="timeline-time">
                                             Since {format(parseUTCTime(med.start_date), 'MMM d')}
-                                            <button className="btn-icon-delete" onClick={() => handleDelete(med.id)}><Trash2 size={14} /></button>
+                                            <div className="timeline-actions">
+                                                <button className="btn-icon-toggle active" onClick={() => onToggle(med)} title="Stop medication"><Power size={14} /></button>
+                                                <button className="btn-icon-edit" onClick={() => onEdit(med)}><Pencil size={14} /></button>
+                                                <button className="btn-icon-delete" onClick={() => onDelete(med)}><Trash2 size={14} /></button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -340,9 +437,16 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
                                         <div className="timeline-icon"><Pill size={16} /></div>
                                         <div className="timeline-content">
                                             <div className="timeline-title">{med.medication_name}</div>
+                                            <div className="timeline-subtitle">
+                                                {med.dosage && `${med.dosage}`}
+                                                {med.frequency && ` • ${med.frequency}`}
+                                            </div>
                                         </div>
                                         <div className="timeline-time">
-                                            <button className="btn-icon-delete" onClick={() => handleDelete(med.id)}><Trash2 size={14} /></button>
+                                            <div className="timeline-actions">
+                                                <button className="btn-icon-toggle" onClick={() => onToggle(med)} title="Resume medication"><Power size={14} /></button>
+                                                <button className="btn-icon-delete" onClick={() => onDelete(med)}><Trash2 size={14} /></button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -355,13 +459,7 @@ function MedicationsSection({ medications, onAdd, onRefresh }) {
     );
 }
 
-function MilestonesSection({ milestones, onAdd, onRefresh }) {
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this milestone?')) return;
-        await api.deleteMilestone(id);
-        onRefresh();
-    };
-
+function MilestonesSection({ milestones, onAdd, onEdit, onDelete }) {
     return (
         <div className="card">
             <div className="card-header">
@@ -376,14 +474,17 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
                 <div className="timeline">
                     {milestones.map(m => (
                         <div key={m.id} className="timeline-item">
-                            <div className="timeline-icon pumping"><Star size={16} /></div>
+                            <div className="timeline-icon health-milestone"><Star size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">{m.milestone_type}</div>
                                 {m.notes && <div className="timeline-subtitle">{m.notes}</div>}
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(m.achieved_date), 'MMM d, yyyy')}
-                                <button className="btn-icon-delete" onClick={() => handleDelete(m.id)}><Trash2 size={14} /></button>
+                                <div className="timeline-actions">
+                                    <button className="btn-icon-edit" onClick={() => onEdit(m)}><Pencil size={14} /></button>
+                                    <button className="btn-icon-delete" onClick={() => onDelete(m)}><Trash2 size={14} /></button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -393,15 +494,9 @@ function MilestonesSection({ milestones, onAdd, onRefresh }) {
     );
 }
 
-function GrowthSection({ records, birthDate, gender, onAdd, onRefresh }) {
+function GrowthSection({ records, birthDate, gender, onAdd, onEdit, onDelete }) {
     const [showChart, setShowChart] = useState(false);
     const [chartMetric, setChartMetric] = useState('weight');
-
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this record?')) return;
-        await api.deleteGrowthRecord(id);
-        onRefresh();
-    };
 
     return (
         <div className="card">
@@ -451,7 +546,7 @@ function GrowthSection({ records, birthDate, gender, onAdd, onRefresh }) {
                 <div className="timeline">
                     {records.map(r => (
                         <div key={r.id} className="timeline-item">
-                            <div className="timeline-icon feeding"><Ruler size={16} /></div>
+                            <div className="timeline-icon health-growth"><Ruler size={16} /></div>
                             <div className="timeline-content">
                                 <div className="timeline-title">
                                     {r.weight_kg && `${r.weight_kg} kg`}
@@ -462,7 +557,10 @@ function GrowthSection({ records, birthDate, gender, onAdd, onRefresh }) {
                             </div>
                             <div className="timeline-time">
                                 {format(parseUTCTime(r.recorded_date), 'MMM d, yyyy')}
-                                <button className="btn-icon-delete" onClick={() => handleDelete(r.id)}><Trash2 size={14} /></button>
+                                <div className="timeline-actions">
+                                    <button className="btn-icon-edit" onClick={() => onEdit(r)}><Pencil size={14} /></button>
+                                    <button className="btn-icon-delete" onClick={() => onDelete(r)}><Trash2 size={14} /></button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -476,21 +574,23 @@ function GrowthSection({ records, birthDate, gender, onAdd, onRefresh }) {
 // Modal Components
 // ============================================================================
 
-function VisitModal({ babyId, onClose, onSave }) {
-    const [visitDate, setVisitDate] = useState(new Date().toISOString().slice(0, 10));
-    const [visitType, setVisitType] = useState('checkup');
-    const [doctorName, setDoctorName] = useState('');
-    const [weight, setWeight] = useState('');
-    const [height, setHeight] = useState('');
-    const [head, setHead] = useState('');
-    const [notes, setNotes] = useState('');
+function VisitModal({ babyId, editData, onClose, onSave }) {
+    const [visitDate, setVisitDate] = useState(
+        editData ? format(parseUTCTime(editData.visit_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
+    );
+    const [visitType, setVisitType] = useState(editData?.visit_type || 'checkup');
+    const [doctorName, setDoctorName] = useState(editData?.doctor_name || '');
+    const [weight, setWeight] = useState(editData?.weight_kg?.toString() || '');
+    const [height, setHeight] = useState(editData?.height_cm?.toString() || '');
+    const [head, setHead] = useState(editData?.head_cm?.toString() || '');
+    const [notes, setNotes] = useState(editData?.notes || '');
     const [saving, setSaving] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            await api.createDoctorVisit({
+            const data = {
                 baby_id: babyId,
                 visit_date: new Date(visitDate).toISOString(),
                 visit_type: visitType,
@@ -499,7 +599,15 @@ function VisitModal({ babyId, onClose, onSave }) {
                 height_cm: height ? parseFloat(height) : null,
                 head_cm: head ? parseFloat(head) : null,
                 notes: notes || null,
-            });
+            };
+
+            if (editData) {
+                await api.updateDoctorVisit(editData.id, data);
+                toast.success('Visit updated');
+            } else {
+                await api.createDoctorVisit(data);
+                toast.success('Visit logged');
+            }
             onSave();
         } catch (error) {
             toast.error('Failed to save');
@@ -512,7 +620,7 @@ function VisitModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> Log Doctor Visit</h2>
+                    <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Doctor Visit</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -564,26 +672,40 @@ function VisitModal({ babyId, onClose, onSave }) {
     );
 }
 
-function VaccModal({ babyId, onClose, onSave }) {
-    const [vaccineName, setVaccineName] = useState('');
-    const [doseNumber, setDoseNumber] = useState(1);
-    const [givenDate, setGivenDate] = useState(new Date().toISOString().slice(0, 10));
-    const [administeredBy, setAdministeredBy] = useState('');
-    const [notes, setNotes] = useState('');
+function VaccModal({ babyId, editData, onClose, onSave }) {
+    const [vaccineName, setVaccineName] = useState(editData?.vaccine_name || '');
+    const [doseNumber, setDoseNumber] = useState(editData?.dose_number || 1);
+    const [givenDate, setGivenDate] = useState(
+        editData ? format(parseUTCTime(editData.given_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
+    );
+    const [administeredBy, setAdministeredBy] = useState(editData?.administered_by || '');
+    const [nextDueDate, setNextDueDate] = useState(
+        editData?.next_due_date ? format(parseUTCTime(editData.next_due_date), 'yyyy-MM-dd') : ''
+    );
+    const [notes, setNotes] = useState(editData?.notes || '');
     const [saving, setSaving] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            await api.createVaccination({
+            const data = {
                 baby_id: babyId,
                 vaccine_name: vaccineName,
                 dose_number: doseNumber,
                 given_date: new Date(givenDate).toISOString(),
                 administered_by: administeredBy || null,
+                next_due_date: nextDueDate ? new Date(nextDueDate).toISOString() : null,
                 notes: notes || null,
-            });
+            };
+
+            if (editData) {
+                await api.updateVaccination(editData.id, data);
+                toast.success('Vaccination updated');
+            } else {
+                await api.createVaccination(data);
+                toast.success('Vaccination logged');
+            }
             onSave();
         } catch (error) {
             toast.error('Failed to save');
@@ -596,7 +718,7 @@ function VaccModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> Log Vaccination</h2>
+                    <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Vaccination</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -620,6 +742,10 @@ function VaccModal({ babyId, onClose, onSave }) {
                             <input type="text" className="form-input" value={administeredBy} onChange={e => setAdministeredBy(e.target.value)} placeholder="Doctor/Clinic name" />
                         </div>
                         <div className="form-group">
+                            <label className="form-label">Next Due Date</label>
+                            <input type="date" className="form-input" value={nextDueDate} onChange={e => setNextDueDate(e.target.value)} />
+                        </div>
+                        <div className="form-group">
                             <label className="form-label">Notes</label>
                             <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional" />
                         </div>
@@ -634,27 +760,37 @@ function VaccModal({ babyId, onClose, onSave }) {
     );
 }
 
-function MedModal({ babyId, onClose, onSave }) {
-    const [medicationName, setMedicationName] = useState('');
-    const [dosage, setDosage] = useState('');
-    const [frequency, setFrequency] = useState('');
-    const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
-    const [notes, setNotes] = useState('');
+function MedModal({ babyId, editData, onClose, onSave }) {
+    const [medicationName, setMedicationName] = useState(editData?.medication_name || '');
+    const [dosage, setDosage] = useState(editData?.dosage || '');
+    const [frequency, setFrequency] = useState(editData?.frequency || '');
+    const [startDate, setStartDate] = useState(
+        editData ? format(parseUTCTime(editData.start_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
+    );
+    const [notes, setNotes] = useState(editData?.notes || '');
     const [saving, setSaving] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            await api.createMedication({
+            const data = {
                 baby_id: babyId,
                 medication_name: medicationName,
                 dosage: dosage || null,
                 frequency: frequency || null,
                 start_date: new Date(startDate).toISOString(),
-                is_active: true,
+                is_active: editData ? editData.is_active : true,
                 notes: notes || null,
-            });
+            };
+
+            if (editData) {
+                await api.updateMedication(editData.id, data);
+                toast.success('Medication updated');
+            } else {
+                await api.createMedication(data);
+                toast.success('Medication added');
+            }
             onSave();
         } catch (error) {
             toast.error('Failed to save');
@@ -667,7 +803,7 @@ function MedModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> Add Medication</h2>
+                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Add'} Medication</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -705,23 +841,36 @@ function MedModal({ babyId, onClose, onSave }) {
     );
 }
 
-function MilestoneModal({ babyId, onClose, onSave }) {
-    const [milestoneType, setMilestoneType] = useState('');
-    const [customType, setCustomType] = useState('');
-    const [achievedDate, setAchievedDate] = useState(new Date().toISOString().slice(0, 10));
-    const [notes, setNotes] = useState('');
+function MilestoneModal({ babyId, editData, onClose, onSave }) {
+    const isCustomMilestone = editData && !MILESTONE_OPTIONS.includes(editData.milestone_type);
+    const [milestoneType, setMilestoneType] = useState(
+        editData ? (isCustomMilestone ? 'Other' : editData.milestone_type) : ''
+    );
+    const [customType, setCustomType] = useState(isCustomMilestone ? editData.milestone_type : '');
+    const [achievedDate, setAchievedDate] = useState(
+        editData ? format(parseUTCTime(editData.achieved_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
+    );
+    const [notes, setNotes] = useState(editData?.notes || '');
     const [saving, setSaving] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            await api.createMilestone({
+            const data = {
                 baby_id: babyId,
                 milestone_type: milestoneType === 'Other' ? customType : milestoneType,
                 achieved_date: new Date(achievedDate).toISOString(),
                 notes: notes || null,
-            });
+            };
+
+            if (editData) {
+                await api.updateMilestone(editData.id, data);
+                toast.success('Milestone updated');
+            } else {
+                await api.createMilestone(data);
+                toast.success('Milestone logged');
+            }
             onSave();
         } catch (error) {
             toast.error('Failed to save');
@@ -734,7 +883,7 @@ function MilestoneModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Star size={20} style={{ marginRight: '8px' }} /> Log Milestone</h2>
+                    <h2 className="modal-title"><Star size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Milestone</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -773,26 +922,36 @@ function MilestoneModal({ babyId, onClose, onSave }) {
     );
 }
 
-function GrowthModal({ babyId, onClose, onSave }) {
-    const [recordedDate, setRecordedDate] = useState(new Date().toISOString().slice(0, 10));
-    const [weight, setWeight] = useState('');
-    const [height, setHeight] = useState('');
-    const [head, setHead] = useState('');
-    const [notes, setNotes] = useState('');
+function GrowthModal({ babyId, editData, onClose, onSave }) {
+    const [recordedDate, setRecordedDate] = useState(
+        editData ? format(parseUTCTime(editData.recorded_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
+    );
+    const [weight, setWeight] = useState(editData?.weight_kg?.toString() || '');
+    const [height, setHeight] = useState(editData?.height_cm?.toString() || '');
+    const [head, setHead] = useState(editData?.head_cm?.toString() || '');
+    const [notes, setNotes] = useState(editData?.notes || '');
     const [saving, setSaving] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            await api.createGrowthRecord({
+            const data = {
                 baby_id: babyId,
                 recorded_date: new Date(recordedDate).toISOString(),
                 weight_kg: weight ? parseFloat(weight) : null,
                 height_cm: height ? parseFloat(height) : null,
                 head_cm: head ? parseFloat(head) : null,
                 notes: notes || null,
-            });
+            };
+
+            if (editData) {
+                await api.updateGrowthRecord(editData.id, data);
+                toast.success('Growth record updated');
+            } else {
+                await api.createGrowthRecord(data);
+                toast.success('Growth record logged');
+            }
             onSave();
         } catch (error) {
             toast.error('Failed to save');
@@ -805,7 +964,7 @@ function GrowthModal({ babyId, onClose, onSave }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> Log Growth</h2>
+                    <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Growth</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>

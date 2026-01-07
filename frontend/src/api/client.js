@@ -450,6 +450,13 @@ class ApiClient {
         return this.request(`/health/doctor-visits/${id}`, { method: 'DELETE' });
     }
 
+    async updateDoctorVisit(id, data) {
+        return this.request(`/health/doctor-visits/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
     // Health - Vaccinations
     async getVaccinations(babyId) {
         try {
@@ -472,6 +479,13 @@ class ApiClient {
 
     async deleteVaccination(id) {
         return this.request(`/health/vaccinations/${id}`, { method: 'DELETE' });
+    }
+
+    async updateVaccination(id, data) {
+        return this.request(`/health/vaccinations/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
     }
 
     // Health - Medications
@@ -498,6 +512,17 @@ class ApiClient {
         return this.request(`/health/medications/${id}`, { method: 'DELETE' });
     }
 
+    async updateMedication(id, data) {
+        return this.request(`/health/medications/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async toggleMedicationActive(id) {
+        return this.request(`/health/medications/${id}/toggle`, { method: 'PATCH' });
+    }
+
     // Health - Milestones
     async getMilestones(babyId) {
         try {
@@ -522,6 +547,13 @@ class ApiClient {
         return this.request(`/health/milestones/${id}`, { method: 'DELETE' });
     }
 
+    async updateMilestone(id, data) {
+        return this.request(`/health/milestones/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
     // Health - Growth
     async getGrowthRecords(babyId) {
         try {
@@ -544,6 +576,13 @@ class ApiClient {
 
     async deleteGrowthRecord(id) {
         return this.request(`/health/growth/${id}`, { method: 'DELETE' });
+    }
+
+    async updateGrowthRecord(id, data) {
+        return this.request(`/health/growth/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
     }
 
     // Activities - Potty
