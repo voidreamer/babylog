@@ -1,5 +1,20 @@
 const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://a4h1jfeguj.execute-api.ca-central-1.amazonaws.com' : '');
 
+import {
+    isOnline,
+    getCachedBabies,
+    getCachedFeedings,
+    getCachedSleeps,
+    getCachedDiapers,
+    getCachedPumpings,
+    cacheBabies,
+    cacheFeedings,
+    cacheSleeps,
+    cacheDiapers,
+    cachePumpings,
+    queueForSync
+} from './utils/offlineStorage.js';
+
 class ApiClient {
     constructor() {
         this.token = localStorage.getItem('auth_token');
@@ -86,7 +101,21 @@ class ApiClient {
 
     // Babies
     async getBabies() {
-        return this.request('/babies/');
+        try {
+            const babies = await this.request('/babies/');
+            // Cache when successfully fetched
+            if (babies) {
+                await cacheBabies(babies);
+            }
+            return babies;
+        } catch (error) {
+            // If offline, return cached data
+            if (!isOnline()) {
+                console.log('Offline: returning cached babies');
+                return await getCachedBabies();
+            }
+            throw error;
+        }
     }
 
     async getBaby(id) {
@@ -128,14 +157,41 @@ class ApiClient {
 
     // Feedings
     async getFeedings(babyId, limit = 50) {
-        return this.request(`/feedings/?baby_id=${babyId}&limit=${limit}`);
+        try {
+            const feedings = await this.request(`/feedings/?baby_id=${babyId}&limit=${limit}`);
+            if (feedings) {
+                await cacheFeedings(babyId, feedings);
+            }
+            return feedings;
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning cached feedings');
+                return await getCachedFeedings(babyId);
+            }
+            throw error;
+        }
     }
 
     async createFeeding(data) {
-        return this.request('/feedings/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+        try {
+            return await this.request('/feedings/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+        } catch (error) {
+            if (!isOnline()) {
+                // Queue for sync when back online
+                await queueForSync({
+                    type: 'CREATE_FEEDING',
+                    endpoint: '/feedings/',
+                    method: 'POST',
+                    data
+                });
+                // Return optimistic response
+                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            }
+            throw error;
+        }
     }
 
     async deleteFeeding(id) {
@@ -153,14 +209,39 @@ class ApiClient {
 
     // Diapers
     async getDiapers(babyId, limit = 50) {
-        return this.request(`/diapers/?baby_id=${babyId}&limit=${limit}`);
+        try {
+            const diapers = await this.request(`/diapers/?baby_id=${babyId}&limit=${limit}`);
+            if (diapers) {
+                await cacheDiapers(babyId, diapers);
+            }
+            return diapers;
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning cached diapers');
+                return await getCachedDiapers(babyId);
+            }
+            throw error;
+        }
     }
 
     async createDiaper(data) {
-        return this.request('/diapers/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+        try {
+            return await this.request('/diapers/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+        } catch (error) {
+            if (!isOnline()) {
+                await queueForSync({
+                    type: 'CREATE_DIAPER',
+                    endpoint: '/diapers/',
+                    method: 'POST',
+                    data
+                });
+                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            }
+            throw error;
+        }
     }
 
     async deleteDiaper(id) {
@@ -178,7 +259,19 @@ class ApiClient {
 
     // Sleeps
     async getSleeps(babyId, limit = 50) {
-        return this.request(`/sleeps/?baby_id=${babyId}&limit=${limit}`);
+        try {
+            const sleeps = await this.request(`/sleeps/?baby_id=${babyId}&limit=${limit}`);
+            if (sleeps) {
+                await cacheSleeps(babyId, sleeps);
+            }
+            return sleeps;
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning cached sleeps');
+                return await getCachedSleeps(babyId);
+            }
+            throw error;
+        }
     }
 
     async getCurrentSleep(babyId) {
@@ -186,10 +279,23 @@ class ApiClient {
     }
 
     async createSleep(data) {
-        return this.request('/sleeps/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+        try {
+            return await this.request('/sleeps/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+        } catch (error) {
+            if (!isOnline()) {
+                await queueForSync({
+                    type: 'CREATE_SLEEP',
+                    endpoint: '/sleeps/',
+                    method: 'POST',
+                    data
+                });
+                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            }
+            throw error;
+        }
     }
 
     async endSleep(id) {
@@ -213,14 +319,39 @@ class ApiClient {
 
     // Pumpings
     async getPumpings(babyId, limit = 50) {
-        return this.request(`/pumpings/?baby_id=${babyId}&limit=${limit}`);
+        try {
+            const pumpings = await this.request(`/pumpings/?baby_id=${babyId}&limit=${limit}`);
+            if (pumpings) {
+                await cachePumpings(babyId, pumpings);
+            }
+            return pumpings;
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning cached pumpings');
+                return await getCachedPumpings(babyId);
+            }
+            throw error;
+        }
     }
 
     async createPumping(data) {
-        return this.request('/pumpings/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+        try {
+            return await this.request('/pumpings/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+        } catch (error) {
+            if (!isOnline()) {
+                await queueForSync({
+                    type: 'CREATE_PUMPING',
+                    endpoint: '/pumpings/',
+                    method: 'POST',
+                    data
+                });
+                return { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            }
+            throw error;
+        }
     }
 
     async deletePumping(id) {
@@ -241,19 +372,56 @@ class ApiClient {
         const params = new URLSearchParams({ baby_id: babyId });
         if (date) params.append('date', date);
         if (tzOffset !== null) params.append('tz_offset', tzOffset);
-        return this.request(`/events/timeline?${params}`);
+
+        try {
+            return await this.request(`/events/timeline?${params}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: timeline not available, returning empty array');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async getDashboard(babyId, localDate = null, tzOffset = null) {
         const params = new URLSearchParams({ baby_id: babyId });
         if (localDate) params.append('local_date', localDate);
         if (tzOffset !== null) params.append('tz_offset', tzOffset);
-        return this.request(`/events/dashboard?${params}`);
+
+        try {
+            return await this.request(`/events/dashboard?${params}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: dashboard not available, returning empty data');
+                return {
+                    last_feeding: null,
+                    last_diaper: null,
+                    last_sleep: null,
+                    current_sleep: null,
+                    last_pumping: null,
+                    daily_summary: {
+                        feedings_count: 0,
+                        diapers_count: 0,
+                        sleep_duration_hours: 0
+                    }
+                };
+            }
+            throw error;
+        }
     }
 
     // Health - Doctor Visits
     async getDoctorVisits(babyId) {
-        return this.request(`/health/doctor-visits/?baby_id=${babyId}`);
+        try {
+            return await this.request(`/health/doctor-visits/?baby_id=${babyId}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty doctor visits');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createDoctorVisit(data) {
@@ -269,7 +437,15 @@ class ApiClient {
 
     // Health - Vaccinations
     async getVaccinations(babyId) {
-        return this.request(`/health/vaccinations/?baby_id=${babyId}`);
+        try {
+            return await this.request(`/health/vaccinations/?baby_id=${babyId}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty vaccinations');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createVaccination(data) {
@@ -285,7 +461,15 @@ class ApiClient {
 
     // Health - Medications
     async getMedications(babyId, activeOnly = false) {
-        return this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`);
+        try {
+            return await this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty medications');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createMedication(data) {
@@ -301,7 +485,15 @@ class ApiClient {
 
     // Health - Milestones
     async getMilestones(babyId) {
-        return this.request(`/health/milestones/?baby_id=${babyId}`);
+        try {
+            return await this.request(`/health/milestones/?baby_id=${babyId}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty milestones');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createMilestone(data) {
@@ -317,7 +509,15 @@ class ApiClient {
 
     // Health - Growth
     async getGrowthRecords(babyId) {
-        return this.request(`/health/growth/?baby_id=${babyId}`);
+        try {
+            return await this.request(`/health/growth/?baby_id=${babyId}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty growth records');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createGrowthRecord(data) {
@@ -333,7 +533,15 @@ class ApiClient {
 
     // Activities - Potty
     async getPottyLogs(babyId, limit = 50) {
-        return this.request(`/activities/potty?baby_id=${babyId}&limit=${limit}`);
+        try {
+            return await this.request(`/activities/potty?baby_id=${babyId}&limit=${limit}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty potty logs');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createPottyLog(data) {
@@ -356,7 +564,15 @@ class ApiClient {
 
     // Activities - Tummy Time
     async getTummyTimes(babyId, limit = 50) {
-        return this.request(`/activities/tummy-time?baby_id=${babyId}&limit=${limit}`);
+        try {
+            return await this.request(`/activities/tummy-time?baby_id=${babyId}&limit=${limit}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty tummy times');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createTummyTime(data) {
@@ -379,7 +595,15 @@ class ApiClient {
 
     // Activities - Bath
     async getBaths(babyId, limit = 50) {
-        return this.request(`/activities/baths?baby_id=${babyId}&limit=${limit}`);
+        try {
+            return await this.request(`/activities/baths?baby_id=${babyId}&limit=${limit}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty baths');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createBath(data) {
@@ -403,7 +627,19 @@ class ApiClient {
     // Analytics
     async getAnalytics(babyId, days = 7) {
         const tzOffset = new Date().getTimezoneOffset();
-        return this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`);
+        try {
+            return await this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: analytics not available, returning empty data');
+                return {
+                    feeding: { total: 0, avg_per_day: 0 },
+                    diaper: { total: 0, avg_per_day: 0 },
+                    sleep: { total_hours: 0, avg_per_day: 0 }
+                };
+            }
+            throw error;
+        }
     }
 
     // Subscription
@@ -415,12 +651,28 @@ class ApiClient {
     }
 
     async getSubscriptionStatus() {
-        return this.request('/subscription/status');
+        try {
+            return await this.request('/subscription/status');
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: subscription status not available');
+                return { premium: false };
+            }
+            throw error;
+        }
     }
 
     // Activities - Supplements
     async getSupplements(babyId, limit = 50) {
-        return this.request(`/activities/supplements?baby_id=${babyId}&limit=${limit}`);
+        try {
+            return await this.request(`/activities/supplements?baby_id=${babyId}&limit=${limit}`);
+        } catch (error) {
+            if (!isOnline()) {
+                console.log('Offline: returning empty supplements');
+                return [];
+            }
+            throw error;
+        }
     }
 
     async createSupplement(data) {
