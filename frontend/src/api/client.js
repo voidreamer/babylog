@@ -13,7 +13,7 @@ import {
     cacheDiapers,
     cachePumpings,
     queueForSync
-} from './utils/offlineStorage.js';
+} from '../utils/offlineStorage.js';
 
 class ApiClient {
     constructor() {
