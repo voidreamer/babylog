@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-    TrendingUp, Clock, Moon, Baby, Droplets,
+    TrendingUp, TrendingDown, Clock, Moon, Baby, Droplets,
     AlertCircle, CheckCircle2, Sparkles, Lock,
-    ChevronRight, Calendar
+    ChevronRight, Calendar, Minus, Activity
 } from 'lucide-react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
@@ -77,6 +77,29 @@ export default function BabyInsights({ isPremium = false }) {
         return 'good';
     };
 
+    // Get color for sleep pressure score
+    const getPressureColor = (score) => {
+        if (score < 30) return 'var(--success)';
+        if (score < 70) return 'var(--feeding)';
+        return 'var(--danger)';
+    };
+
+    // Get trend icon component
+    const TrendIcon = ({ trend }) => {
+        if (trend === 'improving') return <TrendingUp size={16} className="trend-icon trend-up" />;
+        if (trend === 'declining') return <TrendingDown size={16} className="trend-icon trend-down" />;
+        return <Minus size={16} className="trend-icon trend-stable" />;
+    };
+
+    // Format nap prediction based on status
+    const formatNapPrediction = (prediction) => {
+        if (!prediction) return null;
+        if (prediction.status === 'sleeping') {
+            return { text: 'Sleeping now', isSleeping: true };
+        }
+        return formatPrediction(prediction);
+    };
+
     if (!selectedBaby) {
         return (
             <div className="insights-empty">
@@ -126,7 +149,7 @@ export default function BabyInsights({ isPremium = false }) {
         );
     }
 
-    const { patterns, predictions, benchmarks, today_vs_average } = analytics;
+    const { patterns, predictions, benchmarks, today_vs_average, trends } = analytics;
 
     return (
         <div className="insights-container">
@@ -153,6 +176,14 @@ export default function BabyInsights({ isPremium = false }) {
                                 <span className="insight-card-value">
                                     {formatPrediction(predictions.next_feeding)?.text}
                                 </span>
+                                {predictions.next_feeding.confidence && (
+                                    <span className="prediction-confidence">
+                                        ± {predictions.next_feeding.confidence.range_minutes} min
+                                        <span className="confidence-quality">
+                                            {predictions.next_feeding.confidence.quality_label}
+                                        </span>
+                                    </span>
+                                )}
                                 {predictions.next_feeding.past_due && (
                                     <span className="insight-card-alert">May be hungry!</span>
                                 )}
@@ -162,7 +193,7 @@ export default function BabyInsights({ isPremium = false }) {
 
                     {predictions?.next_nap && (
                         <motion.div
-                            className="insight-card prediction-card"
+                            className={`insight-card prediction-card ${predictions.next_nap.status === 'sleeping' ? 'sleeping' : ''}`}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
@@ -173,7 +204,66 @@ export default function BabyInsights({ isPremium = false }) {
                             <div className="insight-card-content">
                                 <span className="insight-card-label">Next Nap</span>
                                 <span className="insight-card-value">
-                                    {formatPrediction(predictions.next_nap)?.text}
+                                    {formatNapPrediction(predictions.next_nap)?.text}
+                                </span>
+                                {predictions.next_nap.status_label && predictions.next_nap.status !== 'sleeping' && (
+                                    <span className={`nap-status nap-status-${predictions.next_nap.status}`}>
+                                        {predictions.next_nap.status_label}
+                                    </span>
+                                )}
+                                {predictions.next_nap.wake_window && (
+                                    <span className="wake-window-info">
+                                        Wake window: {predictions.next_nap.wake_window.min}-{predictions.next_nap.wake_window.max} min
+                                    </span>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Sleep Pressure Gauge */}
+                    {predictions?.sleep_pressure && (
+                        <motion.div
+                            className={`insight-card pressure-card pressure-${predictions.sleep_pressure.zone}`}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <div className="pressure-gauge">
+                                <svg viewBox="0 0 100 100" className="pressure-ring">
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        fill="none"
+                                        stroke="var(--border)"
+                                        strokeWidth="8"
+                                    />
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        fill="none"
+                                        stroke={getPressureColor(predictions.sleep_pressure.score)}
+                                        strokeWidth="8"
+                                        strokeLinecap="round"
+                                        strokeDasharray={`${predictions.sleep_pressure.score * 2.83} 283`}
+                                        transform="rotate(-90 50 50)"
+                                    />
+                                </svg>
+                                <div className="pressure-score">
+                                    {predictions.sleep_pressure.score}
+                                </div>
+                            </div>
+                            <div className="insight-card-content">
+                                <span className="insight-card-label">Sleep Pressure</span>
+                                <span className="insight-card-value">
+                                    {predictions.sleep_pressure.label}
+                                </span>
+                                <span className="pressure-detail">
+                                    {predictions.sleep_pressure.minutes_awake} min awake
+                                </span>
+                                <span className="pressure-recommendation">
+                                    {predictions.sleep_pressure.recommendation}
                                 </span>
                             </div>
                         </motion.div>
@@ -230,6 +320,48 @@ export default function BabyInsights({ isPremium = false }) {
                     </div>
                 )}
             </section>
+
+            {/* Trends Section - Premium */}
+            {trends && (trends.sleep?.trend !== 'insufficient_data' || trends.feeding?.trend !== 'insufficient_data') && (
+                <section className="insights-section">
+                    <h2 className="insights-section-title">
+                        <Activity size={18} />
+                        <span>14-Day Trends</span>
+                        {!isPremium && <Lock size={14} className="premium-lock" />}
+                    </h2>
+
+                    <div className={`insights-trends ${!isPremium ? 'premium-blur' : ''}`}>
+                        {trends.sleep && trends.sleep.trend !== 'insufficient_data' && (
+                            <div className={`trend-item trend-${trends.sleep.trend}`}>
+                                <TrendIcon trend={trends.sleep.trend} />
+                                <div className="trend-content">
+                                    <span className="trend-label">Sleep</span>
+                                    <span className="trend-value">{trends.sleep.trend_label}</span>
+                                </div>
+                                <span className="trend-description">{trends.sleep.description}</span>
+                            </div>
+                        )}
+
+                        {trends.feeding && trends.feeding.trend !== 'insufficient_data' && (
+                            <div className={`trend-item trend-${trends.feeding.trend}`}>
+                                <TrendIcon trend={trends.feeding.trend} />
+                                <div className="trend-content">
+                                    <span className="trend-label">Feeding</span>
+                                    <span className="trend-value">{trends.feeding.trend_label}</span>
+                                </div>
+                                <span className="trend-description">{trends.feeding.description}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {!isPremium && (
+                        <div className="premium-overlay">
+                            <Lock size={20} />
+                            <span>Upgrade to see trends</span>
+                        </div>
+                    )}
+                </section>
+            )}
 
             {/* Benchmarks Section - Free */}
             <section className="insights-section">

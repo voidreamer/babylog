@@ -93,6 +93,42 @@ def get_sleep_benchmarks(age_weeks: int) -> dict:
 
 
 # =============================================================================
+# Wake Window Benchmarks by Age (for nap predictions)
+# =============================================================================
+# Wake windows = optimal awake time between sleeps
+# Based on pediatric sleep research and sleep consultant guidelines
+WAKE_WINDOW_BENCHMARKS = {
+    # age_weeks_max: (min_wake_minutes, optimal_wake_minutes, max_wake_minutes)
+    2: {"min": 45, "optimal": 60, "max": 75, "notes": "Newborn - very short wake windows"},
+    4: {"min": 60, "optimal": 75, "max": 90, "notes": "1 month - still sleepy"},
+    8: {"min": 75, "optimal": 90, "max": 120, "notes": "2 months - slightly longer"},
+    12: {"min": 90, "optimal": 105, "max": 135, "notes": "3 months - more alert periods"},
+    16: {"min": 105, "optimal": 120, "max": 150, "notes": "4 months - sleep regression common"},
+    20: {"min": 120, "optimal": 150, "max": 180, "notes": "5 months - consolidating naps"},
+    26: {"min": 150, "optimal": 180, "max": 210, "notes": "6 months - 2-3 naps typical"},
+    36: {"min": 180, "optimal": 210, "max": 240, "notes": "8-9 months - transitioning to 2 naps"},
+    44: {"min": 210, "optimal": 240, "max": 270, "notes": "10-11 months - 2 naps"},
+    52: {"min": 210, "optimal": 270, "max": 330, "notes": "12 months - 1-2 naps"},
+    78: {"min": 300, "optimal": 330, "max": 390, "notes": "18 months - transitioning to 1 nap"},
+    104: {"min": 330, "optimal": 360, "max": 420, "notes": "2 years - 1 nap or none"},
+    999: {"min": 360, "optimal": 420, "max": 480, "notes": "Toddler - may drop nap"},
+}
+
+
+def get_wake_window_benchmarks(age_weeks: int) -> dict:
+    """Get expected wake window for baby's age in minutes."""
+    for max_weeks, benchmarks in sorted(WAKE_WINDOW_BENCHMARKS.items()):
+        if age_weeks <= max_weeks:
+            return {
+                "min_minutes": benchmarks["min"],
+                "optimal_minutes": benchmarks["optimal"],
+                "max_minutes": benchmarks["max"],
+                "notes": benchmarks["notes"],
+            }
+    return get_wake_window_benchmarks(999)
+
+
+# =============================================================================
 # Feeding Benchmarks by Age
 # =============================================================================
 FEEDING_BENCHMARKS = {

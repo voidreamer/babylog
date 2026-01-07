@@ -19,6 +19,14 @@ from ..database import get_db
 from ..auth import get_current_user, get_user_email
 from ..models import Baby, Feeding, Sleep, Diaper
 from ..benchmarks import get_all_benchmarks, calculate_age_weeks
+from ..predictions import (
+    predict_next_nap_wake_window,
+    calculate_confidence_interval,
+    calculate_sleep_pressure,
+    detect_trend,
+    calculate_daily_totals,
+    calculate_intervals_hours,
+)
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 logger = logging.getLogger(__name__)
@@ -207,15 +215,69 @@ async def get_baby_analytics(
         avg_nap_duration = round(sum(nap_durations) / len(nap_durations)) if nap_durations else None
         
         # ==========================================================================
-        # Calculate predictions
+        # Calculate predictions (enhanced with new features)
         # ==========================================================================
-        
+
+        # Get baby's age for wake window calculations
+        age_weeks = 0
+        if birth_date:
+            age_weeks = calculate_age_weeks(birth_date)
+
+        # Feeding prediction with confidence intervals
         next_feeding = predict_next_event(feeding_times, avg_feeding_interval)
-        
-        # Next nap prediction
-        sleep_start_times = [s.start_time for s in sleeps]
-        avg_sleep_interval = calculate_average_interval(sleep_start_times)
-        next_nap = predict_next_event(sleep_start_times, avg_sleep_interval)
+        feeding_intervals = calculate_intervals_hours(feeding_times)
+        feeding_confidence = calculate_confidence_interval(feeding_intervals)
+        if next_feeding and feeding_confidence:
+            next_feeding["confidence"] = feeding_confidence
+
+        # Next nap prediction using wake windows (replaces naive interval approach)
+        # Find the most recent wake time (end of last sleep)
+        last_wake_time = None
+        if wake_times:
+            last_wake_time = max(make_aware(wt) for wt in wake_times)
+
+        # Check if baby is currently sleeping (active sleep session)
+        active_sleep = db.query(Sleep).filter(
+            Sleep.baby_id == baby_id,
+            Sleep.end_time.is_(None)
+        ).first()
+
+        if active_sleep:
+            # Baby is sleeping - no nap prediction needed
+            next_nap = {
+                "status": "sleeping",
+                "status_label": "Currently sleeping",
+                "started_at": make_aware(active_sleep.start_time).isoformat(),
+            }
+            sleep_pressure = None
+        else:
+            # Use wake window-based prediction
+            next_nap = predict_next_nap_wake_window(last_wake_time, age_weeks, now)
+
+            # Calculate sleep pressure (tiredness score)
+            sleep_pressure = calculate_sleep_pressure(last_wake_time, age_weeks, now)
+
+        # ==========================================================================
+        # Trend detection (7-14 day patterns)
+        # ==========================================================================
+
+        # Calculate daily sleep totals for trend analysis
+        sleep_daily_totals = calculate_daily_totals(
+            sleeps,
+            get_value=lambda s: (s.duration_minutes or 0) / 60,  # Convert to hours
+            get_date=lambda s: make_aware(s.start_time).date(),
+            days=14
+        )
+        sleep_trend = detect_trend(sleep_daily_totals, metric_name="sleep")
+
+        # Calculate daily feeding counts for trend
+        feeding_daily_counts = calculate_daily_totals(
+            feedings,
+            get_value=lambda f: 1,  # Count each feeding
+            get_date=lambda f: make_aware(f.time).date(),
+            days=14
+        )
+        feeding_trend = detect_trend(feeding_daily_counts, metric_name="feeding")
         
         # ==========================================================================
         # Get benchmarks
@@ -273,8 +335,14 @@ async def get_baby_analytics(
             "predictions": {
                 "next_feeding": next_feeding,
                 "next_nap": next_nap,
+                "sleep_pressure": sleep_pressure,
             } if has_enough_data else None,
-            
+
+            "trends": {
+                "sleep": sleep_trend,
+                "feeding": feeding_trend,
+            },
+
             "benchmarks": benchmarks,
             
             "today_vs_average": {

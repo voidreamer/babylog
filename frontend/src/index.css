@@ -4000,6 +4000,177 @@ h4 {
   color: var(--text);
 }
 
+/* Sleep Pressure Card */
+.pressure-card {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.pressure-gauge {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.pressure-ring {
+  width: 100%;
+  height: 100%;
+}
+
+.pressure-score {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pressure-card.pressure-green .pressure-score { color: var(--success); }
+.pressure-card.pressure-yellow .pressure-score { color: var(--feeding); }
+.pressure-card.pressure-orange .pressure-score { color: var(--pumping); }
+.pressure-card.pressure-red .pressure-score { color: var(--danger); }
+
+.pressure-detail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pressure-recommendation {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* Prediction Confidence */
+.prediction-confidence {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.confidence-quality {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+/* Nap Status Badges */
+.nap-status {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.nap-status-too_early {
+  background: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+.nap-status-approaching {
+  background: rgba(234, 179, 8, 0.15);
+  color: var(--tummy);
+}
+
+.nap-status-optimal {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--success);
+}
+
+.nap-status-overtired {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--danger);
+}
+
+.wake-window-info {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.insight-card.sleeping {
+  background: linear-gradient(135deg, var(--sleep-bg) 0%, var(--surface) 100%);
+  border-color: var(--sleep);
+}
+
+/* Trends Section */
+.insights-trends {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.trend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+}
+
+.trend-item.trend-improving {
+  border-left-color: var(--success);
+}
+
+.trend-item.trend-stable {
+  border-left-color: var(--text-secondary);
+}
+
+.trend-item.trend-declining {
+  border-left-color: var(--danger);
+}
+
+.trend-icon {
+  flex-shrink: 0;
+}
+
+.trend-icon.trend-up {
+  color: var(--success);
+}
+
+.trend-icon.trend-stable {
+  color: var(--text-secondary);
+}
+
+.trend-icon.trend-down {
+  color: var(--danger);
+}
+
+.trend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 80px;
+}
+
+.trend-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.trend-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.trend-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
 /* Benchmarks Section */
 .insights-benchmarks {
   display: flex;
