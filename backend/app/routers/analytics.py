@@ -218,7 +218,12 @@ async def get_baby_analytics(
         # Calculate predictions (enhanced with new features)
         # ==========================================================================
 
-        # Get baby's age for wake window calculations
+        # Get baby's birth date and age for calculations
+        birth_date = None
+        if baby.birth_date:
+            bd = make_aware(baby.birth_date)
+            birth_date = bd.date() if hasattr(bd, 'date') else bd
+
         age_weeks = 0
         if birth_date:
             age_weeks = calculate_age_weeks(birth_date)
@@ -282,11 +287,7 @@ async def get_baby_analytics(
         # ==========================================================================
         # Get benchmarks
         # ==========================================================================
-        
-        birth_date = None
-        if baby.birth_date:
-            bd = make_aware(baby.birth_date)
-            birth_date = bd.date() if hasattr(bd, 'date') else bd
+
         benchmarks = get_all_benchmarks(birth_date)
         
         # ==========================================================================
