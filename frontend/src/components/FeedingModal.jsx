@@ -14,8 +14,15 @@ const parseUTCTime = (timeStr) => {
 export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
     const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
-    const [feedMethod, setFeedMethod] = useState('breast'); // 'breast' or 'bottle'
-    const [bottleType, setBottleType] = useState('breastmilk'); // 'breastmilk' or 'formula'
+
+    // Remember last-used feeding preferences
+    const [feedMethod, setFeedMethod] = useState(() => {
+        return localStorage.getItem('lastFeedMethod') || 'breast';
+    });
+    const [bottleType, setBottleType] = useState(() => {
+        return localStorage.getItem('lastBottleType') || 'breastmilk';
+    });
+
     const [time, setTime] = useState(new Date());
     const [duration, setDuration] = useState('');
     const [amount, setAmount] = useState('');
@@ -27,6 +34,17 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const intervalRef = useRef(null);
+
+    // Save preferences when they change
+    const handleFeedMethodChange = (method) => {
+        setFeedMethod(method);
+        localStorage.setItem('lastFeedMethod', method);
+    };
+
+    const handleBottleTypeChange = (type) => {
+        setBottleType(type);
+        localStorage.setItem('lastBottleType', type);
+    };
 
     // Initialize from editEvent when editing
     useEffect(() => {
@@ -177,14 +195,14 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                             <button
                                 type="button"
                                 className={`type-btn ${feedMethod === 'breast' ? 'active' : ''}`}
-                                onClick={() => setFeedMethod('breast')}
+                                onClick={() => handleFeedMethodChange('breast')}
                             >
                                 <User size={16} /> Breast
                             </button>
                             <button
                                 type="button"
                                 className={`type-btn ${feedMethod === 'bottle' ? 'active' : ''}`}
-                                onClick={() => setFeedMethod('bottle')}
+                                onClick={() => handleFeedMethodChange('bottle')}
                             >
                                 <Baby size={16} /> Bottle
                             </button>
@@ -199,16 +217,16 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                                 <button
                                     type="button"
                                     className={`type-btn ${bottleType === 'breastmilk' ? 'active' : ''}`}
-                                    onClick={() => setBottleType('breastmilk')}
+                                    onClick={() => handleBottleTypeChange('breastmilk')}
                                 >
-                                    🥛 Breast Milk
+                                    Breast Milk
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${bottleType === 'formula' ? 'active' : ''}`}
-                                    onClick={() => setBottleType('formula')}
+                                    onClick={() => handleBottleTypeChange('formula')}
                                 >
-                                    🍶 Formula
+                                    Formula
                                 </button>
                             </div>
                         </div>

@@ -264,6 +264,47 @@ export async function addCachedPumping(pumping) {
 }
 
 /**
+ * Cache activities for a baby (tummy time, bath, supplements)
+ */
+export async function cacheActivities(babyId, activityType, activities) {
+    const db = await getDB();
+    const tx = db.transaction(STORES.ACTIVITIES, 'readwrite');
+    const store = tx.objectStore(STORES.ACTIVITIES);
+
+    // Delete old activities of this type for this baby
+    const allActivities = await store.getAll();
+    for (const activity of allActivities) {
+        if (activity.baby_id === babyId && activity.activity_type === activityType) {
+            await store.delete(activity.id);
+        }
+    }
+
+    // Add new activities
+    for (const activity of activities) {
+        await store.put({ ...activity, baby_id: babyId, activity_type: activityType });
+    }
+
+    await tx.done;
+}
+
+/**
+ * Get cached activities for a baby by type
+ */
+export async function getCachedActivities(babyId, activityType) {
+    const db = await getDB();
+    const allActivities = await db.getAll(STORES.ACTIVITIES);
+    return allActivities.filter(a => a.baby_id === babyId && a.activity_type === activityType);
+}
+
+/**
+ * Add a single activity to the cache (for optimistic updates)
+ */
+export async function addCachedActivity(activity, activityType) {
+    const db = await getDB();
+    await db.put(STORES.ACTIVITIES, { ...activity, activity_type: activityType });
+}
+
+/**
  * Queue an action to sync when online
  */
 export async function queueForSync(action) {
@@ -366,6 +407,9 @@ export default {
     cachePumpings,
     getCachedPumpings,
     addCachedPumping,
+    cacheActivities,
+    getCachedActivities,
+    addCachedActivity,
     queueForSync,
     getPendingSyncActions,
     removeSyncAction,
