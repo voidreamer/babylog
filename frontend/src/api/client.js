@@ -406,6 +406,18 @@ class ApiClient {
         return this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`);
     }
 
+    // Subscription
+    async redeemPromoCode(code) {
+        return this.request('/subscription/redeem', {
+            method: 'POST',
+            body: JSON.stringify({ code }),
+        });
+    }
+
+    async getSubscriptionStatus() {
+        return this.request('/subscription/status');
+    }
+
     // Activities - Supplements
     async getSupplements(babyId, limit = 50) {
         return this.request(`/activities/supplements?baby_id=${babyId}&limit=${limit}`);

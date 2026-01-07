@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
+import { api } from './api/client';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
@@ -39,20 +40,34 @@ function MainApp() {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [promoCode, setPromoCode] = useState('');
+    const [promoLoading, setPromoLoading] = useState(false);
 
     // Premium state
     const [isPremium, setIsPremium] = useState(() => {
         return localStorage.getItem('isPremium') === 'true';
     });
 
-    const handlePromoCode = () => {
-        if (promoCode.toUpperCase() === 'SIMPLEBABY2026') {
-            setIsPremium(true);
-            localStorage.setItem('isPremium', 'true');
-            setPromoCode('');
-            alert('Premium unlocked! Enjoy all features.');
-        } else {
-            alert('Invalid code');
+    const handlePromoCode = async () => {
+        if (!promoCode.trim()) {
+            alert('Please enter a promo code');
+            return;
+        }
+
+        setPromoLoading(true);
+        try {
+            const result = await api.redeemPromoCode(promoCode);
+            if (result.valid && result.premium) {
+                setIsPremium(true);
+                localStorage.setItem('isPremium', 'true');
+                setPromoCode('');
+                alert(result.message || 'Premium unlocked!');
+            } else {
+                alert(result.message || 'Invalid code');
+            }
+        } catch (error) {
+            alert('Failed to verify code. Please try again.');
+        } finally {
+            setPromoLoading(false);
         }
     };
 
@@ -154,9 +169,9 @@ function MainApp() {
                             <button
                                 className="btn btn-primary"
                                 onClick={handlePromoCode}
-                                disabled={!promoCode.trim()}
+                                disabled={!promoCode.trim() || promoLoading}
                             >
-                                Apply
+                                {promoLoading ? 'Verifying...' : 'Apply'}
                             </button>
                         </div>
                     </div>
