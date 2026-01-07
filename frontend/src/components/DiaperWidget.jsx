@@ -144,7 +144,7 @@ const sketchyColors = {
     diaper: { stroke: '#059669', bg: '#ecfdf5', text: '#065f46' },
 };
 
-export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpenModal }) {
+export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpenModal, quickActionsEnabled = true }) {
     const [saving, setSaving] = useState(null); // null or 'pee'|'poo'|'mixed'
     const isDarkTheme = useIsDarkTheme();
     const colors = sketchyColors.diaper;
@@ -225,34 +225,38 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                         <div className="widget-time-ago">{timeAgo}</div>
                         <div className="widget-detail">{getLastDiaperType()}</div>
                     </>
+                ) : !quickActionsEnabled ? (
+                    <div className="widget-time-ago">No diapers yet</div>
                 ) : null}
 
                 {/* Quick action buttons */}
-                <div className="diaper-quick-btns">
-                    <button
-                        className="diaper-quick-btn pee"
-                        onClick={(e) => handleQuickLog('pee', e)}
-                        disabled={saving !== null}
-                    >
-                        <Droplets size={14} />
-                        {saving === 'pee' ? '...' : 'Pee'}
-                    </button>
-                    <button
-                        className="diaper-quick-btn poo"
-                        onClick={(e) => handleQuickLog('poo', e)}
-                        disabled={saving !== null}
-                    >
-                        <CircleDot size={14} />
-                        {saving === 'poo' ? '...' : 'Poo'}
-                    </button>
-                    <button
-                        className="diaper-quick-btn mixed"
-                        onClick={(e) => handleQuickLog('mixed', e)}
-                        disabled={saving !== null}
-                    >
-                        {saving === 'mixed' ? '...' : 'Both'}
-                    </button>
-                </div>
+                {quickActionsEnabled && (
+                    <div className="diaper-quick-btns">
+                        <button
+                            className="diaper-quick-btn pee"
+                            onClick={(e) => handleQuickLog('pee', e)}
+                            disabled={saving !== null}
+                        >
+                            <Droplets size={14} />
+                            {saving === 'pee' ? '...' : 'Pee'}
+                        </button>
+                        <button
+                            className="diaper-quick-btn poo"
+                            onClick={(e) => handleQuickLog('poo', e)}
+                            disabled={saving !== null}
+                        >
+                            <CircleDot size={14} />
+                            {saving === 'poo' ? '...' : 'Poo'}
+                        </button>
+                        <button
+                            className="diaper-quick-btn mixed"
+                            onClick={(e) => handleQuickLog('mixed', e)}
+                            disabled={saving !== null}
+                        >
+                            {saving === 'mixed' ? '...' : 'Both'}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

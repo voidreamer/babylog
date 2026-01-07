@@ -70,7 +70,7 @@ const sketchyColors = {
     potty: { stroke: '#7c3aed', bg: '#f5f3ff', text: '#5b21b6' },
 };
 
-export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal }) {
+export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, quickActionsEnabled = true }) {
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(null);
     const isDarkTheme = useIsDarkTheme();
@@ -134,29 +134,33 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal }) {
                         <div className="widget-time-ago">{timeAgo}</div>
                         <div className="widget-detail">{lastPotty.result}</div>
                     </>
+                ) : !quickActionsEnabled ? (
+                    <div className="widget-time-ago">No potty logs yet</div>
                 ) : null}
 
                 {/* Quick action buttons */}
-                <div className="diaper-quick-btns">
-                    <button
-                        className="diaper-quick-btn pee"
-                        onClick={(e) => handleQuickLog('success', e)}
-                        disabled={saving !== null}
-                        style={{ background: '#16a34a' }}
-                    >
-                        <Check size={14} />
-                        {saving === 'success' ? '...' : 'Yes'}
-                    </button>
-                    <button
-                        className="diaper-quick-btn poo"
-                        onClick={(e) => handleQuickLog('attempt', e)}
-                        disabled={saving !== null}
-                        style={{ background: '#6b7280' }}
-                    >
-                        <X size={14} />
-                        {saving === 'attempt' ? '...' : 'Try'}
-                    </button>
-                </div>
+                {quickActionsEnabled && (
+                    <div className="diaper-quick-btns">
+                        <button
+                            className="diaper-quick-btn pee"
+                            onClick={(e) => handleQuickLog('success', e)}
+                            disabled={saving !== null}
+                            style={{ background: '#16a34a' }}
+                        >
+                            <Check size={14} />
+                            {saving === 'success' ? '...' : 'Yes'}
+                        </button>
+                        <button
+                            className="diaper-quick-btn poo"
+                            onClick={(e) => handleQuickLog('attempt', e)}
+                            disabled={saving !== null}
+                            style={{ background: '#6b7280' }}
+                        >
+                            <X size={14} />
+                            {saving === 'attempt' ? '...' : 'Try'}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

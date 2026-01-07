@@ -1223,6 +1223,9 @@ h4 {
 .widget-content {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* Icon + label row */
@@ -1482,7 +1485,7 @@ h4 {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  margin-top: var(--space-xs);
+  margin-top: auto;
 }
 
 .feeding-start-btn,
@@ -1548,7 +1551,7 @@ h4 {
 .diaper-quick-btns {
   display: flex;
   gap: var(--space-xs);
-  margin-top: var(--space-xs);
+  margin-top: auto;
 }
 
 .diaper-quick-btn {
@@ -3872,6 +3875,95 @@ h4 {
 .widget-settings-check.visible {
   opacity: 1;
   transform: scale(1);
+}
+
+/* Quick Actions Toggle */
+.widget-settings-section {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.widget-settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.widget-settings-toggle:hover {
+  background: var(--surface-hover);
+}
+
+.widget-settings-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--surface-hover);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.widget-settings-toggle.enabled .widget-settings-toggle-icon {
+  background: var(--primary);
+  color: white;
+}
+
+.widget-settings-toggle-text {
+  flex: 1;
+  text-align: left;
+}
+
+.widget-settings-toggle-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.widget-settings-toggle-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.widget-settings-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--surface-hover);
+  border-radius: 12px;
+  transition: var(--transition);
+}
+
+.widget-settings-switch.on {
+  background: var(--primary);
+}
+
+.widget-settings-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.widget-settings-switch.on .widget-settings-switch-thumb {
+  left: 22px;
 }
 
 /* ============================================================================

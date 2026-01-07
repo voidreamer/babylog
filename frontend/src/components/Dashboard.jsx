@@ -49,12 +49,22 @@ export default function Dashboard() {
         return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_WIDGETS;
     });
 
+    // Quick actions setting from localStorage (default: enabled)
+    const [quickActionsEnabled, setQuickActionsEnabled] = useState(() => {
+        const saved = localStorage.getItem('quickActionsEnabled');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+
     // Sync with localStorage changes (from Settings page)
     useEffect(() => {
         const handleStorageChange = () => {
-            const saved = localStorage.getItem('visibleWidgets');
-            if (saved) {
-                setVisibleWidgets(JSON.parse(saved));
+            const savedWidgets = localStorage.getItem('visibleWidgets');
+            if (savedWidgets) {
+                setVisibleWidgets(JSON.parse(savedWidgets));
+            }
+            const savedQuickActions = localStorage.getItem('quickActionsEnabled');
+            if (savedQuickActions !== null) {
+                setQuickActionsEnabled(JSON.parse(savedQuickActions));
             }
         };
         window.addEventListener('storage', handleStorageChange);
@@ -68,6 +78,16 @@ export default function Dashboard() {
                 ? prev.filter(id => id !== widgetId)
                 : [...prev, widgetId];
             localStorage.setItem('visibleWidgets', JSON.stringify(updated));
+            window.dispatchEvent(new Event('storage'));
+            return updated;
+        });
+    };
+
+    // Toggle quick actions
+    const toggleQuickActions = () => {
+        setQuickActionsEnabled(prev => {
+            const updated = !prev;
+            localStorage.setItem('quickActionsEnabled', JSON.stringify(updated));
             window.dispatchEvent(new Event('storage'));
             return updated;
         });
@@ -149,6 +169,7 @@ export default function Dashboard() {
                         lastFeeding={dashboard?.last_feeding}
                         onFeedingChange={loadData}
                         onOpenModal={() => setFeedingModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -158,6 +179,7 @@ export default function Dashboard() {
                         lastDiaper={dashboard?.last_diaper}
                         onDiaperChange={loadData}
                         onOpenModal={() => setDiaperModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -176,6 +198,7 @@ export default function Dashboard() {
                         lastPumping={dashboard?.last_pumping}
                         onPumpingChange={loadData}
                         onOpenModal={() => setPumpingModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -184,6 +207,7 @@ export default function Dashboard() {
                         lastPotty={dashboard?.last_potty}
                         onPottyChange={loadData}
                         onOpenModal={() => setPottyModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -192,6 +216,7 @@ export default function Dashboard() {
                         lastTummy={dashboard?.last_tummy}
                         onTummyChange={loadData}
                         onOpenModal={() => setTummyModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -200,6 +225,7 @@ export default function Dashboard() {
                         lastBath={dashboard?.last_bath}
                         onBathChange={loadData}
                         onOpenModal={() => setBathModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -208,6 +234,7 @@ export default function Dashboard() {
                         lastSupplement={dashboard?.last_supplement}
                         onSupplementChange={loadData}
                         onOpenModal={() => setSupplementModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -215,6 +242,8 @@ export default function Dashboard() {
                 <WidgetSettings
                     visibleWidgets={visibleWidgets}
                     onToggle={toggleWidget}
+                    quickActionsEnabled={quickActionsEnabled}
+                    onToggleQuickActions={toggleQuickActions}
                 />
             </div>
 

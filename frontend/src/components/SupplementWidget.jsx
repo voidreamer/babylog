@@ -70,7 +70,7 @@ const sketchyColors = {
     supplement: { stroke: '#16a34a', bg: '#f0fdf4', text: '#166534' },
 };
 
-export default function SupplementWidget({ lastSupplement, onSupplementChange, onOpenModal }) {
+export default function SupplementWidget({ lastSupplement, onSupplementChange, onOpenModal, quickActionsEnabled = true }) {
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const isDarkTheme = useIsDarkTheme();
@@ -144,11 +144,15 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                             <div className="widget-time-ago">{timeAgo}</div>
                             <div className="widget-detail">{supplementLabel}</div>
                         </>
+                    ) : !quickActionsEnabled ? (
+                        <div className="widget-time-ago">No supplements yet</div>
                     ) : null}
-                    <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
-                        <Check size={14} />
-                        {saving ? '...' : 'Vit D'}
-                    </button>
+                    {quickActionsEnabled && (
+                        <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
+                            <Check size={14} />
+                            {saving ? '...' : 'Vit D'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

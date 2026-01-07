@@ -78,7 +78,7 @@ const sketchyColors = {
 
 const ACTIVE_TUMMY_KEY = 'activeTummy';
 
-export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal }) {
+export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal, quickActionsEnabled = true }) {
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -194,7 +194,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal 
                             {saving ? 'Saving...' : 'Done'}
                         </button>
                     </div>
-                ) : (
+                ) : quickActionsEnabled ? (
                     <div className="feeding-widget-idle">
                         {lastTummy ? (
                             <>
@@ -206,6 +206,17 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal 
                             <Play size={14} fill="currentColor" />
                             Start
                         </button>
+                    </div>
+                ) : (
+                    <div className="feeding-widget-idle">
+                        {lastTummy ? (
+                            <>
+                                <div className="widget-time-ago">{timeAgo}</div>
+                                <div className="widget-detail">{lastTummy.duration_minutes}min</div>
+                            </>
+                        ) : (
+                            <div className="widget-time-ago">No tummy time yet</div>
+                        )}
                     </div>
                 )}
             </div>

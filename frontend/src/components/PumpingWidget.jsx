@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Heart, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { useBaby } from '../hooks/useBaby';
 
 // Hook to detect if current theme is a dark theme
 function useIsDarkTheme() {
@@ -117,7 +118,8 @@ const sketchyColors = {
 
 const ACTIVE_PUMPING_KEY = 'activePumping';
 
-export default function PumpingWidget({ babyId, lastPumping, onPumpingChange, onOpenModal }) {
+export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModal, quickActionsEnabled = true }) {
+    const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [activePumping, setActivePumping] = useState(null);
@@ -127,18 +129,19 @@ export default function PumpingWidget({ babyId, lastPumping, onPumpingChange, on
     const seed = 4 * 7.3;
 
     useEffect(() => {
+        if (!selectedBaby) return;
         const stored = localStorage.getItem(ACTIVE_PUMPING_KEY);
         if (stored) {
             try {
                 const parsed = JSON.parse(stored);
-                if (parsed.babyId === babyId) {
+                if (parsed.babyId === selectedBaby.id) {
                     setActivePumping(parsed);
                 }
             } catch (e) {
                 localStorage.removeItem(ACTIVE_PUMPING_KEY);
             }
         }
-    }, [babyId]);
+    }, [selectedBaby]);
 
     useEffect(() => {
         if (activePumping) {
@@ -160,8 +163,9 @@ export default function PumpingWidget({ babyId, lastPumping, onPumpingChange, on
 
     const handleStartPumping = (e) => {
         e.stopPropagation();
+        if (!selectedBaby) return;
         const newActivePumping = {
-            babyId,
+            babyId: selectedBaby.id,
             startTime: Date.now(),
         };
         setActivePumping(newActivePumping);
@@ -171,14 +175,14 @@ export default function PumpingWidget({ babyId, lastPumping, onPumpingChange, on
 
     const handleStopPumping = async (e) => {
         e.stopPropagation();
-        if (!activePumping) return;
+        if (!activePumping || !selectedBaby) return;
 
         setSaving(true);
         try {
             const durationMinutes = Math.ceil(timerSeconds / 60);
 
             await api.createPumping({
-                baby_id: babyId,
+                baby_id: selectedBaby.id,
                 time: new Date(activePumping.startTime).toISOString(),
                 duration_minutes: durationMinutes,
                 amount_ml: null,
@@ -238,7 +242,7 @@ export default function PumpingWidget({ babyId, lastPumping, onPumpingChange, on
                             {saving ? 'Saving...' : 'Done'}
                         </button>
                     </div>
-                ) : (
+                ) : quickActionsEnabled ? (
                     <div className="feeding-widget-idle">
                         {lastPumping ? (
                             <>
@@ -252,6 +256,19 @@ export default function PumpingWidget({ babyId, lastPumping, onPumpingChange, on
                             <Play size={14} fill="currentColor" />
                             Start
                         </button>
+                    </div>
+                ) : (
+                    <div className="feeding-widget-idle">
+                        {lastPumping ? (
+                            <>
+                                <div className="widget-time-ago">{timeAgo}</div>
+                                <div className="widget-detail">
+                                    {lastPumping.amount_ml ? `${lastPumping.amount_ml}ml` : null}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="widget-time-ago">No pumpings yet</div>
+                        )}
                     </div>
                 )}
             </div>

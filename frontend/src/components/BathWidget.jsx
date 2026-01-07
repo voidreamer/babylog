@@ -70,7 +70,7 @@ const sketchyColors = {
     bath: { stroke: '#0891b2', bg: '#ecfeff', text: '#155e75' },
 };
 
-export default function BathWidget({ lastBath, onBathChange, onOpenModal }) {
+export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickActionsEnabled = true }) {
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const isDarkTheme = useIsDarkTheme();
@@ -131,11 +131,15 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal }) {
                 <div className="feeding-widget-idle">
                     {lastBath ? (
                         <div className="widget-time-ago">{timeAgo}</div>
+                    ) : !quickActionsEnabled ? (
+                        <div className="widget-time-ago">No baths yet</div>
                     ) : null}
-                    <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
-                        <Check size={14} />
-                        {saving ? 'Logging...' : 'Log Bath'}
-                    </button>
+                    {quickActionsEnabled && (
+                        <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
+                            <Check size={14} />
+                            {saving ? 'Logging...' : 'Log Bath'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

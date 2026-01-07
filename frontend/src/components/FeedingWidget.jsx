@@ -154,7 +154,7 @@ const sketchyColors = {
 // Storage key for active feeding timer
 const ACTIVE_FEEDING_KEY = 'activeFeeding';
 
-export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, onOpenModal }) {
+export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, onOpenModal, quickActionsEnabled = true }) {
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [activeFeeding, setActiveFeeding] = useState(null);
@@ -302,7 +302,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                 </div>
 
                 {isFeeding ? (
-                    /* Feeding in progress */
+                    /* Feeding in progress - always show timer */
                     <div className="feeding-widget-active">
                         <div className="feeding-timer">
                             {formatTimer(timerSeconds)}
@@ -316,8 +316,8 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                             {saving ? 'Saving...' : 'Done'}
                         </button>
                     </div>
-                ) : (
-                    /* Idle state */
+                ) : quickActionsEnabled ? (
+                    /* Idle state with quick actions */
                     <div className="feeding-widget-idle">
                         {lastFeeding ? (
                             <>
@@ -333,6 +333,18 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                             <Play size={14} fill="currentColor" />
                             Start Feeding
                         </button>
+                    </div>
+                ) : (
+                    /* Simple display without quick actions */
+                    <div className="feeding-widget-idle">
+                        {lastFeeding ? (
+                            <>
+                                <div className="widget-time-ago">{timeAgo}</div>
+                                <div className="widget-detail">{getLastFeedingDetail()}</div>
+                            </>
+                        ) : (
+                            <div className="widget-time-ago">No feedings yet</div>
+                        )}
                     </div>
                 )}
             </div>
