@@ -1264,6 +1264,15 @@ h4 {
   color: #22d3ee;
 }
 
+.widget.supplement {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.15) 0%, rgba(22, 163, 74, 0.25) 100%);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+.widget.supplement .widget-icon-row svg {
+  color: #16a34a;
+}
+
 .widget-label {
   font-family: 'Neucha', cursive;
   font-size: 17px;
