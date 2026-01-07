@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
+import { useOfflineSync } from './hooks/useOfflineSync';
 import { api } from './api/client';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
+import OfflineIndicator from './components/OfflineIndicator';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
@@ -36,6 +38,7 @@ function ProtectedRoute({ children }) {
 function MainApp() {
     const { user, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
+    const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
@@ -256,6 +259,12 @@ function MainApp() {
 
     return (
         <div className="app-container">
+            <OfflineIndicator
+                online={online}
+                syncing={syncing}
+                pendingCount={pendingCount}
+                onSync={syncPendingChanges}
+            />
             <main>
                 {activeTab === 'home' && <Dashboard />}
                 {activeTab === 'timeline' && <TimelineCalendar />}

@@ -40,3 +40,10 @@ variable "cors_origins" {
   type        = string
   default     = "http://localhost:5173"
 }
+
+variable "admin_api_key" {
+  description = "API key for admin endpoints (migrations, etc.)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
