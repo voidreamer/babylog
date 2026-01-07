@@ -440,6 +440,67 @@ class ApiClient {
             body: JSON.stringify(data),
         });
     }
+
+    // Export
+    getExportCsvUrl(babyId, dataType = 'all', startDate = null, endDate = null) {
+        const params = new URLSearchParams({ data_type: dataType });
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+        return `${API_BASE}/api/export/csv/${babyId}?${params}`;
+    }
+
+    async exportBabyDataCsv(babyId, dataType = 'all', startDate = null, endDate = null) {
+        const params = new URLSearchParams({ data_type: dataType });
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+
+        const url = `${API_BASE}/api/export/csv/${babyId}?${params}`;
+
+        const headers = {};
+        if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+        }
+        const userEmail = localStorage.getItem('user_email');
+        if (userEmail) {
+            headers['X-User-Email'] = userEmail;
+        }
+
+        const response = await fetch(url, { headers });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.detail || 'Export failed');
+        }
+
+        // Get filename from header or generate one
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'export.csv';
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename=(.+)/);
+            if (match) filename = match[1];
+        }
+
+        // Create blob and download
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        return { success: true, filename };
+    }
+
+    async exportBabyDataJson(babyId, startDate = null, endDate = null) {
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+        const query = params.toString() ? `?${params}` : '';
+        return this.request(`/export/json/${babyId}${query}`);
+    }
 }
 
 export const api = new ApiClient();

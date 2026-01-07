@@ -35,6 +35,8 @@ jobs:
           cd backend
           pip install -r requirements.txt -t package/
           cp -r app package/
+          cp -r alembic package/
+          cp alembic.ini package/
 
       - name: Create deployment package
         run: |
@@ -71,3 +73,8 @@ jobs:
         run: |
           echo "🚀 Staging backend deployment complete!"
           echo "📍 Lambda Function: ${{ env.LAMBDA_FUNCTION_NAME }}"
+          echo ""
+          echo "📋 To run migrations, call:"
+          echo "   curl -X POST https://api-staging.simplebaby.app/api/admin/migrate -H 'X-Admin-Key: YOUR_KEY'"
+          echo ""
+          echo "   Or set ADMIN_API_KEY in Lambda env vars for automatic migration support"

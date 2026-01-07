@@ -12,7 +12,7 @@ import Callback from './pages/Callback';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -41,6 +41,7 @@ function MainApp() {
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [promoCode, setPromoCode] = useState('');
     const [promoLoading, setPromoLoading] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
 
     // Premium state
     const [isPremium, setIsPremium] = useState(() => {
@@ -68,6 +69,25 @@ function MainApp() {
             alert('Failed to verify code. Please try again.');
         } finally {
             setPromoLoading(false);
+        }
+    };
+
+    const handleExportCsv = async () => {
+        if (!babies || babies.length === 0) {
+            alert('No baby data to export');
+            return;
+        }
+
+        setExportLoading(true);
+        try {
+            // Export current baby's data
+            const currentBaby = babies[0];
+            await api.exportBabyDataCsv(currentBaby.id);
+            alert('Export complete! Check your downloads folder.');
+        } catch (error) {
+            alert('Export failed: ' + error.message);
+        } finally {
+            setExportLoading(false);
         }
     };
 
@@ -176,6 +196,28 @@ function MainApp() {
                         </div>
                     </div>
                 )}
+            </div>
+
+            <div className="settings-section">
+                <div className="settings-section-header">
+                    <Download size={18} className="settings-section-icon" />
+                    <h3 className="settings-section-title">Data</h3>
+                </div>
+                <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-sm)' }}>
+                    <span className="settings-item-label">Export your baby's tracking data</span>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={handleExportCsv}
+                        disabled={exportLoading || !babies || babies.length === 0}
+                        style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', justifyContent: 'center' }}
+                    >
+                        <Download size={16} />
+                        {exportLoading ? 'Exporting...' : 'Download CSV'}
+                    </button>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        Includes all feedings, sleep, diapers, and activities
+                    </span>
+                </div>
             </div>
 
             <div className="settings-section">

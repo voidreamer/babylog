@@ -8,7 +8,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .config import get_settings
 from .database import engine, Base
-from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription
+from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -59,6 +59,8 @@ app.include_router(pumpings.router)
 app.include_router(activities.router)
 app.include_router(analytics.router)
 app.include_router(subscription.router)
+app.include_router(admin.router)
+app.include_router(export.router)
 
 
 @app.get("/health")
