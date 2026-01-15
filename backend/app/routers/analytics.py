@@ -189,10 +189,20 @@ async def get_baby_analytics(
         # ==========================================================================
         # Calculate patterns
         # ==========================================================================
-        
+
+        # Get baby's birth date and age for calculations (needed for pattern logic)
+        birth_date = None
+        if baby.birth_date:
+            bd = make_aware(baby.birth_date)
+            birth_date = bd.date() if hasattr(bd, 'date') else bd
+
+        age_weeks = 0
+        if birth_date:
+            age_weeks = calculate_age_weeks(birth_date)
+
         feeding_times = [f.time for f in feedings]
         avg_feeding_interval = calculate_average_interval(feeding_times)
-        
+
         # Wake times (end of sleep)
         wake_times = [s.end_time for s in sleeps if s.end_time]
 
@@ -225,7 +235,7 @@ async def get_baby_analytics(
                 if st.hour >= 18 or st.hour <= 3:
                     bedtimes.append(st)
             usual_bedtime = calculate_average_time_of_day(bedtimes)
-        
+
         # Nap durations (daytime sleep)
         nap_durations = []
         for s in sleeps:
@@ -234,20 +244,10 @@ async def get_baby_analytics(
                 if 6 <= st.hour < 18 and s.duration_minutes < 180:
                     nap_durations.append(s.duration_minutes)
         avg_nap_duration = round(sum(nap_durations) / len(nap_durations)) if nap_durations else None
-        
+
         # ==========================================================================
         # Calculate predictions (enhanced with new features)
         # ==========================================================================
-
-        # Get baby's birth date and age for calculations
-        birth_date = None
-        if baby.birth_date:
-            bd = make_aware(baby.birth_date)
-            birth_date = bd.date() if hasattr(bd, 'date') else bd
-
-        age_weeks = 0
-        if birth_date:
-            age_weeks = calculate_age_weeks(birth_date)
 
         # Feeding prediction with confidence intervals
         next_feeding = predict_next_event(feeding_times, avg_feeding_interval)
