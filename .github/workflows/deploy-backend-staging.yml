@@ -63,10 +63,13 @@ jobs:
             --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
 
       - name: Run database migrations
-        if: ${{ secrets.DATABASE_URL_STAGING != '' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "⚠️  DATABASE_URL_STAGING secret not set - skipping migrations"
+            exit 0
+          fi
           echo "🔄 Running database migrations..."
           cd backend
           pip install -r requirements.txt -q
@@ -84,8 +87,3 @@ jobs:
         run: |
           echo "🚀 Staging backend deployment complete!"
           echo "📍 Lambda Function: ${{ env.LAMBDA_FUNCTION_NAME }}"
-          if [ -z "${{ secrets.DATABASE_URL_STAGING }}" ]; then
-            echo ""
-            echo "⚠️  DATABASE_URL_STAGING secret not set - migrations were skipped"
-            echo "   Add it in GitHub Settings > Secrets to enable automatic migrations"
-          fi
