@@ -28,6 +28,12 @@ def get_cognito_keys():
 def verify_token(token: str) -> dict:
     """Verify Cognito JWT token and return claims."""
     if not settings.cognito_user_pool_id:
+        # Only allow dev mode bypass in non-production environments
+        if settings.environment in ("prod", "production", "staging"):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Authentication not configured. COGNITO_USER_POOL_ID is required in production."
+            )
         # Development mode - return mock user
         return {"sub": "dev-user-123", "email": "dev@example.com"}
     

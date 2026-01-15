@@ -2,16 +2,19 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
+import { useOfflineSync } from './hooks/useOfflineSync';
+import { api } from './api/client';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
+import OfflineIndicator from './components/OfflineIndicator';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children }) {
@@ -35,24 +38,59 @@ function ProtectedRoute({ children }) {
 function MainApp() {
     const { user, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
+    const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [promoCode, setPromoCode] = useState('');
+    const [promoLoading, setPromoLoading] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
 
     // Premium state
     const [isPremium, setIsPremium] = useState(() => {
         return localStorage.getItem('isPremium') === 'true';
     });
 
-    const handlePromoCode = () => {
-        if (promoCode.toUpperCase() === 'SIMPLEBABY2026') {
-            setIsPremium(true);
-            localStorage.setItem('isPremium', 'true');
-            setPromoCode('');
-            alert('Premium unlocked! Enjoy all features.');
-        } else {
-            alert('Invalid code');
+    const handlePromoCode = async () => {
+        if (!promoCode.trim()) {
+            alert('Please enter a promo code');
+            return;
+        }
+
+        setPromoLoading(true);
+        try {
+            const result = await api.redeemPromoCode(promoCode);
+            if (result.valid && result.premium) {
+                setIsPremium(true);
+                localStorage.setItem('isPremium', 'true');
+                setPromoCode('');
+                alert(result.message || 'Premium unlocked!');
+            } else {
+                alert(result.message || 'Invalid code');
+            }
+        } catch (error) {
+            alert('Failed to verify code. Please try again.');
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
+    const handleExportCsv = async () => {
+        if (!babies || babies.length === 0) {
+            alert('No baby data to export');
+            return;
+        }
+
+        setExportLoading(true);
+        try {
+            // Export current baby's data
+            const currentBaby = babies[0];
+            await api.exportBabyDataCsv(currentBaby.id);
+            alert('Export complete! Check your downloads folder.');
+        } catch (error) {
+            alert('Export failed: ' + error.message);
+        } finally {
+            setExportLoading(false);
         }
     };
 
@@ -68,18 +106,41 @@ function MainApp() {
     }, [theme]);
 
     // Check if we should show onboarding (no babies yet)
+    // Only show onboarding when online - if offline with no cached babies, show offline message instead
     useEffect(() => {
-        if (!babiesLoading && babies.length === 0) {
+        if (!babiesLoading && babies.length === 0 && online) {
             setShowOnboarding(true);
         }
-    }, [babies, babiesLoading]);
+    }, [babies, babiesLoading, online]);
 
-    // Show onboarding for first-time users
-    if (showOnboarding && !babiesLoading && babies.length === 0) {
+    // Show onboarding for first-time users (only when online)
+    if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (
             <Onboarding
                 onComplete={() => setShowOnboarding(false)}
             />
+        );
+    }
+
+    // Show offline message if offline with no cached babies
+    if (!babiesLoading && babies.length === 0 && !online) {
+        return (
+            <div className="app-container">
+                <OfflineIndicator
+                    online={online}
+                    syncing={syncing}
+                    pendingCount={pendingCount}
+                    onSync={syncPendingChanges}
+                />
+                <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
+                    <div className="empty-state-icon">📡</div>
+                    <h2 className="empty-state-title">You're Offline</h2>
+                    <p className="empty-state-text">
+                        Connect to the internet to load your baby data.
+                        Your data will sync automatically when you're back online.
+                    </p>
+                </div>
+            </div>
         );
     }
 
@@ -154,13 +215,35 @@ function MainApp() {
                             <button
                                 className="btn btn-primary"
                                 onClick={handlePromoCode}
-                                disabled={!promoCode.trim()}
+                                disabled={!promoCode.trim() || promoLoading}
                             >
-                                Apply
+                                {promoLoading ? 'Verifying...' : 'Apply'}
                             </button>
                         </div>
                     </div>
                 )}
+            </div>
+
+            <div className="settings-section">
+                <div className="settings-section-header">
+                    <Download size={18} className="settings-section-icon" />
+                    <h3 className="settings-section-title">Data</h3>
+                </div>
+                <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-sm)' }}>
+                    <span className="settings-item-label">Export your baby's tracking data</span>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={handleExportCsv}
+                        disabled={exportLoading || !babies || babies.length === 0}
+                        style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', justifyContent: 'center' }}
+                    >
+                        <Download size={16} />
+                        {exportLoading ? 'Exporting...' : 'Download CSV'}
+                    </button>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        Includes all feedings, sleep, diapers, and activities
+                    </span>
+                </div>
             </div>
 
             <div className="settings-section">
@@ -199,6 +282,12 @@ function MainApp() {
 
     return (
         <div className="app-container">
+            <OfflineIndicator
+                online={online}
+                syncing={syncing}
+                pendingCount={pendingCount}
+                onSync={syncPendingChanges}
+            />
             <main>
                 {activeTab === 'home' && <Dashboard />}
                 {activeTab === 'timeline' && <TimelineCalendar />}

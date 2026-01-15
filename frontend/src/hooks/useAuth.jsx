@@ -47,7 +47,7 @@ async function exchangeCodeForTokens(code) {
     const data = await response.json();
     console.log('[Auth] Tokens received successfully');
 
-    // Store tokens
+    // Store tokens (will be saved to both localStorage and IndexedDB after helpers are defined)
     api.setToken(data.access_token);
     localStorage.setItem('auth_token', data.access_token);
 
@@ -61,12 +61,120 @@ async function exchangeCodeForTokens(code) {
         localStorage.setItem('user_email', payload.email);
     }
 
+    // Also save to IndexedDB for iOS persistence (async, non-blocking)
+    Promise.all([
+        saveToIndexedDB('auth_token', data.access_token),
+        data.refresh_token ? saveToIndexedDB('refresh_token', data.refresh_token) : Promise.resolve(),
+        payload.email ? saveToIndexedDB('user_email', payload.email) : Promise.resolve(),
+    ]).catch(e => console.warn('[Auth] IndexedDB backup save failed:', e));
+
     return payload;
+}
+
+// IndexedDB helpers for more persistent storage on iOS
+const DB_NAME = 'simplebaby_auth';
+const STORE_NAME = 'tokens';
+
+async function openAuthDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME);
+            }
+        };
+    });
+}
+
+async function saveToIndexedDB(key, value) {
+    try {
+        const db = await openAuthDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.put(value, key);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+            tx.oncomplete = () => db.close();
+        });
+    } catch (e) {
+        console.warn('[Auth] IndexedDB save failed:', e);
+    }
+}
+
+async function getFromIndexedDB(key) {
+    try {
+        const db = await openAuthDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.get(key);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            tx.oncomplete = () => db.close();
+        });
+    } catch (e) {
+        console.warn('[Auth] IndexedDB get failed:', e);
+        return null;
+    }
+}
+
+async function removeFromIndexedDB(key) {
+    try {
+        const db = await openAuthDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.delete(key);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+            tx.oncomplete = () => db.close();
+        });
+    } catch (e) {
+        console.warn('[Auth] IndexedDB remove failed:', e);
+    }
+}
+
+// Dual storage helpers - save to both localStorage and IndexedDB
+async function saveToken(key, value) {
+    localStorage.setItem(key, value);
+    await saveToIndexedDB(key, value);
+}
+
+async function getToken(key) {
+    // Try localStorage first, fall back to IndexedDB
+    let value = localStorage.getItem(key);
+    if (!value) {
+        value = await getFromIndexedDB(key);
+        if (value) {
+            // Restore to localStorage if found in IndexedDB
+            localStorage.setItem(key, value);
+        }
+    }
+    return value;
+}
+
+async function removeToken(key) {
+    localStorage.removeItem(key);
+    await removeFromIndexedDB(key);
 }
 
 // Refresh token function
 async function refreshAccessToken() {
-    const refreshToken = localStorage.getItem('refresh_token');
+    let refreshToken = localStorage.getItem('refresh_token');
+
+    // Try IndexedDB if localStorage is empty (iOS might have cleared it)
+    if (!refreshToken) {
+        refreshToken = await getFromIndexedDB('refresh_token');
+        if (refreshToken) {
+            console.log('[Auth] Recovered refresh token from IndexedDB');
+            localStorage.setItem('refresh_token', refreshToken);
+        }
+    }
+
     if (!refreshToken || !COGNITO_DOMAIN) {
         return null;
     }
@@ -87,23 +195,24 @@ async function refreshAccessToken() {
         });
 
         if (!response.ok) {
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user_email');
+            await removeToken('refresh_token');
+            await removeToken('auth_token');
+            await removeToken('user_email');
             return null;
         }
 
         const data = await response.json();
         api.setToken(data.access_token);
-        localStorage.setItem('auth_token', data.access_token);
+        await saveToken('auth_token', data.access_token);
 
         if (data.id_token) {
             const payload = JSON.parse(atob(data.id_token.split('.')[1]));
             if (payload.email) {
-                localStorage.setItem('user_email', payload.email);
+                await saveToken('user_email', payload.email);
             }
         }
 
+        console.log('[Auth] Token refreshed successfully');
         return data.access_token;
     } catch (error) {
         console.error('Token refresh failed:', error);
@@ -159,8 +268,29 @@ export function AuthProvider({ children }) {
     // Initialize auth and set up deep link listener
     useEffect(() => {
         const initAuth = async () => {
-            const token = api.getToken();
-            const lsToken = localStorage.getItem('auth_token');
+            let token = api.getToken();
+            let lsToken = localStorage.getItem('auth_token');
+
+            // Try IndexedDB if localStorage is empty (iOS Safari ITP might have cleared it)
+            if (!lsToken) {
+                const idbToken = await getFromIndexedDB('auth_token');
+                if (idbToken) {
+                    console.log('[Auth] Recovered auth token from IndexedDB');
+                    localStorage.setItem('auth_token', idbToken);
+                    lsToken = idbToken;
+
+                    // Also recover other tokens
+                    const idbRefresh = await getFromIndexedDB('refresh_token');
+                    if (idbRefresh) {
+                        localStorage.setItem('refresh_token', idbRefresh);
+                    }
+                    const idbEmail = await getFromIndexedDB('user_email');
+                    if (idbEmail) {
+                        localStorage.setItem('user_email', idbEmail);
+                    }
+                }
+            }
+
             const effectiveToken = token || lsToken;
 
             if (effectiveToken) {
@@ -194,6 +324,69 @@ export function AuthProvider({ children }) {
 
         initAuth();
     }, []);
+
+    // Visibility change listener - refresh token when app comes back to foreground
+    useEffect(() => {
+        const handleVisibilityChange = async () => {
+            if (document.visibilityState === 'visible' && user) {
+                console.log('[Auth] App became visible, checking token...');
+                const token = api.getToken() || localStorage.getItem('auth_token');
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        const now = Math.floor(Date.now() / 1000);
+                        // Refresh if token expires in less than 5 minutes
+                        if (payload.exp && (payload.exp - now) < 300) {
+                            console.log('[Auth] Token expiring soon, refreshing...');
+                            const newToken = await refreshAccessToken();
+                            if (newToken) {
+                                const newPayload = JSON.parse(atob(newToken.split('.')[1]));
+                                setUser(newPayload);
+                            }
+                        }
+                    } catch (e) {
+                        console.error('[Auth] Visibility check error:', e);
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [user]);
+
+    // Periodic token refresh - refresh 5 minutes before expiry
+    useEffect(() => {
+        if (!user) return;
+
+        const checkAndRefresh = async () => {
+            const token = api.getToken() || localStorage.getItem('auth_token');
+            if (!token) return;
+
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const now = Math.floor(Date.now() / 1000);
+                const timeUntilExpiry = payload.exp ? payload.exp - now : 0;
+
+                // Refresh if less than 5 minutes remaining
+                if (timeUntilExpiry > 0 && timeUntilExpiry < 300) {
+                    console.log('[Auth] Proactive token refresh...');
+                    const newToken = await refreshAccessToken();
+                    if (newToken) {
+                        const newPayload = JSON.parse(atob(newToken.split('.')[1]));
+                        setUser(newPayload);
+                    }
+                }
+            } catch (e) {
+                console.error('[Auth] Periodic refresh error:', e);
+            }
+        };
+
+        // Check every minute
+        const intervalId = setInterval(checkAndRefresh, 60000);
+
+        return () => clearInterval(intervalId);
+    }, [user]);
 
     // Separate effect for native URL handling
     useEffect(() => {
@@ -268,6 +461,14 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user_email');
+
+        // Also clear IndexedDB
+        await Promise.all([
+            removeFromIndexedDB('auth_token'),
+            removeFromIndexedDB('refresh_token'),
+            removeFromIndexedDB('user_email'),
+        ]).catch(e => console.warn('[Auth] IndexedDB clear failed:', e));
+
         setUser(null);
 
         if (COGNITO_DOMAIN) {

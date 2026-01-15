@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Settings, X, Baby, Droplets, Moon, Heart,
-    Toilet, Timer, Bath as BathIcon, Check, Plus, Pill
+    Toilet, Timer, Bath as BathIcon, Check, Plus, Pill, Zap
 } from 'lucide-react';
 
 const ALL_WIDGETS = [
@@ -16,7 +16,7 @@ const ALL_WIDGETS = [
     { id: 'supplement', label: 'Supplement', icon: Pill, color: '#16a34a' },
 ];
 
-export default function WidgetSettings({ visibleWidgets, onToggle }) {
+export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsEnabled, onToggleQuickActions }) {
     const [isOpen, setIsOpen] = useState(false);
 
     const enabledCount = visibleWidgets.length;
@@ -100,6 +100,28 @@ export default function WidgetSettings({ visibleWidgets, onToggle }) {
                                         </motion.button>
                                     );
                                 })}
+                            </div>
+
+                            {/* Quick Actions Toggle */}
+                            <div className="widget-settings-section">
+                                <motion.button
+                                    className={`widget-settings-toggle ${quickActionsEnabled ? 'enabled' : ''}`}
+                                    onClick={onToggleQuickActions}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    <div className="widget-settings-toggle-icon">
+                                        <Zap size={18} />
+                                    </div>
+                                    <div className="widget-settings-toggle-text">
+                                        <span className="widget-settings-toggle-label">Quick Actions</span>
+                                        <span className="widget-settings-toggle-hint">
+                                            One-tap buttons on widgets
+                                        </span>
+                                    </div>
+                                    <div className={`widget-settings-switch ${quickActionsEnabled ? 'on' : ''}`}>
+                                        <div className="widget-settings-switch-thumb" />
+                                    </div>
+                                </motion.button>
                             </div>
                         </motion.div>
                     </>

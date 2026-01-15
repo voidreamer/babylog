@@ -803,8 +803,12 @@ h4 {
 
 /* Responsive Settings for larger screens */
 @media (min-width: 768px) {
+  .app-container {
+    max-width: 900px;
+  }
+
   .settings-page {
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto;
     padding: var(--space-xl);
   }
@@ -849,13 +853,36 @@ h4 {
 }
 
 @media (min-width: 1024px) {
+  .app-container {
+    max-width: 1100px;
+    padding: var(--space-lg);
+  }
+
   .settings-page {
-    max-width: 700px;
+    max-width: 800px;
     padding: var(--space-2xl);
+    margin: 0 auto;
   }
 
   .settings-section {
     padding: var(--space-xl);
+  }
+
+  .settings-select {
+    min-width: 200px;
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  /* Health page responsive for desktop */
+  .health-tabs {
+    max-width: 900px;
+    margin: 0 auto var(--space-lg) auto;
+  }
+
+  .card {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -1223,6 +1250,9 @@ h4 {
 .widget-content {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* Icon + label row */
@@ -1413,6 +1443,184 @@ h4 {
 .widget-picker-item:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+/* Sleep Widget - Stateful */
+.sleep-widget-awake,
+.sleep-widget-sleeping {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.sleep-start-btn,
+.sleep-wake-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.sleep-start-btn {
+  background: var(--widget-stroke, var(--sleep));
+  color: white;
+}
+
+.sleep-start-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.sleep-wake-btn {
+  background: var(--warning);
+  color: white;
+}
+
+.sleep-wake-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.sleep-start-btn:disabled,
+.sleep-wake-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sleep-elapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--widget-text, var(--sleep));
+}
+
+/* Feeding Widget - Stateful */
+.feeding-widget-idle,
+.feeding-widget-active {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: auto;
+}
+
+.feeding-start-btn,
+.feeding-stop-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.feeding-start-btn {
+  background: var(--widget-stroke, var(--feeding));
+  color: white;
+}
+
+.feeding-start-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.feeding-stop-btn {
+  background: var(--success);
+  color: white;
+}
+
+.feeding-stop-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.feeding-start-btn:disabled,
+.feeding-stop-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.feeding-timer {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--widget-text, var(--feeding));
+  text-align: center;
+}
+
+.widget.active-timer {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Diaper Widget - Quick Actions */
+.diaper-quick-btns {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: auto;
+}
+
+.diaper-quick-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  background: var(--widget-stroke, var(--diaper));
+  color: white;
+}
+
+.diaper-quick-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.diaper-quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.diaper-quick-btn.pee {
+  background: #0891b2;
+}
+
+.diaper-quick-btn.poo {
+  background: #92400e;
+}
+
+.diaper-quick-btn.mixed {
+  background: var(--widget-stroke, var(--diaper));
 }
 
 /* ============================================================================
@@ -2096,6 +2304,110 @@ h4 {
   border-radius: 4px;
 }
 
+.timeline-empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+}
+
+.timeline-empty-state svg {
+  opacity: 0.5;
+  margin-bottom: var(--space-sm);
+}
+
+.timeline-empty-state p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.timeline-empty-state span {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Confirm Delete Modal */
+.confirm-modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  width: 90%;
+  max-width: 320px;
+  position: relative;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.confirm-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.confirm-modal .confirm-icon {
+  color: var(--danger);
+  opacity: 0.8;
+}
+
+.confirm-modal h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.confirm-modal p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  width: 100%;
+}
+
+.confirm-modal-actions .btn {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-modal-actions .btn-secondary {
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.confirm-modal-actions .btn-secondary:hover {
+  background: var(--border);
+}
+
+.confirm-modal-actions .btn-danger {
+  background: var(--danger);
+  color: white;
+  border: none;
+}
+
+.confirm-modal-actions .btn-danger:hover {
+  opacity: 0.9;
+}
+
 /* ============================================================================
    Timeline (List View - Legacy)
    ============================================================================ */
@@ -2245,6 +2557,86 @@ h4 {
 .btn-icon-delete:hover {
   background: rgba(239, 68, 68, 0.15);
   color: var(--danger);
+}
+
+/* Edit button icon */
+.btn-icon-edit {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-edit:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--primary);
+}
+
+/* Toggle button icon (for medication active/inactive) */
+.btn-icon-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-toggle:hover {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.btn-icon-toggle.active {
+  color: var(--success);
+}
+
+.btn-icon-toggle.active:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+/* Timeline actions container */
+.timeline-actions {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+/* Health-specific timeline icon colors */
+.timeline-icon.health-visit {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.timeline-icon.health-vaccine {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+}
+
+.timeline-icon.health-med {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.timeline-icon.health-milestone {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.timeline-icon.health-growth {
+  background: rgba(236, 72, 153, 0.15);
+  color: #ec4899;
 }
 
 /* ============================================================================
@@ -3008,6 +3400,49 @@ h4 {
     gap: var(--space-sm);
   }
 
+  /* Learn/Insights - Articles grid responsive */
+  .learn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .learn-card {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-md);
+  }
+
+  .learn-card-image {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+
+  .learn-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .learn-featured-scroll {
+    display: flex;
+    gap: var(--space-md);
+    overflow-x: auto;
+    padding-bottom: var(--space-sm);
+  }
+
+  .learn-card.featured {
+    min-width: 200px;
+    flex-direction: column;
+  }
+
+  .learn-card.featured .learn-card-image {
+    width: 100%;
+    height: 120px;
+  }
+
   /* Growth chart section */
   .growth-chart-section {
     padding: var(--space-sm);
@@ -3032,6 +3467,62 @@ h4 {
   .widget {
     height: 180px;
     /* Taller height for narrower 4-column cards */
+  }
+
+  /* Responsive widget buttons - prevent overflow on larger screens */
+  .sleep-start-btn,
+  .sleep-wake-btn,
+  .feeding-start-btn,
+  .feeding-stop-btn {
+    font-size: 0.8rem;
+    padding: var(--space-xs) var(--space-sm);
+    white-space: nowrap;
+  }
+
+  /* Settings and Health pages for tablet */
+  .settings-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: var(--space-xl);
+  }
+
+  .settings-section {
+    padding: var(--space-lg);
+  }
+
+  .card {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .health-tabs {
+    max-width: 700px;
+    margin: 0 auto var(--space-lg) auto;
+  }
+
+  .health-tab span:not(.health-tab-badge) {
+    display: inline;
+    /* Show label text on tablet and up */
+  }
+
+  .diaper-quick-btns {
+    flex-wrap: wrap;
+  }
+
+  .diaper-quick-btn {
+    font-size: 0.7rem;
+    padding: var(--space-xs);
+    min-width: 0;
+  }
+
+  .feeding-timer,
+  .sleep-elapsed {
+    font-size: 1rem;
+  }
+
+  .widget-content {
+    overflow: hidden;
   }
 
   .quick-actions {
@@ -3667,6 +4158,95 @@ h4 {
 .widget-settings-check.visible {
   opacity: 1;
   transform: scale(1);
+}
+
+/* Quick Actions Toggle */
+.widget-settings-section {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.widget-settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.widget-settings-toggle:hover {
+  background: var(--surface-hover);
+}
+
+.widget-settings-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--surface-hover);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.widget-settings-toggle.enabled .widget-settings-toggle-icon {
+  background: var(--primary);
+  color: white;
+}
+
+.widget-settings-toggle-text {
+  flex: 1;
+  text-align: left;
+}
+
+.widget-settings-toggle-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.widget-settings-toggle-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.widget-settings-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--surface-hover);
+  border-radius: 12px;
+  transition: var(--transition);
+}
+
+.widget-settings-switch.on {
+  background: var(--primary);
+}
+
+.widget-settings-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.widget-settings-switch.on .widget-settings-switch-thumb {
+  left: 22px;
 }
 
 /* ============================================================================
@@ -4637,4 +5217,14 @@ h4 {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: var(--space-xs);
+}
+
+/* Utility classes */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Offline indicator styles */
+.offline-indicator {
+  transition: all 0.3s ease;
 }

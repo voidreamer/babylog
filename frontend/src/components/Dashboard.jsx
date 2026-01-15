@@ -3,7 +3,14 @@ import { toast } from 'sonner';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format } from 'date-fns';
-import Widget from './Widget';
+import SleepWidget from './SleepWidget';
+import FeedingWidget from './FeedingWidget';
+import DiaperWidget from './DiaperWidget';
+import PumpingWidget from './PumpingWidget';
+import TummyTimeWidget from './TummyTimeWidget';
+import BathWidget from './BathWidget';
+import SupplementWidget from './SupplementWidget';
+import PottyWidget from './PottyWidget';
 import WidgetSettings from './WidgetSettings';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
@@ -42,12 +49,22 @@ export default function Dashboard() {
         return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_WIDGETS;
     });
 
+    // Quick actions setting from localStorage (default: enabled)
+    const [quickActionsEnabled, setQuickActionsEnabled] = useState(() => {
+        const saved = localStorage.getItem('quickActionsEnabled');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+
     // Sync with localStorage changes (from Settings page)
     useEffect(() => {
         const handleStorageChange = () => {
-            const saved = localStorage.getItem('visibleWidgets');
-            if (saved) {
-                setVisibleWidgets(JSON.parse(saved));
+            const savedWidgets = localStorage.getItem('visibleWidgets');
+            if (savedWidgets) {
+                setVisibleWidgets(JSON.parse(savedWidgets));
+            }
+            const savedQuickActions = localStorage.getItem('quickActionsEnabled');
+            if (savedQuickActions !== null) {
+                setQuickActionsEnabled(JSON.parse(savedQuickActions));
             }
         };
         window.addEventListener('storage', handleStorageChange);
@@ -61,6 +78,16 @@ export default function Dashboard() {
                 ? prev.filter(id => id !== widgetId)
                 : [...prev, widgetId];
             localStorage.setItem('visibleWidgets', JSON.stringify(updated));
+            window.dispatchEvent(new Event('storage'));
+            return updated;
+        });
+    };
+
+    // Toggle quick actions
+    const toggleQuickActions = () => {
+        setQuickActionsEnabled(prev => {
+            const updated = !prev;
+            localStorage.setItem('quickActionsEnabled', JSON.stringify(updated));
             window.dispatchEvent(new Event('storage'));
             return updated;
         });
@@ -93,17 +120,6 @@ export default function Dashboard() {
         const interval = setInterval(loadData, 30000);
         return () => clearInterval(interval);
     }, [selectedBaby]);
-
-    const parseUTCTime = (timeStr) => {
-        if (!timeStr) return null;
-        const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-        return new Date(utcTime);
-    };
-
-    const formatTime = (dateStr) => {
-        if (!dateStr) return 'Never';
-        return format(parseUTCTime(dateStr), 'h:mm a');
-    };
 
     const handleEventLogged = () => {
         loadData();
@@ -148,106 +164,77 @@ export default function Dashboard() {
             {/* Widgets Grid */}
             <div className="widgets-grid">
                 {visibleWidgets.includes('feeding') && (
-                    <Widget
-                        type="feeding"
-                        label="Feeding"
-                        value={formatTime(dashboard?.last_feeding?.time)}
-                        lastTime={dashboard?.last_feeding?.time}
-                        detail={dashboard?.last_feeding ?
-                            `${dashboard.last_feeding.type === 'breastmilk_bottle' || dashboard.last_feeding.type === 'bottle'
-                                ? 'Breastmilk Bottle'
-                                : dashboard.last_feeding.type.charAt(0).toUpperCase() + dashboard.last_feeding.type.slice(1)}${dashboard.last_feeding.duration_minutes ? ` • ${dashboard.last_feeding.duration_minutes}min` : ''}`
-                            : null}
-                        onClick={() => setFeedingModal(true)}
+                    <FeedingWidget
+                        babyId={selectedBaby.id}
+                        lastFeeding={dashboard?.last_feeding}
+                        onFeedingChange={loadData}
+                        onOpenModal={() => setFeedingModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
                 {visibleWidgets.includes('diaper') && (
-                    <Widget
-                        type="diaper"
-                        label="Diaper"
-                        value={formatTime(dashboard?.last_diaper?.time)}
-                        lastTime={dashboard?.last_diaper?.time}
-                        detail={dashboard?.last_diaper?.type}
-                        onClick={() => setDiaperModal(true)}
+                    <DiaperWidget
+                        babyId={selectedBaby.id}
+                        lastDiaper={dashboard?.last_diaper}
+                        onDiaperChange={loadData}
+                        onOpenModal={() => setDiaperModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
                 {visibleWidgets.includes('sleep') && (
-                    <Widget
-                        type="sleep"
-                        label={dashboard?.current_sleep ? "Sleeping" : "Sleep"}
-                        value={dashboard?.current_sleep
-                            ? `Since ${formatTime(dashboard.current_sleep.start_time)}`
-                            : formatTime(dashboard?.last_sleep?.start_time)}
-                        lastTime={dashboard?.current_sleep?.start_time || dashboard?.last_sleep?.start_time}
-                        detail={dashboard?.current_sleep
-                            ? "Sleeping 💤"
-                            : dashboard?.last_sleep?.duration_minutes
-                                ? `${dashboard.last_sleep.duration_minutes}min`
-                                : null}
-                        isSleeping={!!dashboard?.current_sleep}
-                        onClick={() => setSleepModal(true)}
+                    <SleepWidget
+                        babyId={selectedBaby.id}
+                        currentSleep={dashboard?.current_sleep}
+                        lastSleep={dashboard?.last_sleep}
+                        onSleepChange={loadData}
+                        onOpenModal={() => setSleepModal(true)}
                     />
                 )}
 
                 {visibleWidgets.includes('pumping') && (
-                    <Widget
-                        type="pumping"
-                        label="Pumping"
-                        value={formatTime(dashboard?.last_pumping?.time)}
-                        lastTime={dashboard?.last_pumping?.time}
-                        detail={dashboard?.last_pumping?.amount_ml
-                            ? `${dashboard.last_pumping.amount_ml}ml`
-                            : null}
-                        onClick={() => setPumpingModal(true)}
+                    <PumpingWidget
+                        lastPumping={dashboard?.last_pumping}
+                        onPumpingChange={loadData}
+                        onOpenModal={() => setPumpingModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
                 {visibleWidgets.includes('potty') && (
-                    <Widget
-                        type="potty"
-                        label="Potty"
-                        value={formatTime(dashboard?.last_potty?.time)}
-                        lastTime={dashboard?.last_potty?.time}
-                        detail={dashboard?.last_potty?.result}
-                        onClick={() => setPottyModal(true)}
+                    <PottyWidget
+                        lastPotty={dashboard?.last_potty}
+                        onPottyChange={loadData}
+                        onOpenModal={() => setPottyModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
                 {visibleWidgets.includes('tummy') && (
-                    <Widget
-                        type="tummy"
-                        label="Tummy Time"
-                        value={formatTime(dashboard?.last_tummy?.start_time)}
-                        lastTime={dashboard?.last_tummy?.start_time}
-                        detail={dashboard?.last_tummy?.duration_minutes
-                            ? `${dashboard.last_tummy.duration_minutes}min`
-                            : null}
-                        onClick={() => setTummyModal(true)}
+                    <TummyTimeWidget
+                        lastTummy={dashboard?.last_tummy}
+                        onTummyChange={loadData}
+                        onOpenModal={() => setTummyModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
                 {visibleWidgets.includes('bath') && (
-                    <Widget
-                        type="bath"
-                        label="Bath"
-                        value={formatTime(dashboard?.last_bath?.time)}
-                        lastTime={dashboard?.last_bath?.time}
-                        onClick={() => setBathModal(true)}
+                    <BathWidget
+                        lastBath={dashboard?.last_bath}
+                        onBathChange={loadData}
+                        onOpenModal={() => setBathModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
                 {visibleWidgets.includes('supplement') && (
-                    <Widget
-                        type="supplement"
-                        label="Supplement"
-                        value={formatTime(dashboard?.last_supplement?.time)}
-                        lastTime={dashboard?.last_supplement?.time}
-                        detail={dashboard?.last_supplement?.name
-                            ? dashboard.last_supplement.name.replace('_', ' ')
-                            : null}
-                        onClick={() => setSupplementModal(true)}
+                    <SupplementWidget
+                        lastSupplement={dashboard?.last_supplement}
+                        onSupplementChange={loadData}
+                        onOpenModal={() => setSupplementModal(true)}
+                        quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
 
@@ -255,6 +242,8 @@ export default function Dashboard() {
                 <WidgetSettings
                     visibleWidgets={visibleWidgets}
                     onToggle={toggleWidget}
+                    quickActionsEnabled={quickActionsEnabled}
+                    onToggleQuickActions={toggleQuickActions}
                 />
             </div>
 
@@ -281,7 +270,6 @@ export default function Dashboard() {
             {sleepModal && (
                 <SleepModal
                     babyId={selectedBaby.id}
-                    currentSleep={dashboard?.current_sleep}
                     onClose={() => setSleepModal(false)}
                     onSave={handleEventLogged}
                 />

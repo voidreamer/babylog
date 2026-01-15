@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, subDays, addDays, startOfDay, differenceInMinutes, isToday } from 'date-fns';
@@ -10,8 +10,9 @@ import PottyModal from './PottyModal';
 import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
-import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr) => {
@@ -39,7 +40,13 @@ export default function TimelineCalendar() {
     const [loading, setLoading] = useState(true);
     const [selectedEventId, setSelectedEventId] = useState(null);
     const [editingEvent, setEditingEvent] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(null); // Event to delete
     const scrollRef = useRef(null);
+
+    // Swipe gesture handling
+    const touchStartX = useRef(null);
+    const touchEndX = useRef(null);
+    const minSwipeDistance = 50;
 
     const loadEvents = async () => {
         if (!selectedBaby) return;
@@ -65,8 +72,8 @@ export default function TimelineCalendar() {
     useEffect(() => {
         if (scrollRef.current && !loading) {
             const now = new Date();
-            const isToday = startOfDay(selectedDate).getTime() === startOfDay(now).getTime();
-            const scrollHour = isToday ? Math.max(0, now.getHours() - 2) : 6;
+            const isTodaySelected = isToday(selectedDate);
+            const scrollHour = isTodaySelected ? Math.max(0, now.getHours() - 2) : 6;
             const hourHeight = 80; // px per hour
             scrollRef.current.scrollTop = scrollHour * hourHeight;
         }
@@ -80,6 +87,33 @@ export default function TimelineCalendar() {
         setSelectedDate(new Date());
     };
 
+    // Swipe gesture handlers
+    const onTouchStart = useCallback((e) => {
+        touchEndX.current = null;
+        touchStartX.current = e.targetTouches[0].clientX;
+    }, []);
+
+    const onTouchMove = useCallback((e) => {
+        touchEndX.current = e.targetTouches[0].clientX;
+    }, []);
+
+    const onTouchEnd = useCallback(() => {
+        if (!touchStartX.current || !touchEndX.current) return;
+        const distance = touchStartX.current - touchEndX.current;
+        const isSwipe = Math.abs(distance) > minSwipeDistance;
+        if (isSwipe) {
+            if (distance > 0) {
+                // Swipe left - go to next day
+                navigateDay(1);
+            } else {
+                // Swipe right - go to previous day
+                navigateDay(-1);
+            }
+        }
+        touchStartX.current = null;
+        touchEndX.current = null;
+    }, []);
+
     const handleEdit = (event) => {
         setEditingEvent(event);
         setSelectedEventId(null);
@@ -90,8 +124,15 @@ export default function TimelineCalendar() {
         loadEvents();
     };
 
-    const handleDelete = async (event) => {
-        if (!confirm(`Delete this ${event.event_type}?`)) return;
+    // Show confirm dialog instead of browser confirm
+    const handleDeleteClick = (event) => {
+        setConfirmDelete(event);
+        setSelectedEventId(null);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!confirmDelete) return;
+        const event = confirmDelete;
 
         try {
             switch (event.event_type) {
@@ -120,23 +161,27 @@ export default function TimelineCalendar() {
                     await api.deleteSupplement(event.id);
                     break;
             }
+            toast.success('Deleted successfully');
             loadEvents();
         } catch (error) {
             toast.error('Failed to delete');
         }
-        setSelectedEventId(null);
+        setConfirmDelete(null);
     };
 
     // Calculate event end time in minutes from day start
     const getEventEnd = (event) => {
         const eventTime = parseUTCTime(event.time);
         const dayStart = startOfDay(selectedDate);
+        const dayEnd = differenceInMinutes(addDays(dayStart, 1), dayStart); // 1440 minutes (24 hours)
         const startMins = differenceInMinutes(eventTime, dayStart);
         const details = event.details || {};
 
         if (event.event_type === 'sleep' && details.end_time) {
             const endTime = parseUTCTime(details.end_time);
-            return differenceInMinutes(endTime, dayStart);
+            const endMins = differenceInMinutes(endTime, dayStart);
+            // Clip to day boundaries: if end is beyond this day, cap at midnight
+            return Math.min(endMins, dayEnd);
         } else if (details.duration_minutes) {
             return startMins + details.duration_minutes;
         }
@@ -220,16 +265,27 @@ export default function TimelineCalendar() {
     const getEventStyle = (event) => {
         const eventTime = parseUTCTime(event.time);
         const dayStart = startOfDay(selectedDate);
+        const dayEnd = addDays(dayStart, 1);
         const minutesFromStart = differenceInMinutes(eventTime, dayStart);
-        const top = (minutesFromStart / 60) * 80; // 80px per hour
+
+        // Clip start position: if event starts before this day, start at 0
+        const clippedStart = Math.max(0, minutesFromStart);
+        const top = (clippedStart / 60) * 80; // 80px per hour
+
         const details = event.details || {};
 
         // Duration events get height based on duration
         let height = 30; // Default for point events like diaper
         if (event.event_type === 'sleep' && details.end_time) {
             const endTime = parseUTCTime(details.end_time);
-            const durationMins = differenceInMinutes(endTime, eventTime);
-            height = Math.max(30, (durationMins / 60) * 80);
+            const eventEndMins = differenceInMinutes(endTime, dayStart);
+
+            // Clip the end time to the current day's end (midnight)
+            const clippedEnd = Math.min(eventEndMins, differenceInMinutes(dayEnd, dayStart));
+
+            // Calculate visible duration within this day
+            const visibleDurationMins = clippedEnd - clippedStart;
+            height = Math.max(30, (visibleDurationMins / 60) * 80);
         } else if (details.duration_minutes) {
             height = Math.max(30, (details.duration_minutes / 60) * 80);
         }
@@ -264,7 +320,9 @@ export default function TimelineCalendar() {
                 const duration = details.duration_minutes ? ` • ${details.duration_minutes}min` : '';
                 return feedType + duration;
             case 'diaper':
-                return details.type ? details.type.charAt(0).toUpperCase() + details.type.slice(1) : '';
+                const diaperType = details.type || '';
+                const diaperLabel = { pee: 'Pee', poo: 'Poo', mixed: 'Both' }[diaperType] || diaperType;
+                return diaperLabel;
             case 'sleep':
                 if (details.duration_minutes) {
                     const hrs = Math.floor(details.duration_minutes / 60);
@@ -273,17 +331,21 @@ export default function TimelineCalendar() {
                 }
                 return details.end_time ? '' : 'Sleeping...';
             case 'pumping':
-                return details.amount_ml ? `${details.amount_ml}ml` : '';
+                const pumpParts = [];
+                if (details.duration_minutes) pumpParts.push(`${details.duration_minutes}min`);
+                if (details.amount_ml) pumpParts.push(`${details.amount_ml}ml`);
+                return pumpParts.join(' • ') || 'Pumping';
             case 'potty':
-                const result = details.result ? details.result.charAt(0).toUpperCase() + details.result.slice(1) : '';
-                return result || 'Potty';
+                const resultLabel = { success: 'Success', attempt: 'Attempt' }[details.result] || details.result || '';
+                return resultLabel;
             case 'tummy':
-                return details.duration_minutes ? `${details.duration_minutes}min` : 'Tummy Time';
+                return details.duration_minutes ? `Tummy Time • ${details.duration_minutes}min` : 'Tummy Time';
             case 'bath':
-                return details.notes || 'Bath';
+                return details.notes ? `Bath • ${details.notes}` : 'Bath';
             case 'supplement':
                 const supName = details.name ? details.name.replace('_', ' ') : 'Supplement';
-                return details.dosage ? `${supName} • ${details.dosage}` : supName;
+                const supNameFormatted = supName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                return details.dosage ? `${supNameFormatted} • ${details.dosage}` : supNameFormatted;
             default:
                 return '';
         }
@@ -317,7 +379,13 @@ export default function TimelineCalendar() {
                     <div className="spinner"></div>
                 </div>
             ) : (
-                <div className="timeline-calendar-scroll" ref={scrollRef}>
+                <div
+                    className="timeline-calendar-scroll"
+                    ref={scrollRef}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                >
                     <div className="timeline-calendar-content">
                         {/* Hour markers */}
                         {hours.map(hour => (
@@ -398,7 +466,7 @@ export default function TimelineCalendar() {
                                                     className="timeline-action-btn delete"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleDelete(event);
+                                                        handleDeleteClick(event);
                                                     }}
                                                 >
                                                     <Trash2 size={14} /> Delete
@@ -408,6 +476,15 @@ export default function TimelineCalendar() {
                                     </div>
                                 );
                             })}
+
+                            {/* Empty state when no events */}
+                            {events.length === 0 && (
+                                <div className="timeline-empty-state">
+                                    <Calendar size={48} strokeWidth={1.5} />
+                                    <p>No events recorded</p>
+                                    <span>Add activities from the dashboard to see them here</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -481,6 +558,50 @@ export default function TimelineCalendar() {
                     onSave={handleEditComplete}
                 />
             )}
+
+            {/* Custom Confirm Delete Modal */}
+            <AnimatePresence>
+                {confirmDelete && (
+                    <motion.div
+                        className="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setConfirmDelete(null)}
+                    >
+                        <motion.div
+                            className="confirm-modal"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button className="modal-close" onClick={() => setConfirmDelete(null)}>
+                                <X size={20} />
+                            </button>
+                            <div className="confirm-modal-content">
+                                <Trash2 size={32} className="confirm-icon" />
+                                <h3>Delete {EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event'}?</h3>
+                                <p>This action cannot be undone.</p>
+                                <div className="confirm-modal-actions">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => setConfirmDelete(null)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={handleDeleteConfirm}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -1,11 +1,20 @@
 import { motion } from 'framer-motion';
 import { ChevronLeft, Clock, BookOpen } from 'lucide-react';
 import { AGE_STAGES, getStageFromAge } from '../data/articles';
+import DOMPurify from 'dompurify';
 
 export default function ArticleView({ article, onClose }) {
     if (!article) return null;
 
     const stage = AGE_STAGES[getStageFromAge(article.ageRange)];
+
+    // Sanitize HTML to prevent XSS attacks
+    const sanitizeHtml = (html) => {
+        return DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['strong', 'em', 'b', 'i'],
+            ALLOWED_ATTR: []
+        });
+    };
 
     // Simple markdown-style rendering
     const renderContent = (content) => {
@@ -105,10 +114,10 @@ export default function ArticleView({ article, onClose }) {
             // Regular paragraph
             else if (trimmed && !trimmed.startsWith('|')) {
                 flushList();
-                // Process bold text
+                // Process bold text and sanitize to prevent XSS
                 const processed = trimmed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
                 elements.push(
-                    <p key={idx} className="article-p" dangerouslySetInnerHTML={{ __html: processed }} />
+                    <p key={idx} className="article-p" dangerouslySetInnerHTML={{ __html: sanitizeHtml(processed) }} />
                 );
             }
         });

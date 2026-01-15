@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, func
+from sqlalchemy import or_, and_, func
 from datetime import datetime, timedelta
 from typing import List, Optional
 from ..database import get_db
@@ -94,11 +94,18 @@ def get_timeline(
             }
         ))
     
-    # Sleeps (using start_time)
+    # Sleeps (using start_time OR end_time to catch sleeps spanning midnight)
+    # Include sleeps that:
+    # 1. Start during the day, OR
+    # 2. End during the day (for sleeps that started the previous day)
     sleeps = db.query(Sleep).filter(
         Sleep.baby_id == baby_id,
-        Sleep.start_time >= start_of_day_utc,
-        Sleep.start_time < end_of_day_utc
+        or_(
+            # Sleep starts during this day
+            and_(Sleep.start_time >= start_of_day_utc, Sleep.start_time < end_of_day_utc),
+            # Sleep ends during this day (started before midnight)
+            and_(Sleep.end_time >= start_of_day_utc, Sleep.end_time < end_of_day_utc)
+        )
     ).all()
     
     for s in sleeps:

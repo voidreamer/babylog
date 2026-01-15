@@ -1,15 +1,30 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from mangum import Mangum
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from .config import get_settings
 from .database import engine, Base
-from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics
+from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
 settings = get_settings()
+
+# Rate limiter - uses client IP for identification
+# In production behind API Gateway, use X-Forwarded-For header
+def get_real_client_ip(request: Request) -> str:
+    """Extract real client IP, accounting for proxies."""
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return get_remote_address(request)
+
+limiter = Limiter(key_func=get_real_client_ip)
 
 app = FastAPI(
     title="SimpleBaby Baby Tracker API",
@@ -17,6 +32,10 @@ app = FastAPI(
     version="1.0.0",
     root_path="/api" if settings.environment in ("prod", "staging") else ""
 )
+
+# Add rate limiter to app state
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - Restrict to allowed origins from settings
 # Parse comma-separated origins from environment
@@ -39,6 +58,9 @@ app.include_router(health.router)
 app.include_router(pumpings.router)
 app.include_router(activities.router)
 app.include_router(analytics.router)
+app.include_router(subscription.router)
+app.include_router(admin.router)
+app.include_router(export.router)
 
 
 @app.get("/health")

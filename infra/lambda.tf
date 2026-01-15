@@ -47,6 +47,7 @@ resource "aws_lambda_function" "api" {
       COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.main.id
       COGNITO_REGION       = var.aws_region
       CORS_ORIGINS         = var.cors_origins
+      ADMIN_API_KEY        = var.admin_api_key
     }
   }
 }

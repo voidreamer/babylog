@@ -287,17 +287,28 @@ export default function BabyInsights({ isPremium = false }) {
                 </h2>
 
                 <div className={`insights-patterns ${!isPremium ? 'premium-blur' : ''}`}>
-                    {patterns?.usual_wake_time && (
+                    {patterns?.wake_interval_hours ? (
+                        /* Newborn pattern: show wake interval */
                         <div className="pattern-item">
-                            <span className="pattern-label">Usually wakes up</span>
-                            <span className="pattern-value">{formatTime24to12(patterns.usual_wake_time)}</span>
+                            <span className="pattern-label">Wakes up</span>
+                            <span className="pattern-value">Every {patterns.wake_interval_hours} hours</span>
                         </div>
-                    )}
-                    {patterns?.usual_bedtime && (
-                        <div className="pattern-item">
-                            <span className="pattern-label">Usual bedtime</span>
-                            <span className="pattern-value">{formatTime24to12(patterns.usual_bedtime)}</span>
-                        </div>
+                    ) : (
+                        /* Older baby: show specific times */
+                        <>
+                            {patterns?.usual_wake_time && (
+                                <div className="pattern-item">
+                                    <span className="pattern-label">Usually wakes up</span>
+                                    <span className="pattern-value">{formatTime24to12(patterns.usual_wake_time)}</span>
+                                </div>
+                            )}
+                            {patterns?.usual_bedtime && (
+                                <div className="pattern-item">
+                                    <span className="pattern-label">Usual bedtime</span>
+                                    <span className="pattern-value">{formatTime24to12(patterns.usual_bedtime)}</span>
+                                </div>
+                            )}
+                        </>
                     )}
                     {patterns?.avg_feeding_interval_hours && (
                         <div className="pattern-item">
