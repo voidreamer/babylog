@@ -154,7 +154,16 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
     };
 
     const isActive = !!activeTummy;
-    const timeAgo = lastTummy ? formatTimeAgo(lastTummy.start_time) : null;
+
+    // Calculate end time from start_time + duration for "time ago" display
+    // Shows how long since tummy time ended, not when it started
+    const getEndTime = () => {
+        if (!lastTummy) return null;
+        const startDate = new Date(lastTummy.start_time.endsWith('Z') ? lastTummy.start_time : lastTummy.start_time + 'Z');
+        const endDate = new Date(startDate.getTime() + (lastTummy.duration_minutes || 0) * 60000);
+        return endDate.toISOString();
+    };
+    const timeAgo = lastTummy ? formatTimeAgo(getEndTime()) : null;
 
     const widgetStyle = isDarkTheme ? {} : {
         '--widget-stroke': colors.stroke,
