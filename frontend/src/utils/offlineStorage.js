@@ -10,6 +10,13 @@ import { openDB } from 'idb';
 const DB_NAME = 'simplebaby-offline';
 const DB_VERSION = 2; // Bumped for health records
 
+// Cache configuration
+const CACHE_CONFIG = {
+    MAX_ENTRIES_PER_BABY: 500, // Max entries per baby for each activity type
+    CACHE_TTL_DAYS: 30, // Cache expires after 30 days
+    MAX_PENDING_SYNC_ACTIONS: 100, // Max pending sync actions
+};
+
 // Store names
 const STORES = {
     BABIES: 'babies',
@@ -494,7 +501,9 @@ export async function queueForSync(action) {
     const db = await getDB();
     await db.add(STORES.PENDING_SYNC, {
         ...action,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        retry_count: 0,
+        last_retry: null
     });
 }
 
@@ -512,6 +521,20 @@ export async function getPendingSyncActions() {
 export async function removeSyncAction(id) {
     const db = await getDB();
     await db.delete(STORES.PENDING_SYNC, id);
+}
+
+/**
+ * Update retry count for a failed sync action
+ */
+export async function updateSyncActionRetry(id) {
+    const db = await getDB();
+    const action = await db.get(STORES.PENDING_SYNC, id);
+    if (action) {
+        action.retry_count = (action.retry_count || 0) + 1;
+        action.last_retry = new Date().toISOString();
+        await db.put(STORES.PENDING_SYNC, action);
+    }
+    return action;
 }
 
 /**
@@ -581,6 +604,64 @@ export async function clearAllOfflineData() {
     await tx.done;
 }
 
+/**
+ * Clean up old cache entries based on TTL and max entries
+ * Should be called periodically (e.g., on app start or after sync)
+ */
+export async function cleanupCache() {
+    const db = await getDB();
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - CACHE_CONFIG.CACHE_TTL_DAYS);
+    const cutoffISO = cutoffDate.toISOString();
+
+    // Clean up old pending sync actions
+    const pendingActions = await db.getAll(STORES.PENDING_SYNC);
+    const oldActions = pendingActions.filter(a => a.created_at < cutoffISO);
+    for (const action of oldActions) {
+        await db.delete(STORES.PENDING_SYNC, action.id);
+    }
+
+    // Limit pending sync actions count
+    if (pendingActions.length > CACHE_CONFIG.MAX_PENDING_SYNC_ACTIONS) {
+        const sortedActions = pendingActions.sort((a, b) =>
+            new Date(a.created_at) - new Date(b.created_at)
+        );
+        const toRemove = sortedActions.slice(0, pendingActions.length - CACHE_CONFIG.MAX_PENDING_SYNC_ACTIONS);
+        for (const action of toRemove) {
+            await db.delete(STORES.PENDING_SYNC, action.id);
+        }
+    }
+
+    // Clean up old metadata entries
+    const metadata = await db.getAll(STORES.METADATA);
+    for (const entry of metadata) {
+        if (entry.updated_at && entry.updated_at < cutoffISO) {
+            await db.delete(STORES.METADATA, entry.key);
+        }
+    }
+}
+
+/**
+ * Get cache statistics
+ */
+export async function getCacheStats() {
+    const db = await getDB();
+    return {
+        babies: await db.count(STORES.BABIES),
+        feedings: await db.count(STORES.FEEDINGS),
+        sleeps: await db.count(STORES.SLEEPS),
+        diapers: await db.count(STORES.DIAPERS),
+        pumpings: await db.count(STORES.PUMPINGS),
+        activities: await db.count(STORES.ACTIVITIES),
+        pendingSync: await db.count(STORES.PENDING_SYNC),
+        doctorVisits: await db.count(STORES.DOCTOR_VISITS),
+        vaccinations: await db.count(STORES.VACCINATIONS),
+        medications: await db.count(STORES.MEDICATIONS),
+        milestones: await db.count(STORES.MILESTONES),
+        growthRecords: await db.count(STORES.GROWTH_RECORDS),
+    };
+}
+
 export default {
     isOnline,
     cacheBabies,
@@ -615,9 +696,12 @@ export default {
     queueForSync,
     getPendingSyncActions,
     removeSyncAction,
+    updateSyncActionRetry,
     clearPendingSyncActions,
     getPendingSyncCount,
     setMetadata,
     getMetadata,
-    clearAllOfflineData
+    clearAllOfflineData,
+    cleanupCache,
+    getCacheStats
 };
