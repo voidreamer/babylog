@@ -316,24 +316,6 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                             {saving ? 'Saving...' : 'Done'}
                         </button>
                     </div>
-                ) : quickActionsEnabled ? (
-                    /* Idle state with quick actions */
-                    <div className="feeding-widget-idle">
-                        {lastFeeding ? (
-                            <>
-                                <div className="widget-time-ago">{timeAgo}</div>
-                                <div className="widget-detail">{getLastFeedingDetail()}</div>
-                            </>
-                        ) : null}
-                        <button
-                            className="feeding-start-btn"
-                            onClick={handleStartFeeding}
-                            disabled={saving}
-                        >
-                            <Play size={14} fill="currentColor" />
-                            Start Feeding
-                        </button>
-                    </div>
                 ) : (
                     /* Simple display without quick actions */
                     <div className="feeding-widget-idle">

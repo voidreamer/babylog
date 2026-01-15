@@ -144,15 +144,10 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                             <div className="widget-time-ago">{timeAgo}</div>
                             <div className="widget-detail">{supplementLabel}</div>
                         </>
-                    ) : !quickActionsEnabled ? (
+                    ) : (
                         <div className="widget-time-ago">No supplements yet</div>
-                    ) : null}
-                    {quickActionsEnabled && (
-                        <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
-                            <Check size={14} />
-                            {saving ? '...' : 'Vit D'}
-                        </button>
                     )}
+                </div>
                 </div>
             </div>
         </div>

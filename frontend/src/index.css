@@ -861,10 +861,28 @@ h4 {
   .settings-page {
     max-width: 800px;
     padding: var(--space-2xl);
+    margin: 0 auto;
   }
 
   .settings-section {
     padding: var(--space-xl);
+  }
+
+  .settings-select {
+    min-width: 200px;
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  /* Health page responsive for desktop */
+  .health-tabs {
+    max-width: 900px;
+    margin: 0 auto var(--space-lg) auto;
+  }
+
+  .card {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -1434,6 +1452,8 @@ h4 {
   flex-direction: column;
   gap: var(--space-sm);
   margin-top: var(--space-xs);
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .sleep-start-btn,
@@ -3380,6 +3400,49 @@ h4 {
     gap: var(--space-sm);
   }
 
+  /* Learn/Insights - Articles grid responsive */
+  .learn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .learn-card {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-md);
+  }
+
+  .learn-card-image {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+
+  .learn-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .learn-featured-scroll {
+    display: flex;
+    gap: var(--space-md);
+    overflow-x: auto;
+    padding-bottom: var(--space-sm);
+  }
+
+  .learn-card.featured {
+    min-width: 200px;
+    flex-direction: column;
+  }
+
+  .learn-card.featured .learn-card-image {
+    width: 100%;
+    height: 120px;
+  }
+
   /* Growth chart section */
   .growth-chart-section {
     padding: var(--space-sm);
@@ -3414,6 +3477,33 @@ h4 {
     font-size: 0.8rem;
     padding: var(--space-xs) var(--space-sm);
     white-space: nowrap;
+  }
+
+  /* Settings and Health pages for tablet */
+  .settings-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: var(--space-xl);
+  }
+
+  .settings-section {
+    padding: var(--space-lg);
+  }
+
+  .card {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .health-tabs {
+    max-width: 700px;
+    margin: 0 auto var(--space-lg) auto;
+  }
+
+  .health-tab span:not(.health-tab-badge) {
+    display: inline;
+    /* Show label text on tablet and up */
   }
 
   .diaper-quick-btns {

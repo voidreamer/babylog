@@ -195,15 +195,36 @@ async def get_baby_analytics(
         
         # Wake times (end of sleep)
         wake_times = [s.end_time for s in sleeps if s.end_time]
-        usual_wake_time = calculate_average_time_of_day(wake_times)
-        
-        # Bedtimes (start of overnight sleep - after 6pm)
-        bedtimes = []
-        for s in sleeps:
-            st = make_aware(s.start_time)
-            if st.hour >= 18 or st.hour <= 3:
-                bedtimes.append(st)
-        usual_bedtime = calculate_average_time_of_day(bedtimes)
+
+        # Determine sleep pattern display based on age
+        # Newborns (0-12 weeks): Show wake interval instead of specific times
+        # Older babies (12+ weeks): Show specific wake/bedtime if consolidated
+        usual_wake_time = None
+        usual_bedtime = None
+        wake_interval_hours = None
+
+        if age_weeks < 12:
+            # Newborn pattern: calculate average interval between wake times
+            if len(wake_times) >= 3:
+                wake_intervals = []
+                sorted_wakes = sorted([make_aware(wt) for wt in wake_times])
+                for i in range(1, len(sorted_wakes)):
+                    interval_hours = (sorted_wakes[i] - sorted_wakes[i-1]).total_seconds() / 3600
+                    if interval_hours < 8:  # Filter out unreasonably long gaps
+                        wake_intervals.append(interval_hours)
+                if wake_intervals:
+                    wake_interval_hours = round(sum(wake_intervals) / len(wake_intervals), 1)
+        else:
+            # Older baby: use specific times if sleep is consolidated
+            usual_wake_time = calculate_average_time_of_day(wake_times)
+
+            # Bedtimes (start of overnight sleep - after 6pm)
+            bedtimes = []
+            for s in sleeps:
+                st = make_aware(s.start_time)
+                if st.hour >= 18 or st.hour <= 3:
+                    bedtimes.append(st)
+            usual_bedtime = calculate_average_time_of_day(bedtimes)
         
         # Nap durations (daytime sleep)
         nap_durations = []
@@ -331,6 +352,8 @@ async def get_baby_analytics(
                 "avg_nap_duration_minutes": avg_nap_duration,
                 "usual_wake_time": usual_wake_time,
                 "usual_bedtime": usual_bedtime,
+                "wake_interval_hours": wake_interval_hours,  # For newborns
+                "age_weeks": age_weeks,  # Include age for frontend logic
             } if has_enough_data else None,
             
             "predictions": {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { api } from '../api/client';
-import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check } from 'lucide-react';
+import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil } from 'lucide-react';
 import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
@@ -67,6 +67,7 @@ export default function BabyGreeting({ summary }) {
     const { babies, selectedBaby, selectBaby, removeBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [showEditForm, setShowEditForm] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -103,6 +104,27 @@ export default function BabyGreeting({ summary }) {
         } catch (error) {
             console.error('Failed to add baby:', error);
             toast.error('Failed to add baby');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleEditBaby = async (formData) => {
+        if (!selectedBaby) return;
+        setSaving(true);
+        try {
+            await api.updateBaby(selectedBaby.id, {
+                name: formData.name,
+                birth_date: formData.birthDate ? new Date(formData.birthDate).toISOString() : null,
+                gender: formData.gender,
+            });
+
+            await refresh();
+            setShowEditForm(false);
+            toast.success(`${formData.name} updated!`);
+        } catch (error) {
+            console.error('Failed to update baby:', error);
+            toast.error('Failed to update baby');
         } finally {
             setSaving(false);
         }
@@ -225,6 +247,19 @@ export default function BabyGreeting({ summary }) {
                             </div>
                         )}
 
+                        {selectedBaby?.is_owner && (
+                            <div
+                                className="baby-dropdown-item"
+                                onClick={() => {
+                                    setShowEditForm(true);
+                                    setShowDropdown(false);
+                                }}
+                            >
+                                <Pencil size={16} />
+                                <span>Edit {selectedBaby.name}</span>
+                            </div>
+                        )}
+
                         <div
                             className="baby-dropdown-item"
                             onClick={() => {
@@ -271,6 +306,26 @@ export default function BabyGreeting({ summary }) {
                                 onSubmit={handleAddBaby}
                                 onCancel={() => setShowAddForm(false)}
                                 saving={saving}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showEditForm && selectedBaby && (
+                <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">Edit {selectedBaby.name}</h2>
+                            <button className="modal-close" onClick={() => setShowEditForm(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <AddBabyForm
+                                onSubmit={handleEditBaby}
+                                onCancel={() => setShowEditForm(false)}
+                                saving={saving}
+                                submitLabel="Save Changes"
+                                initialData={selectedBaby}
                             />
                         </div>
                     </div>

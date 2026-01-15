@@ -173,12 +173,15 @@ export default function TimelineCalendar() {
     const getEventEnd = (event) => {
         const eventTime = parseUTCTime(event.time);
         const dayStart = startOfDay(selectedDate);
+        const dayEnd = differenceInMinutes(addDays(dayStart, 1), dayStart); // 1440 minutes (24 hours)
         const startMins = differenceInMinutes(eventTime, dayStart);
         const details = event.details || {};
 
         if (event.event_type === 'sleep' && details.end_time) {
             const endTime = parseUTCTime(details.end_time);
-            return differenceInMinutes(endTime, dayStart);
+            const endMins = differenceInMinutes(endTime, dayStart);
+            // Clip to day boundaries: if end is beyond this day, cap at midnight
+            return Math.min(endMins, dayEnd);
         } else if (details.duration_minutes) {
             return startMins + details.duration_minutes;
         }
@@ -262,16 +265,27 @@ export default function TimelineCalendar() {
     const getEventStyle = (event) => {
         const eventTime = parseUTCTime(event.time);
         const dayStart = startOfDay(selectedDate);
+        const dayEnd = addDays(dayStart, 1);
         const minutesFromStart = differenceInMinutes(eventTime, dayStart);
-        const top = (minutesFromStart / 60) * 80; // 80px per hour
+
+        // Clip start position: if event starts before this day, start at 0
+        const clippedStart = Math.max(0, minutesFromStart);
+        const top = (clippedStart / 60) * 80; // 80px per hour
+
         const details = event.details || {};
 
         // Duration events get height based on duration
         let height = 30; // Default for point events like diaper
         if (event.event_type === 'sleep' && details.end_time) {
             const endTime = parseUTCTime(details.end_time);
-            const durationMins = differenceInMinutes(endTime, eventTime);
-            height = Math.max(30, (durationMins / 60) * 80);
+            const eventEndMins = differenceInMinutes(endTime, dayStart);
+
+            // Clip the end time to the current day's end (midnight)
+            const clippedEnd = Math.min(eventEndMins, differenceInMinutes(dayEnd, dayStart));
+
+            // Calculate visible duration within this day
+            const visibleDurationMins = clippedEnd - clippedStart;
+            height = Math.max(30, (visibleDurationMins / 60) * 80);
         } else if (details.duration_minutes) {
             height = Math.max(30, (details.duration_minutes / 60) * 80);
         }

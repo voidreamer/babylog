@@ -19,7 +19,18 @@ import {
     cacheActivities,
     getCachedActivities,
     addCachedActivity,
-    queueForSync
+    queueForSync,
+    // Health records
+    cacheDoctorVisits,
+    getCachedDoctorVisits,
+    cacheVaccinations,
+    getCachedVaccinations,
+    cacheMedications,
+    getCachedMedications,
+    cacheMilestones,
+    getCachedMilestones,
+    cacheGrowthRecords,
+    getCachedGrowthRecords
 } from '../utils/offlineStorage.js';
 
 class ApiClient {
@@ -429,11 +440,15 @@ class ApiClient {
     // Health - Doctor Visits
     async getDoctorVisits(babyId) {
         try {
-            return await this.request(`/health/doctor-visits/?baby_id=${babyId}`);
+            const visits = await this.request(`/health/doctor-visits/?baby_id=${babyId}`);
+            if (visits) {
+                await cacheDoctorVisits(babyId, visits);
+            }
+            return visits;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning empty doctor visits');
-                return [];
+                console.log('Offline: returning cached doctor visits');
+                return await getCachedDoctorVisits(babyId);
             }
             throw error;
         }
@@ -460,11 +475,15 @@ class ApiClient {
     // Health - Vaccinations
     async getVaccinations(babyId) {
         try {
-            return await this.request(`/health/vaccinations/?baby_id=${babyId}`);
+            const vaccinations = await this.request(`/health/vaccinations/?baby_id=${babyId}`);
+            if (vaccinations) {
+                await cacheVaccinations(babyId, vaccinations);
+            }
+            return vaccinations;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning empty vaccinations');
-                return [];
+                console.log('Offline: returning cached vaccinations');
+                return await getCachedVaccinations(babyId);
             }
             throw error;
         }
@@ -491,11 +510,16 @@ class ApiClient {
     // Health - Medications
     async getMedications(babyId, activeOnly = false) {
         try {
-            return await this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`);
+            const medications = await this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`);
+            if (medications) {
+                await cacheMedications(babyId, medications);
+            }
+            return medications;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning empty medications');
-                return [];
+                console.log('Offline: returning cached medications');
+                const cached = await getCachedMedications(babyId);
+                return activeOnly ? cached.filter(m => m.is_active) : cached;
             }
             throw error;
         }
@@ -526,11 +550,15 @@ class ApiClient {
     // Health - Milestones
     async getMilestones(babyId) {
         try {
-            return await this.request(`/health/milestones/?baby_id=${babyId}`);
+            const milestones = await this.request(`/health/milestones/?baby_id=${babyId}`);
+            if (milestones) {
+                await cacheMilestones(babyId, milestones);
+            }
+            return milestones;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning empty milestones');
-                return [];
+                console.log('Offline: returning cached milestones');
+                return await getCachedMilestones(babyId);
             }
             throw error;
         }
@@ -557,11 +585,15 @@ class ApiClient {
     // Health - Growth
     async getGrowthRecords(babyId) {
         try {
-            return await this.request(`/health/growth/?baby_id=${babyId}`);
+            const records = await this.request(`/health/growth/?baby_id=${babyId}`);
+            if (records) {
+                await cacheGrowthRecords(babyId, records);
+            }
+            return records;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning empty growth records');
-                return [];
+                console.log('Offline: returning cached growth records');
+                return await getCachedGrowthRecords(babyId);
             }
             throw error;
         }

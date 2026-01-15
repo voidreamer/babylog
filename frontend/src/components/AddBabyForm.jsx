@@ -4,6 +4,7 @@ import { Scale, Ruler } from 'lucide-react';
 /**
  * Reusable baby form component used by both Onboarding wizard and BabySelector.
  * Collects: name, birth date, gender, weight, height
+ * Can be used for both creating new babies and editing existing ones.
  */
 export default function AddBabyForm({
     onSubmit,
@@ -11,13 +12,14 @@ export default function AddBabyForm({
     saving = false,
     submitLabel = 'Add Baby',
     showCancel = true,
-    compact = false
+    compact = false,
+    initialData = null,  // For edit mode
 }) {
-    const [name, setName] = useState('');
-    const [birthDate, setBirthDate] = useState('');
-    const [gender, setGender] = useState('');
-    const [birthWeight, setBirthWeight] = useState('');
-    const [birthHeight, setBirthHeight] = useState('');
+    const [name, setName] = useState(initialData?.name || '');
+    const [birthDate, setBirthDate] = useState(initialData?.birth_date ? initialData.birth_date.split('T')[0] : '');
+    const [gender, setGender] = useState(initialData?.gender || '');
+    const [birthWeight, setBirthWeight] = useState(initialData?.birth_weight || '');
+    const [birthHeight, setBirthHeight] = useState(initialData?.birth_height || '');
 
     const handleSubmit = (e) => {
         e.preventDefault();
