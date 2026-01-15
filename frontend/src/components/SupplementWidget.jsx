@@ -148,7 +148,6 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                         <div className="widget-time-ago">No supplements yet</div>
                     )}
                 </div>
-                </div>
             </div>
         </div>
     );
