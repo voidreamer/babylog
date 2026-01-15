@@ -10,6 +10,27 @@ def utc_now():
     return datetime.now(timezone.utc)
 
 
+# ============================================================================
+# User Model - for premium status and user settings
+# ============================================================================
+
+class User(Base):
+    """
+    User model to store user-specific data.
+    The user_id comes from Cognito (sub claim).
+    """
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, unique=True, index=True, nullable=False)  # Cognito sub
+    email = Column(String, index=True, nullable=True)
+    is_premium = Column(Boolean, default=False, nullable=False)
+    premium_since = Column(DateTime, nullable=True)  # When premium was activated
+    promo_code_used = Column(String, nullable=True)  # Which promo code was redeemed
+    created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+
+
 class Baby(Base):
     __tablename__ = "babies"
     

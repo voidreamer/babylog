@@ -15,160 +15,26 @@ import Callback from './pages/Callback';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings as SettingsIcon, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
-function ProtectedRoute({ children }) {
-    const { user, loading } = useAuth();
-
-    if (loading) {
-        return (
-            <div className="loading">
-                <div className="spinner"></div>
-            </div>
-        );
-    }
-
-    if (!user) {
-        return <Navigate to="/login" replace />;
-    }
-
-    return children;
-}
-
-function MainApp() {
-    const { user, logout } = useAuth();
-    const { babies, loading: babiesLoading } = useBaby();
-    const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
-    const [activeTab, setActiveTab] = useState('home');
-    const [showOnboarding, setShowOnboarding] = useState(false);
-    const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
-    const [promoCode, setPromoCode] = useState('');
-    const [promoLoading, setPromoLoading] = useState(false);
-    const [exportLoading, setExportLoading] = useState(false);
-
-    // Premium state
-    const [isPremium, setIsPremium] = useState(() => {
-        return localStorage.getItem('isPremium') === 'true';
-    });
-
-    const handlePromoCode = async () => {
-        if (!promoCode.trim()) {
-            toast.error('Please enter a promo code');
-            return;
-        }
-
-        // Check rate limit: 3 attempts per minute
-        const rateLimit = checkRateLimit('promoCode', 3, 60000);
-        if (!rateLimit.allowed) {
-            const timeLeft = getTimeUntilReset(rateLimit.resetTime);
-            toast.error(`Too many attempts. Please wait ${timeLeft} and try again.`);
-            return;
-        }
-
-        setPromoLoading(true);
-        // Record this attempt before making the API call
-        recordAttempt('promoCode', 60000);
-
-        try {
-            const result = await api.redeemPromoCode(promoCode);
-            if (result.valid && result.premium) {
-                setIsPremium(true);
-                localStorage.setItem('isPremium', 'true');
-                setPromoCode('');
-                // Clear rate limit on success so user isn't penalized
-                clearRateLimit('promoCode');
-                toast.success(result.message || 'Premium unlocked!');
-            } else {
-                toast.error(result.message || 'Invalid code');
-            }
-        } catch (error) {
-            toast.error('Failed to verify code. Please try again.');
-        } finally {
-            setPromoLoading(false);
-        }
-    };
-
-    const handleExportCsv = async () => {
-        if (!babies || babies.length === 0) {
-            toast.error('No baby data to export');
-            return;
-        }
-
-        setExportLoading(true);
-        try {
-            // Export current baby's data
-            const currentBaby = babies[0];
-            await api.exportBabyDataCsv(currentBaby.id);
-            toast.success('Export complete! Check your downloads folder.');
-        } catch (error) {
-            toast.error('Export failed: ' + error.message);
-        } finally {
-            setExportLoading(false);
-        }
-    };
-
-    // Theme state
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'handwritten';
-    });
-
-    // Apply theme on mount and when it changes
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-    }, [theme]);
-
-    // Check if we should show onboarding (no babies yet)
-    // Only show onboarding when online - if offline with no cached babies, show offline message instead
-    useEffect(() => {
-        if (!babiesLoading && babies.length === 0 && online) {
-            setShowOnboarding(true);
-        }
-    }, [babies, babiesLoading, online]);
-
-    // Show onboarding for first-time users (only when online)
-    if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
-        return (
-            <Onboarding
-                onComplete={() => setShowOnboarding(false)}
-            />
-        );
-    }
-
-    // Show offline message if offline with no cached babies
-    if (!babiesLoading && babies.length === 0 && !online) {
-        return (
-            <div className="app-container">
-                <OfflineIndicator
-                    online={online}
-                    syncing={syncing}
-                    pendingCount={pendingCount}
-                    onSync={syncPendingChanges}
-                />
-                <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
-                    <div className="empty-state-icon">📡</div>
-                    <h2 className="empty-state-title">You're Offline</h2>
-                    <p className="empty-state-text">
-                        Connect to the internet to load your baby data.
-                        Your data will sync automatically when you're back online.
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
-    // Show privacy policy if requested
-    if (showPrivacyPolicy) {
-        return (
-            <div className="app-container" style={{ paddingBottom: 'var(--space-xl)' }}>
-                <PrivacyPolicy onBack={() => setShowPrivacyPolicy(false)} />
-            </div>
-        );
-    }
-
-    // Settings page content
-    const SettingsPage = () => (
+// SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
+function SettingsPage({
+    user,
+    theme,
+    setTheme,
+    isPremium,
+    promoCode,
+    setPromoCode,
+    promoLoading,
+    handlePromoCode,
+    exportLoading,
+    handleExportCsv,
+    babies,
+    setShowPrivacyPolicy,
+    logout
+}) {
+    return (
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
 
@@ -285,6 +151,182 @@ function MainApp() {
             </div>
         </div>
     );
+}
+
+function ProtectedRoute({ children }) {
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="loading">
+                <div className="spinner"></div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
+}
+
+function MainApp() {
+    const { user, logout } = useAuth();
+    const { babies, loading: babiesLoading } = useBaby();
+    const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
+    const [activeTab, setActiveTab] = useState('home');
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+    const [promoCode, setPromoCode] = useState('');
+    const [promoLoading, setPromoLoading] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
+
+    // Premium state
+    const [isPremium, setIsPremium] = useState(() => {
+        return localStorage.getItem('isPremium') === 'true';
+    });
+
+    const handlePromoCode = async () => {
+        if (!promoCode.trim()) {
+            toast.error('Please enter a promo code');
+            return;
+        }
+
+        // Check rate limit: 3 attempts per minute
+        const rateLimit = checkRateLimit('promoCode', 3, 60000);
+        if (!rateLimit.allowed) {
+            const timeLeft = getTimeUntilReset(rateLimit.resetTime);
+            toast.error(`Too many attempts. Please wait ${timeLeft} and try again.`);
+            return;
+        }
+
+        setPromoLoading(true);
+        // Record this attempt before making the API call
+        recordAttempt('promoCode', 60000);
+
+        try {
+            const result = await api.redeemPromoCode(promoCode);
+            if (result.valid && result.premium) {
+                setIsPremium(true);
+                localStorage.setItem('isPremium', 'true');
+                setPromoCode('');
+                // Clear rate limit on success so user isn't penalized
+                clearRateLimit('promoCode');
+                toast.success(result.message || 'Premium unlocked!');
+            } else {
+                toast.error(result.message || 'Invalid code');
+            }
+        } catch (error) {
+            toast.error('Failed to verify code. Please try again.');
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
+    const handleExportCsv = async () => {
+        if (!babies || babies.length === 0) {
+            toast.error('No baby data to export');
+            return;
+        }
+
+        setExportLoading(true);
+        try {
+            // Export current baby's data
+            const currentBaby = babies[0];
+            await api.exportBabyDataCsv(currentBaby.id);
+            toast.success('Export complete! Check your downloads folder.');
+        } catch (error) {
+            toast.error('Export failed: ' + error.message);
+        } finally {
+            setExportLoading(false);
+        }
+    };
+
+    // Theme state
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem('theme') || 'handwritten';
+    });
+
+    // Apply theme on mount and when it changes
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
+    // Check premium status from server on app load
+    // This ensures premium persists across cache clears and devices
+    useEffect(() => {
+        const checkPremiumStatus = async () => {
+            if (!user || !online) return;
+
+            try {
+                const status = await api.getSubscriptionStatus();
+                if (status.premium) {
+                    setIsPremium(true);
+                    localStorage.setItem('isPremium', 'true');
+                } else {
+                    // Server says not premium - update local state
+                    // (could be cache was cleared but user never had premium)
+                    setIsPremium(false);
+                    localStorage.setItem('isPremium', 'false');
+                }
+            } catch (error) {
+                // On error, keep localStorage value as fallback
+                console.warn('Failed to check premium status:', error);
+            }
+        };
+
+        checkPremiumStatus();
+    }, [user, online]);
+
+    // Check if we should show onboarding (no babies yet)
+    // Only show onboarding when online - if offline with no cached babies, show offline message instead
+    useEffect(() => {
+        if (!babiesLoading && babies.length === 0 && online) {
+            setShowOnboarding(true);
+        }
+    }, [babies, babiesLoading, online]);
+
+    // Show onboarding for first-time users (only when online)
+    if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
+        return (
+            <Onboarding
+                onComplete={() => setShowOnboarding(false)}
+            />
+        );
+    }
+
+    // Show offline message if offline with no cached babies
+    if (!babiesLoading && babies.length === 0 && !online) {
+        return (
+            <div className="app-container">
+                <OfflineIndicator
+                    online={online}
+                    syncing={syncing}
+                    pendingCount={pendingCount}
+                    onSync={syncPendingChanges}
+                />
+                <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
+                    <div className="empty-state-icon">📡</div>
+                    <h2 className="empty-state-title">You're Offline</h2>
+                    <p className="empty-state-text">
+                        Connect to the internet to load your baby data.
+                        Your data will sync automatically when you're back online.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    // Show privacy policy if requested
+    if (showPrivacyPolicy) {
+        return (
+            <div className="app-container" style={{ paddingBottom: 'var(--space-xl)' }}>
+                <PrivacyPolicy onBack={() => setShowPrivacyPolicy(false)} />
+            </div>
+        );
+    }
 
     if (babiesLoading) {
         return (
@@ -307,7 +349,23 @@ function MainApp() {
                 {activeTab === 'timeline' && <TimelineCalendar />}
                 {activeTab === 'health' && <Health />}
                 {activeTab === 'learn' && <Learn isPremium={isPremium} />}
-                {activeTab === 'settings' && <SettingsPage />}
+                {activeTab === 'settings' && (
+                    <SettingsPage
+                        user={user}
+                        theme={theme}
+                        setTheme={setTheme}
+                        isPremium={isPremium}
+                        promoCode={promoCode}
+                        setPromoCode={setPromoCode}
+                        promoLoading={promoLoading}
+                        handlePromoCode={handlePromoCode}
+                        exportLoading={exportLoading}
+                        handleExportCsv={handleExportCsv}
+                        babies={babies}
+                        setShowPrivacyPolicy={setShowPrivacyPolicy}
+                        logout={logout}
+                    />
+                )}
             </main>
 
             {/* Bottom Navigation */}
@@ -344,7 +402,7 @@ function MainApp() {
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
                     onClick={() => setActiveTab('settings')}
                 >
-                    <Settings size={20} />
+                    <SettingsIcon size={20} />
                     <span>Settings</span>
                 </button>
             </nav>
