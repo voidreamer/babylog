@@ -22,11 +22,52 @@ import {
     queueForSync,
     getPendingSyncActions,
     removeSyncAction,
+    updateSyncActionRetry,
     getPendingSyncCount,
     setMetadata,
     getMetadata,
-    clearAllOfflineData
+    clearAllOfflineData,
+    cleanupCache
 } from '../utils/offlineStorage';
+
+// Only log in development
+const isDev = import.meta.env.DEV;
+const log = (...args) => isDev && console.log(...args);
+
+// Retry configuration
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 1000; // 1 second
+
+/**
+ * Calculate exponential backoff delay
+ * @param {number} retryCount - Current retry count
+ * @returns {number} Delay in milliseconds
+ */
+function getBackoffDelay(retryCount) {
+    return Math.min(BASE_DELAY_MS * Math.pow(2, retryCount), 30000); // Max 30 seconds
+}
+
+/**
+ * Check if action should be retried based on retry count and time
+ * @param {object} action - The sync action
+ * @returns {boolean} Whether to retry
+ */
+function shouldRetryAction(action) {
+    if ((action.retry_count || 0) >= MAX_RETRIES) {
+        return false;
+    }
+
+    // Check if enough time has passed since last retry (exponential backoff)
+    if (action.last_retry) {
+        const timeSinceLastRetry = Date.now() - new Date(action.last_retry).getTime();
+        const requiredDelay = getBackoffDelay(action.retry_count || 0);
+        if (timeSinceLastRetry < requiredDelay) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 export function useOfflineSync() {
     const [online, setOnline] = useState(isOnline());
@@ -52,6 +93,11 @@ export function useOfflineSync() {
         // Check pending count on mount
         updatePendingCount();
 
+        // Run cache cleanup on mount (non-blocking)
+        cleanupCache().catch(e => {
+            if (isDev) console.error('Cache cleanup failed:', e);
+        });
+
         return () => {
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
@@ -64,11 +110,11 @@ export function useOfflineSync() {
             const count = await getPendingSyncCount();
             setPendingCount(count);
         } catch (e) {
-            console.error('Failed to get pending count:', e);
+            if (isDev) console.error('Failed to get pending count:', e);
         }
     }, []);
 
-    // Sync pending changes
+    // Sync pending changes with retry limits and exponential backoff
     const syncPendingChanges = useCallback(async () => {
         if (!isOnline() || syncInProgress.current) return;
 
@@ -79,23 +125,40 @@ export function useOfflineSync() {
             const actions = await getPendingSyncActions();
 
             for (const action of actions) {
+                // Check if action has exceeded max retries
+                if ((action.retry_count || 0) >= MAX_RETRIES) {
+                    log('Action exceeded max retries, removing:', action);
+                    await removeSyncAction(action.id);
+                    continue;
+                }
+
+                // Check if we should retry based on backoff timing
+                if (!shouldRetryAction(action)) {
+                    log('Skipping action due to backoff:', action);
+                    continue;
+                }
+
                 try {
                     await executeAction(action);
                     await removeSyncAction(action.id);
+                    log('Successfully synced action:', action.type);
                 } catch (error) {
-                    console.error('Failed to sync action:', action, error);
-                    // Keep the action for retry if it's a network error
-                    if (!error.message?.includes('Unauthorized')) {
+                    log('Failed to sync action:', action, error);
+
+                    // Remove on auth errors (401)
+                    if (error.message?.includes('Unauthorized')) {
+                        await removeSyncAction(action.id);
                         continue;
                     }
-                    // Remove invalid actions (like 401s)
-                    await removeSyncAction(action.id);
+
+                    // Update retry count for other errors
+                    await updateSyncActionRetry(action.id);
                 }
             }
 
             await updatePendingCount();
         } catch (error) {
-            console.error('Sync failed:', error);
+            log('Sync failed:', error);
         } finally {
             syncInProgress.current = false;
             setSyncing(false);
@@ -161,7 +224,7 @@ export function useOfflineSync() {
             }
             await setMetadata(`lastSync_${type}_${babyId || 'all'}`, new Date().toISOString());
         } catch (e) {
-            console.error('Failed to cache data:', e);
+            if (isDev) console.error('Failed to cache data:', e);
         }
     }, []);
 
@@ -183,7 +246,7 @@ export function useOfflineSync() {
                     return null;
             }
         } catch (e) {
-            console.error('Failed to get cached data:', e);
+            if (isDev) console.error('Failed to get cached data:', e);
             return null;
         }
     }, []);

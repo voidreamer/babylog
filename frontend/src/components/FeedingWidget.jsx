@@ -250,7 +250,16 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
     };
 
     const isFeeding = !!activeFeeding;
-    const timeAgo = lastFeeding ? formatTimeAgo(lastFeeding.time) : null;
+
+    // Calculate end time from time + duration for "time ago" display
+    // Shows how long since feeding ended, not when it started
+    const getEndTime = () => {
+        if (!lastFeeding) return null;
+        const startDate = new Date(lastFeeding.time.endsWith('Z') ? lastFeeding.time : lastFeeding.time + 'Z');
+        const endDate = new Date(startDate.getTime() + (lastFeeding.duration_minutes || 0) * 60000);
+        return endDate.toISOString();
+    };
+    const timeAgo = lastFeeding ? formatTimeAgo(getEndTime()) : null;
 
     const widgetStyle = isDarkTheme ? {} : {
         '--widget-stroke': colors.stroke,

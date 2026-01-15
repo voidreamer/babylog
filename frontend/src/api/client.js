@@ -1,4 +1,13 @@
-const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://a4h1jfeguj.execute-api.ca-central-1.amazonaws.com' : '');
+// Only log in development
+const isDev = import.meta.env.DEV;
+const log = (...args) => isDev && console.log(...args);
+
+// Validate API_BASE is set in production
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
+if (!API_BASE && import.meta.env.PROD) {
+    console.error('CRITICAL: VITE_API_URL environment variable is not set in production!');
+}
 
 import {
     isOnline,
@@ -129,7 +138,7 @@ class ApiClient {
         } catch (error) {
             // If offline, return cached data
             if (!isOnline()) {
-                console.log('Offline: returning cached babies');
+                log('Offline: returning cached babies');
                 return await getCachedBabies();
             }
             throw error;
@@ -183,7 +192,7 @@ class ApiClient {
             return feedings;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached feedings');
+                log('Offline: returning cached feedings');
                 return await getCachedFeedings(babyId);
             }
             throw error;
@@ -237,7 +246,7 @@ class ApiClient {
             return diapers;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached diapers');
+                log('Offline: returning cached diapers');
                 return await getCachedDiapers(babyId);
             }
             throw error;
@@ -289,7 +298,7 @@ class ApiClient {
             return sleeps;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached sleeps');
+                log('Offline: returning cached sleeps');
                 return await getCachedSleeps(babyId);
             }
             throw error;
@@ -351,7 +360,7 @@ class ApiClient {
             return pumpings;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached pumpings');
+                log('Offline: returning cached pumpings');
                 return await getCachedPumpings(babyId);
             }
             throw error;
@@ -403,7 +412,7 @@ class ApiClient {
             return await this.request(`/events/timeline?${params}`);
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: timeline not available, returning empty array');
+                log('Offline: timeline not available, returning empty array');
                 return [];
             }
             throw error;
@@ -419,7 +428,7 @@ class ApiClient {
             return await this.request(`/events/dashboard?${params}`);
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: dashboard not available, returning empty data');
+                log('Offline: dashboard not available, returning empty data');
                 return {
                     last_feeding: null,
                     last_diaper: null,
@@ -447,7 +456,7 @@ class ApiClient {
             return visits;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached doctor visits');
+                log('Offline: returning cached doctor visits');
                 return await getCachedDoctorVisits(babyId);
             }
             throw error;
@@ -482,7 +491,7 @@ class ApiClient {
             return vaccinations;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached vaccinations');
+                log('Offline: returning cached vaccinations');
                 return await getCachedVaccinations(babyId);
             }
             throw error;
@@ -517,7 +526,7 @@ class ApiClient {
             return medications;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached medications');
+                log('Offline: returning cached medications');
                 const cached = await getCachedMedications(babyId);
                 return activeOnly ? cached.filter(m => m.is_active) : cached;
             }
@@ -557,7 +566,7 @@ class ApiClient {
             return milestones;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached milestones');
+                log('Offline: returning cached milestones');
                 return await getCachedMilestones(babyId);
             }
             throw error;
@@ -592,7 +601,7 @@ class ApiClient {
             return records;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached growth records');
+                log('Offline: returning cached growth records');
                 return await getCachedGrowthRecords(babyId);
             }
             throw error;
@@ -627,7 +636,7 @@ class ApiClient {
             return pottyLogs;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached potty logs');
+                log('Offline: returning cached potty logs');
                 return await getCachedActivities(babyId, 'potty');
             }
             throw error;
@@ -677,7 +686,7 @@ class ApiClient {
             return tummyTimes;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached tummy times');
+                log('Offline: returning cached tummy times');
                 return await getCachedActivities(babyId, 'tummy_time');
             }
             throw error;
@@ -727,7 +736,7 @@ class ApiClient {
             return baths;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached baths');
+                log('Offline: returning cached baths');
                 return await getCachedActivities(babyId, 'bath');
             }
             throw error;
@@ -774,7 +783,7 @@ class ApiClient {
             return await this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`);
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: analytics not available, returning empty data');
+                log('Offline: analytics not available, returning empty data');
                 return {
                     feeding: { total: 0, avg_per_day: 0 },
                     diaper: { total: 0, avg_per_day: 0 },
@@ -798,7 +807,7 @@ class ApiClient {
             return await this.request('/subscription/status');
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: subscription status not available');
+                log('Offline: subscription status not available');
                 return { premium: false };
             }
             throw error;
@@ -815,7 +824,7 @@ class ApiClient {
             return supplements;
         } catch (error) {
             if (!isOnline()) {
-                console.log('Offline: returning cached supplements');
+                log('Offline: returning cached supplements');
                 return await getCachedActivities(babyId, 'supplement');
             }
             throw error;

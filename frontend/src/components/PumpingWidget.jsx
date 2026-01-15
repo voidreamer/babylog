@@ -202,7 +202,16 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
     };
 
     const isPumping = !!activePumping;
-    const timeAgo = lastPumping ? formatTimeAgo(lastPumping.time) : null;
+
+    // Calculate end time from time + duration for "time ago" display
+    // Shows how long since pumping ended, not when it started
+    const getEndTime = () => {
+        if (!lastPumping) return null;
+        const startDate = new Date(lastPumping.time.endsWith('Z') ? lastPumping.time : lastPumping.time + 'Z');
+        const endDate = new Date(startDate.getTime() + (lastPumping.duration_minutes || 0) * 60000);
+        return endDate.toISOString();
+    };
+    const timeAgo = lastPumping ? formatTimeAgo(getEndTime()) : null;
 
     const widgetStyle = isDarkTheme ? {} : {
         '--widget-stroke': colors.stroke,

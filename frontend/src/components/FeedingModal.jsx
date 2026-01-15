@@ -114,6 +114,18 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
     const handleSaveTimer = async () => {
         if (timerSeconds < 1) return;
 
+        // Validate amount if provided
+        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
+            toast.error('Amount must be between 0 and 500 ml');
+            return;
+        }
+
+        // Validate notes length
+        if (notes && notes.length > 500) {
+            toast.error('Notes must be less than 500 characters');
+            return;
+        }
+
         setSaving(true);
         try {
             await api.createFeeding({
@@ -134,6 +146,25 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
 
     const handleSubmitQuick = async (e) => {
         e.preventDefault();
+
+        // Validate duration if provided
+        if (duration && (isNaN(parseInt(duration)) || parseInt(duration) < 0 || parseInt(duration) > 120)) {
+            toast.error('Duration must be between 0 and 120 minutes');
+            return;
+        }
+
+        // Validate amount if provided
+        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
+            toast.error('Amount must be between 0 and 500 ml');
+            return;
+        }
+
+        // Validate notes length
+        if (notes && notes.length > 500) {
+            toast.error('Notes must be less than 500 characters');
+            return;
+        }
+
         setSaving(true);
 
         const data = {
@@ -303,6 +334,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                                     placeholder="Optional notes..."
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
+                                    maxLength={500}
                                 />
                             </div>
                         </>
@@ -352,6 +384,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }) {
                                     placeholder="Optional notes..."
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
+                                    maxLength={500}
                                 />
                             </div>
                         </form>

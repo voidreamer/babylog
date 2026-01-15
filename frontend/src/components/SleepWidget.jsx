@@ -223,7 +223,8 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
         '--widget-text': colors.text
     };
 
-    const timeAgo = lastSleep ? formatTimeAgo(lastSleep.start_time) : null;
+    // Use end_time for "time ago" - shows how long since baby woke up, not when they fell asleep
+    const timeAgo = lastSleep ? formatTimeAgo(lastSleep.end_time || lastSleep.start_time) : null;
 
     return (
         <div
