@@ -20,7 +20,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: staging
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,6 +62,17 @@ jobs:
           aws lambda wait function-updated \
             --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
 
+      - name: Run database migrations
+        if: ${{ secrets.DATABASE_URL_STAGING != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+        run: |
+          echo "🔄 Running database migrations..."
+          cd backend
+          pip install -r requirements.txt -q
+          alembic upgrade head
+          echo "✅ Migrations complete!"
+
       - name: Verify deployment
         run: |
           aws lambda get-function \
@@ -73,8 +84,8 @@ jobs:
         run: |
           echo "🚀 Staging backend deployment complete!"
           echo "📍 Lambda Function: ${{ env.LAMBDA_FUNCTION_NAME }}"
-          echo ""
-          echo "📋 To run migrations, call:"
-          echo "   curl -X POST https://api-staging.simplebaby.app/api/admin/migrate -H 'X-Admin-Key: YOUR_KEY'"
-          echo ""
-          echo "   Or set ADMIN_API_KEY in Lambda env vars for automatic migration support"
+          if [ -z "${{ secrets.DATABASE_URL_STAGING }}" ]; then
+            echo ""
+            echo "⚠️  DATABASE_URL_STAGING secret not set - migrations were skipped"
+            echo "   Add it in GitHub Settings > Secrets to enable automatic migrations"
+          fi
