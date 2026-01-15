@@ -26,3 +26,7 @@ yarn-error.log*
 # Capacitor native projects (generated locally)
 ios/
 android/
+
+# Documentation (keep README only)
+*.md
+!README.md

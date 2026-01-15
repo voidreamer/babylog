@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
 import { useOfflineSync } from './hooks/useOfflineSync';
 import { api } from './api/client';
+import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
 import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
@@ -57,13 +58,26 @@ function MainApp() {
             return;
         }
 
+        // Check rate limit: 3 attempts per minute
+        const rateLimit = checkRateLimit('promoCode', 3, 60000);
+        if (!rateLimit.allowed) {
+            const timeLeft = getTimeUntilReset(rateLimit.resetTime);
+            toast.error(`Too many attempts. Please wait ${timeLeft} and try again.`);
+            return;
+        }
+
         setPromoLoading(true);
+        // Record this attempt before making the API call
+        recordAttempt('promoCode', 60000);
+
         try {
             const result = await api.redeemPromoCode(promoCode);
             if (result.valid && result.premium) {
                 setIsPremium(true);
                 localStorage.setItem('isPremium', 'true');
                 setPromoCode('');
+                // Clear rate limit on success so user isn't penalized
+                clearRateLimit('promoCode');
                 toast.success(result.message || 'Premium unlocked!');
             } else {
                 toast.error(result.message || 'Invalid code');
