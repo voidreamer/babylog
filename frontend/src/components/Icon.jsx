@@ -7,11 +7,14 @@ const icons = {
     logo: '/icons/logo.png',
 };
 
+// Only warn in development
+const isDev = import.meta.env.DEV;
+
 export default function Icon({ name, size = 32, className = '' }) {
     const src = icons[name];
 
     if (!src) {
-        console.warn(`Icon not found: ${name}`);
+        if (isDev) console.warn(`Icon not found: ${name}`);
         return null;
     }
 

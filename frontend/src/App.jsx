@@ -15,7 +15,7 @@ import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
 import { Home, CalendarDays, HeartPulse, BookOpen, Settings, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -53,7 +53,7 @@ function MainApp() {
 
     const handlePromoCode = async () => {
         if (!promoCode.trim()) {
-            alert('Please enter a promo code');
+            toast.error('Please enter a promo code');
             return;
         }
 
@@ -64,12 +64,12 @@ function MainApp() {
                 setIsPremium(true);
                 localStorage.setItem('isPremium', 'true');
                 setPromoCode('');
-                alert(result.message || 'Premium unlocked!');
+                toast.success(result.message || 'Premium unlocked!');
             } else {
-                alert(result.message || 'Invalid code');
+                toast.error(result.message || 'Invalid code');
             }
         } catch (error) {
-            alert('Failed to verify code. Please try again.');
+            toast.error('Failed to verify code. Please try again.');
         } finally {
             setPromoLoading(false);
         }
@@ -77,7 +77,7 @@ function MainApp() {
 
     const handleExportCsv = async () => {
         if (!babies || babies.length === 0) {
-            alert('No baby data to export');
+            toast.error('No baby data to export');
             return;
         }
 
@@ -86,9 +86,9 @@ function MainApp() {
             // Export current baby's data
             const currentBaby = babies[0];
             await api.exportBabyDataCsv(currentBaby.id);
-            alert('Export complete! Check your downloads folder.');
+            toast.success('Export complete! Check your downloads folder.');
         } catch (error) {
-            alert('Export failed: ' + error.message);
+            toast.error('Export failed: ' + error.message);
         } finally {
             setExportLoading(false);
         }

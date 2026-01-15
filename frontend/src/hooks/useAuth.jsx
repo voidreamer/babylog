@@ -1,8 +1,12 @@
-import { useState, useEffect, useRef, createContext, useContext } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { App as CapApp } from '@capacitor/app';
 import { api } from '../api/client';
+
+// Only log in development
+const isDev = import.meta.env.DEV;
+const log = (...args) => isDev && console.log(...args);
 
 const AuthContext = createContext(null);
 
@@ -22,7 +26,7 @@ const REDIRECT_URI = getRedirectUri();
 
 // Token exchange function (standalone, not dependent on component state)
 async function exchangeCodeForTokens(code) {
-    console.log('[Auth] Exchanging code for tokens...');
+    log('[Auth] Exchanging code for tokens...');
 
     const params = new URLSearchParams({
         grant_type: 'authorization_code',
@@ -45,7 +49,7 @@ async function exchangeCodeForTokens(code) {
     }
 
     const data = await response.json();
-    console.log('[Auth] Tokens received successfully');
+    log('[Auth] Tokens received successfully');
 
     // Store tokens (will be saved to both localStorage and IndexedDB after helpers are defined)
     api.setToken(data.access_token);
@@ -170,7 +174,7 @@ async function refreshAccessToken() {
     if (!refreshToken) {
         refreshToken = await getFromIndexedDB('refresh_token');
         if (refreshToken) {
-            console.log('[Auth] Recovered refresh token from IndexedDB');
+            log('[Auth] Recovered refresh token from IndexedDB');
             localStorage.setItem('refresh_token', refreshToken);
         }
     }
@@ -212,7 +216,7 @@ async function refreshAccessToken() {
             }
         }
 
-        console.log('[Auth] Token refreshed successfully');
+        log('[Auth] Token refreshed successfully');
         return data.access_token;
     } catch (error) {
         console.error('Token refresh failed:', error);
@@ -226,17 +230,26 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const processingCallback = useRef(false);
+    const browserCloseTimeoutRef = useRef(null);
 
-    // Handle OAuth callback
-    const handleCallback = async (code) => {
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (browserCloseTimeoutRef.current) {
+                clearTimeout(browserCloseTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Handle OAuth callback with improved race condition handling
+    const handleCallback = useCallback(async (code) => {
         if (processingCallback.current) {
-            console.log('[Auth] Already processing callback, ignoring');
             return;
         }
         processingCallback.current = true;
 
         try {
-            console.log('[Auth] Processing callback with code:', code.substring(0, 8) + '...');
+            log('[Auth] Processing callback with code:', code.substring(0, 8) + '...');
 
             if (!COGNITO_DOMAIN) {
                 api.setToken('dev-token');
@@ -246,7 +259,7 @@ export function AuthProvider({ children }) {
 
             const payload = await exchangeCodeForTokens(code);
             setUser(payload);
-            console.log('[Auth] User logged in:', payload.email);
+            log('[Auth] User logged in:', payload.email);
 
             // Close browser on native and force reload to refresh UI
             if (Capacitor.isNativePlatform()) {
@@ -263,7 +276,7 @@ export function AuthProvider({ children }) {
         } finally {
             processingCallback.current = false;
         }
-    };
+    }, []);
 
     // Initialize auth and set up deep link listener
     useEffect(() => {
@@ -275,7 +288,7 @@ export function AuthProvider({ children }) {
             if (!lsToken) {
                 const idbToken = await getFromIndexedDB('auth_token');
                 if (idbToken) {
-                    console.log('[Auth] Recovered auth token from IndexedDB');
+                    log('[Auth] Recovered auth token from IndexedDB');
                     localStorage.setItem('auth_token', idbToken);
                     lsToken = idbToken;
 
@@ -329,7 +342,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const handleVisibilityChange = async () => {
             if (document.visibilityState === 'visible' && user) {
-                console.log('[Auth] App became visible, checking token...');
+                log('[Auth] App became visible, checking token...');
                 const token = api.getToken() || localStorage.getItem('auth_token');
                 if (token) {
                     try {
@@ -337,7 +350,7 @@ export function AuthProvider({ children }) {
                         const now = Math.floor(Date.now() / 1000);
                         // Refresh if token expires in less than 5 minutes
                         if (payload.exp && (payload.exp - now) < 300) {
-                            console.log('[Auth] Token expiring soon, refreshing...');
+                            log('[Auth] Token expiring soon, refreshing...');
                             const newToken = await refreshAccessToken();
                             if (newToken) {
                                 const newPayload = JSON.parse(atob(newToken.split('.')[1]));
@@ -370,7 +383,7 @@ export function AuthProvider({ children }) {
 
                 // Refresh if less than 5 minutes remaining
                 if (timeUntilExpiry > 0 && timeUntilExpiry < 300) {
-                    console.log('[Auth] Proactive token refresh...');
+                    log('[Auth] Proactive token refresh...');
                     const newToken = await refreshAccessToken();
                     if (newToken) {
                         const newPayload = JSON.parse(atob(newToken.split('.')[1]));
@@ -392,11 +405,11 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
 
-        console.log('[Auth] Setting up native URL listener');
+        log('[Auth] Setting up native URL listener');
 
         const handleAppUrlOpen = async (event) => {
             const { url } = event;
-            console.log('[Auth] App URL opened:', url);
+            log('[Auth] App URL opened:', url);
 
             if (url && url.startsWith('simplebaby://callback')) {
                 try {
@@ -406,7 +419,7 @@ export function AuthProvider({ children }) {
                         const params = new URLSearchParams(queryString);
                         const code = params.get('code');
                         if (code) {
-                            console.log('[Auth] Got auth code, processing...');
+                            log('[Auth] Got auth code, processing...');
                             await handleCallback(code);
                         }
                     }
@@ -421,13 +434,13 @@ export function AuthProvider({ children }) {
         // Check if app was opened with a URL (cold start)
         CapApp.getLaunchUrl().then((result) => {
             if (result?.url) {
-                console.log('[Auth] App launched with URL:', result.url);
+                log('[Auth] App launched with URL:', result.url);
                 handleAppUrlOpen({ url: result.url });
             }
         });
 
         return () => {
-            console.log('[Auth] Removing URL listener');
+            log('[Auth] Removing URL listener');
             CapApp.removeAllListeners();
         };
     }, []);
@@ -447,7 +460,7 @@ export function AuthProvider({ children }) {
         });
 
         const loginUrl = `${COGNITO_DOMAIN}/login?${params}`;
-        console.log('[Auth] Opening login URL:', loginUrl);
+        log('[Auth] Opening login URL:', loginUrl);
 
         if (Capacitor.isNativePlatform()) {
             await Browser.open({ url: loginUrl });
@@ -476,7 +489,8 @@ export function AuthProvider({ children }) {
 
             if (Capacitor.isNativePlatform()) {
                 await Browser.open({ url: logoutUrl });
-                setTimeout(() => Browser.close(), 1000);
+                // Use ref to track timeout for proper cleanup
+                browserCloseTimeoutRef.current = setTimeout(() => Browser.close(), 1000);
             } else {
                 window.location.href = logoutUrl;
             }
