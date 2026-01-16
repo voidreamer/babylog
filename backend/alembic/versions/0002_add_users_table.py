@@ -20,6 +20,17 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # Check if users table already exists (idempotent migration)
+    conn = op.get_bind()
+    result = conn.execute(sa.text(
+        "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users')"
+    ))
+    table_exists = result.scalar()
+
+    if table_exists:
+        # Table already exists, skip creation
+        return
+
     # Create users table for premium status tracking
     op.create_table(
         'users',
