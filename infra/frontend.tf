@@ -86,10 +86,14 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
       override        = true
     }
 
-    # Content Security Policy
-    content_security_policy {
-      content_security_policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://accounts.google.com https://oauth2.googleapis.com https://*.supabase.com https://*.supabase.co wss://*.supabase.co; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
-      override                = true
+    # Content Security Policy - STAGING ONLY (testing before production)
+    # Using dynamic block to conditionally include CSP only in staging
+    dynamic "content_security_policy" {
+      for_each = var.environment == "staging" ? [1] : []
+      content {
+        content_security_policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.amazonaws.com https://*.amazoncognito.com https://*.cloudfront.net https://accounts.google.com https://oauth2.googleapis.com https://*.supabase.com https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
+        override                = true
+      }
     }
   }
 

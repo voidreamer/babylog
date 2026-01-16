@@ -20,7 +20,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: staging
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,6 +62,54 @@ jobs:
           aws lambda wait function-updated \
             --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
 
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "⚠️  DATABASE_URL_STAGING secret not set - skipping migrations"
+            exit 0
+          fi
+          echo "🔄 Running database migrations..."
+          cd backend
+          pip install -r requirements.txt -q
+
+          # Check if alembic_version table exists and has a version
+          CURRENT_VERSION=$(python -c "
+          from sqlalchemy import create_engine, text
+          import os
+          engine = create_engine(os.environ['DATABASE_URL'])
+          try:
+              with engine.connect() as conn:
+                  result = conn.execute(text('SELECT version_num FROM alembic_version'))
+                  row = result.fetchone()
+                  print(row[0] if row else '')
+          except:
+              print('')
+          " 2>/dev/null)
+
+          if [ -z "$CURRENT_VERSION" ]; then
+            echo "📋 No alembic version found - checking if baseline tables exist..."
+            # Check if babies table exists (indicates pre-alembic database)
+            TABLE_EXISTS=$(python -c "
+          from sqlalchemy import create_engine, text
+          import os
+          engine = create_engine(os.environ['DATABASE_URL'])
+          with engine.connect() as conn:
+              result = conn.execute(text(\"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'babies')\"))
+              print('yes' if result.fetchone()[0] else 'no')
+          " 2>/dev/null)
+
+            if [ "$TABLE_EXISTS" = "yes" ]; then
+              echo "📌 Existing database detected - stamping baseline migration 0001"
+              alembic stamp 0001
+            fi
+          fi
+
+          # Now run any pending migrations
+          alembic upgrade head
+          echo "✅ Migrations complete!"
+
       - name: Verify deployment
         run: |
           aws lambda get-function \
@@ -73,8 +121,3 @@ jobs:
         run: |
           echo "🚀 Staging backend deployment complete!"
           echo "📍 Lambda Function: ${{ env.LAMBDA_FUNCTION_NAME }}"
-          echo ""
-          echo "📋 To run migrations, call:"
-          echo "   curl -X POST https://api-staging.simplebaby.app/api/admin/migrate -H 'X-Admin-Key: YOUR_KEY'"
-          echo ""
-          echo "   Or set ADMIN_API_KEY in Lambda env vars for automatic migration support"

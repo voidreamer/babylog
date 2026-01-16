@@ -525,3 +525,81 @@ class SupplementUpdate(BaseModel):
     name: Optional[SupplementNameEnum] = None
     dosage: Optional[str] = None
     notes: Optional[str] = None
+
+
+# ============================================================================
+# Teeth Schemas
+# ============================================================================
+
+class ToothBase(BaseModel):
+    position: str  # e.g., "upper_A_left", "lower_E_right"
+    emerged_date: datetime
+    notes: Optional[str] = None
+
+
+class ToothCreate(ToothBase):
+    baby_id: int
+
+
+class ToothResponse(ToothBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+# ============================================================================
+# Sick Days Schemas
+# ============================================================================
+
+class SickDayBase(BaseModel):
+    date: datetime
+    symptoms: Optional[List[str]] = []  # ["fever", "cough", "runny_nose"]
+    temperature: Optional[float] = None  # e.g., 38.5
+    notes: Optional[str] = None
+
+
+class SickDayCreate(SickDayBase):
+    baby_id: int
+
+
+class SickDayResponse(SickDayBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+# ============================================================================
+# Allergy Schemas
+# ============================================================================
+
+class AllergyBase(BaseModel):
+    allergen: str  # "Dairy", "Peanuts", "Eggs"
+    severity: Optional[str] = None  # "mild", "moderate", "severe"
+    reaction: Optional[str] = None  # "hives", "vomiting", "swelling"
+    discovered_date: Optional[datetime] = None
+    notes: Optional[str] = None
+
+
+class AllergyCreate(AllergyBase):
+    baby_id: int
+
+
+class AllergyResponse(AllergyBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )

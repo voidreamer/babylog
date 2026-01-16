@@ -6,10 +6,13 @@ Handles premium feature unlocking via promo codes.
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from ..auth import get_current_user
 from ..config import get_settings
+from ..database import get_db
+from ..models import User, utc_now
 
 router = APIRouter(prefix="/subscription", tags=["subscription"])
 settings = get_settings()
@@ -17,8 +20,8 @@ settings = get_settings()
 # Rate limiter for this router
 limiter = Limiter(key_func=get_remote_address)
 
-# Promo codes stored server-side (in production, these would be in a database)
-# Format: code -> {premium: bool, expires: date or None}
+# Promo codes stored server-side
+# Format: code -> {premium: bool, description: str}
 VALID_PROMO_CODES = {
     "SIMPLEBABY2026": {"premium": True, "description": "Launch promo"},
     "BETATESTER": {"premium": True, "description": "Beta tester reward"},
@@ -35,18 +38,35 @@ class PromoCodeResponse(BaseModel):
     message: str
 
 
+def get_or_create_user(db: Session, user_id: str, email: str | None = None) -> User:
+    """Get existing user or create a new one."""
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        user = User(user_id=user_id, email=email)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    elif email and user.email != email:
+        # Update email if it changed
+        user.email = email
+        db.commit()
+        db.refresh(user)
+    return user
+
+
 @router.post("/redeem", response_model=PromoCodeResponse)
 @limiter.limit("5/minute")  # Prevent brute force attempts
 async def redeem_promo_code(
     request: Request,
     promo_request: PromoCodeRequest,
-    user: dict = Depends(get_current_user)
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
     Validate and redeem a promo code.
 
     Returns whether the code is valid and what features it unlocks.
-    In production, this would also store the redemption in the database.
+    Stores the redemption in the database and associates premium status with user.
     """
     code = promo_request.code.strip().upper()
 
@@ -62,40 +82,58 @@ async def redeem_promo_code(
             message="Invalid promo code"
         )
 
-    # In production, you would:
-    # 1. Check if code has already been redeemed by this user
-    # 2. Check if code has usage limits
-    # 3. Store the redemption in database
-    # 4. Associate premium status with user account
+    # Get or create user record
+    user_id = user.get("sub") or user.get("user_id")
+    user_email = user.get("email")
+    db_user = get_or_create_user(db, user_id, user_email)
+
+    # Check if user is already premium
+    if db_user.is_premium:
+        return PromoCodeResponse(
+            valid=True,
+            premium=True,
+            message="You already have premium access!"
+        )
+
+    # Activate premium for this user
+    db_user.is_premium = True
+    db_user.premium_since = utc_now()
+    db_user.promo_code_used = code
+    db.commit()
 
     return PromoCodeResponse(
         valid=True,
-        premium=promo.get("premium", False),
-        message=f"Code redeemed! {promo.get('description', '')}"
+        premium=True,
+        message=f"Code redeemed! {promo.get('description', '')} - Premium unlocked!"
     )
 
 
 @router.get("/status")
 async def get_subscription_status(
-    user: dict = Depends(get_current_user)
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
     Get current subscription status for the user.
 
-    In production, this would check the database for:
-    - Active subscriptions
-    - Redeemed promo codes
-    - Trial status
+    Checks the database for the user's premium status.
     """
-    # For now, return free tier
-    # In production, query database for user's subscription
+    user_id = user.get("sub") or user.get("user_id")
+    user_email = user.get("email")
+
+    # Get or create user record
+    db_user = get_or_create_user(db, user_id, user_email)
+
+    is_premium = db_user.is_premium
+
     return {
-        "tier": "free",
-        "premium": False,
+        "tier": "premium" if is_premium else "free",
+        "premium": is_premium,
+        "premium_since": db_user.premium_since.isoformat() if db_user.premium_since else None,
         "features": {
-            "predictions": False,
-            "patterns": False,
-            "trends": False,
-            "export": False,
+            "predictions": is_premium,
+            "patterns": is_premium,
+            "trends": is_premium,
+            "export": True,  # Export is free for everyone
         }
     }
