@@ -54,6 +54,9 @@ class Baby(Base):
     medications = relationship("Medication", back_populates="baby", cascade="all, delete-orphan")
     milestones = relationship("Milestone", back_populates="baby", cascade="all, delete-orphan")
     growth_records = relationship("GrowthRecord", back_populates="baby", cascade="all, delete-orphan")
+    teeth = relationship("Tooth", back_populates="baby", cascade="all, delete-orphan")
+    sick_days = relationship("SickDay", back_populates="baby", cascade="all, delete-orphan")
+    allergies = relationship("Allergy", back_populates="baby", cascade="all, delete-orphan")
     # Activity relationships
     potty_logs = relationship("Potty", back_populates="baby", cascade="all, delete-orphan")
     tummy_times = relationship("TummyTime", back_populates="baby", cascade="all, delete-orphan")
@@ -195,7 +198,7 @@ class Milestone(Base):
 
 class GrowthRecord(Base):
     __tablename__ = "growth_records"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     recorded_date = Column(DateTime, nullable=False)
@@ -204,8 +207,53 @@ class GrowthRecord(Base):
     head_cm = Column(Numeric(5, 2), nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="growth_records")
+
+
+class Tooth(Base):
+    """Track individual baby teeth emergence."""
+    __tablename__ = "teeth"
+
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    position = Column(String(20), nullable=False)  # e.g., "upper_A_left", "lower_E_right"
+    emerged_date = Column(DateTime, nullable=False)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=utc_now)
+
+    baby = relationship("Baby", back_populates="teeth")
+
+
+class SickDay(Base):
+    """Track illness episodes and symptoms."""
+    __tablename__ = "sick_days"
+
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    date = Column(DateTime, nullable=False)
+    symptoms = Column(ARRAY(String), default=list)  # ["fever", "cough", "runny_nose"]
+    temperature = Column(Numeric(4, 1), nullable=True)  # e.g., 38.5
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=utc_now)
+
+    baby = relationship("Baby", back_populates="sick_days")
+
+
+class Allergy(Base):
+    """Track known allergies for safety reference."""
+    __tablename__ = "allergies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    allergen = Column(String(100), nullable=False)  # "Dairy", "Peanuts", "Eggs"
+    severity = Column(String(20), nullable=True)  # "mild", "moderate", "severe"
+    reaction = Column(String, nullable=True)  # "hives", "vomiting", "swelling"
+    discovered_date = Column(DateTime, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=utc_now)
+
+    baby = relationship("Baby", back_populates="allergies")
 
 
 # ============================================================================

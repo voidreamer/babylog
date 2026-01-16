@@ -5224,6 +5224,1133 @@ h4 {
   animation: spin 1s linear infinite;
 }
 
+/* ============================================================================
+   HEALTH DASHBOARD - New Dashboard Layout
+   ============================================================================ */
+
+.health-dashboard {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.health-section {
+  width: 100%;
+}
+
+.health-section-primary {
+  /* Primary section styling */
+}
+
+.health-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 600px) {
+  .health-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Health Card Base Styles */
+.health-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.health-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.health-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+  color: var(--text);
+}
+
+.health-card-title svg {
+  color: var(--primary);
+}
+
+.health-card-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.health-card-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.health-card-action:hover {
+  background: var(--surface-hover);
+}
+
+.health-card-action .rotated {
+  transform: rotate(90deg);
+}
+
+.health-card-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+.health-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: var(--space-md);
+}
+
+.health-add-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+/* Growth Card Specific Styles */
+.growth-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.growth-metric-box {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  text-align: center;
+}
+
+.growth-metric-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.growth-metric-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: var(--space-xs) 0;
+}
+
+.growth-metric-percentile {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.percentile-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: var(--space-xs);
+  overflow: hidden;
+}
+
+.percentile-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.percentile-fill.on-track {
+  background: var(--success);
+}
+
+.percentile-fill.watch {
+  background: #eab308;
+}
+
+.percentile-fill.concern {
+  background: var(--danger);
+}
+
+.percentile-fill.neutral {
+  background: var(--text-muted);
+}
+
+.growth-quick-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-md);
+}
+
+.growth-input {
+  flex: 1;
+  min-width: 60px;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.growth-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: var(--space-md);
+}
+
+.growth-add-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.growth-chart-container {
+  margin-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-md);
+}
+
+/* Milestones Card Styles */
+.milestones-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.milestone-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+
+.milestone-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.milestone-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.milestone-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.milestone-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  display: flex;
+  transition: var(--transition);
+}
+
+.milestone-delete:hover {
+  color: var(--danger);
+}
+
+.milestone-quick-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-md);
+}
+
+.milestone-input {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.milestone-date-input {
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.milestone-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Teething Card Styles */
+.teething-card .health-card-count {
+  background: rgba(139, 92, 246, 0.1);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.teeth-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md) 0;
+}
+
+.teeth-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.teeth-row {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+}
+
+.teeth-divider {
+  width: 80%;
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-xs) 0;
+}
+
+.tooth-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  font-size: 0.9rem;
+}
+
+.tooth-btn:hover {
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.tooth-btn.emerged {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.tooth-btn.expected {
+  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.tooth-btn.overdue {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.tooth-icon {
+  font-size: 0.8rem;
+}
+
+.teeth-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.emerged {
+  background: var(--primary);
+}
+
+.legend-dot.expected {
+  background: #eab308;
+}
+
+.legend-dot.future {
+  background: var(--border);
+}
+
+/* Tooth Modal */
+.tooth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-md);
+}
+
+.tooth-modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  max-width: 320px;
+  width: 100%;
+  position: relative;
+}
+
+.tooth-modal-close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+}
+
+.tooth-modal h4 {
+  margin: 0 0 var(--space-xs);
+  font-size: 1.1rem;
+}
+
+.tooth-modal-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-md);
+}
+
+.tooth-date-input {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: var(--space-md);
+}
+
+.tooth-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooth-emerged-date {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-md);
+}
+
+/* Sick Days Card Styles */
+.sick-days-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sick-day-item {
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+
+.sick-day-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.sick-day-date {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.sick-day-temp {
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-left: auto;
+}
+
+.sick-day-temp.normal {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+
+.sick-day-temp.elevated {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.sick-day-temp.fever {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+
+.sick-day-temp.high-fever {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+.sick-day-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+}
+
+.sick-day-delete:hover {
+  color: var(--danger);
+}
+
+.sick-day-symptoms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: var(--space-xs);
+}
+
+.symptom-chip {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.sick-day-notes {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.sick-day-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-md);
+}
+
+.sick-day-form-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.sick-day-date-input,
+.sick-day-temp-input {
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.sick-day-date-input {
+  flex: 1;
+}
+
+.sick-day-temp-input {
+  width: 100px;
+}
+
+.symptom-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.symptom-chip-btn {
+  font-size: 0.75rem;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.symptom-chip-btn:hover {
+  border-color: var(--primary);
+}
+
+.symptom-chip-btn.selected {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sick-day-notes-input {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+  resize: none;
+}
+
+.sick-day-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Allergies Card Styles */
+.allergies-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.allergy-item {
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--border);
+}
+
+.allergy-item.severity-mild {
+  border-left-color: var(--success);
+}
+
+.allergy-item.severity-moderate {
+  border-left-color: #eab308;
+}
+
+.allergy-item.severity-severe {
+  border-left-color: var(--danger);
+}
+
+.allergy-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.allergy-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.allergy-severity {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+  text-transform: capitalize;
+}
+
+.allergy-severity.severity-mild {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+
+.allergy-severity.severity-moderate {
+  background: rgba(234, 179, 8, 0.1);
+  color: #854d0e;
+}
+
+.allergy-severity.severity-severe {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+.allergy-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+}
+
+.allergy-delete:hover {
+  color: var(--danger);
+}
+
+.allergy-reaction,
+.allergy-date,
+.allergy-notes {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 2px 0;
+}
+
+.allergy-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-md);
+}
+
+.allergy-input,
+.allergy-reaction-input,
+.allergy-notes-input {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.allergy-notes-input {
+  resize: none;
+}
+
+.severity-selector {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.severity-btn {
+  flex: 1;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.severity-btn.selected.severity-mild {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.severity-btn.selected.severity-moderate {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: #eab308;
+  color: #854d0e;
+}
+
+.severity-btn.selected.severity-severe {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.allergy-form-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.allergy-date-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.allergy-date-input {
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.allergy-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Records Section Styles */
+.records-section {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.records-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.records-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.records-tab:hover {
+  background: var(--surface-hover);
+}
+
+.records-tab.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: -1px;
+}
+
+.tab-count {
+  font-size: 0.7rem;
+  background: rgba(139, 92, 246, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  color: var(--primary);
+}
+
+.records-content {
+  padding: var(--space-md);
+}
+
+.records-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.record-item {
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+
+.record-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.record-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.record-type {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
+}
+
+.record-delete {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+}
+
+.record-delete:hover {
+  color: var(--danger);
+}
+
+.record-doctor,
+.record-admin,
+.record-next-due,
+.record-notes {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 2px 0;
+}
+
+.record-measurements {
+  display: flex;
+  gap: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.records-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-lg) 0;
+}
+
+.records-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.records-add-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.record-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+
+.record-form-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.record-form-row.measurements {
+  flex-wrap: wrap;
+}
+
+.record-date-input,
+.record-select,
+.record-text-input,
+.record-number-input,
+.record-notes-input {
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.record-text-input {
+  flex: 1;
+}
+
+.record-number-input {
+  flex: 1;
+  min-width: 80px;
+}
+
+.record-number-input.dose {
+  max-width: 70px;
+}
+
+.record-notes-input {
+  width: 100%;
+  resize: none;
+}
+
+.record-date-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.record-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Vaccination reminders */
+.vaccination-reminders {
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.reminders-title {
+  font-size: 0.8rem;
+  color: #854d0e;
+  margin: 0 0 var(--space-xs);
+}
+
+.reminder-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: var(--space-xs) 0;
+}
+
+.reminder-vaccine {
+  color: var(--text);
+}
+
+.reminder-date {
+  color: #854d0e;
+  font-weight: 500;
+}
+
+.vaccine-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.vaccine-dose {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: auto;
+  margin-right: var(--space-sm);
+}
+
+/* Medications */
+.medications-active,
+.medications-past {
+  margin-bottom: var(--space-md);
+}
+
+.meds-section-title {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-sm);
+}
+
+.medication-item {
+  padding: var(--space-sm);
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.medication-item.past {
+  opacity: 0.6;
+}
+
+.medication-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.medication-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.medication-toggle {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(139, 92, 246, 0.1);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.medication-toggle:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.medication-dosage,
+.medication-dates,
+.medication-notes {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 2px 0;
+}
+
 /* Offline indicator styles */
 .offline-indicator {
   transition: all 0.3s ease;

@@ -397,14 +397,241 @@ def update_growth_record(
 
 @router.delete("/growth/{record_id}")
 def delete_growth_record(
-    record_id: int, 
-    db: Session = Depends(get_db), 
+    record_id: int,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id)
 ):
     record = db.query(models.GrowthRecord).filter(models.GrowthRecord.id == record_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
-    
+
     db.delete(record)
+    db.commit()
+    return {"message": "Deleted"}
+
+
+# ============================================================================
+# Teeth (Teething Tracker)
+# ============================================================================
+
+@router.get("/teeth/", response_model=List[schemas.ToothResponse])
+def get_teeth(
+    baby_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    return db.query(models.Tooth).filter(
+        models.Tooth.baby_id == baby_id
+    ).order_by(desc(models.Tooth.emerged_date)).all()
+
+
+@router.post("/teeth/", response_model=schemas.ToothResponse)
+def create_tooth(
+    tooth: schemas.ToothCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, tooth.baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    # Check if tooth at this position already exists
+    existing = db.query(models.Tooth).filter(
+        models.Tooth.baby_id == tooth.baby_id,
+        models.Tooth.position == tooth.position
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Tooth at this position already recorded")
+
+    db_tooth = models.Tooth(**tooth.model_dump())
+    db.add(db_tooth)
+    db.commit()
+    db.refresh(db_tooth)
+    return db_tooth
+
+
+@router.put("/teeth/{tooth_id}", response_model=schemas.ToothResponse)
+def update_tooth(
+    tooth_id: int,
+    tooth_data: schemas.ToothCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    tooth = db.query(models.Tooth).filter(models.Tooth.id == tooth_id).first()
+    if not tooth:
+        raise HTTPException(status_code=404, detail="Tooth not found")
+
+    for key, value in tooth_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(tooth, key, value)
+
+    db.commit()
+    db.refresh(tooth)
+    return tooth
+
+
+@router.delete("/teeth/{tooth_id}")
+def delete_tooth(
+    tooth_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    tooth = db.query(models.Tooth).filter(models.Tooth.id == tooth_id).first()
+    if not tooth:
+        raise HTTPException(status_code=404, detail="Tooth not found")
+
+    db.delete(tooth)
+    db.commit()
+    return {"message": "Deleted"}
+
+
+# ============================================================================
+# Sick Days
+# ============================================================================
+
+@router.get("/sick-days/", response_model=List[schemas.SickDayResponse])
+def get_sick_days(
+    baby_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    return db.query(models.SickDay).filter(
+        models.SickDay.baby_id == baby_id
+    ).order_by(desc(models.SickDay.date)).all()
+
+
+@router.post("/sick-days/", response_model=schemas.SickDayResponse)
+def create_sick_day(
+    sick_day: schemas.SickDayCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, sick_day.baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    db_sick_day = models.SickDay(**sick_day.model_dump())
+    db.add(db_sick_day)
+    db.commit()
+    db.refresh(db_sick_day)
+    return db_sick_day
+
+
+@router.put("/sick-days/{sick_day_id}", response_model=schemas.SickDayResponse)
+def update_sick_day(
+    sick_day_id: int,
+    sick_day_data: schemas.SickDayCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    sick_day = db.query(models.SickDay).filter(models.SickDay.id == sick_day_id).first()
+    if not sick_day:
+        raise HTTPException(status_code=404, detail="Sick day not found")
+
+    for key, value in sick_day_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(sick_day, key, value)
+
+    db.commit()
+    db.refresh(sick_day)
+    return sick_day
+
+
+@router.delete("/sick-days/{sick_day_id}")
+def delete_sick_day(
+    sick_day_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    sick_day = db.query(models.SickDay).filter(models.SickDay.id == sick_day_id).first()
+    if not sick_day:
+        raise HTTPException(status_code=404, detail="Sick day not found")
+
+    db.delete(sick_day)
+    db.commit()
+    return {"message": "Deleted"}
+
+
+# ============================================================================
+# Allergies
+# ============================================================================
+
+@router.get("/allergies/", response_model=List[schemas.AllergyResponse])
+def get_allergies(
+    baby_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    return db.query(models.Allergy).filter(
+        models.Allergy.baby_id == baby_id
+    ).order_by(models.Allergy.allergen).all()
+
+
+@router.post("/allergies/", response_model=schemas.AllergyResponse)
+def create_allergy(
+    allergy: schemas.AllergyCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, allergy.baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    db_allergy = models.Allergy(**allergy.model_dump())
+    db.add(db_allergy)
+    db.commit()
+    db.refresh(db_allergy)
+    return db_allergy
+
+
+@router.put("/allergies/{allergy_id}", response_model=schemas.AllergyResponse)
+def update_allergy(
+    allergy_id: int,
+    allergy_data: schemas.AllergyCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    allergy = db.query(models.Allergy).filter(models.Allergy.id == allergy_id).first()
+    if not allergy:
+        raise HTTPException(status_code=404, detail="Allergy not found")
+
+    for key, value in allergy_data.model_dump().items():
+        if key != 'baby_id':
+            setattr(allergy, key, value)
+
+    db.commit()
+    db.refresh(allergy)
+    return allergy
+
+
+@router.delete("/allergies/{allergy_id}")
+def delete_allergy(
+    allergy_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id)
+):
+    allergy = db.query(models.Allergy).filter(models.Allergy.id == allergy_id).first()
+    if not allergy:
+        raise HTTPException(status_code=404, detail="Allergy not found")
+
+    db.delete(allergy)
     db.commit()
     return {"message": "Deleted"}

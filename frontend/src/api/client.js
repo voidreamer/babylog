@@ -924,6 +924,84 @@ class ApiClient {
         const query = params.toString() ? `?${params}` : '';
         return this.request(`/export/json/${babyId}${query}`);
     }
+
+    // ========================================================================
+    // Teeth (Teething Tracker)
+    // ========================================================================
+
+    async getTeeth(babyId) {
+        return this.request(`/health/teeth/?baby_id=${babyId}`);
+    }
+
+    async createTooth(data) {
+        return this.request('/health/teeth/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateTooth(id, data) {
+        return this.request(`/health/teeth/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteTooth(id) {
+        return this.request(`/health/teeth/${id}`, { method: 'DELETE' });
+    }
+
+    // ========================================================================
+    // Sick Days
+    // ========================================================================
+
+    async getSickDays(babyId) {
+        return this.request(`/health/sick-days/?baby_id=${babyId}`);
+    }
+
+    async createSickDay(data) {
+        return this.request('/health/sick-days/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateSickDay(id, data) {
+        return this.request(`/health/sick-days/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteSickDay(id) {
+        return this.request(`/health/sick-days/${id}`, { method: 'DELETE' });
+    }
+
+    // ========================================================================
+    // Allergies
+    // ========================================================================
+
+    async getAllergies(babyId) {
+        return this.request(`/health/allergies/?baby_id=${babyId}`);
+    }
+
+    async createAllergy(data) {
+        return this.request('/health/allergies/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateAllergy(id, data) {
+        return this.request(`/health/allergies/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteAllergy(id) {
+        return this.request(`/health/allergies/${id}`, { method: 'DELETE' });
+    }
 }
 
 export const api = new ApiClient();
