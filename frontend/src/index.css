@@ -5233,8 +5233,6 @@ h4 {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .health-section {
@@ -5251,12 +5249,6 @@ h4 {
   gap: var(--space-md);
 }
 
-@media (min-width: 600px) {
-  .health-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 /* Health Card Base Styles */
 .health-card {
   background: var(--surface);
@@ -5264,6 +5256,11 @@ h4 {
   border: 1px solid var(--border);
   padding: var(--space-md);
   box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.health-card:hover {
+  box-shadow: var(--shadow);
 }
 
 .health-card-header {
@@ -6370,9 +6367,8 @@ h4 {
     font-size: 0.9rem;
   }
 
-  /* Growth metrics - stack on very small screens */
+  /* Growth metrics - keep 3 columns but smaller */
   .growth-metrics {
-    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-xs);
   }
 
@@ -6412,6 +6408,10 @@ h4 {
     gap: var(--space-sm);
   }
 
+  .legend-item {
+    font-size: 0.65rem;
+  }
+
   /* Sick days form */
   .sick-day-form-row {
     flex-direction: column;
@@ -6433,11 +6433,18 @@ h4 {
   /* Records section */
   .records-tab {
     padding: var(--space-sm);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    gap: 2px;
   }
 
   .records-tab svg {
-    display: none;
+    width: 14px;
+    height: 14px;
+  }
+
+  .tab-count {
+    font-size: 0.6rem;
+    padding: 1px 4px;
   }
 
   .record-form-row {
@@ -6446,20 +6453,41 @@ h4 {
 
   .record-form-row.measurements {
     flex-direction: row;
+    flex-wrap: wrap;
   }
 
   .record-number-input {
-    min-width: 60px;
+    min-width: 70px;
+    flex: 1;
   }
 
   /* Allergy form */
   .severity-selector {
-    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .severity-btn {
+    padding: var(--space-xs);
+    font-size: 0.75rem;
   }
 
   .allergy-form-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* Milestone list */
+  .milestone-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+/* Medium screens - 2 column grid (600px+) */
+@media (min-width: 600px) {
+  .health-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -6468,10 +6496,10 @@ h4 {
   .health-dashboard {
     padding: var(--space-lg);
     max-width: 900px;
+    margin: 0 auto;
   }
 
   .health-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-lg);
   }
 
@@ -6479,12 +6507,28 @@ h4 {
     padding: var(--space-lg);
   }
 
+  .health-card-header {
+    margin-bottom: var(--space-lg);
+  }
+
   /* Growth chart gets more height on larger screens */
   .growth-chart-container {
     padding-top: var(--space-lg);
   }
 
-  /* Records section - show icons */
+  .growth-metrics {
+    gap: var(--space-md);
+  }
+
+  .growth-metric-box {
+    padding: var(--space-md);
+  }
+
+  .growth-metric-value {
+    font-size: 1.25rem;
+  }
+
+  /* Records section */
   .records-tab {
     padding: var(--space-md) var(--space-lg);
   }
@@ -6497,6 +6541,13 @@ h4 {
   .tooth-modal {
     max-width: 400px;
   }
+
+  /* Teething - larger tooth buttons */
+  .tooth-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
 }
 
 /* Large screens (1024px+) */
@@ -6505,13 +6556,12 @@ h4 {
     max-width: 1000px;
   }
 
-  .health-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* Growth metrics get more space */
-  .growth-metric-value {
-    font-size: 1.25rem;
+  /* Optional: 2 column layout for records and cards */
+  .health-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    align-items: start;
   }
 }
 
