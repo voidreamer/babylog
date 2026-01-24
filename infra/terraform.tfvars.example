@@ -5,12 +5,13 @@
 environment = "prod"
 
 # Supabase PostgreSQL connection URL
-database_url = "postgresql://postgres.blfitvvauoncoifrgvej:p3mfYQEtf3n@aws-1-ca-central-1.pooler.supabase.com:6543/postgres"
-supabase_jwt_secret = "fBKCscwieFb6CS1zZcDr+djAahu6mqhCiOwJfTolI8t82F9/AwdeGafxDRVDxmJ0ik7VOXSgfMj5nvQ37idDcA=="
+database_url = "postgresql://user:password@host:6543/postgres"
 
-# Google OAuth (optional - leave empty to disable)
-google_client_id     = ""
-google_client_secret = ""
+# Supabase JWT Secret (from Supabase Dashboard > Settings > API)
+supabase_jwt_secret = "your-jwt-secret-here"
 
 # CORS allowed origins (comma-separated)
-cors_origins = "https://d3nsr7lzhub0bz.cloudfront.net"
+cors_origins = "https://your-cloudfront-domain.cloudfront.net"
+
+# Admin API key for protected endpoints
+admin_api_key = ""
