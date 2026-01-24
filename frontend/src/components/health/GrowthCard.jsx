@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
-import GrowthChart from './GrowthChart';
+
+// Lazy load the GrowthChart component - only loads when user clicks "Full Chart"
+const GrowthChart = lazy(() => import('./GrowthChart'));
 
 // Calculate percentile position (0-100) based on WHO data
 function getPercentilePosition(value, p3, p97) {
@@ -214,13 +216,19 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 </button>
             )}
 
-            {/* Expandable Chart */}
+            {/* Expandable Chart - Lazy loaded */}
             {showChart && baby && (
                 <div className="growth-chart-container">
-                    <GrowthChart
-                        baby={baby}
-                        growthRecords={growthRecords}
-                    />
+                    <Suspense fallback={
+                        <div className="loading" style={{ padding: 'var(--space-xl)' }}>
+                            <div className="spinner"></div>
+                        </div>
+                    }>
+                        <GrowthChart
+                            baby={baby}
+                            growthRecords={growthRecords}
+                        />
+                    </Suspense>
                 </div>
             )}
         </div>

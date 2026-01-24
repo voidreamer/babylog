@@ -257,14 +257,38 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
     poo_count = sum(1 for d in diapers if d.type == 'poo')
     mixed_count = sum(1 for d in diapers if d.type == 'mixed')
     
-    # Sleeps
+    # Sleeps - include sleeps that overlap with this day (start, end, or span the day)
+    # A sleep overlaps with the day if:
+    # 1. Sleep starts during this day, OR
+    # 2. Sleep ends during this day (started previous day), OR
+    # 3. Sleep spans the entire day (started before and ends after)
     sleeps = db.query(Sleep).filter(
         Sleep.baby_id == baby_id,
-        Sleep.start_time >= start_of_day,
-        Sleep.start_time < end_of_day
+        or_(
+            # Sleep starts during this day
+            and_(Sleep.start_time >= start_of_day, Sleep.start_time < end_of_day),
+            # Sleep ends during this day (started before this day)
+            and_(Sleep.end_time > start_of_day, Sleep.end_time <= end_of_day, Sleep.start_time < start_of_day),
+            # Sleep spans the entire day
+            and_(Sleep.start_time < start_of_day, Sleep.end_time > end_of_day)
+        )
     ).all()
-    
-    total_sleep_minutes = sum(s.duration_minutes or 0 for s in sleeps)
+
+    # Calculate sleep minutes that fall within this day only
+    total_sleep_minutes = 0
+    for s in sleeps:
+        if s.end_time is None:
+            # Ongoing sleep - count from start (or day start if started earlier) to now
+            effective_start = max(s.start_time, start_of_day)
+            effective_end = min(datetime.utcnow(), end_of_day)
+        else:
+            # Completed sleep - count only the portion within this day
+            effective_start = max(s.start_time, start_of_day)
+            effective_end = min(s.end_time, end_of_day)
+
+        if effective_end > effective_start:
+            minutes = int((effective_end - effective_start).total_seconds() / 60)
+            total_sleep_minutes += minutes
     
     # Pumpings
     pumpings = db.query(Pumping).filter(

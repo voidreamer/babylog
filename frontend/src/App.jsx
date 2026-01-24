@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
@@ -12,9 +12,11 @@ import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
-import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Learn from './components/Learn';
+
+// Lazy load Health page - only loads when user clicks Health tab
+const Health = lazy(() => import('./pages/Health'));
 import { Home, CalendarDays, HeartPulse, BookOpen, Settings as SettingsIcon, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
@@ -347,7 +349,15 @@ function MainApp() {
             <main>
                 {activeTab === 'home' && <Dashboard />}
                 {activeTab === 'timeline' && <TimelineCalendar />}
-                {activeTab === 'health' && <Health />}
+                {activeTab === 'health' && (
+                    <Suspense fallback={
+                        <div className="loading">
+                            <div className="spinner"></div>
+                        </div>
+                    }>
+                        <Health />
+                    </Suspense>
+                )}
                 {activeTab === 'learn' && <Learn isPremium={isPremium} />}
                 {activeTab === 'settings' && (
                     <SettingsPage
