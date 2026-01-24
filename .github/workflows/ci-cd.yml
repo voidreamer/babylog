@@ -1,5 +1,5 @@
 # Huckle CI/CD Pipeline
-# Runs tests, then deploys to AWS
+# Runs tests, then deploys infrastructure and code to AWS
 # - staging branch -> staging environment
 # - main branch -> production environment
 
@@ -15,6 +15,7 @@ env:
   AWS_REGION: ca-central-1
   PYTHON_VERSION: "3.11"
   NODE_VERSION: "22"
+  TF_VERSION: "1.6.0"
 
 jobs:
   # ============================================
@@ -113,11 +114,6 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
     environment: staging
 
-    env:
-      LAMBDA_FUNCTION_NAME: simplebaby-api-staging
-      S3_BUCKET: ${{ vars.S3_BUCKET_STAGING }}
-      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_ID_STAGING }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -128,6 +124,46 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      # ----- Terraform Infrastructure -----
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: infra
+        env:
+          TF_VAR_environment: staging
+          TF_VAR_database_url: ${{ secrets.DATABASE_URL_STAGING }}
+          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
+          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS_STAGING }}
+          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: infra
+        env:
+          TF_VAR_environment: staging
+          TF_VAR_database_url: ${{ secrets.DATABASE_URL_STAGING }}
+          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
+          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS_STAGING }}
+          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Get Terraform outputs
+        id: tf-outputs
+        working-directory: infra
+        run: |
+          echo "lambda_name=$(terraform output -raw lambda_function_name)" >> $GITHUB_OUTPUT
+          echo "s3_bucket=$(terraform output -raw frontend_bucket)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
+          echo "api_url=$(terraform output -raw api_gateway_url)" >> $GITHUB_OUTPUT
 
       # ----- Backend Deploy -----
       - name: Set up Python
@@ -147,11 +183,11 @@ jobs:
       - name: Deploy backend to Lambda
         run: |
           aws lambda update-function-code \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
             --zip-file fileb://backend/lambda.zip \
             --no-cli-pager
           aws lambda wait function-updated \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
+            --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
 
       - name: Run database migrations
         env:
@@ -175,7 +211,7 @@ jobs:
 
       - name: Build frontend
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING }}
+          VITE_API_URL: ${{ steps.tf-outputs.outputs.api_url }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
@@ -185,15 +221,14 @@ jobs:
 
       - name: Deploy frontend to S3
         run: |
-          aws s3 sync frontend/dist/ s3://${{ env.S3_BUCKET }}/ \
+          aws s3 sync frontend/dist/ s3://${{ steps.tf-outputs.outputs.s3_bucket }}/ \
             --delete \
             --no-cli-pager
 
       - name: Invalidate CloudFront cache
-        if: env.CLOUDFRONT_DISTRIBUTION_ID != ''
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id ${{ steps.tf-outputs.outputs.cloudfront_id }} \
             --paths "/*" \
             --no-cli-pager
 
@@ -201,8 +236,9 @@ jobs:
         run: |
           echo "## Staging Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Backend:** ${{ env.LAMBDA_FUNCTION_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Frontend:** s3://${{ env.S3_BUCKET }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** https://$(aws cloudfront get-distribution --id ${{ steps.tf-outputs.outputs.cloudfront_id }} --query 'Distribution.DomainName' --output text)" >> $GITHUB_STEP_SUMMARY
+          echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
   # Deploy to Production (on main branch)
@@ -214,11 +250,6 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
 
-    env:
-      LAMBDA_FUNCTION_NAME: simplebaby-api-prod
-      S3_BUCKET: simplebaby-frontend-prod-96f8ln2e
-      CLOUDFRONT_DISTRIBUTION_ID: E7IAO0DCKG6U7
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -229,6 +260,46 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      # ----- Terraform Infrastructure -----
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: infra
+        env:
+          TF_VAR_environment: prod
+          TF_VAR_database_url: ${{ secrets.DATABASE_URL }}
+          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
+          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS }}
+          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: infra
+        env:
+          TF_VAR_environment: prod
+          TF_VAR_database_url: ${{ secrets.DATABASE_URL }}
+          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
+          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS }}
+          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Get Terraform outputs
+        id: tf-outputs
+        working-directory: infra
+        run: |
+          echo "lambda_name=$(terraform output -raw lambda_function_name)" >> $GITHUB_OUTPUT
+          echo "s3_bucket=$(terraform output -raw frontend_bucket)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
+          echo "api_url=$(terraform output -raw api_gateway_url)" >> $GITHUB_OUTPUT
 
       # ----- Backend Deploy -----
       - name: Set up Python
@@ -248,11 +319,11 @@ jobs:
       - name: Deploy backend to Lambda
         run: |
           aws lambda update-function-code \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
             --zip-file fileb://backend/lambda.zip \
             --no-cli-pager
           aws lambda wait function-updated \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
+            --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
 
       - name: Run database migrations
         env:
@@ -276,7 +347,7 @@ jobs:
 
       - name: Build frontend
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_API_URL: ${{ steps.tf-outputs.outputs.api_url }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
@@ -286,14 +357,14 @@ jobs:
 
       - name: Deploy frontend to S3
         run: |
-          aws s3 sync frontend/dist/ s3://${{ env.S3_BUCKET }}/ \
+          aws s3 sync frontend/dist/ s3://${{ steps.tf-outputs.outputs.s3_bucket }}/ \
             --delete \
             --no-cli-pager
 
       - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id ${{ steps.tf-outputs.outputs.cloudfront_id }} \
             --paths "/*" \
             --no-cli-pager
 
@@ -301,5 +372,6 @@ jobs:
         run: |
           echo "## Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Backend:** ${{ env.LAMBDA_FUNCTION_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Frontend:** https://$(aws cloudfront get-distribution --id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} --query 'Distribution.DomainName' --output text)" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** https://$(aws cloudfront get-distribution --id ${{ steps.tf-outputs.outputs.cloudfront_id }} --query 'Distribution.DomainName' --output text)" >> $GITHUB_STEP_SUMMARY
+          echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY

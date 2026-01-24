@@ -11,6 +11,12 @@ terraform {
       version = "~> 2.0"
     }
   }
+
+  backend "s3" {
+    bucket = "simplebaby-terraform-state"
+    key    = "terraform.tfstate"
+    region = "ca-central-1"
+  }
 }
 
 provider "aws" {
