@@ -134,7 +134,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: infra
-        run: terraform init
+        run: terraform init -backend-config="key=staging/terraform.tfstate"
 
       - name: Terraform Plan
         working-directory: infra
@@ -270,7 +270,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: infra
-        run: terraform init
+        run: terraform init -backend-config="key=prod/terraform.tfstate"
 
       - name: Terraform Plan
         working-directory: infra

@@ -12,10 +12,12 @@ terraform {
     }
   }
 
+  # Backend configured via -backend-config in CI/CD
+  # Each environment uses a different state key
   backend "s3" {
     bucket = "simplebaby-terraform-state"
-    key    = "terraform.tfstate"
     region = "ca-central-1"
+    # key is set dynamically: staging/terraform.tfstate or prod/terraform.tfstate
   }
 }
 
