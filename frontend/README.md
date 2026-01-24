@@ -16,8 +16,8 @@ Open http://localhost:5173
 For production, create a `.env` file:
 
 ```
-VITE_COGNITO_DOMAIN=https://your-domain.auth.us-east-1.amazoncognito.com
-VITE_COGNITO_CLIENT_ID=your-client-id
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_REDIRECT_URI=https://your-cloudfront-url.cloudfront.net/callback
 ```
 

@@ -22,14 +22,14 @@ variable "database_url" {
   sensitive   = true
 }
 
-variable "google_client_id" {
-  description = "Google OAuth Client ID"
+variable "supabase_url" {
+  description = "Supabase project URL"
   type        = string
   default     = ""
 }
 
-variable "google_client_secret" {
-  description = "Google OAuth Client Secret"
+variable "supabase_jwt_secret" {
+  description = "Supabase JWT secret for token verification"
   type        = string
   sensitive   = true
   default     = ""

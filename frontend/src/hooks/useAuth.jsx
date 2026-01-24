@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, createContext, useContext, useCallback } f
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { App as CapApp } from '@capacitor/app';
+import { supabase } from '../lib/supabase';
 import { api } from '../api/client';
 
 // Only log in development
@@ -10,9 +11,8 @@ const log = (...args) => isDev && console.log(...args);
 
 const AuthContext = createContext(null);
 
-// Cognito configuration
-const COGNITO_DOMAIN = import.meta.env.VITE_COGNITO_DOMAIN || '';
-const COGNITO_CLIENT_ID = import.meta.env.VITE_COGNITO_CLIENT_ID || '';
+// Supabase configuration
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 
 // Determine redirect URI based on platform
 const getRedirectUri = () => {
@@ -23,57 +23,6 @@ const getRedirectUri = () => {
 };
 
 const REDIRECT_URI = getRedirectUri();
-
-// Token exchange function (standalone, not dependent on component state)
-async function exchangeCodeForTokens(code) {
-    log('[Auth] Exchanging code for tokens...');
-
-    const params = new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: COGNITO_CLIENT_ID,
-        code,
-        redirect_uri: REDIRECT_URI,
-    });
-
-    const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params,
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Token exchange failed: ${errorText}`);
-    }
-
-    const data = await response.json();
-    log('[Auth] Tokens received successfully');
-
-    // Store tokens (will be saved to both localStorage and IndexedDB after helpers are defined)
-    api.setToken(data.access_token);
-    localStorage.setItem('auth_token', data.access_token);
-
-    if (data.refresh_token) {
-        localStorage.setItem('refresh_token', data.refresh_token);
-    }
-
-    // Parse user info from id_token
-    const payload = JSON.parse(atob(data.id_token.split('.')[1]));
-    if (payload.email) {
-        localStorage.setItem('user_email', payload.email);
-    }
-
-    // Also save to IndexedDB for iOS persistence (async, non-blocking)
-    Promise.all([
-        saveToIndexedDB('auth_token', data.access_token),
-        data.refresh_token ? saveToIndexedDB('refresh_token', data.refresh_token) : Promise.resolve(),
-        payload.email ? saveToIndexedDB('user_email', payload.email) : Promise.resolve(),
-    ]).catch(e => console.warn('[Auth] IndexedDB backup save failed:', e));
-
-    return payload;
-}
 
 // IndexedDB helpers for more persistent storage on iOS
 const DB_NAME = 'simplebaby_auth';
@@ -166,58 +115,32 @@ async function removeToken(key) {
     await removeFromIndexedDB(key);
 }
 
-// Refresh token function
+// Refresh token function using Supabase
 async function refreshAccessToken() {
-    let refreshToken = localStorage.getItem('refresh_token');
-
-    // Try IndexedDB if localStorage is empty (iOS might have cleared it)
-    if (!refreshToken) {
-        refreshToken = await getFromIndexedDB('refresh_token');
-        if (refreshToken) {
-            log('[Auth] Recovered refresh token from IndexedDB');
-            localStorage.setItem('refresh_token', refreshToken);
-        }
-    }
-
-    if (!refreshToken || !COGNITO_DOMAIN) {
+    if (!SUPABASE_URL) {
         return null;
     }
 
     try {
-        const params = new URLSearchParams({
-            grant_type: 'refresh_token',
-            client_id: COGNITO_CLIENT_ID,
-            refresh_token: refreshToken,
-        });
+        const { data, error } = await supabase.auth.refreshSession();
 
-        const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params,
-        });
-
-        if (!response.ok) {
-            await removeToken('refresh_token');
+        if (error || !data.session) {
+            log('[Auth] Token refresh failed:', error);
             await removeToken('auth_token');
             await removeToken('user_email');
             return null;
         }
 
-        const data = await response.json();
-        api.setToken(data.access_token);
-        await saveToken('auth_token', data.access_token);
+        const accessToken = data.session.access_token;
+        api.setToken(accessToken);
+        await saveToken('auth_token', accessToken);
 
-        if (data.id_token) {
-            const payload = JSON.parse(atob(data.id_token.split('.')[1]));
-            if (payload.email) {
-                await saveToken('user_email', payload.email);
-            }
+        if (data.session.user?.email) {
+            await saveToken('user_email', data.session.user.email);
         }
 
         log('[Auth] Token refreshed successfully');
-        return data.access_token;
+        return accessToken;
     } catch (error) {
         console.error('Token refresh failed:', error);
         return null;
@@ -241,25 +164,58 @@ export function AuthProvider({ children }) {
         };
     }, []);
 
-    // Handle OAuth callback with improved race condition handling
-    const handleCallback = useCallback(async (code) => {
+    // Handle OAuth callback - for native apps that receive the URL
+    const handleCallback = useCallback(async (url) => {
         if (processingCallback.current) {
             return;
         }
         processingCallback.current = true;
 
         try {
-            log('[Auth] Processing callback with code:', code.substring(0, 8) + '...');
+            log('[Auth] Processing callback URL:', url);
 
-            if (!COGNITO_DOMAIN) {
+            if (!SUPABASE_URL) {
+                // Dev mode
                 api.setToken('dev-token');
-                setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
+                setUser({ id: 'dev-user-123', email: 'dev@example.com' });
                 return;
             }
 
-            const payload = await exchangeCodeForTokens(code);
-            setUser(payload);
-            log('[Auth] User logged in:', payload.email);
+            // For native apps, we need to extract the tokens from the URL
+            // Supabase uses fragment (#) based tokens for implicit flow
+            const hashParams = new URLSearchParams(url.split('#')[1] || '');
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+
+            if (accessToken) {
+                // Set session from tokens
+                const { data, error } = await supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken || '',
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data.session) {
+                    api.setToken(data.session.access_token);
+                    await saveToken('auth_token', data.session.access_token);
+
+                    const userData = {
+                        id: data.session.user.id,
+                        email: data.session.user.email,
+                        sub: data.session.user.id, // For backwards compatibility
+                    };
+
+                    if (data.session.user.email) {
+                        await saveToken('user_email', data.session.user.email);
+                    }
+
+                    setUser(userData);
+                    log('[Auth] User logged in:', userData.email);
+                }
+            }
 
             // Close browser on native and force reload to refresh UI
             if (Capacitor.isNativePlatform()) {
@@ -278,130 +234,108 @@ export function AuthProvider({ children }) {
         }
     }, []);
 
-    // Initialize auth and set up deep link listener
+    // Initialize auth and listen for Supabase auth changes
     useEffect(() => {
         const initAuth = async () => {
-            let token = api.getToken();
-            let lsToken = localStorage.getItem('auth_token');
-
-            // Try IndexedDB if localStorage is empty (iOS Safari ITP might have cleared it)
-            if (!lsToken) {
-                const idbToken = await getFromIndexedDB('auth_token');
-                if (idbToken) {
-                    log('[Auth] Recovered auth token from IndexedDB');
-                    localStorage.setItem('auth_token', idbToken);
-                    lsToken = idbToken;
-
-                    // Also recover other tokens
-                    const idbRefresh = await getFromIndexedDB('refresh_token');
-                    if (idbRefresh) {
-                        localStorage.setItem('refresh_token', idbRefresh);
-                    }
-                    const idbEmail = await getFromIndexedDB('user_email');
-                    if (idbEmail) {
-                        localStorage.setItem('user_email', idbEmail);
-                    }
+            if (!SUPABASE_URL) {
+                // Dev mode - check for dev token
+                const devToken = localStorage.getItem('auth_token');
+                if (devToken === 'dev-token') {
+                    api.setToken('dev-token');
+                    setUser({ id: 'dev-user-123', email: 'dev@example.com', sub: 'dev-user-123' });
                 }
+                setLoading(false);
+                return;
             }
 
-            const effectiveToken = token || lsToken;
+            try {
+                // Try to recover session
+                const { data: { session }, error } = await supabase.auth.getSession();
 
-            if (effectiveToken) {
-                try {
-                    const payload = JSON.parse(atob(effectiveToken.split('.')[1]));
-                    const now = Math.floor(Date.now() / 1000);
+                if (error) {
+                    log('[Auth] Error getting session:', error);
+                }
 
-                    if (payload.exp && payload.exp < now) {
+                if (session) {
+                    api.setToken(session.access_token);
+                    await saveToken('auth_token', session.access_token);
+
+                    const userData = {
+                        id: session.user.id,
+                        email: session.user.email,
+                        sub: session.user.id, // For backwards compatibility
+                    };
+
+                    if (session.user.email) {
+                        await saveToken('user_email', session.user.email);
+                    }
+
+                    setUser(userData);
+                    log('[Auth] Session restored for:', userData.email);
+                } else {
+                    // Try to recover from IndexedDB (iOS Safari ITP workaround)
+                    const idbToken = await getFromIndexedDB('auth_token');
+                    if (idbToken && idbToken !== 'dev-token') {
+                        log('[Auth] Found token in IndexedDB, attempting refresh...');
                         const newToken = await refreshAccessToken();
                         if (newToken) {
-                            const newPayload = JSON.parse(atob(newToken.split('.')[1]));
-                            setUser(newPayload);
-                        } else {
-                            api.setToken(null);
-                            setUser(null);
-                        }
-                    } else {
-                        setUser(payload);
-                        if (!token && lsToken) {
-                            api.setToken(lsToken);
+                            const { data: { session: refreshedSession } } = await supabase.auth.getSession();
+                            if (refreshedSession) {
+                                const userData = {
+                                    id: refreshedSession.user.id,
+                                    email: refreshedSession.user.email,
+                                    sub: refreshedSession.user.id,
+                                };
+                                setUser(userData);
+                            }
                         }
                     }
-                } catch (e) {
-                    console.error('[Auth] Token parse error:', e);
-                    api.setToken(null);
-                    localStorage.removeItem('auth_token');
                 }
+            } catch (e) {
+                console.error('[Auth] Init error:', e);
             }
+
             setLoading(false);
         };
 
         initAuth();
+
+        // Listen for auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            log('[Auth] Auth state changed:', event);
+
+            if (event === 'SIGNED_IN' && session) {
+                api.setToken(session.access_token);
+                await saveToken('auth_token', session.access_token);
+
+                const userData = {
+                    id: session.user.id,
+                    email: session.user.email,
+                    sub: session.user.id,
+                };
+
+                if (session.user.email) {
+                    await saveToken('user_email', session.user.email);
+                }
+
+                setUser(userData);
+            } else if (event === 'SIGNED_OUT') {
+                api.setToken(null);
+                await removeToken('auth_token');
+                await removeToken('user_email');
+                setUser(null);
+            } else if (event === 'TOKEN_REFRESHED' && session) {
+                api.setToken(session.access_token);
+                await saveToken('auth_token', session.access_token);
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
-    // Visibility change listener - refresh token when app comes back to foreground
-    useEffect(() => {
-        const handleVisibilityChange = async () => {
-            if (document.visibilityState === 'visible' && user) {
-                log('[Auth] App became visible, checking token...');
-                const token = api.getToken() || localStorage.getItem('auth_token');
-                if (token) {
-                    try {
-                        const payload = JSON.parse(atob(token.split('.')[1]));
-                        const now = Math.floor(Date.now() / 1000);
-                        // Refresh if token expires in less than 5 minutes
-                        if (payload.exp && (payload.exp - now) < 300) {
-                            log('[Auth] Token expiring soon, refreshing...');
-                            const newToken = await refreshAccessToken();
-                            if (newToken) {
-                                const newPayload = JSON.parse(atob(newToken.split('.')[1]));
-                                setUser(newPayload);
-                            }
-                        }
-                    } catch (e) {
-                        console.error('[Auth] Visibility check error:', e);
-                    }
-                }
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [user]);
-
-    // Periodic token refresh - refresh 5 minutes before expiry
-    useEffect(() => {
-        if (!user) return;
-
-        const checkAndRefresh = async () => {
-            const token = api.getToken() || localStorage.getItem('auth_token');
-            if (!token) return;
-
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const now = Math.floor(Date.now() / 1000);
-                const timeUntilExpiry = payload.exp ? payload.exp - now : 0;
-
-                // Refresh if less than 5 minutes remaining
-                if (timeUntilExpiry > 0 && timeUntilExpiry < 300) {
-                    log('[Auth] Proactive token refresh...');
-                    const newToken = await refreshAccessToken();
-                    if (newToken) {
-                        const newPayload = JSON.parse(atob(newToken.split('.')[1]));
-                        setUser(newPayload);
-                    }
-                }
-            } catch (e) {
-                console.error('[Auth] Periodic refresh error:', e);
-            }
-        };
-
-        // Check every minute
-        const intervalId = setInterval(checkAndRefresh, 60000);
-
-        return () => clearInterval(intervalId);
-    }, [user]);
-
-    // Separate effect for native URL handling
+    // Native URL handling for OAuth callback
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
 
@@ -412,20 +346,7 @@ export function AuthProvider({ children }) {
             log('[Auth] App URL opened:', url);
 
             if (url && url.startsWith('simplebaby://callback')) {
-                try {
-                    // Parse the URL to get the code
-                    const queryString = url.split('?')[1];
-                    if (queryString) {
-                        const params = new URLSearchParams(queryString);
-                        const code = params.get('code');
-                        if (code) {
-                            log('[Auth] Got auth code, processing...');
-                            await handleCallback(code);
-                        }
-                    }
-                } catch (error) {
-                    console.error('[Auth] Error parsing callback URL:', error);
-                }
+                await handleCallback(url);
             }
         };
 
@@ -443,56 +364,66 @@ export function AuthProvider({ children }) {
             log('[Auth] Removing URL listener');
             CapApp.removeAllListeners();
         };
-    }, []);
+    }, [handleCallback]);
 
     const login = async () => {
-        if (!COGNITO_DOMAIN) {
+        if (!SUPABASE_URL) {
+            // Dev mode
             api.setToken('dev-token');
-            setUser({ sub: 'dev-user-123', email: 'dev@example.com' });
+            localStorage.setItem('auth_token', 'dev-token');
+            setUser({ id: 'dev-user-123', email: 'dev@example.com', sub: 'dev-user-123' });
             return;
         }
 
-        const params = new URLSearchParams({
-            client_id: COGNITO_CLIENT_ID,
-            response_type: 'code',
-            scope: 'openid email profile',
-            redirect_uri: REDIRECT_URI,
-        });
+        try {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: REDIRECT_URI,
+                    skipBrowserRedirect: Capacitor.isNativePlatform(),
+                },
+            });
 
-        const loginUrl = `${COGNITO_DOMAIN}/login?${params}`;
-        log('[Auth] Opening login URL:', loginUrl);
+            if (error) {
+                console.error('[Auth] Login error:', error);
+                return;
+            }
 
-        if (Capacitor.isNativePlatform()) {
-            await Browser.open({ url: loginUrl });
-        } else {
-            window.location.href = loginUrl;
+            if (Capacitor.isNativePlatform() && data?.url) {
+                // Open in-app browser for native
+                await Browser.open({ url: data.url });
+            }
+            // For web, Supabase handles the redirect automatically
+        } catch (error) {
+            console.error('[Auth] Login error:', error);
         }
     };
 
     const logout = async () => {
         api.setToken(null);
         localStorage.removeItem('auth_token');
-        localStorage.removeItem('refresh_token');
         localStorage.removeItem('user_email');
 
         // Also clear IndexedDB
         await Promise.all([
             removeFromIndexedDB('auth_token'),
-            removeFromIndexedDB('refresh_token'),
             removeFromIndexedDB('user_email'),
         ]).catch(e => console.warn('[Auth] IndexedDB clear failed:', e));
 
         setUser(null);
 
-        if (COGNITO_DOMAIN) {
-            const logoutUrl = `${COGNITO_DOMAIN}/logout?client_id=${COGNITO_CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI.replace('/callback', ''))}`;
+        if (SUPABASE_URL) {
+            try {
+                await supabase.auth.signOut();
 
-            if (Capacitor.isNativePlatform()) {
-                await Browser.open({ url: logoutUrl });
-                // Use ref to track timeout for proper cleanup
-                browserCloseTimeoutRef.current = setTimeout(() => Browser.close(), 1000);
-            } else {
-                window.location.href = logoutUrl;
+                if (Capacitor.isNativePlatform()) {
+                    // Native app - no need to redirect
+                } else {
+                    // Web - redirect to login
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('[Auth] Logout error:', error);
             }
         }
     };

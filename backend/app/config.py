@@ -4,15 +4,15 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
-    
+
     database_url: str = "postgresql://user:pass@localhost:5432/simplebaby"
     environment: str = "development"
-    cognito_user_pool_id: str = ""
-    cognito_client_id: str = ""
-    cognito_region: str = "us-east-1"
+    # Supabase Auth settings
+    supabase_url: str = ""
+    supabase_jwt_secret: str = ""
     # CORS origins - comma-separated list of allowed origins
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
-    
+
     class Config:
         env_file = ".env"
         case_sensitive = False

@@ -50,8 +50,8 @@ jobs:
       - name: Build (Staging)
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING }}
-          VITE_COGNITO_DOMAIN: ${{ secrets.VITE_COGNITO_DOMAIN_STAGING }}
-          VITE_COGNITO_CLIENT_ID: ${{ secrets.VITE_COGNITO_CLIENT_ID_STAGING }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_STAGING }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY_STAGING }}
           VITE_REDIRECT_URI: ${{ secrets.VITE_REDIRECT_URI_STAGING }}
         run: |
           cd frontend
