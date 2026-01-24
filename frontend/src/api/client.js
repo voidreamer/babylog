@@ -9,6 +9,7 @@ if (!API_BASE && import.meta.env.PROD) {
     console.error('CRITICAL: VITE_API_URL environment variable is not set in production!');
 }
 
+import { supabase } from '../lib/supabase';
 import {
     isOnline,
     getCachedBabies,
@@ -44,70 +45,31 @@ import {
 
 class ApiClient {
     constructor() {
-        this.token = localStorage.getItem('auth_token');
-        this.refreshFunction = null;
-        this.isRefreshing = false;
+        // No longer store token - get it fresh from Supabase each request
     }
 
-    setToken(token) {
-        this.token = token;
-        if (token) {
-            localStorage.setItem('auth_token', token);
-        } else {
-            localStorage.removeItem('auth_token');
-        }
+    async getAuthHeaders() {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        };
     }
 
-    getToken() {
-        return this.token;
-    }
-
-    setRefreshFunction(fn) {
-        this.refreshFunction = fn;
-    }
-
-    async request(endpoint, options = {}, isRetry = false) {
+    async request(endpoint, options = {}) {
         const url = `${API_BASE}/api${endpoint}`;
 
+        const authHeaders = await this.getAuthHeaders();
         const headers = {
-            'Content-Type': 'application/json',
+            ...authHeaders,
             ...options.headers,
         };
-
-        if (this.token) {
-            headers['Authorization'] = `Bearer ${this.token}`;
-        }
-
-        // Send user email from id_token for baby sharing feature
-        const userEmail = localStorage.getItem('user_email');
-        if (userEmail) {
-            headers['X-User-Email'] = userEmail;
-        }
 
         const response = await fetch(url, {
             ...options,
             headers,
         });
-
-        // Handle 401 - try to refresh token and retry once
-        if (response.status === 401 && !isRetry && this.refreshFunction && !this.isRefreshing) {
-            this.isRefreshing = true;
-            try {
-                const newToken = await this.refreshFunction();
-                this.isRefreshing = false;
-
-                if (newToken) {
-                    // Retry the original request with new token
-                    return this.request(endpoint, options, true);
-                }
-            } catch (e) {
-                this.isRefreshing = false;
-            }
-
-            // Refresh failed, throw unauthorized error
-            const errorBody = await response.text();
-            throw new Error('Unauthorized: ' + errorBody);
-        }
 
         if (response.status === 401) {
             const errorBody = await response.text();
@@ -879,14 +841,7 @@ class ApiClient {
 
         const url = `${API_BASE}/api/export/csv/${babyId}?${params}`;
 
-        const headers = {};
-        if (this.token) {
-            headers['Authorization'] = `Bearer ${this.token}`;
-        }
-        const userEmail = localStorage.getItem('user_email');
-        if (userEmail) {
-            headers['X-User-Email'] = userEmail;
-        }
+        const headers = await this.getAuthHeaders();
 
         const response = await fetch(url, { headers });
 

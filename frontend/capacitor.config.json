@@ -6,7 +6,8 @@
     "allowNavigation": [
       "*.cloudfront.net",
       "*.amazonaws.com",
-      "*.amazoncognito.com"
+      "*.supabase.co",
+      "*.supabase.com"
     ]
   },
   "ios": {

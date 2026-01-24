@@ -4,6 +4,13 @@ secrets/
 *.pem
 *.key
 *.p12
+CLAUDE.md
+
+# Terraform state (contains sensitive data)
+*.tfstate
+*.tfstate.*
+.terraform/
+infra/backups/
 
 # Environment files
 .env

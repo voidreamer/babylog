@@ -3,13 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Callback() {
-    const { handleCallback } = useAuth();
+    const { user, loading } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const code = searchParams.get('code');
         const errorParam = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
 
@@ -18,14 +17,21 @@ export default function Callback() {
             return;
         }
 
-        if (code) {
-            handleCallback(code)
-                .then(() => navigate('/'))
-                .catch((err) => setError(err.message));
-        } else {
-            navigate('/login');
+        // Supabase handles the OAuth callback automatically via onAuthStateChange
+        // Once the user is set and loading is complete, navigate to home
+        if (!loading && user) {
+            navigate('/');
+        } else if (!loading && !user) {
+            // If loading is complete but no user, something went wrong
+            // Wait a moment for Supabase to process the hash
+            const timeout = setTimeout(() => {
+                if (!user) {
+                    navigate('/login');
+                }
+            }, 2000);
+            return () => clearTimeout(timeout);
         }
-    }, []);
+    }, [user, loading, navigate, searchParams]);
 
     if (error) {
         return (

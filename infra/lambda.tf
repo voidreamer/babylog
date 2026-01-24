@@ -41,13 +41,11 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      DATABASE_URL         = var.database_url
-      ENVIRONMENT          = var.environment
-      COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
-      COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.main.id
-      COGNITO_REGION       = var.aws_region
-      CORS_ORIGINS         = var.cors_origins
-      ADMIN_API_KEY        = var.admin_api_key
+      DATABASE_URL        = var.database_url
+      ENVIRONMENT         = var.environment
+      SUPABASE_JWT_SECRET = var.supabase_jwt_secret
+      CORS_ORIGINS        = var.cors_origins
+      ADMIN_API_KEY       = var.admin_api_key
     }
   }
 }
@@ -79,19 +77,6 @@ resource "aws_apigatewayv2_api" "api" {
   }
 }
 
-# JWT Authorizer
-resource "aws_apigatewayv2_authorizer" "cognito" {
-  api_id           = aws_apigatewayv2_api.api.id
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  name             = "cognito-authorizer"
-
-  jwt_configuration {
-    audience = [aws_cognito_user_pool_client.main.id]
-    issuer   = "https://cognito-idp.${var.aws_region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
-  }
-}
-
 # Lambda Integration
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id                 = aws_apigatewayv2_api.api.id
@@ -100,13 +85,11 @@ resource "aws_apigatewayv2_integration" "lambda" {
   payload_format_version = "2.0"
 }
 
-# Routes - Protected
-resource "aws_apigatewayv2_route" "api_protected" {
-  api_id             = aws_apigatewayv2_api.api.id
-  route_key          = "ANY /api/{proxy+}"
-  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
-  authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+# Routes - API (auth handled by backend)
+resource "aws_apigatewayv2_route" "api" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "ANY /api/{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
 # Routes - OPTIONS for CORS preflight (no auth)

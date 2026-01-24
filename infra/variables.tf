@@ -22,17 +22,10 @@ variable "database_url" {
   sensitive   = true
 }
 
-variable "google_client_id" {
-  description = "Google OAuth Client ID"
-  type        = string
-  default     = ""
-}
-
-variable "google_client_secret" {
-  description = "Google OAuth Client Secret"
+variable "supabase_jwt_secret" {
+  description = "Supabase JWT Secret (from Supabase Dashboard > Settings > API)"
   type        = string
   sensitive   = true
-  default     = ""
 }
 
 variable "cors_origins" {
