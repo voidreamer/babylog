@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
-import { format, subDays, addDays, startOfDay, differenceInMinutes, isToday } from 'date-fns';
+import { format, subDays, addDays, startOfDay, differenceInMinutes, isToday, addMinutes } from 'date-fns';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
@@ -10,7 +10,7 @@ import PottyModal from './PottyModal';
 import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
-import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X, Undo2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,10 +43,15 @@ export default function TimelineCalendar() {
     const [confirmDelete, setConfirmDelete] = useState(null); // Event to delete
     const scrollRef = useRef(null);
 
-    // Swipe gesture handling
-    const touchStartX = useRef(null);
-    const touchEndX = useRef(null);
-    const minSwipeDistance = 50;
+    // Drag and drop state
+    const [draggedEvent, setDraggedEvent] = useState(null);
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartY = useRef(null);
+    const dragStartScrollTop = useRef(null);
+
+    // Undo state - stores the last moved event's original state
+    const [undoAction, setUndoAction] = useState(null);
 
     const loadEvents = async () => {
         if (!selectedBaby) return;
@@ -87,32 +92,204 @@ export default function TimelineCalendar() {
         setSelectedDate(new Date());
     };
 
-    // Swipe gesture handlers
-    const onTouchStart = useCallback((e) => {
-        touchEndX.current = null;
-        touchStartX.current = e.targetTouches[0].clientX;
+    // Drag and drop handlers
+    const handleDragStart = useCallback((e, event) => {
+        e.stopPropagation();
+        // Don't start drag if clicking on action buttons
+        if (e.target.closest('.timeline-action-btn')) return;
+
+        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+        dragStartY.current = clientY;
+        dragStartScrollTop.current = scrollRef.current?.scrollTop || 0;
+
+        setDraggedEvent(event);
+        setDragOffset(0);
+        setIsDragging(true);
+        setSelectedEventId(null); // Deselect when starting drag
     }, []);
 
-    const onTouchMove = useCallback((e) => {
-        touchEndX.current = e.targetTouches[0].clientX;
-    }, []);
+    const handleDragMove = useCallback((e) => {
+        if (!isDragging || !draggedEvent) return;
 
-    const onTouchEnd = useCallback(() => {
-        if (!touchStartX.current || !touchEndX.current) return;
-        const distance = touchStartX.current - touchEndX.current;
-        const isSwipe = Math.abs(distance) > minSwipeDistance;
-        if (isSwipe) {
-            if (distance > 0) {
-                // Swipe left - go to next day
-                navigateDay(1);
-            } else {
-                // Swipe right - go to previous day
-                navigateDay(-1);
-            }
+        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        const deltaY = clientY - dragStartY.current;
+
+        // Account for scroll changes during drag
+        const scrollDelta = (scrollRef.current?.scrollTop || 0) - dragStartScrollTop.current;
+        const totalDelta = deltaY + scrollDelta;
+
+        setDragOffset(totalDelta);
+    }, [isDragging, draggedEvent]);
+
+    const handleDragEnd = useCallback(async () => {
+        if (!isDragging || !draggedEvent || Math.abs(dragOffset) < 10) {
+            // Minimal movement - treat as a click, not a drag
+            setIsDragging(false);
+            setDraggedEvent(null);
+            setDragOffset(0);
+            return;
         }
-        touchStartX.current = null;
-        touchEndX.current = null;
-    }, []);
+
+        // Calculate new time based on drag offset
+        // 80px = 1 hour, so offset in minutes = (offset / 80) * 60
+        const minutesOffset = Math.round((dragOffset / 80) * 60);
+
+        // Round to nearest 5 minutes for cleaner times
+        const roundedMinutes = Math.round(minutesOffset / 5) * 5;
+
+        if (roundedMinutes === 0) {
+            setIsDragging(false);
+            setDraggedEvent(null);
+            setDragOffset(0);
+            return;
+        }
+
+        const originalTime = parseUTCTime(draggedEvent.time);
+        const newTime = addMinutes(originalTime, roundedMinutes);
+
+        // Store undo action before updating
+        const previousState = {
+            event: draggedEvent,
+            originalTime: draggedEvent.time,
+        };
+
+        try {
+            // Update the event time via API
+            await updateEventTime(draggedEvent, newTime);
+
+            // Save undo action
+            setUndoAction(previousState);
+
+            toast.success(`Moved to ${format(newTime, 'h:mm a')}`);
+            loadEvents();
+        } catch (error) {
+            toast.error('Failed to update time');
+        }
+
+        setIsDragging(false);
+        setDraggedEvent(null);
+        setDragOffset(0);
+    }, [isDragging, draggedEvent, dragOffset, selectedDate]);
+
+    // Update event time via API
+    const updateEventTime = async (event, newTime) => {
+        const details = event.details || {};
+        const newTimeISO = newTime.toISOString();
+
+        switch (event.event_type) {
+            case 'feeding':
+                await api.updateFeeding(event.id, {
+                    baby_id: selectedBaby.id,
+                    time: newTimeISO,
+                    type: details.type,
+                    duration_minutes: details.duration_minutes,
+                    amount_ml: details.amount_ml,
+                    notes: details.notes,
+                });
+                break;
+            case 'diaper':
+                await api.updateDiaper(event.id, {
+                    baby_id: selectedBaby.id,
+                    time: newTimeISO,
+                    type: details.type,
+                    poo_color: details.poo_color,
+                    poo_consistency: details.poo_consistency,
+                    poo_amount: details.poo_amount,
+                    notes: details.notes,
+                });
+                break;
+            case 'sleep':
+                // For sleep, we need to adjust both start and end times
+                const oldStart = parseUTCTime(event.time);
+                const oldEnd = details.end_time ? parseUTCTime(details.end_time) : null;
+                const timeDiff = newTime.getTime() - oldStart.getTime();
+
+                await api.updateSleep(event.id, {
+                    baby_id: selectedBaby.id,
+                    start_time: newTimeISO,
+                    end_time: oldEnd ? new Date(oldEnd.getTime() + timeDiff).toISOString() : null,
+                    notes: details.notes,
+                });
+                break;
+            case 'pumping':
+                await api.updatePumping(event.id, {
+                    baby_id: selectedBaby.id,
+                    time: newTimeISO,
+                    duration_minutes: details.duration_minutes,
+                    amount_ml: details.amount_ml,
+                    notes: details.notes,
+                });
+                break;
+            case 'potty':
+                await api.updatePottyLog(event.id, {
+                    baby_id: selectedBaby.id,
+                    time: newTimeISO,
+                    result: details.result,
+                    potty_type: details.potty_type,
+                    notes: details.notes,
+                });
+                break;
+            case 'tummy':
+                await api.updateTummyTime(event.id, {
+                    baby_id: selectedBaby.id,
+                    start_time: newTimeISO,
+                    duration_minutes: details.duration_minutes,
+                    notes: details.notes,
+                });
+                break;
+            case 'bath':
+                await api.updateBath(event.id, {
+                    baby_id: selectedBaby.id,
+                    time: newTimeISO,
+                    notes: details.notes,
+                });
+                break;
+            case 'supplement':
+                await api.updateSupplement(event.id, {
+                    baby_id: selectedBaby.id,
+                    time: newTimeISO,
+                    name: details.name,
+                    dosage: details.dosage,
+                    notes: details.notes,
+                });
+                break;
+        }
+    };
+
+    // Handle undo
+    const handleUndo = async () => {
+        if (!undoAction) return;
+
+        try {
+            const originalTime = parseUTCTime(undoAction.originalTime);
+            await updateEventTime(undoAction.event, originalTime);
+            toast.success('Undone');
+            setUndoAction(null);
+            loadEvents();
+        } catch (error) {
+            toast.error('Failed to undo');
+        }
+    };
+
+    // Add global mouse/touch move and end handlers
+    useEffect(() => {
+        if (!isDragging) return;
+
+        const handleMove = (e) => handleDragMove(e);
+        const handleEnd = () => handleDragEnd();
+
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        document.addEventListener('touchend', handleEnd);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('mouseup', handleEnd);
+            document.removeEventListener('touchmove', handleMove);
+            document.removeEventListener('touchend', handleEnd);
+        };
+    }, [isDragging, handleDragMove, handleDragEnd]);
 
     const handleEdit = (event) => {
         setEditingEvent(event);
@@ -374,6 +551,22 @@ export default function TimelineCalendar() {
                 <button className="timeline-nav-btn" onClick={() => navigateDay(1)}>▶</button>
             </div>
 
+            {/* Undo Button - shown when there's an action to undo */}
+            <AnimatePresence>
+                {undoAction && (
+                    <motion.button
+                        className="timeline-undo-btn"
+                        onClick={handleUndo}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                    >
+                        <Undo2 size={16} />
+                        Undo move
+                    </motion.button>
+                )}
+            </AnimatePresence>
+
             {loading ? (
                 <div className="loading" style={{ padding: 'var(--space-2xl)' }}>
                     <div className="spinner"></div>
@@ -382,9 +575,6 @@ export default function TimelineCalendar() {
                 <div
                     className="timeline-calendar-scroll"
                     ref={scrollRef}
-                    onTouchStart={onTouchStart}
-                    onTouchMove={onTouchMove}
-                    onTouchEnd={onTouchEnd}
                 >
                     <div className="timeline-calendar-content">
                         {/* Hour markers */}
@@ -422,25 +612,42 @@ export default function TimelineCalendar() {
                                 const config = EVENT_CONFIG[event.event_type] || EVENT_CONFIG.feeding;
                                 const style = getEventStyle(event);
                                 const isSelected = selectedEventId === `${event.event_type}-${event.id}`;
+                                const isBeingDragged = draggedEvent?.id === event.id && draggedEvent?.event_type === event.event_type;
+
+                                // Calculate dragged position
+                                const dragStyle = isBeingDragged ? {
+                                    transform: `translateY(${dragOffset}px)`,
+                                    zIndex: 100,
+                                    opacity: 0.9,
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                                } : {};
 
                                 return (
                                     <div
                                         key={`${event.event_type}-${event.id}`}
-                                        className={`timeline-event-block ${event.event_type} ${isSelected ? 'selected' : ''}`}
+                                        className={`timeline-event-block ${event.event_type} ${isSelected ? 'selected' : ''} ${isBeingDragged ? 'dragging' : ''}`}
                                         style={{
                                             ...style,
+                                            ...dragStyle,
                                             background: config.bg,
                                             borderLeft: `4px solid ${config.color}`,
+                                            cursor: isDragging ? 'grabbing' : 'grab',
                                         }}
                                         onClick={() => {
+                                            if (isDragging) return;
                                             if (isSelected) {
                                                 setSelectedEventId(null);
                                             } else {
                                                 setSelectedEventId(`${event.event_type}-${event.id}`);
                                             }
                                         }}
+                                        onMouseDown={(e) => handleDragStart(e, event)}
+                                        onTouchStart={(e) => handleDragStart(e, event)}
                                     >
                                         <div className="timeline-event-content">
+                                            <span className="timeline-event-drag-handle">
+                                                <GripVertical size={12} />
+                                            </span>
                                             <span className="timeline-event-icon"><config.icon size={14} /></span>
                                             <span className="timeline-event-time">
                                                 {format(parseUTCTime(event.time), 'h:mm a')}
@@ -451,7 +658,7 @@ export default function TimelineCalendar() {
                                         </div>
 
                                         {/* Action buttons (shown when selected) */}
-                                        {isSelected && (
+                                        {isSelected && !isDragging && (
                                             <div className="timeline-event-actions">
                                                 <button
                                                     className="timeline-action-btn edit"
