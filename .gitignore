@@ -44,3 +44,9 @@ yarn-error.log*
 
 # art
 art/
+
+# AI coding instructions (not for public repos)
+CLAUDE.md
+AGENTS.md
+.github/copilot-instructions.md
+CURSOR.md
