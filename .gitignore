@@ -4,7 +4,6 @@ secrets/
 *.pem
 *.key
 *.p12
-CLAUDE.md
 
 # Terraform state (contains sensitive data)
 *.tfstate
@@ -44,5 +43,4 @@ yarn-error.log*
 .cache/
 
 # art
-art
-*.md
+art/
