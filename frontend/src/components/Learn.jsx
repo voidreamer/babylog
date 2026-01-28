@@ -1,7 +1,14 @@
 import { useMemo } from 'react';
 import { useBaby } from '../hooks/useBaby';
-import { calculateAgeInMonths } from '../data/articles';
 import BabyInsights from './BabyInsights';
+
+function calculateAgeInMonths(birthDate) {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    const months = (today.getFullYear() - birth.getFullYear()) * 12 +
+        (today.getMonth() - birth.getMonth());
+    return Math.max(0, months);
+}
 import { TrendingUp, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
