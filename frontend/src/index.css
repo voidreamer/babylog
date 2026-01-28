@@ -97,8 +97,8 @@
    ============================================================================ */
 [data-theme="dark"] {
   --primary: #e8a8c0;
-  --primary-dark: #d4849c;
-  --primary-light: #f8c8dc;
+  --primary-dark: #c0708a;
+  --primary-light: #4a3540;
 
   --feeding: #e8a8c0;
   --feeding-light: #f8c8dc;
@@ -164,6 +164,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 html,
@@ -470,10 +474,6 @@ h4 {
     box-shadow: var(--shadow-sm);
   }
 
-  .widgets-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   .health-tabs {
     max-width: 900px;
     margin: 0 auto var(--space-lg) auto;
@@ -496,10 +496,6 @@ h4 {
 }
 
 @media (min-width: 1024px) {
-  .widgets-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
   .widget {
     min-height: 160px;
   }
@@ -561,7 +557,7 @@ h4 {
 .greeting-text {
   font-family: var(--font-family-heading);
   font-size: 17px;
-  color: #374151;
+  color: var(--text);
   font-weight: 400;
 }
 
@@ -581,7 +577,7 @@ h4 {
   justify-content: center;
   font-size: 1rem;
   font-weight: 700;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text);
   flex-shrink: 0;
 }
 
@@ -612,7 +608,7 @@ h4 {
   border-radius: var(--radius-full);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .baby-greeting-stats {
@@ -743,10 +739,25 @@ h4 {
 
 .widgets-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
   margin-bottom: var(--space-xl);
   padding: var(--space-sm);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .widgets-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .widgets-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .widget {
@@ -1226,6 +1237,124 @@ h4 {
 }
 
 /* ============================================================================
+   Coming Up
+   ============================================================================ */
+
+.coming-up-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.coming-up-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  color: var(--text);
+}
+
+.coming-up-header h3 {
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.coming-up-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.coming-up-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.coming-up-item:hover {
+  background: var(--surface-hover);
+}
+
+.coming-up-lavender {
+  border-left: 3px solid var(--potty);
+}
+
+.coming-up-peach {
+  border-left: 3px solid var(--feeding);
+}
+
+.coming-up-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.coming-up-lavender .coming-up-icon {
+  background: var(--potty-bg);
+  color: var(--potty-text);
+}
+
+.coming-up-peach .coming-up-icon {
+  background: var(--feeding-bg);
+  color: var(--feeding-text);
+}
+
+.coming-up-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.coming-up-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.coming-up-detail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.coming-up-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.coming-up-badge.lavender {
+  background: var(--potty-bg);
+  color: var(--potty-text);
+}
+
+.coming-up-badge.peach {
+  background: var(--feeding-bg);
+  color: var(--feeding-text);
+}
+
+/* ============================================================================
    Daily Summary (Collapsible)
    ============================================================================ */
 
@@ -1428,8 +1557,8 @@ h4 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-  color: var(--text);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1535,7 +1664,7 @@ h4 {
 .type-btn.active {
   border-color: var(--primary);
   background: rgba(212, 132, 156, 0.25);
-  color: var(--primary-light);
+  color: var(--primary);
 }
 
 .type-btn:hover:not(.active) {
@@ -2408,7 +2537,7 @@ h4 {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2544,7 +2673,7 @@ h4 {
   width: 88px;
   height: 88px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--potty-light) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--potty) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2652,7 +2781,7 @@ h4 {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--potty-light) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--potty) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2829,9 +2958,9 @@ h4 {
     margin-bottom: var(--space-md);
   }
 
-  /* Widgets: 2 columns on small mobile */
+  /* Widgets: single column on small mobile */
   .widgets-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: var(--space-sm);
     margin-bottom: var(--space-md);
   }
@@ -2859,6 +2988,31 @@ h4 {
 
   .widget-detail {
     font-size: 18px;
+  }
+
+  /* Coming Up card */
+  .coming-up-card {
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .coming-up-item {
+    padding: var(--space-xs) var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  .coming-up-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .coming-up-title {
+    font-size: 0.8rem;
+  }
+
+  .coming-up-badge {
+    font-size: 0.5625rem;
+    padding: 1px 6px;
   }
 
   /* Quick actions bottom bar */
@@ -3590,7 +3744,7 @@ h4 {
   font-size: 1.3rem;
   font-weight: 600;
   margin: var(--space-xl) 0 var(--space-md);
-  color: var(--primary-light);
+  color: var(--primary);
 }
 
 .article-h3 {
@@ -3678,8 +3832,8 @@ h4 {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
-  background: var(--primary-light);
-  color: var(--background);
+  background: var(--primary);
+  color: #fff;
 }
 
 .widget-settings-btn-text {

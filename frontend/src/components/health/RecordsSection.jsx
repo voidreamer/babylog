@@ -81,6 +81,7 @@ function VisitsPanel({ baby, visits, onDataChanged }) {
         weight_kg: '',
         height_cm: '',
         head_cm: '',
+        next_visit_date: '',
         notes: '',
     });
 
@@ -97,6 +98,7 @@ function VisitsPanel({ baby, visits, onDataChanged }) {
                 weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
                 height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
                 head_cm: formData.head_cm ? parseFloat(formData.head_cm) : null,
+                next_visit_date: formData.next_visit_date ? new Date(formData.next_visit_date).toISOString() : null,
                 notes: formData.notes || null,
             };
 
@@ -109,6 +111,7 @@ function VisitsPanel({ baby, visits, onDataChanged }) {
                 weight_kg: '',
                 height_cm: '',
                 head_cm: '',
+                next_visit_date: '',
                 notes: '',
             });
             setIsAdding(false);
@@ -164,6 +167,9 @@ function VisitsPanel({ baby, visits, onDataChanged }) {
                                     {visit.height_cm && <span>{parseFloat(visit.height_cm).toFixed(1)} cm</span>}
                                     {visit.head_cm && <span>Head: {parseFloat(visit.head_cm).toFixed(1)} cm</span>}
                                 </div>
+                            )}
+                            {visit.next_visit_date && (
+                                <p className="record-next-visit">Next visit: {formatDate(visit.next_visit_date)}</p>
                             )}
                             {visit.notes && <p className="record-notes">{visit.notes}</p>}
                         </div>
@@ -223,6 +229,15 @@ function VisitsPanel({ baby, visits, onDataChanged }) {
                             value={formData.head_cm}
                             onChange={(e) => setFormData({ ...formData, head_cm: e.target.value })}
                             className="record-number-input"
+                        />
+                    </div>
+                    <div className="record-form-row">
+                        <label className="record-inline-label">Next Visit</label>
+                        <input
+                            type="date"
+                            value={formData.next_visit_date}
+                            onChange={(e) => setFormData({ ...formData, next_visit_date: e.target.value })}
+                            className="record-date-input"
                         />
                     </div>
                     <textarea

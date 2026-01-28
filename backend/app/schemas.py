@@ -268,6 +268,7 @@ class DoctorVisitBase(BaseModel):
     weight_kg: Optional[float] = None
     height_cm: Optional[float] = None
     head_cm: Optional[float] = None
+    next_visit_date: Optional[datetime] = None
     notes: Optional[str] = None
 
 
@@ -293,6 +294,7 @@ class DoctorVisitUpdate(BaseModel):
     weight_kg: Optional[float] = None
     height_cm: Optional[float] = None
     head_cm: Optional[float] = None
+    next_visit_date: Optional[datetime] = None
     notes: Optional[str] = None
 
 

@@ -27,6 +27,9 @@ export function VisitModal({ babyId, editData, onClose, onSave }) {
     const [weight, setWeight] = useState(editData?.weight_kg?.toString() || '');
     const [height, setHeight] = useState(editData?.height_cm?.toString() || '');
     const [head, setHead] = useState(editData?.head_cm?.toString() || '');
+    const [nextVisitDate, setNextVisitDate] = useState(
+        editData?.next_visit_date ? format(parseUTCTime(editData.next_visit_date), 'yyyy-MM-dd') : ''
+    );
     const [notes, setNotes] = useState(editData?.notes || '');
     const [saving, setSaving] = useState(false);
 
@@ -42,6 +45,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }) {
                 weight_kg: weight ? parseFloat(weight) : null,
                 height_cm: height ? parseFloat(height) : null,
                 head_cm: head ? parseFloat(head) : null,
+                next_visit_date: nextVisitDate ? new Date(nextVisitDate).toISOString() : null,
                 notes: notes || null,
             };
 
@@ -100,6 +104,10 @@ export function VisitModal({ babyId, editData, onClose, onSave }) {
                                 <label className="form-label">Head (cm)</label>
                                 <input type="number" step="0.1" className="form-input" value={head} onChange={e => setHead(e.target.value)} placeholder="35" />
                             </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Next Visit Date</label>
+                            <input type="date" className="form-input" value={nextVisitDate} onChange={e => setNextVisitDate(e.target.value)} />
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>

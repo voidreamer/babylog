@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, or_
 from typing import List
+from datetime import datetime, timedelta, timezone
 
 from .. import models, schemas
 from ..database import get_db
@@ -635,3 +636,78 @@ def delete_allergy(
     db.delete(allergy)
     db.commit()
     return {"message": "Deleted"}
+
+
+# ============================================================================
+# Upcoming Items (Dashboard)
+# ============================================================================
+
+@router.get("/upcoming/")
+def get_upcoming(
+    baby_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
+):
+    baby = get_accessible_baby(db, baby_id, user_id, user_email)
+    if not baby:
+        raise HTTPException(status_code=404, detail="Baby not found")
+
+    today = datetime.now(timezone.utc)
+    horizon = today + timedelta(days=30)
+    upcoming = []
+
+    # Vaccinations with next_due_date in the next 30 days
+    vaccinations = db.query(models.Vaccination).filter(
+        models.Vaccination.baby_id == baby_id,
+        models.Vaccination.next_due_date >= today,
+        models.Vaccination.next_due_date <= horizon
+    ).order_by(models.Vaccination.next_due_date).all()
+
+    for v in vaccinations:
+        upcoming.append({
+            "type": "vaccination",
+            "title": f"{v.vaccine_name} (Dose {v.dose_number + 1})",
+            "date": v.next_due_date.isoformat(),
+            "color": "lavender"
+        })
+
+    # Doctor visits with next_visit_date in the next 30 days
+    visits = db.query(models.DoctorVisit).filter(
+        models.DoctorVisit.baby_id == baby_id,
+        models.DoctorVisit.next_visit_date >= today,
+        models.DoctorVisit.next_visit_date <= horizon
+    ).order_by(models.DoctorVisit.next_visit_date).all()
+
+    for v in visits:
+        label = v.visit_type or "Doctor Visit"
+        if v.doctor_name:
+            label += f" — {v.doctor_name}"
+        upcoming.append({
+            "type": "doctor_visit",
+            "title": label,
+            "date": v.next_visit_date.isoformat(),
+            "color": "lavender"
+        })
+
+    # Active medications
+    medications = db.query(models.Medication).filter(
+        models.Medication.baby_id == baby_id,
+        models.Medication.is_active == True
+    ).all()
+
+    for m in medications:
+        upcoming.append({
+            "type": "medication",
+            "title": m.medication_name,
+            "date": None,
+            "frequency": m.frequency,
+            "dosage": m.dosage,
+            "color": "peach"
+        })
+
+    # Sort: dated items first by date, then undated (medications)
+    dated = sorted([i for i in upcoming if i.get("date")], key=lambda x: x["date"])
+    undated = [i for i in upcoming if not i.get("date")]
+
+    return {"upcoming": dated + undated}
