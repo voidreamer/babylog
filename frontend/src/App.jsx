@@ -17,14 +17,14 @@ import Learn from './components/Learn';
 
 // Lazy load Health page - only loads when user clicks Health tab
 const Health = lazy(() => import('./pages/Health'));
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings as SettingsIcon, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
+import { Home, CalendarDays, HeartPulse, BookOpen, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
 function SettingsPage({
     user,
-    theme,
-    setTheme,
+    isDark,
+    toggleTheme,
     isPremium,
     promoCode,
     setPromoCode,
@@ -42,20 +42,18 @@ function SettingsPage({
 
             <div className="settings-section">
                 <div className="settings-section-header">
-                    <Palette size={18} className="settings-section-icon" />
+                    <Moon size={18} className="settings-section-icon" />
                     <h3 className="settings-section-title">Appearance</h3>
                 </div>
                 <div className="settings-item">
-                    <span className="settings-item-label">Theme</span>
-                    <select
-                        className="settings-select"
-                        value={theme}
-                        onChange={(e) => setTheme(e.target.value)}
+                    <span className="settings-item-label">Dark Mode</span>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={toggleTheme}
+                        style={{ minWidth: 60 }}
                     >
-                        <option value="handwritten">Handwritten Light</option>
-                        <option value="handwritten-dark">Handwritten Dark</option>
-                        <option value="classic">Classic Dark</option>
-                    </select>
+                        {isDark ? 'On' : 'Off'}
+                    </button>
                 </div>
             </div>
 
@@ -245,10 +243,15 @@ function MainApp() {
         }
     };
 
-    // Theme state
+    // Theme state with migration from old theme values
     const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'handwritten';
+        const saved = localStorage.getItem('theme');
+        if (saved === 'handwritten') return 'light';
+        if (saved === 'handwritten-dark' || saved === 'classic') return 'dark';
+        return saved || 'light';
     });
+
+    const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
     // Apply theme on mount and when it changes
     useEffect(() => {
@@ -340,6 +343,14 @@ function MainApp() {
 
     return (
         <div className="app-container">
+            <header className="app-header">
+                <span className="header-title">Baby Tracker</span>
+                <div className="header-actions">
+                    <button className="btn-icon theme-toggle" onClick={toggleTheme}>
+                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
+                </div>
+            </header>
             <OfflineIndicator
                 online={online}
                 syncing={syncing}
@@ -362,8 +373,8 @@ function MainApp() {
                 {activeTab === 'settings' && (
                     <SettingsPage
                         user={user}
-                        theme={theme}
-                        setTheme={setTheme}
+                        isDark={theme === 'dark'}
+                        toggleTheme={toggleTheme}
                         isPremium={isPremium}
                         promoCode={promoCode}
                         setPromoCode={setPromoCode}

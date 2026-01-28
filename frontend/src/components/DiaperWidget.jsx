@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 function useIsDarkTheme() {
     const [isDark, setIsDark] = useState(() => {
         const theme = document.documentElement.getAttribute('data-theme');
-        return theme === 'handwritten-dark' || theme === 'classic';
+        return theme === 'dark';
     });
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
             const theme = document.documentElement.getAttribute('data-theme');
-            setIsDark(theme === 'handwritten-dark' || theme === 'classic');
+            setIsDark(theme === 'dark');
         });
 
         observer.observe(document.documentElement, {
@@ -190,7 +190,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
 
     return (
         <div
-            className="widget sketchy diaper"
+            className="widget diaper"
             onClick={onOpenModal}
             style={widgetStyle}
         >

@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 function useIsDarkTheme() {
     const [isDark, setIsDark] = useState(() => {
         const theme = document.documentElement.getAttribute('data-theme');
-        return theme === 'handwritten-dark' || theme === 'classic';
+        return theme === 'dark';
     });
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
             const theme = document.documentElement.getAttribute('data-theme');
-            setIsDark(theme === 'handwritten-dark' || theme === 'classic');
+            setIsDark(theme === 'dark');
         });
 
         observer.observe(document.documentElement, {
@@ -278,7 +278,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
     return (
         <div
-            className={`widget sketchy feeding ${isFeeding ? 'active-timer' : ''}`}
+            className={`widget feeding ${isFeeding ? 'active-timer' : ''}`}
             onClick={onOpenModal}
             style={widgetStyle}
         >

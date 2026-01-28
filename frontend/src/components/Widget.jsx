@@ -5,13 +5,13 @@ import { useMemo, useState, useEffect } from 'react';
 function useIsDarkTheme() {
     const [isDark, setIsDark] = useState(() => {
         const theme = document.documentElement.getAttribute('data-theme');
-        return theme === 'handwritten-dark' || theme === 'classic';
+        return theme === 'dark';
     });
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
             const theme = document.documentElement.getAttribute('data-theme');
-            setIsDark(theme === 'handwritten-dark' || theme === 'classic');
+            setIsDark(theme === 'dark');
         });
 
         observer.observe(document.documentElement, {
@@ -224,7 +224,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
 
     return (
         <div
-            className={`widget sketchy ${type} ${isSleeping ? 'sleeping' : ''}`}
+            className={`widget ${type} ${isSleeping ? 'sleeping' : ''}`}
             onClick={onClick}
             style={widgetStyle}
         >

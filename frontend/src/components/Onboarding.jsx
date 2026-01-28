@@ -3,7 +3,7 @@ import { useBaby } from '../hooks/useBaby';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';
 import AddBabyForm from './AddBabyForm';
-import { Baby, ArrowRight, Sparkles, LogOut, Palette, Pencil, Moon } from 'lucide-react';
+import { Baby, ArrowRight, Sparkles, LogOut, Palette, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Onboarding({ onComplete }) {
@@ -15,7 +15,10 @@ export default function Onboarding({ onComplete }) {
 
     // Theme state
     const [selectedTheme, setSelectedTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'handwritten';
+        const stored = localStorage.getItem('theme');
+        if (stored === 'handwritten') return 'light';
+        if (stored === 'handwritten-dark' || stored === 'classic') return 'dark';
+        return stored || 'light';
     });
 
     // Apply theme preview
@@ -114,36 +117,25 @@ export default function Onboarding({ onComplete }) {
 
                     <div className="theme-selector">
                         <button
-                            className={`theme-option ${selectedTheme === 'handwritten' ? 'active' : ''}`}
-                            onClick={() => setSelectedTheme('handwritten')}
+                            className={`theme-option ${selectedTheme === 'light' ? 'active' : ''}`}
+                            onClick={() => setSelectedTheme('light')}
                         >
-                            <div className="theme-preview theme-preview-handwritten">
-                                <Pencil size={24} />
+                            <div className="theme-preview" style={{ background: '#fef7ed' }}>
+                                <Sun size={24} />
                             </div>
-                            <span className="theme-name">Handwritten Light</span>
-                            <span className="theme-desc">Warm, cozy, personal</span>
+                            <span className="theme-name">Light</span>
+                            <span className="theme-desc">Warm and bright</span>
                         </button>
 
                         <button
-                            className={`theme-option ${selectedTheme === 'handwritten-dark' ? 'active' : ''}`}
-                            onClick={() => setSelectedTheme('handwritten-dark')}
+                            className={`theme-option ${selectedTheme === 'dark' ? 'active' : ''}`}
+                            onClick={() => setSelectedTheme('dark')}
                         >
-                            <div className="theme-preview theme-preview-handwritten-dark">
-                                <Pencil size={24} />
+                            <div className="theme-preview" style={{ background: '#18181b' }}>
+                                <Moon size={24} color="#fff" />
                             </div>
-                            <span className="theme-name">Handwritten Dark</span>
-                            <span className="theme-desc">Cozy dark mode</span>
-                        </button>
-
-                        <button
-                            className={`theme-option ${selectedTheme === 'classic' ? 'active' : ''}`}
-                            onClick={() => setSelectedTheme('classic')}
-                        >
-                            <div className="theme-preview theme-preview-classic">
-                                <Moon size={24} />
-                            </div>
-                            <span className="theme-name">Classic Dark</span>
-                            <span className="theme-desc">Modern, sleek</span>
+                            <span className="theme-name">Dark</span>
+                            <span className="theme-desc">Easy on the eyes</span>
                         </button>
                     </div>
 
