@@ -1,50 +1,98 @@
-# Babylog - Baby Tracker
+# Babylog
 
-A serverless baby tracking app built with FastAPI, React, and deployed on AWS.
+A serverless baby tracking application built with FastAPI and React, deployed on AWS.
 
 ## Features
 
-- 👶 Track multiple babies
-- 🍼 Log feedings (formula/breast)
-- 🧷 Track diaper changes
-- 😴 Monitor sleep sessions
-- 📊 Dashboard with widgets
-- 📅 Daily timeline view
-- 📱 iPad-optimized responsive design
+- Track multiple babies with sharing support
+- Log feedings (formula, breast, bottle, solid foods)
+- Track diaper changes with optional rash monitoring
+- Monitor sleep sessions with quality tracking
+- Health records: doctor visits, vaccinations, medications, milestones, growth charts
+- Activity tracking: tummy time, baths, supplements
+- Dashboard with customizable widgets
+- Daily timeline view with drag-and-drop editing
+- Analytics and insights
+- Offline support with sync
+- iPad-optimized responsive design
+- PWA support
 
 ## Tech Stack
 
-- **Backend**: FastAPI on AWS Lambda
-- **Frontend**: React + Vite on S3/CloudFront
-- **Database**: Supabase PostgreSQL
-- **Auth**: AWS Cognito with Google OAuth
-- **Infrastructure**: Terraform
+**Backend**
+- Python 3.11+ with FastAPI
+- SQLAlchemy ORM
+- AWS Lambda (via Mangum)
+- API Gateway
 
-## Quick Start
+**Frontend**
+- React 18 with Vite
+- Framer Motion for animations
+- Recharts for data visualization
+- Capacitor for iOS/Android builds
 
-See [docs/deployment.md](docs/deployment.md) for deployment instructions.
+**Infrastructure**
+- Supabase PostgreSQL
+- Supabase Auth
+- AWS S3 + CloudFront for static hosting
+- Terraform for IaC
+- GitHub Actions CI/CD
 
-### Local Development
+## Project Structure
 
-**Backend**:
+```
+backend/           FastAPI application
+  app/
+    routers/       API endpoints by domain
+    models.py      SQLAlchemy models
+    auth.py        JWT authentication
+  alembic/         Database migrations
+
+frontend/          React application
+  src/
+    components/    UI components
+    hooks/         React hooks
+    pages/         Route pages
+    api/           API client
+
+infra/             Terraform configurations
+```
+
+## Local Development
+
+### Backend
+
 ```bash
 cd backend
 pip install -r requirements.txt
-cp .env.example .env  # Configure DATABASE_URL
+```
+
+Create `.env` with:
+```
+DATABASE_URL=postgresql://user:pass@localhost:5432/babylog
+SUPABASE_JWT_SECRET=your-jwt-secret
+```
+
+Run:
+```bash
 uvicorn app.main:app --reload
 ```
 
-**Frontend**:
+### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## Documentation
+## Deployment
 
-- [Deployment Guide](docs/deployment.md)
-- [Region Migration Troubleshooting](docs/region-migration-troubleshooting.md)
+The project uses GitHub Actions for CI/CD:
+- Push to `staging` branch deploys to staging environment
+- Push to `main` branch deploys to production
+
+Infrastructure is managed with Terraform. Copy `infra/terraform.tfvars.example` to `terraform.tfvars` and configure your variables.
 
 ## License
 
