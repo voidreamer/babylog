@@ -40,3 +40,10 @@ variable "admin_api_key" {
   sensitive   = true
   default     = ""
 }
+
+# BabyHub Integration
+variable "babyhub_cloudfront_arn" {
+  description = "ARN of BabyHub's CloudFront distribution (for unified routing)"
+  type        = string
+  default     = ""
+}
