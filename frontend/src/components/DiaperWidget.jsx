@@ -1,122 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState } from 'react';
 import { Droplets, CircleDot, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
-
-// Hook to detect if current theme is a dark theme
-function useIsDarkTheme() {
-    const [isDark, setIsDark] = useState(() => {
-        const theme = document.documentElement.getAttribute('data-theme');
-        return theme === 'dark';
-    });
-
-    useEffect(() => {
-        const observer = new MutationObserver(() => {
-            const theme = document.documentElement.getAttribute('data-theme');
-            setIsDark(theme === 'dark');
-        });
-
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-theme']
-        });
-
-        return () => observer.disconnect();
-    }, []);
-
-    return isDark;
-}
-
-// Generate a subtle wobbly path for hand-drawn effect
-function generateSketchyPath(width, height, seed, roughness = 1.5) {
-    const points = 60;
-    let path = 'M ';
-
-    const wobble = (base, index) => {
-        return base + Math.sin(seed + index * 0.4) * roughness + Math.cos(seed * 1.2 + index * 0.6) * roughness * 0.4;
-    };
-
-    for (let i = 0; i <= points; i++) {
-        const x = (i / points) * width;
-        const y = wobble(0, i);
-        path += `${x},${y} `;
-    }
-
-    for (let i = 0; i <= points; i++) {
-        const x = wobble(width, i + points);
-        const y = (i / points) * height;
-        path += `${x},${y} `;
-    }
-
-    for (let i = points; i >= 0; i--) {
-        const x = (i / points) * width;
-        const y = wobble(height, i + points * 2);
-        path += `${x},${y} `;
-    }
-
-    for (let i = points; i >= 0; i--) {
-        const x = wobble(0, i + points * 3);
-        const y = (i / points) * height;
-        path += `${x},${y} `;
-    }
-
-    path += 'Z';
-    return path;
-}
-
-// Sketchy border SVG component
-function SketchyBorder({ width, height, seed }) {
-    const paths = useMemo(() => ({
-        main: generateSketchyPath(width, height, seed),
-        second: generateSketchyPath(width, height, seed + 0.1),
-        shadow: generateSketchyPath(width, height, seed + 0.5),
-    }), [width, height, seed]);
-
-    return (
-        <>
-            <svg
-                className="sketchy-shadow"
-                viewBox={`0 0 ${width} ${height}`}
-                preserveAspectRatio="none"
-            >
-                <path
-                    d={paths.shadow}
-                    fill="var(--widget-stroke)"
-                    opacity="0.15"
-                />
-            </svg>
-
-            <svg
-                className="sketchy-border"
-                viewBox={`0 0 ${width} ${height}`}
-                preserveAspectRatio="none"
-            >
-                <path
-                    d={paths.main}
-                    fill="var(--widget-bg)"
-                />
-                <path
-                    d={paths.main}
-                    fill="none"
-                    stroke="var(--widget-stroke)"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    opacity="0.5"
-                />
-                <path
-                    d={paths.second}
-                    fill="none"
-                    stroke="var(--widget-stroke)"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    opacity="0.25"
-                />
-            </svg>
-        </>
-    );
-}
 
 // Format time ago
 function formatTimeAgo(dateStr) {
@@ -140,15 +25,8 @@ function formatTimeAgo(dateStr) {
     return `${diffDays}d ago`;
 }
 
-const sketchyColors = {
-    diaper: { stroke: '#059669', bg: '#ecfdf5', text: '#065f46' },
-};
-
 export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpenModal, quickActionsEnabled = true }) {
     const [saving, setSaving] = useState(null); // null or 'pee'|'poo'|'mixed'
-    const isDarkTheme = useIsDarkTheme();
-    const colors = sketchyColors.diaper;
-    const seed = 2 * 7.3; // Same seed as diaper widget
 
     const handleQuickLog = async (type, e) => {
         e.stopPropagation();
@@ -175,12 +53,6 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
 
     const timeAgo = lastDiaper ? formatTimeAgo(lastDiaper.time) : null;
 
-    const widgetStyle = isDarkTheme ? {} : {
-        '--widget-stroke': colors.stroke,
-        '--widget-bg': colors.bg,
-        '--widget-text': colors.text
-    };
-
     // Format last diaper type for display
     const getLastDiaperType = () => {
         if (!lastDiaper?.type) return null;
@@ -192,10 +64,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
         <div
             className="widget diaper"
             onClick={onOpenModal}
-            style={widgetStyle}
         >
-            <SketchyBorder width={200} height={150} seed={seed} />
-
             {/* Background icon */}
             <div className="widget-bg-icon">
                 <img

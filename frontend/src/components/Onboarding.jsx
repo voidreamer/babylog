@@ -3,7 +3,7 @@ import { useBaby } from '../hooks/useBaby';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';
 import AddBabyForm from './AddBabyForm';
-import { Baby, ArrowRight, Sparkles, LogOut, Palette, Sun, Moon } from 'lucide-react';
+import { Baby, ArrowRight, Sparkles, LogOut, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Onboarding({ onComplete }) {
@@ -108,7 +108,7 @@ export default function Onboarding({ onComplete }) {
             <div className="onboarding-container">
                 <div className="onboarding-card onboarding-theme-card">
                     <div className="onboarding-icon">
-                        <Palette size={48} />
+                        <Moon size={48} />
                     </div>
                     <h2 className="onboarding-title">Choose Your Style</h2>
                     <p className="onboarding-subtitle">
@@ -120,7 +120,7 @@ export default function Onboarding({ onComplete }) {
                             className={`theme-option ${selectedTheme === 'light' ? 'active' : ''}`}
                             onClick={() => setSelectedTheme('light')}
                         >
-                            <div className="theme-preview" style={{ background: '#fef7ed' }}>
+                            <div className="theme-preview" style={{ background: '#fefdfb' }}>
                                 <Sun size={24} />
                             </div>
                             <span className="theme-name">Light</span>
@@ -131,8 +131,8 @@ export default function Onboarding({ onComplete }) {
                             className={`theme-option ${selectedTheme === 'dark' ? 'active' : ''}`}
                             onClick={() => setSelectedTheme('dark')}
                         >
-                            <div className="theme-preview" style={{ background: '#18181b' }}>
-                                <Moon size={24} color="#fff" />
+                            <div className="theme-preview" style={{ background: '#1a1614' }}>
+                                <Moon size={24} color="#f0e8e4" />
                             </div>
                             <span className="theme-name">Dark</span>
                             <span className="theme-desc">Easy on the eyes</span>

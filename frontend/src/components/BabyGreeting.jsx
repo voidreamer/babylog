@@ -63,7 +63,7 @@ function getAvatarColor(name) {
     return `hsl(${hue}, 70%, 75%)`;
 }
 
-export default function BabyGreeting({ summary }) {
+export default function BabyGreeting({ summary, latestGrowth }) {
     const { babies, selectedBaby, selectBaby, removeBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -292,6 +292,29 @@ export default function BabyGreeting({ summary }) {
                     <Sparkles size={14} />
                     <span>{encouragement}</span>
                 </div>
+
+                {latestGrowth && (latestGrowth.weight_kg || latestGrowth.height_cm || latestGrowth.head_cm) && (
+                    <div className="baby-greeting-stats">
+                        {latestGrowth.weight_kg && (
+                            <div className="baby-stat-pill">
+                                <span className="baby-stat-value">{latestGrowth.weight_kg}</span>
+                                <span className="baby-stat-unit">kg</span>
+                            </div>
+                        )}
+                        {latestGrowth.height_cm && (
+                            <div className="baby-stat-pill">
+                                <span className="baby-stat-value">{latestGrowth.height_cm}</span>
+                                <span className="baby-stat-unit">cm</span>
+                            </div>
+                        )}
+                        {latestGrowth.head_cm && (
+                            <div className="baby-stat-pill">
+                                <span className="baby-stat-value">{latestGrowth.head_cm}</span>
+                                <span className="baby-stat-unit">cm head</span>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {showAddForm && (
