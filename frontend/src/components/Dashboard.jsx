@@ -172,8 +172,6 @@ export default function Dashboard() {
         <div>
             <BabyGreeting summary={dashboard?.daily_summary} latestGrowth={latestGrowth} />
 
-            <ComingUp items={upcoming} />
-
             {/* Widgets Grid */}
             <div className="widgets-grid">
                 {visibleWidgets.includes('feeding') && (
@@ -259,6 +257,8 @@ export default function Dashboard() {
                     onToggleQuickActions={toggleQuickActions}
                 />
             </div>
+
+            <ComingUp items={upcoming} />
 
             {/* Daily Summary */}
             <DailySummary summary={dashboard?.daily_summary} visibleWidgets={visibleWidgets} />
