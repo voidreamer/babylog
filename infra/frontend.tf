@@ -26,22 +26,41 @@ resource "aws_s3_bucket_policy" "frontend" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowCloudFrontAccess"
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.frontend.arn}/*"
-        Condition = {
-          StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.frontend.arn
+    Statement = concat(
+      [
+        {
+          Sid    = "AllowCloudFrontAccess"
+          Effect = "Allow"
+          Principal = {
+            Service = "cloudfront.amazonaws.com"
+          }
+          Action   = "s3:GetObject"
+          Resource = "${aws_s3_bucket.frontend.arn}/*"
+          Condition = {
+            StringEquals = {
+              "AWS:SourceArn" = aws_cloudfront_distribution.frontend.arn
+            }
           }
         }
-      }
-    ]
+      ],
+      # Allow BabyHub CloudFront to access this bucket (for unified routing)
+      var.babyhub_cloudfront_arn != "" ? [
+        {
+          Sid    = "AllowBabyHubCloudFrontAccess"
+          Effect = "Allow"
+          Principal = {
+            Service = "cloudfront.amazonaws.com"
+          }
+          Action   = "s3:GetObject"
+          Resource = "${aws_s3_bucket.frontend.arn}/*"
+          Condition = {
+            StringEquals = {
+              "AWS:SourceArn" = var.babyhub_cloudfront_arn
+            }
+          }
+        }
+      ] : []
+    )
   })
 }
 
