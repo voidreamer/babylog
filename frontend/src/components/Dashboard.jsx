@@ -22,6 +22,7 @@ import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
+import ComingUp from './ComingUp';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
 
@@ -31,6 +32,8 @@ const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
 export default function Dashboard() {
     const { selectedBaby } = useBaby();
     const [dashboard, setDashboard] = useState(null);
+    const [latestGrowth, setLatestGrowth] = useState(null);
+    const [upcoming, setUpcoming] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Modal states
@@ -99,8 +102,16 @@ export default function Dashboard() {
         try {
             const localDate = format(new Date(), 'yyyy-MM-dd');
             const tzOffset = new Date().getTimezoneOffset();
-            const dashboardData = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
+            const [dashboardData, growthRecords, upcomingData] = await Promise.all([
+                api.getDashboard(selectedBaby.id, localDate, tzOffset),
+                api.getGrowthRecords(selectedBaby.id).catch(() => []),
+                api.getUpcoming(selectedBaby.id).catch(() => ({ upcoming: [] })),
+            ]);
             setDashboard(dashboardData);
+            if (growthRecords?.length > 0) {
+                setLatestGrowth(growthRecords[growthRecords.length - 1]);
+            }
+            setUpcoming(upcomingData?.upcoming || []);
         } catch (error) {
             console.error('Failed to load dashboard:', error);
             toast.error('Failed to load dashboard', {
@@ -159,7 +170,9 @@ export default function Dashboard() {
 
     return (
         <div>
-            <BabyGreeting summary={dashboard?.daily_summary} />
+            <BabyGreeting summary={dashboard?.daily_summary} latestGrowth={latestGrowth} />
+
+            <ComingUp items={upcoming} />
 
             {/* Widgets Grid */}
             <div className="widgets-grid">

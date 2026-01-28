@@ -1,29 +1,4 @@
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
-import { useMemo, useState, useEffect } from 'react';
-
-// Hook to detect if current theme is a dark theme
-function useIsDarkTheme() {
-    const [isDark, setIsDark] = useState(() => {
-        const theme = document.documentElement.getAttribute('data-theme');
-        return theme === 'handwritten-dark' || theme === 'classic';
-    });
-
-    useEffect(() => {
-        const observer = new MutationObserver(() => {
-            const theme = document.documentElement.getAttribute('data-theme');
-            setIsDark(theme === 'handwritten-dark' || theme === 'classic');
-        });
-
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-theme']
-        });
-
-        return () => observer.disconnect();
-    }, []);
-
-    return isDark;
-}
 
 // Map widget types to PNG icons (null means use Lucide fallback)
 const pngIcons = {
@@ -48,59 +23,6 @@ const lucideIcons = {
     bath: ShowerHead,
     supplement: Pill,
 };
-
-// Sketchy color scheme - warm baby-friendly pastels with dark text for readability
-const sketchyColors = {
-    feeding: { stroke: '#ea580c', bg: '#fff7ed', text: '#9a3412' },   // Orange
-    diaper: { stroke: '#059669', bg: '#ecfdf5', text: '#065f46' },    // Emerald
-    sleep: { stroke: '#4f46e5', bg: '#eef2ff', text: '#3730a3' },     // Indigo
-    pumping: { stroke: '#db2777', bg: '#fdf2f8', text: '#9d174d' },   // Pink
-    potty: { stroke: '#7c3aed', bg: '#f5f3ff', text: '#5b21b6' },     // Violet
-    tummy: { stroke: '#ca8a04', bg: '#fefce8', text: '#854d0e' },     // Yellow
-    bath: { stroke: '#0891b2', bg: '#ecfeff', text: '#155e75' },      // Cyan
-    supplement: { stroke: '#16a34a', bg: '#f0fdf4', text: '#166534' }, // Green
-};
-
-// Generate a subtle wobbly path for hand-drawn effect
-function generateSketchyPath(width, height, seed, roughness = 1.5) {
-    const points = 60; // More points = smoother edges
-    let path = 'M ';
-
-    const wobble = (base, index) => {
-        return base + Math.sin(seed + index * 0.4) * roughness + Math.cos(seed * 1.2 + index * 0.6) * roughness * 0.4;
-    };
-
-    // Top edge
-    for (let i = 0; i <= points; i++) {
-        const x = (i / points) * width;
-        const y = wobble(0, i);
-        path += `${x},${y} `;
-    }
-
-    // Right edge
-    for (let i = 0; i <= points; i++) {
-        const x = wobble(width, i + points);
-        const y = (i / points) * height;
-        path += `${x},${y} `;
-    }
-
-    // Bottom edge
-    for (let i = points; i >= 0; i--) {
-        const x = (i / points) * width;
-        const y = wobble(height, i + points * 2);
-        path += `${x},${y} `;
-    }
-
-    // Left edge
-    for (let i = points; i >= 0; i--) {
-        const x = wobble(0, i + points * 3);
-        const y = (i / points) * height;
-        path += `${x},${y} `;
-    }
-
-    path += 'Z';
-    return path;
-}
 
 // Format time ago from a date
 function formatTimeAgo(dateStr) {
@@ -144,92 +66,15 @@ function WidgetIcon({ type, size, className, strokeWidth }) {
     return <LucideIcon size={size} strokeWidth={strokeWidth} />;
 }
 
-// Sketchy border SVG component
-function SketchyBorder({ width, height, type, seed }) {
-    const paths = useMemo(() => ({
-        main: generateSketchyPath(width, height, seed),
-        second: generateSketchyPath(width, height, seed + 0.1),
-        third: generateSketchyPath(width, height, seed - 0.1),
-        shadow: generateSketchyPath(width, height, seed + 0.5),
-    }), [width, height, seed]);
-
-    return (
-        <>
-            {/* Shadow */}
-            <svg
-                className="sketchy-shadow"
-                viewBox={`0 0 ${width} ${height}`}
-                preserveAspectRatio="none"
-            >
-                <path
-                    d={paths.shadow}
-                    fill="var(--widget-stroke)"
-                    opacity="0.15"
-                />
-            </svg>
-
-            {/* Main border */}
-            <svg
-                className="sketchy-border"
-                viewBox={`0 0 ${width} ${height}`}
-                preserveAspectRatio="none"
-            >
-                {/* Background fill */}
-                <path
-                    d={paths.main}
-                    fill="var(--widget-bg)"
-                />
-                {/* Two subtle border lines - cleaner hand-drawn effect */}
-                <path
-                    d={paths.main}
-                    fill="none"
-                    stroke="var(--widget-stroke)"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    opacity="0.5"
-                />
-                <path
-                    d={paths.second}
-                    fill="none"
-                    stroke="var(--widget-stroke)"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    opacity="0.25"
-                />
-            </svg>
-        </>
-    );
-}
-
 export default function Widget({ type, label, value, detail, isSleeping, onClick, lastTime }) {
     const timeAgo = formatTimeAgo(lastTime);
     const isEmpty = !lastTime && value === 'Never';
-    const colors = sketchyColors[type] || sketchyColors.feeding;
-    const isDarkTheme = useIsDarkTheme();
-
-    // Use a unique seed based on type for consistent but different wobbles
-    const seed = useMemo(() => {
-        const typeIndex = Object.keys(sketchyColors).indexOf(type);
-        return (typeIndex + 1) * 7.3;
-    }, [type]);
-
-    // Only apply inline styles in light theme; dark themes use CSS variables
-    const widgetStyle = isDarkTheme ? {} : {
-        '--widget-stroke': colors.stroke,
-        '--widget-bg': colors.bg,
-        '--widget-text': colors.text
-    };
 
     return (
         <div
-            className={`widget sketchy ${type} ${isSleeping ? 'sleeping' : ''}`}
+            className={`widget ${type} ${isSleeping ? 'sleeping' : ''}`}
             onClick={onClick}
-            style={widgetStyle}
         >
-            {/* Sketchy border */}
-            <SketchyBorder width={200} height={150} type={type} seed={seed} />
 
             {/* Background glow for sleeping */}
             {isSleeping && <div className="widget-glow" />}

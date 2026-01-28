@@ -17,14 +17,14 @@ import Learn from './components/Learn';
 
 // Lazy load Health page - only loads when user clicks Health tab
 const Health = lazy(() => import('./pages/Health'));
-import { Home, CalendarDays, HeartPulse, BookOpen, Settings as SettingsIcon, LogOut, ChevronRight, Palette, User, FileText, Pencil, Moon, Star, Gift, Sparkles, Download } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
 function SettingsPage({
     user,
-    theme,
-    setTheme,
+    isDark,
+    toggleTheme,
     isPremium,
     promoCode,
     setPromoCode,
@@ -40,115 +40,130 @@ function SettingsPage({
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
 
-            <div className="settings-section">
-                <div className="settings-section-header">
-                    <Palette size={18} className="settings-section-icon" />
-                    <h3 className="settings-section-title">Appearance</h3>
-                </div>
-                <div className="settings-item">
-                    <span className="settings-item-label">Theme</span>
-                    <select
-                        className="settings-select"
-                        value={theme}
-                        onChange={(e) => setTheme(e.target.value)}
-                    >
-                        <option value="handwritten">Handwritten Light</option>
-                        <option value="handwritten-dark">Handwritten Dark</option>
-                        <option value="classic">Classic Dark</option>
-                    </select>
+            {/* Preferences */}
+            <div className="settings-group">
+                <div className="settings-group-title">Preferences</div>
+                <div className="settings-row" onClick={toggleTheme}>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box peach">
+                            <Moon size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">Dark Mode</div>
+                            <div className="settings-row-desc">Easier on eyes at night</div>
+                        </div>
+                    </div>
+                    <div className={`toggle-switch ${isDark ? 'active' : ''}`} />
                 </div>
             </div>
 
-            <div className="settings-section">
-                <div className="settings-section-header">
-                    <User size={18} className="settings-section-icon" />
-                    <h3 className="settings-section-title">Account</h3>
-                </div>
+            {/* Account */}
+            <div className="settings-group">
+                <div className="settings-group-title">Account</div>
                 {user && (
-                    <div className="settings-item">
-                        <span className="settings-item-label">Signed in as:  </span>
-                        <span className="settings-item-value">{user.email}</span>
-                    </div>
-                )}
-            </div>
-
-            <div className="settings-section">
-                <div className="settings-section-header">
-                    <Star size={18} className="settings-section-icon" />
-                    <h3 className="settings-section-title">Premium</h3>
-                </div>
-                {isPremium ? (
-                    <div className="settings-item" style={{ color: 'var(--success)' }}>
-                        <span className="settings-item-label">Status</span>
-                        <span className="settings-item-value" style={{ color: 'var(--success)' }}>Active</span>
-                    </div>
-                ) : (
-                    <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-sm)' }}>
-                        <label className="settings-item-label">Enter promo code</label>
-                        <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="Enter code..."
-                                value={promoCode}
-                                onChange={(e) => setPromoCode(e.target.value)}
-                                style={{ flex: 1 }}
-                            />
-                            <button
-                                className="btn btn-primary"
-                                onClick={handlePromoCode}
-                                disabled={!promoCode.trim() || promoLoading}
-                            >
-                                {promoLoading ? 'Verifying...' : 'Apply'}
-                            </button>
+                    <div className="settings-row">
+                        <div className="settings-row-left">
+                            <div className="settings-icon-box lavender">
+                                <User size={16} />
+                            </div>
+                            <div>
+                                <div className="settings-row-label">{user.email}</div>
+                                <div className="settings-row-desc">Signed in</div>
+                            </div>
                         </div>
                     </div>
                 )}
+                <div className="settings-row">
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box butter">
+                            <Star size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">Premium Plan</div>
+                            <div className="settings-row-desc">
+                                {isPremium ? 'Active' : 'Unlock AI insights'}
+                            </div>
+                        </div>
+                    </div>
+                    {isPremium ? (
+                        <span className="settings-badge mint">Active</span>
+                    ) : (
+                        <span className="settings-badge lavender">Upgrade</span>
+                    )}
+                </div>
+                {!isPremium && (
+                    <div className="settings-promo-row">
+                        <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Enter promo code..."
+                            value={promoCode}
+                            onChange={(e) => setPromoCode(e.target.value)}
+                        />
+                        <button
+                            className="btn btn-primary btn-sm"
+                            onClick={handlePromoCode}
+                            disabled={!promoCode.trim() || promoLoading}
+                        >
+                            {promoLoading ? '...' : 'Apply'}
+                        </button>
+                    </div>
+                )}
             </div>
 
-            <div className="settings-section">
-                <div className="settings-section-header">
-                    <Download size={18} className="settings-section-icon" />
-                    <h3 className="settings-section-title">Data</h3>
-                </div>
-                <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-sm)' }}>
-                    <span className="settings-item-label">Export your baby's tracking data</span>
-                    <button
-                        className="btn btn-secondary"
-                        onClick={handleExportCsv}
-                        disabled={exportLoading || !babies || babies.length === 0}
-                        style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', justifyContent: 'center' }}
-                    >
-                        <Download size={16} />
-                        {exportLoading ? 'Exporting...' : 'Download CSV'}
-                    </button>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        Includes all feedings, sleep, diapers, and activities
-                    </span>
+            {/* Data */}
+            <div className="settings-group">
+                <div className="settings-group-title">Data</div>
+                <div
+                    className="settings-row"
+                    onClick={handleExportCsv}
+                    style={{ cursor: exportLoading || !babies || babies.length === 0 ? 'not-allowed' : 'pointer' }}
+                >
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box sky">
+                            <Download size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">Export Data</div>
+                            <div className="settings-row-desc">
+                                {exportLoading ? 'Exporting...' : 'Download as CSV'}
+                            </div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
                 </div>
             </div>
 
-            <div className="settings-section">
-                <div className="settings-section-header">
-                    <FileText size={18} className="settings-section-icon" />
-                    <h3 className="settings-section-title">Legal</h3>
-                </div>
+            {/* Support */}
+            <div className="settings-group">
+                <div className="settings-group-title">Support</div>
                 <button
-                    className="settings-item settings-link-btn"
+                    className="settings-row"
                     onClick={() => setShowPrivacyPolicy(true)}
                 >
-                    <span className="settings-item-label">Privacy Policy</span>
-                    <ChevronRight size={18} />
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box mint">
+                            <Shield size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">Privacy Policy</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
                 </button>
-            </div>
-
-            <div className="settings-section">
                 <button
-                    className="settings-logout-btn"
+                    className="settings-row settings-row-danger"
                     onClick={logout}
                 >
-                    <LogOut size={18} />
-                    <span>Sign Out</span>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box danger">
+                            <LogOut size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">Sign Out</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
                 </button>
             </div>
         </div>
@@ -245,10 +260,15 @@ function MainApp() {
         }
     };
 
-    // Theme state
+    // Theme state with migration from old theme values
     const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'handwritten';
+        const saved = localStorage.getItem('theme');
+        if (saved === 'handwritten') return 'light';
+        if (saved === 'handwritten-dark' || saved === 'classic') return 'dark';
+        return saved || 'light';
     });
+
+    const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
     // Apply theme on mount and when it changes
     useEffect(() => {
@@ -340,6 +360,14 @@ function MainApp() {
 
     return (
         <div className="app-container">
+            <header className="app-header">
+                <span className="header-title">Baby Tracker</span>
+                <div className="header-actions">
+                    <button className="btn-icon theme-toggle" onClick={toggleTheme}>
+                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
+                </div>
+            </header>
             <OfflineIndicator
                 online={online}
                 syncing={syncing}
@@ -362,8 +390,8 @@ function MainApp() {
                 {activeTab === 'settings' && (
                     <SettingsPage
                         user={user}
-                        theme={theme}
-                        setTheme={setTheme}
+                        isDark={theme === 'dark'}
+                        toggleTheme={toggleTheme}
                         isPremium={isPremium}
                         promoCode={promoCode}
                         setPromoCode={setPromoCode}
@@ -384,35 +412,35 @@ function MainApp() {
                     className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
                     onClick={() => setActiveTab('home')}
                 >
-                    <Home size={20} />
+                    <Home size={22} />
                     <span>Home</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
                     onClick={() => setActiveTab('timeline')}
                 >
-                    <CalendarDays size={20} />
+                    <Clock size={22} />
                     <span>Timeline</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
                     onClick={() => setActiveTab('health')}
                 >
-                    <HeartPulse size={20} />
+                    <Activity size={22} />
                     <span>Health</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
                     onClick={() => setActiveTab('learn')}
                 >
-                    <Sparkles size={20} />
+                    <PieChart size={22} />
                     <span>Insights</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
                     onClick={() => setActiveTab('settings')}
                 >
-                    <SettingsIcon size={20} />
+                    <SettingsIcon size={22} />
                     <span>Settings</span>
                 </button>
             </nav>

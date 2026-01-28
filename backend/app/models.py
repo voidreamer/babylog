@@ -144,9 +144,10 @@ class DoctorVisit(Base):
     weight_kg = Column(Numeric(5, 2), nullable=True)
     height_cm = Column(Numeric(5, 2), nullable=True)
     head_cm = Column(Numeric(5, 2), nullable=True)
+    next_visit_date = Column(DateTime, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="doctor_visits")
 
 

@@ -957,6 +957,11 @@ class ApiClient {
     async deleteAllergy(id) {
         return this.request(`/health/allergies/${id}`, { method: 'DELETE' });
     }
+
+    // Upcoming items (dashboard)
+    async getUpcoming(babyId) {
+        return this.request(`/health/upcoming/?baby_id=${babyId}`);
+    }
 }
 
 export const api = new ApiClient();
