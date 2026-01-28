@@ -34,38 +34,38 @@
 
   --feeding: #d4849c;
   --feeding-light: #f8c8dc;
-  --feeding-bg: #f8c8dc;
-  --feeding-text: #d4849c;
+  --feeding-bg: #fce4ec;
+  --feeding-text: #8a3a52;
 
   --diaper: #7ab89c;
   --diaper-light: #c8e6d4;
-  --diaper-bg: #c8e6d4;
-  --diaper-text: #7ab89c;
+  --diaper-bg: #e8f5e9;
+  --diaper-text: #2e6b4a;
 
   --sleep: #6a9cb8;
   --sleep-light: #b8d4e8;
-  --sleep-bg: #b8d4e8;
-  --sleep-text: #6a9cb8;
+  --sleep-bg: #e3f2fd;
+  --sleep-text: #2a5a78;
 
   --pumping: #d4849c;
   --pumping-light: #f8c8dc;
-  --pumping-bg: #f8c8dc;
-  --pumping-text: #d4849c;
+  --pumping-bg: #fce4ec;
+  --pumping-text: #8a3a52;
 
   --potty: #9878b8;
   --potty-light: #d8c8e8;
-  --potty-bg: #d8c8e8;
-  --potty-text: #9878b8;
+  --potty-bg: #f3e5f5;
+  --potty-text: #5a3878;
 
   --tummy: #c8a848;
   --tummy-light: #f8e8b8;
-  --tummy-bg: #f8e8b8;
-  --tummy-text: #c8a848;
+  --tummy-bg: #fffde7;
+  --tummy-text: #7a6420;
 
   --bath: #6a9cb8;
   --bath-light: #b8d4e8;
-  --bath-bg: #b8d4e8;
-  --bath-text: #6a9cb8;
+  --bath-bg: #e3f2fd;
+  --bath-text: #2a5a78;
 
   --background: #fefdfb;
   --bg: #fefdfb;
@@ -919,7 +919,7 @@ h4 {
   font-family: var(--font-family-heading);
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--widget-stroke, var(--text-secondary));
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -929,7 +929,7 @@ h4 {
   font-family: var(--font-family-heading);
   font-size: 21px;
   font-weight: 700;
-  color: var(--widget-stroke, var(--text));
+  color: var(--text);
   margin-bottom: var(--space-xs);
   line-height: 1.1;
 }
@@ -939,13 +939,13 @@ h4 {
   font-family: var(--font-family);
   font-size: 16px;
   font-weight: 400;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .widget-detail {
   font-family: var(--font-family);
   font-size: 21px;
-  color: #374151;
+  color: var(--text);
   margin-top: var(--space-xs);
   font-weight: 500;
   line-height: 1.4;
@@ -964,7 +964,7 @@ h4 {
 .widget-empty-text {
   font-family: var(--font-family);
   font-size: 21px;
-  color: var(--widget-stroke, #6b7280);
+  color: var(--text-muted);
   font-weight: 500;
 }
 
