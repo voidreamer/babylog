@@ -153,6 +153,8 @@ jobs:
           TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
           TF_VAR_custom_domain: staging-app.heybub.app
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
@@ -165,6 +167,8 @@ jobs:
           TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
           TF_VAR_custom_domain: staging-app.heybub.app
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
         run: terraform apply -auto-approve tfplan
 
       - name: Get Terraform outputs
@@ -330,6 +334,8 @@ jobs:
           TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
           TF_VAR_custom_domain: app.heybub.app
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
@@ -342,6 +348,8 @@ jobs:
           TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
           TF_VAR_custom_domain: app.heybub.app
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
         run: terraform apply -auto-approve tfplan
 
       - name: Get Terraform outputs
