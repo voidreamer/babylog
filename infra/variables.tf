@@ -41,6 +41,18 @@ variable "admin_api_key" {
   default     = ""
 }
 
+variable "custom_domain" {
+  description = "Custom domain for CloudFront (e.g. app.heybub.app). Leave empty for no custom domain."
+  type        = string
+  default     = ""
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN in us-east-1 for the custom domain"
+  type        = string
+  default     = ""
+}
+
 # BabyHub Integration
 variable "babyhub_cloudfront_arn" {
   description = "ARN of BabyHub's CloudFront distribution (for unified routing)"
