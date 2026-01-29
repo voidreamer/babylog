@@ -1,6 +1,6 @@
 import { openDB, IDBPDatabase } from 'idb';
 
-const DB_NAME = 'simplebaby-offline';
+const DB_NAME = 'heybub-offline';
 const DB_VERSION = 2;
 
 const CACHE_CONFIG = {

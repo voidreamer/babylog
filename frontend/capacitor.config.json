@@ -1,6 +1,6 @@
 {
-  "appId": "com.simplebaby.app",
-  "appName": "Simple Baby",
+  "appId": "com.heybub.app",
+  "appName": "HeyBub",
   "webDir": "dist",
   "server": {
     "allowNavigation": [
@@ -14,7 +14,7 @@
     "contentInset": "automatic",
     "preferredContentMode": "mobile",
     "backgroundColor": "#18181b",
-    "scheme": "simplebaby"
+    "scheme": "heybub"
   },
   "android": {
     "allowMixedContent": true,

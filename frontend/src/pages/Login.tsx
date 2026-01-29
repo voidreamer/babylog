@@ -18,7 +18,7 @@ export default function Login() {
                 <div className="auth-logo">
                     <Baby size={48} />
                 </div>
-                <h1 className="auth-title">SimpleBaby</h1>
+                <h1 className="auth-title">HeyBub</h1>
                 <p className="auth-subtitle">
                     The simple way to track your baby's daily activities
                 </p>
