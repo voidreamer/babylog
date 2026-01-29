@@ -23,7 +23,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                 <section className="legal-section">
                     <h2>1. Information We Collect</h2>
                     <p>
-                        SimpleBaby collects information you provide directly when using our baby tracking app:
+                        HeyBub collects information you provide directly when using our baby tracking app:
                     </p>
                     <ul>
                         <li><strong>Account Information:</strong> Email address and name via Google Sign-In</li>
@@ -100,7 +100,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                     <p>
                         For privacy questions or concerns, contact us at:
                         <br />
-                        <strong>privacy@simplebaby.app</strong>
+                        <strong>privacy@heybub.app</strong>
                     </p>
                 </section>
             </div>

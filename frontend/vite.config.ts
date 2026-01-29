@@ -9,8 +9,8 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['baby.svg', 'favicon.ico'],
             manifest: {
-                name: 'SimpleBaby - Baby Tracker',
-                short_name: 'SimpleBaby',
+                name: 'HeyBub - Baby Tracker',
+                short_name: 'HeyBub',
                 description: 'Track your baby\'s sleep, feeding, and diaper changes',
                 theme_color: '#6366f1',
                 background_color: '#fef7ed',

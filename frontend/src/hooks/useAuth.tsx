@@ -101,7 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         const redirectTo = Capacitor.isNativePlatform()
-            ? 'simplebaby://callback'
+            ? 'heybub://callback'
             : `${window.location.origin}/callback`;
 
         const { error } = await supabase.auth.signInWithOAuth({

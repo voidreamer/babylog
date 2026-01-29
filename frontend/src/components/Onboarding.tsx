@@ -75,7 +75,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <div className="onboarding-icon">
                         <Baby size={48} />
                     </div>
-                    <h1 className="onboarding-title">Welcome to SimpleBaby!</h1>
+                    <h1 className="onboarding-title">Welcome to HeyBub!</h1>
                     <p className="onboarding-subtitle">
                         Let's set up your baby's profile so you can start tracking.
                     </p>

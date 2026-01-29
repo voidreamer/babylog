@@ -1,4 +1,4 @@
-# SimpleBaby Frontend
+# HeyBub Frontend
 
 React frontend for the baby tracker app.
 
