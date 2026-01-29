@@ -14,6 +14,54 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Check for auth relay params from cross-app navigation
+        const params = new URLSearchParams(window.location.search);
+        const accessToken = params.get('auth_relay');
+        const refreshToken = params.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+            log('[Auth] Auth relay detected, setting session');
+            // Consume theme param before cleaning URL
+            const themeParam = params.get('theme');
+            if (themeParam === 'dark' || themeParam === 'light') {
+                localStorage.setItem('theme', themeParam);
+            }
+            // Clean URL immediately
+            params.delete('auth_relay');
+            params.delete('refresh_token');
+            params.delete('theme');
+            const cleanUrl = params.toString()
+                ? `${window.location.pathname}?${params.toString()}`
+                : window.location.pathname;
+            window.history.replaceState({}, '', cleanUrl);
+
+            supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+            }).then(({ data: { session }, error }) => {
+                if (error) {
+                    log('[Auth] Auth relay failed:', error);
+                } else {
+                    log('[Auth] Auth relay success');
+                    setSession(session);
+                    setUser(session?.user ?? null);
+                }
+                setLoading(false);
+            });
+            return; // Skip normal session check, relay will handle it
+        }
+
+        // Check for theme param (even without auth relay)
+        const themeParam = params.get('theme');
+        if (themeParam === 'dark' || themeParam === 'light') {
+            localStorage.setItem('theme', themeParam);
+            params.delete('theme');
+            const cleanUrl = params.toString()
+                ? `${window.location.pathname}?${params.toString()}`
+                : window.location.pathname;
+            window.history.replaceState({}, '', cleanUrl);
+        }
+
         // Check active session on mount
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);

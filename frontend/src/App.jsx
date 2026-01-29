@@ -17,7 +17,7 @@ import Learn from './components/Learn';
 
 // Lazy load Health page - only loads when user clicks Health tab
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
@@ -188,8 +188,20 @@ function ProtectedRoute({ children }) {
     return children;
 }
 
+function buildHubUrl(session, theme) {
+    const url = new URL('https://heybub.app');
+    if (session?.access_token && session?.refresh_token) {
+        url.searchParams.set('auth_relay', session.access_token);
+        url.searchParams.set('refresh_token', session.refresh_token);
+    }
+    if (theme) {
+        url.searchParams.set('theme', theme);
+    }
+    return url.toString();
+}
+
 function MainApp() {
-    const { user, logout } = useAuth();
+    const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
@@ -361,7 +373,13 @@ function MainApp() {
     return (
         <div className="app-container">
             <header className="app-header">
-                <span className="header-title">Baby Tracker</span>
+                <div className="header-left">
+                    <a href={buildHubUrl(session, theme)} className="hub-back-link">
+                        <ArrowLeft size={16} />
+                        <span>Hub</span>
+                    </a>
+                    <span className="header-title">Baby Tracker</span>
+                </div>
                 <div className="header-actions">
                     <button className="btn-icon theme-toggle" onClick={toggleTheme}>
                         {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
