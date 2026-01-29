@@ -5,6 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { ShowerHead } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -16,6 +17,7 @@ const parseUTCTime = (timeStr: any): Date => {
 interface BathModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function BathModal({ editEvent, onClose, onSave }: BathModalProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const isEditing = !!editEvent;
     const [time, setTime] = useState(new Date());
     const [notes, setNotes] = useState('');
@@ -50,7 +52,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
             onSave();
         } catch (error) {
             console.error('Failed to log bath:', error);
-            toast.error('Failed to save bath');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -60,7 +62,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><ShowerHead size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Bath</h2>
+                    <h2 className="modal-title"><ShowerHead size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editBath') : t('logBath')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -68,17 +70,17 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
                     <div className="modal-body">
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">Time</label>
+                            <label className="form-label">{t('time')}</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">Notes (optional)</label>
+                            <label className="form-label">{t('notes')} ({t('optional')})</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Products used, etc."
+                                placeholder={t('productsUsed')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />
@@ -90,7 +92,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
+                            {saving ? t('saving') : t('save')}
                         </button>
                     </div>
                 </form>

@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Milk, Pencil, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr: any): Date => {
@@ -15,6 +16,7 @@ const parseUTCTime = (timeStr: any): Date => {
 interface PumpingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PumpingModal({ babyId, editEvent, onClose, onSave }: PumpingModalProps) {
     const isEditing = !!editEvent;
+    const { t } = useTranslation('common');
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
     const [time, setTime] = useState(new Date());
     const [duration, setDuration] = useState('');
@@ -89,7 +91,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             });
             onSave();
         } catch (error) {
-            toast.error('Failed to save pumping');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -116,7 +118,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             onSave();
         } catch (error) {
             console.error('Failed to save pumping:', error);
-            toast.error('Failed to save pumping');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -126,7 +128,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Pumping</h2>
+                    <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editPumping') : t('logPumping')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -140,14 +142,14 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     className={`type-btn ${mode === 'quick' ? 'active' : ''}`}
                                     onClick={() => { setMode('quick'); handleStopTimer(); }}
                                 >
-                                    <Pencil size={16} /> Quick Log
+                                    <Pencil size={16} /> {t('quickLog')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${mode === 'timer' ? 'active' : ''}`}
                                     onClick={() => setMode('timer')}
                                 >
-                                    <Timer size={16} /> Timer
+                                    <Timer size={16} /> {t('timer')}
                                 </button>
                             </div>
                         </div>
@@ -189,7 +191,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         style={{ background: 'var(--pumping)' }}
                                         disabled={saving}
                                     >
-                                        ▶️ Start Pumping
+                                        ▶️ {t('startPumping')}
                                     </button>
                                 ) : (
                                     <button
@@ -197,7 +199,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         className="btn btn-secondary btn-block btn-lg"
                                         onClick={handleStopTimer}
                                     >
-                                        ⏹️ Stop
+                                        ⏹️ {t('stop')}
                                     </button>
                                 )}
                             </div>
@@ -206,7 +208,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                             {(timerRunning || timerSeconds > 0) && (
                                 <>
                                     <div className="form-group">
-                                        <label className="form-label">Amount (ml)</label>
+                                        <label className="form-label">{t('amountMl')}</label>
                                         <input
                                             type="number"
                                             className="form-input"
@@ -219,11 +221,11 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     </div>
 
                                     <div className="form-group">
-                                        <label className="form-label">Notes</label>
+                                        <label className="form-label">{t('notes')}</label>
                                         <input
                                             type="text"
                                             className="form-input"
-                                            placeholder="Optional notes..."
+                                            placeholder={t('notesOptional')}
                                             value={notes}
                                             onChange={(e) => setNotes(e.target.value)}
                                         />
@@ -243,7 +245,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         onClick={handleSaveTimer}
                                         disabled={saving}
                                     >
-                                        {saving ? 'Saving...' : 'Save Pumping'}
+                                        {saving ? t('saving') : t('savePumping')}
                                     </button>
                                 </div>
                             )}
@@ -252,13 +254,13 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                         /* Quick Log Mode */
                         <form onSubmit={handleSubmitQuick}>
                             <div className="form-group">
-                                <label className="form-label">Time</label>
+                                <label className="form-label">{t('time')}</label>
                                 <TimePicker value={time} onChange={setTime} />
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label className="form-label">Duration (min)</label>
+                                    <label className="form-label">{t('durationMin')}</label>
                                     <input
                                         type="number"
                                         className="form-input"
@@ -271,7 +273,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">Amount (ml)</label>
+                                    <label className="form-label">{t('amountMl')}</label>
                                     <input
                                         type="number"
                                         className="form-input"
@@ -285,11 +287,11 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Notes</label>
+                                <label className="form-label">{t('notes')}</label>
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Optional notes..."
+                                    placeholder={t('notesOptional')}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                 />
@@ -300,7 +302,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     Cancel
                                 </button>
                                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                                    {saving ? 'Saving...' : 'Save Pumping'}
+                                    {saving ? t('saving') : t('savePumping')}
                                 </button>
                             </div>
                         </form>

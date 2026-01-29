@@ -1,0 +1,39 @@
+{
+  "dailySummary": {
+    "title": "Résumé du jour",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "noData": "Aucune donnée pour {{period}}",
+    "loading": "Chargement...",
+    "feedings": "alimentations",
+    "diapers": "couches",
+    "sleep": "sommeil",
+    "pumps": "tirages",
+    "potty": "petit pot",
+    "tummyTime": "temps sur le ventre",
+    "bath_one": "bain",
+    "bath_other": "bains",
+    "naps": "{{count}} siestes",
+    "wet": "{{count}} pipi",
+    "dirty": "{{count}} caca",
+    "mixed": "{{count}} mixtes",
+    "success": "{{count}} succès"
+  },
+  "widgetSettings": {
+    "editActivities": "Modifier les activités",
+    "hidden_one": "{{count}} masquée",
+    "hidden_other": "{{count}} masquées",
+    "allVisible": "Toutes visibles",
+    "dashboardActivities": "Activités du tableau de bord",
+    "tapToToggle": "Touche pour afficher ou masquer les activités sur ton tableau de bord",
+    "quickActions": "Actions rapides",
+    "quickActionsHint": "Boutons à touche unique sur les widgets"
+  },
+  "quickActions": {
+    "feeding": "Alimentation",
+    "diaper": "Couche",
+    "sleep": "Sommeil",
+    "pump": "Tirage"
+  },
+  "logging": "Enregistrement..."
+}

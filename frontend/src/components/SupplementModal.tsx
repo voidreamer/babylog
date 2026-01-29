@@ -5,6 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Pill } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -15,17 +16,18 @@ const parseUTCTime = (timeStr: any): Date => {
 
 // Common baby supplements
 const supplementOptions = [
-    { value: 'vitamin_d', label: 'Vitamin D', defaultDosage: '400 IU' },
-    { value: 'iron', label: 'Iron', defaultDosage: '1ml' },
-    { value: 'dha', label: 'DHA/Omega-3', defaultDosage: '' },
-    { value: 'probiotic', label: 'Probiotic', defaultDosage: '' },
-    { value: 'multivitamin', label: 'Multivitamin', defaultDosage: '' },
-    { value: 'other', label: 'Other', defaultDosage: '' },
+    { value: 'vitamin_d', label: t('supplementTypes.vitamin_d'), defaultDosage: '400 IU' },
+    { value: 'iron', label: t('supplementTypes.iron'), defaultDosage: '1ml' },
+    { value: 'dha', label: t('supplementTypes.dha'), defaultDosage: '' },
+    { value: 'probiotic', label: t('supplementTypes.probiotic'), defaultDosage: '' },
+    { value: 'multivitamin', label: t('supplementTypes.multivitamin'), defaultDosage: '' },
+    { value: 'other', label: t('supplementTypes.other'), defaultDosage: '' },
 ];
 
 interface SupplementModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function SupplementModal({ editEvent, onClose, onSave }: SupplementModalProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const isEditing = !!editEvent;
     const [supplementName, setSupplementName] = useState('vitamin_d');
     const [dosage, setDosage] = useState('400 IU');
@@ -75,7 +77,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
             onSave();
         } catch (error) {
             console.error('Failed to log supplement:', error);
-            toast.error('Failed to save supplement');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -89,7 +91,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Supplement</h2>
+                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editSupplement') : t('logSupplement')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -97,7 +99,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
                     <div className="modal-body">
                         {/* Supplement Type */}
                         <div className="form-group">
-                            <label className="form-label">Supplement</label>
+                            <label className="form-label">{t('supplement')}</label>
                             <div className="type-selector" style={{ flexWrap: 'wrap' }}>
                                 {supplementOptions.map((opt) => (
                                     <button
@@ -114,11 +116,11 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
 
                         {/* Dosage */}
                         <div className="form-group">
-                            <label className="form-label">Dosage (optional)</label>
+                            <label className="form-label">{t('dosageOptional')}</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="e.g., 400 IU, 1ml"
+                                placeholder={t('dosagePlaceholder')}
                                 value={dosage}
                                 onChange={(e) => setDosage(e.target.value)}
                             />
@@ -126,17 +128,17 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
 
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">Time</label>
+                            <label className="form-label">{t('time')}</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">Notes (optional)</label>
+                            <label className="form-label">{t('notes')} ({t('optional')})</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Any notes..."
+                                placeholder={t('anyNotes')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />
@@ -148,7 +150,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
+                            {saving ? t('saving') : t('save')}
                         </button>
                     </div>
                 </form>

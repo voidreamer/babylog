@@ -6,10 +6,12 @@ import { api } from '../api/client';
 import AddBabyForm from './AddBabyForm';
 import { Baby, ArrowRight, Sparkles, LogOut, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface OnboardingProps { onComplete: () => void; }
 export default function Onboarding({ onComplete }: OnboardingProps) {
     const { refresh } = useBaby();
+    const { t } = useTranslation(['onboarding', 'common']);
     const { logout, user } = useAuth();
     const [step, setStep] = useState(1);
     const [saving, setSaving] = useState(false);
@@ -61,7 +63,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             setStep(4); // Success step
         } catch (error) {
             console.error('Failed to create baby:', error);
-            toast.error('Failed to add baby');
+            toast.error(t('common:errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -75,15 +77,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <div className="onboarding-icon">
                         <Baby size={48} />
                     </div>
-                    <h1 className="onboarding-title">Welcome to HeyBub!</h1>
+                    <h1 className="onboarding-title">{t('onboarding:welcome')}</h1>
                     <p className="onboarding-subtitle">
-                        Let's set up your baby's profile so you can start tracking.
+                        {t('onboarding:setupSubtitle')}
                     </p>
                     <button
                         className="btn btn-primary btn-lg"
                         onClick={() => setStep(2)}
                     >
-                        Get Started <ArrowRight size={18} />
+                        {t('onboarding:getStarted')} <ArrowRight size={18} />
                     </button>
 
                     {/* Logout option */}
@@ -96,7 +98,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                             onClick={logout}
                             style={{ marginTop: 'var(--space-md)' }}
                         >
-                            <LogOut size={14} /> Sign out
+                            <LogOut size={14} /> {t('onboarding:signOut')}
                         </button>
                     </div>
                 </div>
@@ -112,9 +114,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <div className="onboarding-icon">
                         <Moon size={48} />
                     </div>
-                    <h2 className="onboarding-title">Choose Your Style</h2>
+                    <h2 className="onboarding-title">{t('onboarding:chooseStyle')}</h2>
                     <p className="onboarding-subtitle">
-                        Pick the look that feels right for you.
+                        {t('onboarding:pickLook')}
                     </p>
 
                     <div className="theme-selector">
@@ -125,8 +127,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                             <div className="theme-preview" style={{ background: '#fefdfb' }}>
                                 <Sun size={24} />
                             </div>
-                            <span className="theme-name">Light</span>
-                            <span className="theme-desc">Warm and bright</span>
+                            <span className="theme-name">{t('onboarding:light')}</span>
+                            <span className="theme-desc">{t('onboarding:lightDesc')}</span>
                         </button>
 
                         <button
@@ -136,8 +138,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                             <div className="theme-preview" style={{ background: '#1a1614' }}>
                                 <Moon size={24} color="#f0e8e4" />
                             </div>
-                            <span className="theme-name">Dark</span>
-                            <span className="theme-desc">Easy on the eyes</span>
+                            <span className="theme-name">{t('onboarding:dark')}</span>
+                            <span className="theme-desc">{t('onboarding:darkDesc')}</span>
                         </button>
                     </div>
 
@@ -145,7 +147,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         className="btn btn-primary btn-lg"
                         onClick={() => setStep(3)}
                     >
-                        Continue <ArrowRight size={18} />
+                        {t('onboarding:continue')} <ArrowRight size={18} />
                     </button>
                 </div>
             </div>
@@ -157,7 +159,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         return (
             <div className="onboarding-container">
                 <div className="onboarding-card onboarding-form-card">
-                    <h2 className="onboarding-form-title">Add Your Baby</h2>
+                    <h2 className="onboarding-form-title">{t('onboarding:addYourBaby')}</h2>
                     <AddBabyForm
                         onSubmit={handleBabySubmit}
                         saving={saving}
@@ -177,15 +179,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <div className="onboarding-icon success">
                         <Sparkles size={48} />
                     </div>
-                    <h1 className="onboarding-title">All Set!</h1>
+                    <h1 className="onboarding-title">{t('onboarding:allSet')}</h1>
                     <p className="onboarding-subtitle">
-                        {babyName}'s profile is ready. Start tracking now!
+                        {t('onboarding:profileReady', { name: babyName })}
                     </p>
                     <button
                         className="btn btn-primary btn-lg"
                         onClick={onComplete}
                     >
-                        Go to Dashboard <ArrowRight size={18} />
+                        {t('onboarding:goToDashboard')} <ArrowRight size={18} />
                     </button>
                 </div>
             </div>

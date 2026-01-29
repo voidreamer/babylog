@@ -4,6 +4,7 @@ import { ShowerHead, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 function formatTimeAgo(dateStr: string | null): string | null {
     if (!dateStr) return null;
@@ -19,6 +20,7 @@ function formatTimeAgo(dateStr: string | null): string | null {
 interface BathWidgetProps { lastBath: any; onBathChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickActionsEnabled = true }: BathWidgetProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const [saving, setSaving] = useState(false);
 
     const handleQuickLog = async (e: React.MouseEvent) => {
@@ -32,11 +34,11 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
                 time: new Date().toISOString(),
                 notes: null,
             });
-            toast.success('Bath logged');
+            toast.success(t('bathLogged'));
             onBathChange();
         } catch (error) {
             console.error('Failed to log bath:', error);
-            toast.error('Failed to log bath');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -60,19 +62,19 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <ShowerHead size={24} strokeWidth={2} />
-                    <span className="widget-label">Bath</span>
+                    <span className="widget-label">{t('widgets.bath')}</span>
                 </div>
 
                 <div className="feeding-widget-idle">
                     {lastBath ? (
                         <div className="widget-time-ago">{timeAgo}</div>
                     ) : !quickActionsEnabled ? (
-                        <div className="widget-time-ago">No baths yet</div>
+                        <div className="widget-time-ago">{t('noBathsYet')}</div>
                     ) : null}
                     {quickActionsEnabled && (
                         <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
                             <Check size={14} />
-                            {saving ? 'Logging...' : 'Log Bath'}
+                            {saving ? t('saving') : t('logBathAction')}
                         </button>
                     )}
                 </div>

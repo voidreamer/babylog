@@ -4,6 +4,7 @@ import { Smile, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 // Baby teeth positions - 20 total
 // Upper: A-E (left to right from baby's perspective)
@@ -46,6 +47,7 @@ const ERUPTION_AGES: Record<string, { min: number; max: number; avg: number }> =
 
 interface TeethingCardProps { baby: any; teeth: any[]; onToothAdded?: () => void; onToothDeleted?: () => void; }
 export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted }: TeethingCardProps) {
+    const { t } = useTranslation('health');
     const [selectedTooth, setSelectedTooth] = useState<any>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [emergedDate, setEmergedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -86,7 +88,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                 position: selectedTooth.position,
                 emerged_date: new Date(emergedDate).toISOString(),
             });
-            toast.success(`${selectedTooth.name} marked as emerged!`);
+            toast.success(t('teething.markedEmerged', { name: selectedTooth.name }));
             setSelectedTooth(null);
             setShowDatePicker(false);
             if (onToothAdded) onToothAdded();
@@ -100,7 +102,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
     const handleDelete = async (toothId: number) => {
         try {
             await api.deleteTooth(toothId);
-            toast.success('Tooth record removed');
+            toast.success(t('teething.toothRemoved'));
             setSelectedTooth(null);
             if (onToothDeleted) onToothDeleted();
         } catch (error) {
@@ -153,23 +155,23 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                     <Smile size={18} />
                     Teething
                 </h3>
-                <span className="health-card-count">{teethCount}/20 teeth</span>
+                <span className="health-card-count">{t('teething.teethCount', { count: teethCount })}</span>
             </div>
 
             {/* Teeth Diagram */}
             <div className="teeth-diagram">
-                <div className="teeth-label">Upper</div>
+                <div className="teeth-label">{t('teething.upper')}</div>
                 {renderToothRow(TEETH_MAP.upper, true)}
                 <div className="teeth-divider" />
                 {renderToothRow(TEETH_MAP.lower, false)}
-                <div className="teeth-label">Lower</div>
+                <div className="teeth-label">{t('teething.lower')}</div>
             </div>
 
             {/* Legend */}
             <div className="teeth-legend">
-                <span className="legend-item"><span className="legend-dot emerged" /> Emerged</span>
-                <span className="legend-item"><span className="legend-dot expected" /> Expected</span>
-                <span className="legend-item"><span className="legend-dot future" /> Future</span>
+                <span className="legend-item"><span className="legend-dot emerged" /> {t('teething.emerged')}</span>
+                <span className="legend-item"><span className="legend-dot expected" /> {t('teething.expected')}</span>
+                <span className="legend-item"><span className="legend-dot future" /> {t('teething.future')}</span>
             </div>
 
             {/* Date Picker Modal */}
@@ -179,7 +181,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                         <button className="tooth-modal-close" onClick={() => setShowDatePicker(false)}>
                             <X size={18} />
                         </button>
-                        <h4>Mark {selectedTooth.name} as Emerged</h4>
+                        <h4>{t('teething.markEmerged', { name: selectedTooth.name })}</h4>
                         <p className="tooth-modal-subtitle">
                             {selectedTooth.position.includes('upper') ? 'Upper' : 'Lower'} {selectedTooth.label}
                         </p>

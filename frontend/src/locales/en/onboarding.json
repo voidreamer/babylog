@@ -1,0 +1,17 @@
+{
+  "welcome": "Welcome to HeyBub!",
+  "setupSubtitle": "Let's set up your baby's profile so you can start tracking.",
+  "getStarted": "Get Started",
+  "signOut": "Sign out",
+  "chooseStyle": "Choose Your Style",
+  "pickLook": "Pick the look that feels right for you.",
+  "light": "Light",
+  "lightDesc": "Warm and bright",
+  "dark": "Dark",
+  "darkDesc": "Easy on the eyes",
+  "continue": "Continue",
+  "addYourBaby": "Add Your Baby",
+  "allSet": "All Set!",
+  "profileReady": "{{name}}'s profile is ready. Start tracking now!",
+  "goToDashboard": "Go to Dashboard"
+}

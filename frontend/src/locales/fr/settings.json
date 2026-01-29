@@ -1,0 +1,91 @@
+{
+  "title": "Paramètres",
+  "preferences": "Préférences",
+  "darkMode": "Mode sombre",
+  "darkModeDesc": "Plus doux pour les yeux la nuit",
+  "language": "Langue",
+  "languageDesc": "Choisis ta langue",
+
+  "account": "Compte",
+  "signedIn": "Connecté",
+  "premiumPlan": "Plan Premium",
+  "premiumActive": "Actif",
+  "unlockAiInsights": "Débloque les statistiques IA",
+  "upgrade": "Passer à Premium",
+  "enterPromoCode": "Entre un code promo...",
+
+  "data": "Données",
+  "exportData": "Exporter les données",
+  "exporting": "Exportation...",
+  "downloadCsv": "Télécharger en CSV",
+
+  "support": "Soutien",
+  "privacyPolicy": "Politique de confidentialité",
+  "signOut": "Déconnexion",
+
+  "login": {
+    "title": "HeyBub",
+    "subtitle": "La façon simple de suivre les activités quotidiennes de ton bébé",
+    "signInWithGoogle": "Se connecter avec Google",
+    "trackFeedings": "Suis les alimentations",
+    "monitorSleep": "Surveille le sommeil",
+    "logDiapers": "Enregistre les couches",
+    "viewGrowthCharts": "Consulte les courbes de croissance",
+    "freeWithPremium": "Gratuit avec des fonctionnalités Premium"
+  },
+
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour: janvier 2026",
+    "back": "Retour",
+    "section1Title": "1. Information que nous recueillons",
+    "section1Intro": "HeyBub recueille l'information que tu fournis directement en utilisant notre application de suivi de bébé:",
+    "section1Items": {
+      "account": "Information du compte:",
+      "accountDesc": "Adresse courriel et nom via Google Sign-In",
+      "baby": "Information du bébé:",
+      "babyDesc": "Noms, dates de naissance et sexe des bébés",
+      "activity": "Données d'activité:",
+      "activityDesc": "Données d'alimentation, de couches, de sommeil et autres enregistrements",
+      "health": "Dossiers de santé:",
+      "healthDesc": "Visites médicales, vaccinations, médicaments et données de croissance"
+    },
+    "section2Title": "2. Comment nous utilisons ton information",
+    "section2Intro": "Nous utilisons tes données uniquement pour:",
+    "section2Items": [
+      "Fournir le service de suivi de bébé",
+      "Afficher tes activités enregistrées et tes résumés",
+      "Permettre le partage avec les aidants que tu autorises",
+      "Améliorer les fonctionnalités de l'application et corriger les bogues"
+    ],
+    "section2NoSell": "Nous ne vendons pas tes données à des tiers.",
+    "section3Title": "3. Stockage et sécurité des données",
+    "section3Intro": "Tes données sont stockées de façon sécuritaire en utilisant:",
+    "section3Items": [
+      "Infrastructure infonuagique AWS avec chiffrement au repos",
+      "Authentification sécurisée via AWS Cognito",
+      "Chiffrement HTTPS pour toute transmission de données"
+    ],
+    "section4Title": "4. Partage des données",
+    "section4Intro": "Nous partageons tes données seulement quand:",
+    "section4Items": [
+      "Tu partages explicitement un profil de bébé avec un autre aidant",
+      "Requis par la loi ou un processus légal"
+    ],
+    "section5Title": "5. Tes droits",
+    "section5Intro": "Tu peux:",
+    "section5Items": [
+      "Accéder à toutes tes données stockées via l'application",
+      "Supprimer les profils de tes bébés et les données associées",
+      "Révoquer l'accès partagé à tout moment",
+      "Demander la suppression de ton compte en nous contactant"
+    ],
+    "section6Title": "6. Vie privée des enfants",
+    "section6Text": "Cette application est conçue pour que les parents/aidants suivent les soins du nourrisson. Nous ne recueillons pas intentionnellement d'information auprès d'enfants de moins de 13 ans.",
+    "section7Title": "7. Modifications de cette politique",
+    "section7Text": "Nous pouvons mettre à jour cette politique périodiquement. Nous informerons les utilisateurs des changements importants via l'application.",
+    "section8Title": "8. Nous contacter",
+    "section8Text": "Pour des questions ou préoccupations concernant la vie privée, contacte-nous à:",
+    "section8Email": "privacy@heybub.app"
+  }
+}

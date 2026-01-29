@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../data/whoGrowthData';
 import { differenceInMonths } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 // Calculate age in months from birth date to measurement date
 function getAgeMonths(birthDate: string, measurementDate: string): number {
@@ -24,6 +25,7 @@ function getAgeMonths(birthDate: string, measurementDate: string): number {
 
 interface GrowthChartProps { records: any[]; birthDate: string; metric?: 'weight' | 'height'; gender?: string; }
 export default function GrowthChart({ records, birthDate, metric = 'weight', gender = 'boy' }: GrowthChartProps) {
+    const { t } = useTranslation('health');
     // Get appropriate WHO data based on metric and gender
     const whoData = useMemo(() => {
         if (metric === 'weight') {
@@ -108,7 +110,7 @@ export default function GrowthChart({ records, birthDate, metric = 'weight', gen
     if (!birthDate) {
         return (
             <div className="growth-chart-empty">
-                Add baby's birth date to see growth chart
+                {t('growth.addBirthDate')}
             </div>
         );
     }
@@ -116,7 +118,7 @@ export default function GrowthChart({ records, birthDate, metric = 'weight', gen
     if (babyData.length === 0) {
         return (
             <div className="growth-chart-empty">
-                No {metric} data recorded yet
+                {metric === 'weight' ? t('growth.noWeightData') : t('growth.noHeightData')}
             </div>
         );
     }
@@ -124,9 +126,9 @@ export default function GrowthChart({ records, birthDate, metric = 'weight', gen
     return (
         <div className="growth-chart">
             <div className="growth-chart-header">
-                <h4>{label} for Age</h4>
+                <h4>{metric === 'weight' ? t('growth.weightForAge') : t('growth.heightForAge')}</h4>
                 <span className="growth-chart-subtitle">
-                    WHO standards ({gender === 'girl' ? 'Girls' : 'Boys'})
+                    {t('growth.whoStandards', { gender: gender === 'girl' ? t('growth.girls') : t('growth.boys') })}
                 </span>
             </div>
 
@@ -200,7 +202,7 @@ export default function GrowthChart({ records, birthDate, metric = 'weight', gen
             <div className="growth-chart-legend">
                 <span className="growth-chart-legend-item">
                     <span className="growth-chart-legend-dot baby"></span>
-                    Your baby
+                    {t('growth.yourBaby')}
                 </span>
                 <span className="growth-chart-legend-item">
                     <span className="growth-chart-legend-line"></span>

@@ -4,6 +4,7 @@ import { Sun, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 function formatTimeAgo(dateStr: string | null): string | null {
     if (!dateStr) return null;
@@ -27,6 +28,7 @@ const ACTIVE_TUMMY_KEY = 'activeTummy';
 interface TummyTimeWidgetProps { lastTummy: any; onTummyChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal, quickActionsEnabled = true }: TummyTimeWidgetProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [activeTummy, setActiveTummy] = useState<any>(null);
@@ -66,7 +68,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
         const newActive = { babyId: selectedBaby.id, startTime: Date.now() };
         setActiveTummy(newActive);
         localStorage.setItem(ACTIVE_TUMMY_KEY, JSON.stringify(newActive));
-        toast.success('Tummy time started');
+        toast.success(t('tummyTimeStarted'));
     };
 
     const handleStopTummy = async (e: React.MouseEvent) => {
@@ -86,11 +88,11 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
 
             localStorage.removeItem(ACTIVE_TUMMY_KEY);
             setActiveTummy(null);
-            toast.success(`Tummy time logged (${durationMinutes} min)`);
+            toast.success(t('tummyTimeLogged', { duration: durationMinutes }));
             onTummyChange();
         } catch (error) {
             console.error('Failed to save tummy time:', error);
-            toast.error('Failed to save tummy time');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -126,7 +128,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <Sun size={24} strokeWidth={2} />
-                    <span className="widget-label">Tummy</span>
+                    <span className="widget-label">{t('widgets.tummy')}</span>
                 </div>
 
                 {isActive ? (
@@ -134,7 +136,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                         <div className="feeding-timer">{formatTimer(timerSeconds)}</div>
                         <button className="feeding-stop-btn" onClick={handleStopTummy} disabled={saving}>
                             <Square size={14} fill="currentColor" />
-                            {saving ? 'Saving...' : 'Done'}
+                            {saving ? t('saving') : t('done')}
                         </button>
                     </div>
                 ) : quickActionsEnabled ? (
@@ -158,7 +160,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                                 <div className="widget-detail">{lastTummy.duration_minutes}min</div>
                             </>
                         ) : (
-                            <div className="widget-time-ago">No tummy time yet</div>
+                            <div className="widget-time-ago">{t('noTummyTimeYet')}</div>
                         )}
                     </div>
                 )}

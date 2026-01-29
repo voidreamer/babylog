@@ -4,6 +4,7 @@ import { Heart, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 function formatTimeAgo(dateStr: string | null): string | null {
     if (!dateStr) return null;
@@ -36,6 +37,7 @@ const ACTIVE_PUMPING_KEY = 'activePumping';
 interface PumpingWidgetProps { lastPumping: any; onPumpingChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModal, quickActionsEnabled = true }: PumpingWidgetProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [activePumping, setActivePumping] = useState<any>(null);
@@ -82,7 +84,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
         };
         setActivePumping(newActivePumping);
         localStorage.setItem(ACTIVE_PUMPING_KEY, JSON.stringify(newActivePumping));
-        toast.success('Pumping started');
+        toast.success(t('pumpingStarted'));
     };
 
     const handleStopPumping = async (e: React.MouseEvent) => {
@@ -103,11 +105,11 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
 
             localStorage.removeItem(ACTIVE_PUMPING_KEY);
             setActivePumping(null);
-            toast.success(`Pumping logged (${durationMinutes} min)`);
+            toast.success(t('pumpingLogged', { duration: durationMinutes }));
             onPumpingChange();
         } catch (error) {
             console.error('Failed to save pumping:', error);
-            toast.error('Failed to save pumping');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -143,7 +145,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <img src="/icons/pumping.png" alt="pumping" style={{ width: 24, height: 24, objectFit: 'contain' }} />
-                    <span className="widget-label">Pumping</span>
+                    <span className="widget-label">{t('widgets.pumping')}</span>
                 </div>
 
                 {isPumping ? (
@@ -151,7 +153,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                         <div className="feeding-timer">{formatTimer(timerSeconds)}</div>
                         <button className="feeding-stop-btn" onClick={handleStopPumping} disabled={saving}>
                             <Square size={14} fill="currentColor" />
-                            {saving ? 'Saving...' : 'Done'}
+                            {saving ? t('saving') : t('done')}
                         </button>
                     </div>
                 ) : quickActionsEnabled ? (
@@ -179,7 +181,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                                 </div>
                             </>
                         ) : (
-                            <div className="widget-time-ago">No pumpings yet</div>
+                            <div className="widget-time-ago">{t('noPumpingsYet')}</div>
                         )}
                     </div>
                 )}

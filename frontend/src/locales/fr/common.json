@@ -1,0 +1,349 @@
+{
+  "appName": "HeyBub",
+  "babyTracker": "Suivi du bébé",
+  "hub": "Hub",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "add": "Ajouter",
+  "done": "Terminé",
+  "start": "Démarrer",
+  "stop": "Arrêter",
+  "close": "Fermer",
+  "back": "Retour",
+  "loading": "Chargement...",
+  "saving": "Enregistrement...",
+  "deleting": "Suppression...",
+  "apply": "Appliquer",
+  "remove": "Retirer",
+  "share": "Partager",
+  "optional": "Optionnel",
+  "required": "Requis",
+  "yes": "Oui",
+  "no": "Non",
+  "ok": "OK",
+  "tryAgain": "Réessayer",
+  "now": "Maintenant",
+  "today": "Aujourd'hui",
+  "yesterday": "Hier",
+  "notes": "Notes",
+  "notesOptional": "Notes optionnelles...",
+  "time": "Heure",
+  "date": "Date",
+  "type": "Type",
+  "duration": "Durée",
+  "amount": "Quantité",
+
+  "nav": {
+    "home": "Accueil",
+    "timeline": "Chronologie",
+    "health": "Santé",
+    "insights": "Statistiques",
+    "settings": "Paramètres"
+  },
+
+  "timeAgo": {
+    "justNow": "À l'instant",
+    "minutesAgo": "il y a {{count}}m",
+    "hoursMinutesAgo": "il y a {{hours}}h {{minutes}}m",
+    "hoursAgo": "il y a {{count}}h",
+    "daysAgo": "il y a {{count}}j"
+  },
+
+  "widgets": {
+    "feeding": "Alimentation",
+    "diaper": "Couche",
+    "sleep": "Sommeil",
+    "pumping": "Tirage",
+    "potty": "Petit pot",
+    "tummy": "Sur le ventre",
+    "tummyTime": "Temps sur le ventre",
+    "bath": "Bain",
+    "supplement": "Supplément"
+  },
+
+  "feedingTypes": {
+    "breast": "Sein",
+    "bottle": "Biberon",
+    "formula": "Préparation",
+    "breastMilk": "Lait maternel",
+    "breastmilkBottle": "Biberon de lait maternel",
+    "solid": "Solides"
+  },
+
+  "diaperTypes": {
+    "pee": "Pipi",
+    "poo": "Caca",
+    "mixed": "Les deux"
+  },
+
+  "sleepStates": {
+    "sleeping": "Dort",
+    "awake": "Éveillé",
+    "sleepingNow": "Dort présentement"
+  },
+
+  "pottyResults": {
+    "success": "Succès",
+    "attempt": "Essai",
+    "accident": "Accident"
+  },
+
+  "errors": {
+    "failedToLoad": "Échec du chargement des données",
+    "failedToSave": "Échec de l'enregistrement",
+    "failedToDelete": "Échec de la suppression",
+    "checkConnection": "Vérifie ta connexion et réessaie.",
+    "somethingWentWrong": "Quelque chose a mal tourné",
+    "unexpectedError": "Désolé, quelque chose d'inattendu s'est produit. Réessaie s'il te plaît.",
+    "tooManyAttempts": "Trop de tentatives. Attends {{time}} et réessaie."
+  },
+
+  "empty": {
+    "noBabyAdded": "Aucun bébé ajouté",
+    "addBabyToStart": "Ajoute ton bébé pour commencer le suivi",
+    "noBabySelected": "Aucun bébé sélectionné",
+    "noEventsToday": "Aucun événement enregistré aujourd'hui",
+    "noEventsRecorded": "Aucun événement enregistré",
+    "addFromDashboard": "Ajoute des activités depuis le tableau de bord pour les voir ici",
+    "tapToLog": "Touche pour enregistrer"
+  },
+
+  "offline": {
+    "youreOffline": "Tu es hors ligne",
+    "offlineMessage": "Connecte-toi à Internet pour charger les données de ton bébé. Tes données se synchroniseront automatiquement quand tu seras de retour en ligne.",
+    "syncingChanges": "Synchronisation en cours...",
+    "changesToSync": "{{count}} changement à synchroniser",
+    "changesToSync_other": "{{count}} changements à synchroniser",
+    "changesPending": "{{count}} changement en attente",
+    "changesPending_other": "{{count}} changements en attente",
+    "syncNow": "Synchroniser maintenant"
+  },
+
+  "baby": {
+    "addBaby": "Ajouter un bébé",
+    "addAnotherBaby": "+ Ajouter un autre bébé",
+    "selectBaby": "Sélectionner un bébé",
+    "shared": "Partagé",
+    "shareBaby": "Partager {{name}}",
+    "deleteBaby": "Supprimer {{name}}",
+    "editBaby": "Modifier {{name}}",
+    "deleteConfirm": "Es-tu sûr de vouloir supprimer {{name}}? Cela supprimera tous les registres d'alimentation, de couches, de sommeil et de santé. Cette action est irréversible.",
+    "deleteConfirmShort": "Supprimer {{name}}? Toutes les données seront perdues.",
+    "babyAdded": "{{name}} ajouté!",
+    "babyUpdated": "{{name}} mis à jour!",
+    "birthMeasurements": "Mesures à la naissance",
+    "welcome": "Bienvenue!",
+    "addFirstBaby": "Ajoute ton premier bébé pour commencer"
+  },
+
+  "age": {
+    "bornToday": "Né aujourd'hui!",
+    "daysOld_one": "1 jour",
+    "daysOld_other": "{{count}} jours",
+    "weeksOld_one": "1 semaine",
+    "weeksOld_other": "{{count}} semaines",
+    "monthsOld_one": "1 mois",
+    "monthsOld_other": "{{count}} mois",
+    "yearsMonths": "{{years}}a {{months}}m",
+    "yearsOld_one": "1 an",
+    "yearsOld_other": "{{count}} ans"
+  },
+
+  "greeting": {
+    "morning": "Bonjour",
+    "afternoon": "Bon après-midi",
+    "evening": "Bonsoir"
+  },
+
+  "encouragement": {
+    "default": "Enregistrons les activités d'aujourd'hui!",
+    "firstEvent": "Prêt à enregistrer le premier événement!",
+    "greatStart": "Beau début de journée!",
+    "doingAmazing": "Tu fais ça super bien!",
+    "superParent": "Super parent! Continue comme ça!"
+  },
+
+  "units": {
+    "kg": "kg",
+    "cm": "cm",
+    "cmHead": "cm tête",
+    "ml": "ml",
+    "min": "min",
+    "minutes": "minutes",
+    "hours": "heures",
+    "iu": "UI"
+  },
+
+  "gender": {
+    "boy": "Garçon",
+    "girl": "Fille"
+  },
+
+  "form": {
+    "babysName": "Nom du bébé",
+    "enterName": "Entre le nom",
+    "birthDate": "Date de naissance",
+    "gender": "Sexe",
+    "genderHint": "Optionnel - aide avec les courbes de croissance",
+    "birthMeasurements": "Mesures à la naissance (optionnel)",
+    "weight": "Poids (kg)",
+    "height": "Taille (cm)",
+    "saveChanges": "Sauvegarder"
+  },
+
+  "comingUp": {
+    "title": "À venir",
+    "active": "Actif",
+    "vaccine": "Vaccin",
+    "visit": "Visite"
+  },
+
+  "quickLog": "Enregistrement rapide",
+  "timer": "Chronomètre",
+  "method": "Méthode",
+  "bottleContents": "Contenu du biberon",
+  "startedAt": "Débuté à {{time}}",
+  "startFeeding": "Démarrer l'alimentation",
+  "startPumping": "Démarrer le tirage",
+
+  "logFeeding": "Enregistrer alimentation",
+  "editFeeding": "Modifier alimentation",
+  "saveFeeding": "Sauvegarder alimentation",
+  "feedingStarted": "Alimentation démarrée",
+  "feedingLogged": "Alimentation enregistrée ({{duration}} min)",
+  "noFeedingsYet": "Aucune alimentation",
+
+  "logSleep": "Enregistrer sommeil",
+  "editSleep": "Modifier sommeil",
+  "startTime": "Heure de début",
+  "endTime": "Heure de fin",
+  "sleepStarted": "Sommeil démarré",
+  "babyIsAwake": "Le bébé est réveillé!",
+  "wakeUp": "Réveiller",
+  "waking": "Réveil...",
+  "starting": "Démarrage...",
+  "startSleep": "Démarrer sommeil",
+  "noSleepYet": "Aucun sommeil",
+  "logCompletedSleep": "Enregistrer sommeil complété",
+
+  "logDiaper": "Enregistrer changement de couche",
+  "editDiaper": "Modifier changement de couche",
+  "saveDiaperChange": "Sauvegarder changement de couche",
+  "diaperLogged": "Couche {{type}} enregistrée",
+  "noDiapersYet": "Aucune couche",
+  "logWithDetails": "Enregistrer avec détails",
+
+  "logBath": "Enregistrer bain",
+  "editBath": "Modifier bain",
+  "bathLogged": "Bain enregistré",
+  "noBathsYet": "Aucun bain",
+  "logBathAction": "Enregistrer bain",
+  "logWithNotes": "Enregistrer avec notes",
+  "productsUsed": "Produits utilisés, etc.",
+
+  "logPumping": "Enregistrer tirage",
+  "editPumping": "Modifier tirage",
+  "savePumping": "Sauvegarder tirage",
+  "pumpingStarted": "Tirage démarré",
+  "pumpingLogged": "Tirage enregistré ({{duration}} min)",
+  "noPumpingsYet": "Aucun tirage",
+  "logPumpingManually": "Enregistrer tirage manuellement",
+
+  "logSupplement": "Enregistrer supplément",
+  "editSupplement": "Modifier supplément",
+  "supplementLogged": "Supplément enregistré",
+  "noSupplementsYet": "Aucun supplément",
+  "logDifferentSupplement": "Enregistrer autre supplément",
+  "supplement": "Supplément",
+  "dosage": "Dosage",
+  "dosageOptional": "Dosage (optionnel)",
+  "dosagePlaceholder": "ex., 400 UI, 1ml",
+  "supplementTypes": {
+    "vitamin_d": "Vitamine D",
+    "iron": "Fer",
+    "dha": "DHA/Oméga-3",
+    "probiotic": "Probiotique",
+    "multivitamin": "Multivitamine",
+    "other": "Autre"
+  },
+
+  "logTummyTime": "Enregistrer temps sur le ventre",
+  "editTummyTime": "Modifier temps sur le ventre",
+  "tummyTimeStarted": "Temps sur le ventre démarré",
+  "tummyTimeLogged": "Temps sur le ventre enregistré ({{duration}} min)",
+  "noTummyTimeYet": "Aucun temps sur le ventre",
+  "logTummyManually": "Enregistrer temps sur le ventre manuellement",
+  "customMinutes": "Minutes personnalisées",
+  "babysMood": "Humeur du bébé, etc.",
+
+  "logPotty": "Enregistrer petit pot",
+  "editPotty": "Modifier petit pot",
+  "pottyLogged": "Petit pot {{result}} enregistré",
+  "noPottyYet": "Aucun enregistrement de petit pot",
+  "result": "Résultat",
+  "pottyType": "Type (optionnel)",
+  "anyNotes": "Notes...",
+
+  "diaperColors": {
+    "yellow": "Jaune",
+    "brown": "Brun",
+    "green": "Vert",
+    "orange": "Orange",
+    "black": "Noir",
+    "red": "Rouge",
+    "white": "Blanc"
+  },
+  "diaperConsistency": {
+    "liquid": "Liquide",
+    "soft": "Mou",
+    "formed": "Formé",
+    "hard": "Dur",
+    "pellets": "Billes"
+  },
+  "diaperAmount": {
+    "small": "P",
+    "medium": "M",
+    "large": "G",
+    "blowout": "TG"
+  },
+  "color": "Couleur",
+  "consistency": "Consistance",
+
+  "durationMin": "Durée (min)",
+  "amountMl": "Quantité (ml)",
+
+  "deleteEvent": "Supprimer {{type}}?",
+  "deleteCannotUndo": "Cette action est irréversible.",
+  "deletedSuccessfully": "Supprimé avec succès",
+
+  "shareModal": {
+    "addByEmail": "Ajouter par courriel",
+    "emailPlaceholder": "partenaire@exemple.com",
+    "sharedWith": "Partagé avec",
+    "sharePrompt": "Entre un courriel pour partager l'accès à {{name}} avec une autre personne.",
+    "done": "Terminé"
+  },
+
+  "validationErrors": {
+    "durationRange": "La durée doit être entre 0 et 120 minutes",
+    "amountRange": "La quantité doit être entre 0 et 500 ml",
+    "notesLength": "Les notes doivent avoir moins de 500 caractères",
+    "enterPromoCode": "Entre un code promo s'il te plaît",
+    "noBabyData": "Aucune donnée de bébé à exporter"
+  },
+
+  "export": {
+    "complete": "Exportation complétée! Vérifie ton dossier de téléchargements.",
+    "failed": "Échec de l'exportation: {{error}}"
+  },
+
+  "premium": {
+    "unlocked": "Premium débloqué!",
+    "invalidCode": "Code invalide",
+    "failedToVerify": "Échec de la vérification du code. Réessaie."
+  },
+
+  "inProgress": "en cours"
+}

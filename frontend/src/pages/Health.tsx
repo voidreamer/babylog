@@ -13,9 +13,11 @@ import TeethingCard from '../components/health/TeethingCard';
 import SickDaysCard from '../components/health/SickDaysCard';
 import AllergiesCard from '../components/health/AllergiesCard';
 import RecordsSection from '../components/health/RecordsSection';
+import { useTranslation } from 'react-i18next';
 
 export default function Health() {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation(['health', 'common']);
     const [loading, setLoading] = useState(true);
 
     // Data
@@ -59,7 +61,7 @@ export default function Health() {
             setSickDays(s);
             setAllergies(a);
         } catch (error) {
-            toast.error('Failed to load health data');
+            toast.error(t('common:errors.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -81,7 +83,7 @@ export default function Health() {
         return (
             <div className="empty-state">
                 <Baby size={48} style={{ opacity: 0.5, marginBottom: 'var(--space-md)' }} />
-                <h2 className="empty-state-title">No baby selected</h2>
+                <h2 className="empty-state-title">{t('health:noBabySelected')}</h2>
             </div>
         );
     }

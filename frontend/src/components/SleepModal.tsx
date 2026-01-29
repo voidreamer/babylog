@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
+import { useTranslation } from 'react-i18next';
 
 // Parse time from API (UTC) to local Date object
 const parseUTCTime = (timeStr: any): Date => {
@@ -15,6 +16,7 @@ const parseUTCTime = (timeStr: any): Date => {
 interface SleepModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function SleepModal({ babyId, editEvent, onClose, onSave }: SleepModalProps) {
     const isEditing = !!editEvent;
+    const { t } = useTranslation('common');
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
     const [notes, setNotes] = useState('');
@@ -52,7 +54,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);
-            toast.error('Failed to log sleep');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -62,28 +64,28 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Sleep</h2>
+                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editSleep') : t('logSleep')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
                         <div className="form-group">
-                            <label className="form-label">Start Time</label>
+                            <label className="form-label">{t('startTime')}</label>
                             <TimePicker value={startTime} onChange={setStartTime} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">End Time</label>
+                            <label className="form-label">{t('endTime')}</label>
                             <TimePicker value={endTime} onChange={setEndTime} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">Notes</label>
+                            <label className="form-label">{t('notes')}</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Optional notes..."
+                                placeholder={t('notesOptional')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />
@@ -95,7 +97,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : (isEditing ? 'Save Changes' : 'Log Sleep')}
+                            {saving ? t('saving') : (isEditing ? t('form.saveChanges') : t('logSleep'))}
                         </button>
                     </div>
                 </form>
