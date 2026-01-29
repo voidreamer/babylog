@@ -144,6 +144,8 @@ jobs:
           TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
           TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS_STAGING }}
           TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
+          TF_VAR_custom_domain: staging-app.heybub.app
+          TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
@@ -154,6 +156,8 @@ jobs:
           TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
           TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS_STAGING }}
           TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
+          TF_VAR_custom_domain: staging-app.heybub.app
+          TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
         run: terraform apply -auto-approve tfplan
 
       - name: Get Terraform outputs

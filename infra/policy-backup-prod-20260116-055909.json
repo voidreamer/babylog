@@ -1,0 +1,46 @@
+{
+    "ETag": "E1PA6795UKMFR9",
+    "ResponseHeadersPolicy": {
+        "Id": "6bbf52e8-cd97-456d-857b-27e82d2693c9",
+        "LastModifiedTime": "2026-01-15T20:11:16.350000+00:00",
+        "ResponseHeadersPolicyConfig": {
+            "Comment": "Security headers policy for simplebaby prod",
+            "Name": "simplebaby-security-headers-prod",
+            "SecurityHeadersConfig": {
+                "XSSProtection": {
+                    "Override": true,
+                    "Protection": true,
+                    "ModeBlock": true
+                },
+                "FrameOptions": {
+                    "Override": true,
+                    "FrameOption": "DENY"
+                },
+                "ReferrerPolicy": {
+                    "Override": true,
+                    "ReferrerPolicy": "strict-origin-when-cross-origin"
+                },
+                "ContentSecurityPolicy": {},
+                "ContentTypeOptions": {
+                    "Override": true
+                },
+                "StrictTransportSecurity": {
+                    "Override": true,
+                    "IncludeSubdomains": true,
+                    "Preload": true,
+                    "AccessControlMaxAgeSec": 31536000
+                }
+            },
+            "CustomHeadersConfig": {
+                "Quantity": 1,
+                "Items": [
+                    {
+                        "Header": "Permissions-Policy",
+                        "Value": "camera=(), microphone=(), geolocation=(), payment=()",
+                        "Override": true
+                    }
+                ]
+            }
+        }
+    }
+}
