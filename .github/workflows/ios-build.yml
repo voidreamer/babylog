@@ -1,0 +1,95 @@
+# iOS Simulator Build
+# Builds the Capacitor iOS app for simulator testing (no signing required)
+# Runs on push to staging/main and PRs
+
+name: iOS Build
+
+on:
+  push:
+    branches: [main, staging]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/ios-build.yml'
+  pull_request:
+    branches: [main, staging]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch: # manual trigger
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  ios-build:
+    name: iOS Simulator Build
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Add iOS platform
+        run: npx cap add ios
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Build for iOS Simulator
+        run: |
+          cd ios/App
+          xcodebuild \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -derivedDataPath build \
+            build \
+            | tee build.log | tail -20
+
+      - name: Verify build output
+        run: |
+          APP_PATH=$(find ios/App/build -name "App.app" -type d | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "❌ Build failed - no .app found"
+            exit 1
+          fi
+          echo "✅ iOS app built successfully: $APP_PATH"
+          ls -lh "$APP_PATH"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-build-${{ github.sha }}
+          path: frontend/ios/App/build/**/App.app
+          retention-days: 7
+
+      - name: Build summary
+        run: |
+          echo "## iOS Simulator Build ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform:** iOS Simulator (iPhone 16)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Config:** Debug" >> $GITHUB_STEP_SUMMARY
+          echo "- **App ID:** com.heybub.app" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifact:** Download from Actions tab" >> $GITHUB_STEP_SUMMARY
