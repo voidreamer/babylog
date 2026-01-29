@@ -1,0 +1,73 @@
+# Lighthouse CI — Performance, Accessibility, SEO audits
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [staging, main]
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches: [staging, main]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install & Build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: .github/lighthouse/lighthouserc.json
+
+      - name: Format results
+        if: always()
+        id: results
+        run: |
+          if [ -f ".lighthouseci/manifest.json" ]; then
+            node -e "
+              const fs = require('fs');
+              const manifest = JSON.parse(fs.readFileSync('.lighthouseci/manifest.json'));
+              const result = manifest[0];
+              const summary = JSON.parse(fs.readFileSync(result.jsonPath));
+              const scores = {
+                performance: Math.round(summary.categories.performance.score * 100),
+                accessibility: Math.round(summary.categories.accessibility.score * 100),
+                bestPractices: Math.round(summary.categories['best-practices'].score * 100),
+                seo: Math.round(summary.categories.seo.score * 100),
+              };
+              const emoji = (s) => s >= 90 ? '🟢' : s >= 50 ? '🟡' : '🔴';
+              const msg = [
+                '## Lighthouse Results',
+                '',
+                '| Category | Score |',
+                '|----------|-------|',
+                \`| Performance | \${emoji(scores.performance)} \${scores.performance} |\`,
+                \`| Accessibility | \${emoji(scores.accessibility)} \${scores.accessibility} |\`,
+                \`| Best Practices | \${emoji(scores.bestPractices)} \${scores.bestPractices} |\`,
+                \`| SEO | \${emoji(scores.seo)} \${scores.seo} |\`,
+              ].join('\n');
+              fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, msg);
+              console.log(msg);
+            "
+          fi
