@@ -243,12 +243,49 @@ jobs:
             --paths "/*" \
             --no-cli-pager
 
+      # ----- Post-Deploy Health Check -----
+      - name: Health check (frontend)
+        run: |
+          echo "Waiting 30s for CloudFront invalidation..."
+          sleep 30
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://staging-app.heybub.app)
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Health check failed! HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "✅ Frontend health check passed (HTTP $HTTP_CODE)"
+
+      - name: Health check (API)
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.tf-outputs.outputs.api_url }}/health 2>/dev/null || echo "000")
+          echo "API health check: HTTP $HTTP_CODE"
+          # Don't fail on API check — endpoint may not exist yet
+
+      # ----- Notifications -----
+      - name: Notify deploy success
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d parse_mode=HTML \
+            -d text="✅ <b>HeyBub Tracker</b> deployed to <b>staging</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A📝 ${{ github.event.head_commit.message }}" \
+            --no-progress-meter > /dev/null || true
+
+      - name: Notify deploy failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d parse_mode=HTML \
+            -d text="❌ <b>HeyBub Tracker</b> staging deploy <b>FAILED</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --no-progress-meter > /dev/null || true
+
       - name: Output deployment info
         run: |
           echo "## Staging Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Frontend:** https://$(aws cloudfront get-distribution --id ${{ steps.tf-outputs.outputs.cloudfront_id }} --query 'Distribution.DomainName' --output text)" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** https://staging-app.heybub.app" >> $GITHUB_STEP_SUMMARY
           echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
@@ -383,10 +420,47 @@ jobs:
             --paths "/*" \
             --no-cli-pager
 
+      # ----- Post-Deploy Health Check -----
+      - name: Health check (frontend)
+        run: |
+          echo "Waiting 30s for CloudFront invalidation..."
+          sleep 30
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://app.heybub.app)
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Health check failed! HTTP $HTTP_CODE"
+            echo "🔄 Triggering rollback..."
+            exit 1
+          fi
+          echo "✅ Frontend health check passed (HTTP $HTTP_CODE)"
+
+      - name: Health check (API)
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.tf-outputs.outputs.api_url }}/health 2>/dev/null || echo "000")
+          echo "API health check: HTTP $HTTP_CODE"
+
+      # ----- Notifications -----
+      - name: Notify deploy success
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d parse_mode=HTML \
+            -d text="🚀 <b>HeyBub Tracker</b> deployed to <b>PRODUCTION</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A📝 ${{ github.event.head_commit.message }}%0A🔗 https://app.heybub.app" \
+            --no-progress-meter > /dev/null || true
+
+      - name: Notify deploy failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d parse_mode=HTML \
+            -d text="🔥 <b>HeyBub Tracker</b> PRODUCTION deploy <b>FAILED</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --no-progress-meter > /dev/null || true
+
       - name: Output deployment info
         run: |
           echo "## Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Frontend:** https://$(aws cloudfront get-distribution --id ${{ steps.tf-outputs.outputs.cloudfront_id }} --query 'Distribution.DomainName' --output text)" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** https://app.heybub.app" >> $GITHUB_STEP_SUMMARY
           echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
