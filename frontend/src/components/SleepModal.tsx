@@ -1,0 +1,105 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect } from 'react';
+import { api } from '../api/client';
+import { Moon } from 'lucide-react';
+import { toast } from 'sonner';
+import TimePicker from './TimePicker';
+
+// Parse time from API (UTC) to local Date object
+const parseUTCTime = (timeStr: any): Date => {
+    if (!timeStr) return new Date();
+    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
+    return new Date(utcTime);
+};
+
+interface SleepModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
+export default function SleepModal({ babyId, editEvent, onClose, onSave }: SleepModalProps) {
+    const isEditing = !!editEvent;
+    const [startTime, setStartTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(new Date());
+    const [notes, setNotes] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    // Initialize from editEvent when editing
+    useEffect(() => {
+        if (editEvent && editEvent.details) {
+            const details = editEvent.details;
+            setStartTime(parseUTCTime(editEvent.time));
+            if (details.end_time) {
+                setEndTime(parseUTCTime(details.end_time));
+            }
+            if (details.notes) setNotes(details.notes);
+        }
+    }, [editEvent]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+
+        const data = {
+            baby_id: babyId,
+            start_time: startTime.toISOString(),
+            end_time: endTime.toISOString(),
+            notes: notes || null,
+        };
+
+        try {
+            if (isEditing) {
+                await api.updateSleep(editEvent.id, data);
+            } else {
+                await api.createSleep(data);
+            }
+            onSave();
+        } catch (error) {
+            console.error('Failed to log sleep:', error);
+            toast.error('Failed to log sleep');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Sleep</h2>
+                    <button className="modal-close" onClick={onClose}>×</button>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="modal-body">
+                        <div className="form-group">
+                            <label className="form-label">Start Time</label>
+                            <TimePicker value={startTime} onChange={setStartTime} />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">End Time</label>
+                            <TimePicker value={endTime} onChange={setEndTime} />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Notes</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Optional notes..."
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            Cancel
+                        </button>
+                        <button type="submit" className="btn btn-primary" disabled={saving}>
+                            {saving ? 'Saving...' : (isEditing ? 'Save Changes' : 'Log Sleep')}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
