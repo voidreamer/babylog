@@ -5,13 +5,16 @@ import { api } from '../api/client';
 import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
+import UpgradeDialog from './UpgradeDialog';
 
 export default function BabySelector(): React.ReactElement | null {
     const { babies, selectedBaby, selectBaby, refresh, removeBaby } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showUpgrade, setShowUpgrade] = useState(false);
     const [saving, setSaving] = useState(false);
+    const isPremium = localStorage.getItem('isPremium') === 'true';
 
     const handleAddBaby = async (formData: any) => {
         setSaving(true);
@@ -191,8 +194,13 @@ export default function BabySelector(): React.ReactElement | null {
                             fontWeight: 500,
                         }}
                         onClick={() => {
-                            setShowAddForm(true);
-                            setShowDropdown(false);
+                            if (!isPremium && babies.length >= 1) {
+                                setShowUpgrade(true);
+                                setShowDropdown(false);
+                            } else {
+                                setShowAddForm(true);
+                                setShowDropdown(false);
+                            }
                         }}
                     >
                         + Add Another Baby
@@ -225,6 +233,7 @@ export default function BabySelector(): React.ReactElement | null {
                     onShare={() => refresh()}
                 />
             )}
+            {showUpgrade && <UpgradeDialog onClose={() => setShowUpgrade(false)} />}
         </div>
     );
 }

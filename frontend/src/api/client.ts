@@ -324,7 +324,6 @@ class ApiClient {
     }
 
     // Subscription
-    async redeemPromoCode(code: string): Promise<any> { return this.request('/subscription/redeem', { method: 'POST', body: JSON.stringify({ code }) }); }
     async getSubscriptionStatus(): Promise<any> {
         try { return await this.request('/subscription/status'); }
         catch (error) { if (!isOnline()) { return { premium: false }; } throw error; }
