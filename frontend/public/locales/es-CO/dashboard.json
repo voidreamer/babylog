@@ -1,6 +1,6 @@
 {
   "title": "Cuadro de mandos",
-  "dailySummary": "Resumen de hoy",
+  "dailySummary": "Resumen diario",
   "comingUp": "Próximamente",
   "widgetSettings": "Configuración del widget",
   "quickActions": "Acciones rápidas",
@@ -22,7 +22,20 @@
     "amount": "Importe",
     "duration": "Duración",
     "notes": "Notas",
-    "type": "Tipo"
+    "type": "Tipo",
+    "saveFeeding": "Ahorrar alimentación",
+    "breastMilk": "Leche materna",
+    "formula": "Fórmula",
+    "quickLog": "Registro rápido",
+    "timer": "Temporizador",
+    "method": "Método",
+    "bottleContents": "Contenido de la botella",
+    "durationMin": "Duración (min)",
+    "amountMl": "Cantidad (ml)",
+    "startedAt": "Iniciado en {{time}}",
+    "stop": "Stop",
+    "noFeedingsYet": "Aún no se ha alimentado",
+    "feedingLogged": "Alimentación registrada ({{duration}} min)"
   },
   "diaper": {
     "title": "Pañales",
@@ -33,7 +46,34 @@
     "mixed": "Mixto",
     "dry": "Seco",
     "color": "Color",
-    "notes": "Notas"
+    "notes": "Notas",
+    "pee": "Pee",
+    "poo": "Poo",
+    "both": "Ambos",
+    "saveDiaperChange": "Guardar cambio de pañal",
+    "diaperChange": "Cambio de pañales",
+    "type": "Tipo",
+    "consistency": "Coherencia",
+    "amount": "Importe",
+    "time": "Tiempo",
+    "noDiapersYet": "Aún no hay pañales",
+    "colors": {
+      "yellow": "Amarillo",
+      "brown": "Marrón",
+      "green": "Verde",
+      "orange": "Naranja",
+      "black": "Negro",
+      "red": "Rojo",
+      "white": "Blanco"
+    },
+    "consistencies": {
+      "liquid": "Líquido",
+      "soft": "Suave",
+      "formed": "Formado",
+      "hard": "Duro",
+      "pellets": "Pellets"
+    },
+    "diaperLogged": "{{type}} pañal registrado"
   },
   "sleep": {
     "title": "Dormir",
@@ -46,7 +86,13 @@
     "nap": "Siesta",
     "nightSleep": "Sueño nocturno",
     "duration": "Duración",
-    "notes": "Notas"
+    "notes": "Notas",
+    "wakeUp": "Despierta",
+    "waking": "Despertar...",
+    "starting": "Empezando...",
+    "startTime": "Hora de inicio",
+    "endTime": "Fin de los tiempos",
+    "saveChanges": "Guardar cambios"
   },
   "pumping": {
     "title": "Bombeo",
@@ -56,7 +102,11 @@
     "logPumping": "Bombeo de troncos",
     "amount": "Importe",
     "duration": "Duración",
-    "notes": "Notas"
+    "notes": "Notas",
+    "savePumping": "Ahorrar bombeo",
+    "start": "Inicio",
+    "noPumpingsYet": "Aún no hay bombeos",
+    "pumpingLogged": "Bombeo registrado ({{duration}} min)"
   },
   "potty": {
     "title": "Orinal",
@@ -64,7 +114,19 @@
     "logPotty": "Orinal de troncos",
     "success": "Éxito",
     "accident": "Accidente",
-    "notes": "Notas"
+    "notes": "Notas",
+    "result": "Resultado",
+    "typeOptional": "Tipo (opcional)",
+    "pee": "Pee",
+    "poo": "Poo",
+    "both": "Ambos",
+    "successLabel": "✓ Éxito",
+    "attemptLabel": "~ Attempt",
+    "accidentLabel": "Accidente",
+    "noPottyYet": "Aún no hay registros de orinales",
+    "pottyLogged": "Orinal {{result}} registrado",
+    "yes": "Sí",
+    "try": "Pruebe"
   },
   "tummyTime": {
     "title": "Hora del vientre",
@@ -73,13 +135,19 @@
     "stopTummyTime": "Stop Tummy Time",
     "logTummyTime": "Log Tummy Time",
     "duration": "Duración",
-    "notes": "Notas"
+    "notes": "Notas",
+    "tummy": "Barriga",
+    "start": "Inicio",
+    "noTummyTimeYet": "Todavía no está boca abajo",
+    "tummyTimeLogged": "Tiempo boca abajo registrado ({{duration}} min)"
   },
   "bath": {
     "title": "Baño",
     "lastBath": "Último baño",
     "logBath": "Baño de troncos",
-    "notes": "Notas"
+    "notes": "Notas",
+    "noBathsYet": "Aún no hay baños",
+    "logging": "Registro..."
   },
   "supplement": {
     "title": "Suplemento",
@@ -87,18 +155,183 @@
     "logSupplement": "Suplemento de registro",
     "name": "Nombre",
     "dosage": "Dosificación",
-    "notes": "Notas"
+    "notes": "Notas",
+    "dosageOptional": "Dosificación (opcional)",
+    "noSupplementsYet": "Aún no hay suplementos",
+    "vitaminD": "Vitamina D",
+    "iron": "Hierro",
+    "dhaOmega3": "DHA/Omega-3",
+    "probiotic": "Probiótico",
+    "multivitamin": "Multivitamínico",
+    "other": "Otros"
   },
   "summary": {
+    "feedings": "alimentación",
+    "diapers": "pañales",
+    "sleepTotal": "dormir",
+    "pumpings": "bombas",
+    "pottyTrips": "orinal",
+    "tummyTimeSessions": "tiempo boca abajo",
+    "baths": "baños",
+    "supplements": "Suplementos",
+    "naps": "{{count}} siestas",
+    "successCount": "{{count}} éxito",
+    "bath": "baño"
+  },
+  "dailySummarySection": {
+    "title": "Resumen diario",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "loading": "Cargando...",
+    "noData": "No hay datos para {{period}}",
+    "wet": "{{count}} mojado",
+    "dirty": "{{count}} sucio",
+    "mixed": "{{count}} mixto"
+  },
+  "comingUpSection": {
+    "active": "Activo",
+    "vaccine": "Vacuna",
+    "visit": "Visite",
+    "ongoing": "En curso"
+  },
+  "timeline": {
+    "noEventsToday": "Hoy no se ha registrado ningún evento",
+    "noEventsRecorded": "Ningún evento registrado",
+    "addFromDashboard": "Añada actividades desde el panel de control para verlas aquí",
+    "inProgress": "en curso",
+    "sleeping": "Durmiendo...",
+    "edit": "Editar",
+    "delete": "Borrar",
+    "deleteConfirmTitle": "¿Borrar {{type}}?",
+    "deleteConfirmMessage": "Esta acción no puede deshacerse.",
+    "tummyTime": "Hora del vientre",
+    "breastmilkBottle": "Biberón",
+    "attempt": "Inténtelo"
+  },
+  "greeting": {
+    "goodMorning": "Buenos días.",
+    "goodAfternoon": "Buenas tardes",
+    "goodEvening": "Buenas noches",
+    "welcome": "Bienvenido.",
+    "addFirstBaby": "Añade tu primer bebé para empezar",
+    "addBaby": "Añadir bebé",
+    "shared": "Compartido",
+    "shareName": "Compartir {{name}}",
+    "editName": "Editar {{name}}",
+    "deleteName": "Borrar {{name}}",
+    "deleteConfirm": "Borrar {{name}}? Esto elimina todos los datos y no se puede deshacer.",
+    "babyAdded": "{{name}} ¡añadido!",
+    "babyUpdated": "{{name}} ¡actualizado!",
+    "editBaby": "Editar {{name}}"
+  },
+  "age": {
+    "bornToday": "¡Ha nacido hoy!",
+    "daysOld": "{{count}} día de antigüedad",
+    "daysOld_plural": "{{count}} días de antigüedad",
+    "weeksOld": "{{count}} semana de edad",
+    "weeksOld_plural": "{{count}} semanas de edad",
+    "monthsOld": "{{count}} mes de edad",
+    "monthsOld_plural": "{{count}} meses de edad",
+    "yearsMonthsOld": "{{years}}y {{months}}m antiguo",
+    "yearsOld": "{{count}} año de edad",
+    "yearsOld_plural": "{{count}} años de edad"
+  },
+  "encouragement": {
+    "letsTrack": "Hagamos un seguimiento de las actividades de hoy",
+    "readyToLog": "¡Listos para registrar el primer evento de hoy!",
+    "greatStart": "¡Gran comienzo del día!",
+    "doingAmazing": "¡Lo estás haciendo genial!",
+    "superParent": "¡Super padre! ¡Seguid así!"
+  },
+  "widgetSettingsSection": {
+    "editActivities": "Editar actividades",
+    "hidden": "{{count}} oculto",
+    "allVisible": "Todo visible",
+    "dashboardActivities": "Actividades del cuadro de mando",
+    "tapToShowHide": "Toca para mostrar u ocultar actividades en tu panel de control",
+    "quickActions": "Acciones rápidas",
+    "oneTapButtons": "Botones de un toque en los widgets"
+  },
+  "insights": {
+    "selectBaby": "Selecciona un bebé para ver sus características",
+    "analyzingPatterns": "Analizar patrones...",
+    "unableToLoad": "No se puede cargar la información",
+    "collectingData": "Recopilación de datos",
+    "collectingDataDesc": "Siga haciendo el seguimiento unos días más. Necesitamos al menos 3-5 días de datos para identificar patrones y hacer predicciones.",
+    "dataPoints": "Puntos de datos: {{feedings}} comidas, {{sleeps}} sueños",
+    "predictions": "Predicciones",
+    "nextFeeding": "Próxima alimentación",
+    "nextNap": "Siguiente siesta",
+    "sleepPressure": "Presión del sueño",
+    "pastDue": "Vencidos",
+    "sleepingNow": "Dormir ahora",
+    "mayBeHungry": "¡Puede tener hambre!",
+    "wakeWindow": "Ventana de vigilia: {{min}}-{{max}} min",
+    "minutesAwake": "{{count}} min despierto",
+    "upgradeToSeePredictions": "Actualizar para ver las predicciones",
+    "patterns": "Patrones",
+    "wakesUp": "Despierta",
+    "everyHours": "Cada {{hours}} horas",
+    "usuallyWakesUp": "Normalmente se despierta",
+    "usualBedtime": "Hora habitual de acostarse",
+    "feedsEvery": "Alimenta cada",
+    "hours": "{{hours}} horas",
+    "avgNapLength": "Duración media de la siesta",
+    "minutes": "{{minutes}} min",
+    "upgradeToseePatterns": "Actualizar para ver patrones",
+    "fourteenDayTrends": "Tendencias a 14 días",
+    "sleep": "Dormir",
+    "feeding": "Alimentación",
+    "upgradeToSeeTrends": "Actualizar para ver tendencias",
+    "ageGuidelines": "Pautas de edad",
+    "weeks": "{{count}} semanas",
+    "diapersToday": "Pañales Hoy",
+    "wet": "húmedo",
+    "expected": "esperado",
+    "sleepToday": "Dormir hoy",
+    "hours_label": "horas",
+    "feedingsToday": "Alimentación hoy",
+    "feeds": "alimenta",
+    "todayVsAverage": "La actualidad frente a la media",
     "feedings": "Alimentación",
     "diapers": "Pañales",
-    "sleepTotal": "Dormir Total",
-    "pumpings": "Bombeos",
-    "pottyTrips": "Viajes al orinal",
-    "tummyTimeSessions": "Hora del vientre",
-    "baths": "Baños",
-    "supplements": "Suplementos"
+    "vs": "vs",
+    "perDay": "{{value}}/día"
   },
+  "learn": {
+    "insights": "Perspectivas",
+    "forBaby": "Para {{name}}, {{months}} {{monthLabel}} antiguos",
+    "month": "mes",
+    "months": "meses"
+  },
+  "share": {
+    "shareTitle": "Compartir {{name}}",
+    "addByEmail": "Añadir por correo electrónico",
+    "share": "Compartir",
+    "sharedWith": "Compartido con",
+    "remove": "Eliminar",
+    "shareHint": "Introduzca un correo electrónico para compartir el acceso a {{name}} con otra persona.",
+    "done": "Hecho"
+  },
+  "babySelector": {
+    "addBaby": "+ Añadir bebé",
+    "addYourBaby": "Añade a tu bebé",
+    "selectBaby": "Seleccionar bebé",
+    "shared": "Compartido",
+    "shareName": "Compartir {{name}}",
+    "deleteName": "Borrar {{name}}",
+    "deleteConfirm": "¿Está seguro de que desea eliminar {{name}}? Esto eliminará todos los registros de alimentación, pañales, sueño y salud. Esto no se puede deshacer.",
+    "addAnotherBaby": "+ Añadir otro bebé"
+  },
+  "quickActionsSection": {
+    "feeding": "Alimentación",
+    "diaper": "Pañales",
+    "sleep": "Dormir",
+    "pump": "Bomba"
+  },
+  "failedToLoadDashboard": "Error al cargar el panel de control",
+  "failedToLoadDashboardDesc": "Por favor, compruebe su conexión e inténtelo de nuevo.",
+  "tapToLog": "Pulse para registrar",
   "toast_failedToAddBaby": "No se ha podido añadir el bebé",
   "toast_failedToUpdateBaby": "No se ha podido actualizar el bebé",
   "submitLabel_saveChanges": "Guardar cambios",
@@ -142,5 +375,12 @@
   "placeholder_customMinutes": "Actas personalizadas",
   "placeholder_babysMoodEtc": "Estado de ánimo del bebé, etc.",
   "toast_tummyTimeStarted": "Empieza la hora del vientre",
-  "title_logTummyTimeManually": "Registrar la hora del vientre manualmente"
+  "title_logTummyTimeManually": "Registrar la hora del vientre manualmente",
+  "modal": {
+    "edit": "Editar",
+    "log": "Registro",
+    "time": "Tiempo",
+    "notesOptional": "Notas (opcional)",
+    "notes": "Notas"
+  }
 }

@@ -4,6 +4,7 @@
   "hub": "Cubo",
   "loading": "Cargando...",
   "save": "Guardar",
+  "saving": "Ahorrar...",
   "cancel": "Cancelar",
   "delete": "Borrar",
   "edit": "Editar",
@@ -28,8 +29,10 @@
   "addBabyPrompt": "Añade a tu bebé para iniciar el seguimiento",
   "noBabySelected": "Ningún bebé seleccionado",
   "errorBoundaryTitle": "Algo salió mal",
-  "errorBoundaryMessage": "Se ha producido un error inesperado. Intente actualizar la página.",
+  "errorBoundaryMessage": "Lo sentimos, pero ha ocurrido algo inesperado. Inténtelo de nuevo.",
   "refresh": "Actualizar",
+  "tryAgain": "Inténtalo de nuevo",
+  "now": "Ahora",
   "nav": {
     "home": "Inicio",
     "timeline": "Cronología",
@@ -64,5 +67,23 @@
   "placeholder_50": "50",
   "toast_failedToAddBaby": "No se ha podido añadir el bebé",
   "submitLabel_addBaby": "Añadir bebé",
-  "submitLabel_saveChanges": "Guardar cambios"
+  "submitLabel_saveChanges": "Guardar cambios",
+  "addBabyForm": {
+    "babysName": "Nombre del bebé *",
+    "birthDate": "Fecha de nacimiento *",
+    "gender": "Género",
+    "boy": "Chico",
+    "girl": "Chica",
+    "genderHint": "Opcional: ayuda a elaborar gráficos de crecimiento precisos",
+    "birthMeasurements": "Medidas al nacer (opcional)",
+    "weightKg": "Peso (kg)",
+    "heightCm": "Altura (cm)"
+  },
+  "offlineIndicator": {
+    "youreOffline": "Estás desconectado",
+    "changesPending": "{{count}} cambio{{s}} pendiente",
+    "syncingChanges": "Sincronizar los cambios...",
+    "changesToSync": "{{count}} cambiar{{s}} a sync",
+    "syncNow": "Sincronizar ahora"
+  }
 }

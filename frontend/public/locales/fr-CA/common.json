@@ -4,6 +4,7 @@
   "hub": "Hub",
   "loading": "Chargement...",
   "save": "Économiser",
+  "saving": "Économiser...",
   "cancel": "Annuler",
   "delete": "Supprimer",
   "edit": "Editer",
@@ -28,8 +29,10 @@
   "addBabyPrompt": "Ajoutez votre bébé pour commencer le suivi",
   "noBabySelected": "Pas de bébé sélectionné",
   "errorBoundaryTitle": "Quelque chose n'a pas fonctionné",
-  "errorBoundaryMessage": "Une erreur inattendue s'est produite. Veuillez essayer d'actualiser la page.",
+  "errorBoundaryMessage": "Nous sommes désolés, mais un événement inattendu s'est produit. Veuillez réessayer.",
   "refresh": "Rafraîchir",
+  "tryAgain": "Réessayer",
+  "now": "Maintenant",
   "nav": {
     "home": "Accueil",
     "timeline": "Chronologie",
@@ -64,5 +67,23 @@
   "placeholder_50": "50",
   "toast_failedToAddBaby": "Échec de l'ajout d'un bébé",
   "submitLabel_addBaby": "Ajouter un bébé",
-  "submitLabel_saveChanges": "Enregistrer les modifications"
+  "submitLabel_saveChanges": "Enregistrer les modifications",
+  "addBabyForm": {
+    "babysName": "Nom du bébé *",
+    "birthDate": "Date de naissance *",
+    "gender": "Genre",
+    "boy": "Garçon",
+    "girl": "Fille",
+    "genderHint": "Facultatif - aide à établir des courbes de croissance précises",
+    "birthMeasurements": "Mesures de naissance (facultatif)",
+    "weightKg": "Poids (kg)",
+    "heightCm": "Hauteur (cm)"
+  },
+  "offlineIndicator": {
+    "youreOffline": "Vous êtes hors ligne",
+    "changesPending": "{{count}} change{{s}} en attente",
+    "syncingChanges": "Synchronisation des changements...",
+    "changesToSync": "{{count}} change{{s}} en sync",
+    "syncNow": "Synchroniser maintenant"
+  }
 }
