@@ -197,7 +197,7 @@
   "timeline": {
     "noEventsToday": "Hoy no se ha registrado ningún evento",
     "noEventsRecorded": "Ningún evento registrado",
-    "addFromDashboard": "Añadir actividades desde el cuadro de mandos para verlas aquí",
+    "addFromDashboard": "Añada actividades desde el panel de control para verlas aquí",
     "inProgress": "en curso",
     "sleeping": "Durmiendo...",
     "edit": "Editar",
@@ -253,7 +253,7 @@
     "oneTapButtons": "Botones de un toque en los widgets"
   },
   "insights": {
-    "selectBaby": "Selecciona un bebé para ver sus características",
+    "selectBaby": "Selecciona un bebé para ver sus perspectivas",
     "analyzingPatterns": "Analizar patrones...",
     "unableToLoad": "No se puede cargar la información",
     "collectingData": "Recopilación de datos",

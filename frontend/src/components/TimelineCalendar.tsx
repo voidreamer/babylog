@@ -23,20 +23,20 @@ const parseUTCTime = (timeStr: any): Date => {
     return new Date(utcTime);
 };
 
-// Event type config with Lucide icons
-const EVENT_CONFIG: Record<string, any> = {
-    feeding: { icon: Baby, color: 'var(--feeding)', bg: 'var(--feeding-bg)', label: 'Feeding' },
-    diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: 'Diaper' },
-    sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: 'Sleep' },
-    pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: 'Pumping' },
-    potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: 'Potty' },
-    tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: 'Tummy Time' },
-    bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: 'Bath' },
-    supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: 'Supplement' },
-};
-
 export default function TimelineCalendar() {
     const { t } = useTranslation('dashboard');
+
+    // Event type config with Lucide icons
+    const EVENT_CONFIG: Record<string, any> = {
+        feeding: { icon: Baby, color: 'var(--feeding)', bg: 'var(--feeding-bg)', label: t('feeding.title') },
+        diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: t('diaper.title') },
+        sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: t('sleep.title') },
+        pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: t('pumping.title') },
+        potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: t('potty.title') },
+        tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: t('tummyTime.title') },
+        bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: t('bath.title') },
+        supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: t('supplement.title') },
+    };
     const { selectedBaby } = useBaby();
     const [events, setEvents] = useState<any[]>([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -281,10 +281,10 @@ export default function TimelineCalendar() {
                 let feedType = details.type || '';
                 // Format the type for display
                 if (feedType === 'breastmilk_bottle') {
-                    feedType = 'Breastmilk Bottle';
+                    feedType = t('timeline.breastmilkBottle');
                 } else if (feedType === 'bottle') {
                     // Legacy data - treat as breastmilk bottle
-                    feedType = 'Breastmilk Bottle';
+                    feedType = t('timeline.breastmilkBottle');
                 } else {
                     feedType = feedType.charAt(0).toUpperCase() + feedType.slice(1);
                 }
@@ -292,7 +292,7 @@ export default function TimelineCalendar() {
                 return feedType + duration;
             case 'diaper':
                 const diaperType = details.type || '';
-                const diaperLabel = ({ pee: 'Pee', poo: 'Poo', mixed: 'Both' } as Record<string, string>)[diaperType] || diaperType;
+                const diaperLabel = ({ pee: t('diaper.pee'), poo: t('diaper.poo'), mixed: t('diaper.both') } as Record<string, string>)[diaperType] || diaperType;
                 return diaperLabel;
             case 'sleep':
                 if (details.duration_minutes) {
@@ -307,14 +307,14 @@ export default function TimelineCalendar() {
                 if (details.amount_ml) pumpParts.push(`${details.amount_ml}ml`);
                 return pumpParts.join(' • ') || 'Pumping';
             case 'potty':
-                const resultLabel = ({ success: 'Success', attempt: 'Attempt' } as Record<string, string>)[details.result] || details.result || '';
+                const resultLabel = ({ success: t('potty.success'), attempt: t('timeline.attempt') } as Record<string, string>)[details.result] || details.result || '';
                 return resultLabel;
             case 'tummy':
                 return details.duration_minutes ? `Tummy Time • ${details.duration_minutes}min` : 'Tummy Time';
             case 'bath':
                 return details.notes ? `Bath • ${details.notes}` : 'Bath';
             case 'supplement':
-                const supName = details.name ? details.name.replace('_', ' ') : 'Supplement';
+                const supName = details.name ? details.name.replace('_', ' ') : t('supplement.title');
                 const supNameFormatted = supName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 return details.dosage ? `${supNameFormatted} • ${details.dosage}` : supNameFormatted;
             default:

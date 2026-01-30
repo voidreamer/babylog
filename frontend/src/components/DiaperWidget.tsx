@@ -40,7 +40,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
     // Format last diaper type for display
     const getLastDiaperType = () => {
         if (!lastDiaper?.type) return null;
-        const typeMap: Record<string, string> = { pee: 'Pee', poo: 'Poo', mixed: 'Both' };
+        const typeMap: Record<string, string> = { pee: t('diaper.pee'), poo: t('diaper.poo'), mixed: t('diaper.both') };
         return typeMap[lastDiaper.type] || lastDiaper.type;
     };
 

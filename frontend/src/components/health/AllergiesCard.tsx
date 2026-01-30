@@ -19,11 +19,7 @@ const COMMON_ALLERGENS = [
     'Sesame',
 ];
 
-const SEVERITY_LEVELS = [
-    { value: 'mild', label: 'Mild', description: 'Minor symptoms, no treatment needed' },
-    { value: 'moderate', label: 'Moderate', description: 'Noticeable symptoms, may need medication' },
-    { value: 'severe', label: 'Severe', description: 'Serious reaction, needs immediate attention' },
-];
+const SEVERITY_KEYS = ['mild', 'moderate', 'severe'] as const;
 
 interface AllergiesCardProps { baby: any; allergies: any[]; onAllergyAdded?: () => void; onAllergyDeleted?: () => void; }
 export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAllergyDeleted }: AllergiesCardProps) {
@@ -71,7 +67,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             setIsAdding(false);
             if (onAllergyAdded) onAllergyAdded();
         } catch (error) {
-            toast.error('Failed to save: ' + (error as Error).message);
+            toast.error(t('failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -83,7 +79,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             toast.success(t('toast_allergyRemoved'));
             if (onAllergyDeleted) onAllergyDeleted();
         } catch (error) {
-            toast.error('Failed to delete: ' + (error as Error).message);
+            toast.error(t('failedToDelete'));
         }
     };
 
@@ -109,10 +105,10 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             <div className="health-card-header">
                 <h3 className="health-card-title">
                     <AlertTriangle size={18} />
-                    Allergies
+                    {t('allergies.title')}
                 </h3>
                 {allergies?.length > 0 && (
-                    <span className="health-card-count">{allergies.length} known</span>
+                    <span className="health-card-count">{t('allergies.known', { count: allergies.length })}</span>
                 )}
             </div>
 
@@ -124,7 +120,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                             <div className="allergy-header">
                                 <span className="allergy-name">{allergy.allergen}</span>
                                 <span className={`allergy-severity ${getSeverityClass(allergy.severity)}`}>
-                                    {allergy.severity || 'Unknown'}
+                                    {allergy.severity ? t(`allergies.${allergy.severity}`) : t('allergies.unknown')}
                                 </span>
                                 <button
                                     className="allergy-delete"
@@ -135,10 +131,10 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                                 </button>
                             </div>
                             {allergy.reaction && (
-                                <p className="allergy-reaction">Reaction: {allergy.reaction}</p>
+                                <p className="allergy-reaction">{t('allergies.reactionLabel', { reaction: allergy.reaction })}</p>
                             )}
                             {allergy.discovered_date && (
-                                <p className="allergy-date">Discovered: {formatDate(allergy.discovered_date)}</p>
+                                <p className="allergy-date">{t('allergies.discoveredLabel', { date: formatDate(allergy.discovered_date) })}</p>
                             )}
                             {allergy.notes && (
                                 <p className="allergy-notes">{allergy.notes}</p>
@@ -147,7 +143,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     ))}
                 </div>
             ) : (
-                <p className="health-card-empty">No known allergies</p>
+                <p className="health-card-empty">{t('allergies.noAllergies')}</p>
             )}
 
             {/* Add Form */}
@@ -171,14 +167,14 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     </div>
 
                     <div className="severity-selector">
-                        {SEVERITY_LEVELS.map((level) => (
+                        {SEVERITY_KEYS.map((key) => (
                             <button
-                                key={level.value}
+                                key={key}
                                 type="button"
-                                className={`severity-btn ${formData.severity === level.value ? 'selected' : ''} ${getSeverityClass(level.value)}`}
-                                onClick={() => setFormData({ ...formData, severity: level.value })}
+                                className={`severity-btn ${formData.severity === key ? 'selected' : ''} ${getSeverityClass(key)}`}
+                                onClick={() => setFormData({ ...formData, severity: key })}
                             >
-                                {level.label}
+                                {t(`allergies.${key}`)}
                             </button>
                         ))}
                     </div>
@@ -193,7 +189,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
 
                     <div className="allergy-form-row">
                         <label className="allergy-date-label">
-                            Discovered:
+                            {t('allergies.discoveredField')}
                             <input
                                 type="date"
                                 value={formData.discovered_date}
@@ -213,14 +209,14 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
 
                     <div className="allergy-form-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? 'Saving...' : 'Add Allergy'}
+                            {saving ? t('common:saving') : t('allergies.addAllergy')}
                         </button>
                         <button
                             type="button"
                             className="btn btn-ghost btn-sm"
                             onClick={() => setIsAdding(false)}
                         >
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                     </div>
                 </form>
@@ -230,7 +226,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     onClick={() => setIsAdding(true)}
                 >
                     <Plus size={16} />
-                    Add Allergy
+                    {t('allergies.addAllergy')}
                 </button>
             )}
         </div>

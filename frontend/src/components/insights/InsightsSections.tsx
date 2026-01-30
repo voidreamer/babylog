@@ -23,7 +23,7 @@ export const formatPrediction = (prediction: any): { text: string; isPastDue: bo
     if (!prediction) return null;
     const minutes = prediction.in_minutes;
     if (minutes < 0) {
-        return { text: 'Past due', isPastDue: true };
+        return { text: 'past_due', isPastDue: true };
     }
     if (minutes < 60) {
         return { text: `in ${minutes} min`, isPastDue: false };
@@ -39,7 +39,7 @@ export const formatPrediction = (prediction: any): { text: string; isPastDue: bo
 export const formatNapPrediction = (prediction: any): { text: string; isPastDue?: boolean; isSleeping?: boolean } | null => {
     if (!prediction) return null;
     if (prediction.status === 'sleeping') {
-        return { text: 'Sleeping now', isSleeping: true };
+        return { text: 'sleeping_now', isSleeping: true };
     }
     return formatPrediction(prediction);
 };
@@ -74,6 +74,7 @@ export function TrendIcon({ trend }: { trend: string }) {
 
 interface PredictionsSectionProps { predictions: any; isPremium: boolean; }
 export function PredictionsSection({ predictions, isPremium }: PredictionsSectionProps) {
+    const { t } = useTranslation('dashboard');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -134,7 +135,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                             )}
                             {predictions.next_nap.wake_window && (
                                 <span className="wake-window-info">
-                                    Wake window: {predictions.next_nap.wake_window.min}-{predictions.next_nap.wake_window.max} min
+                                    {t('insights.wakeWindow', { min: predictions.next_nap.wake_window.min, max: predictions.next_nap.wake_window.max })}
                                 </span>
                             )}
                         </div>
@@ -180,7 +181,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                                 {predictions.sleep_pressure.label}
                             </span>
                             <span className="pressure-detail">
-                                {predictions.sleep_pressure.minutes_awake} min awake
+                                {t('insights.minutesAwake', { count: predictions.sleep_pressure.minutes_awake })}
                             </span>
                             <span className="pressure-recommendation">
                                 {predictions.sleep_pressure.recommendation}
@@ -202,6 +203,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
 
 interface PatternsSectionProps { patterns: any; isPremium: boolean; }
 export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
+    const { t } = useTranslation('dashboard');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -258,6 +260,7 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
 
 interface TrendsSectionProps { trends: any; isPremium: boolean; }
 export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
+    const { t } = useTranslation('dashboard');
     if (!trends || (trends.sleep?.trend === 'insufficient_data' && trends.feeding?.trend === 'insufficient_data')) {
         return null;
     }
@@ -306,6 +309,7 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
 
 interface BenchmarksSectionProps { benchmarks: any; today_vs_average: any; }
 export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSectionProps) {
+    const { t } = useTranslation('dashboard');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -384,7 +388,7 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
                                 {benchmarks?.feeding?.expected_feeds_per_day?.min}-
                                 {benchmarks?.feeding?.expected_feeds_per_day?.max}
                             </span>
-                            <span className="benchmark-label">expected</span>
+                            <span className="benchmark-label">{t('insights.expected')}</span>
                         </div>
                         <div className={`benchmark-status ${getStatus(
                             today_vs_average?.feedings?.today || 0,
@@ -405,6 +409,7 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
 
 interface TodayVsAverageSectionProps { today_vs_average: any; }
 export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectionProps) {
+    const { t } = useTranslation('dashboard');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -425,15 +430,15 @@ export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectio
                     <span className="comparison-label">{t('insights.diapers')}</span>
                     <div className="comparison-values">
                         <span className="comparison-today">{today_vs_average?.diapers?.today}</span>
-                        <span className="comparison-vs">vs</span>
-                        <span className="comparison-avg">{today_vs_average?.diapers?.daily_avg}/day</span>
+                        <span className="comparison-vs">{t('insights.vs')}</span>
+                        <span className="comparison-avg">{t('insights.perDay', { value: today_vs_average?.diapers?.daily_avg })}</span>
                     </div>
                 </div>
                 <div className="comparison-item">
                     <span className="comparison-label">{t('insights.sleep')}</span>
                     <div className="comparison-values">
                         <span className="comparison-today">{today_vs_average?.sleep_hours?.today}h</span>
-                        <span className="comparison-vs">vs</span>
+                        <span className="comparison-vs">{t('insights.vs')}</span>
                         <span className="comparison-avg">{today_vs_average?.sleep_hours?.daily_avg}h/day</span>
                     </div>
                 </div>

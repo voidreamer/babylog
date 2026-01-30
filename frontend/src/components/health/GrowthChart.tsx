@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../../data/whoGrowthData';
 import { differenceInMonths } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 // Calculate age in months from birth date to measurement date
 function getAgeMonths(birthDate: string, measurementDate: string): number {
@@ -22,6 +23,7 @@ function getAgeMonths(birthDate: string, measurementDate: string): number {
 
 interface HealthGrowthChartProps { baby: any; growthRecords: any[]; }
 export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartProps) {
+    const { t } = useTranslation('health');
     const [metric, setMetric] = useState('weight'); // 'weight' or 'height'
 
     const birthDate = baby?.birth_date;
@@ -83,7 +85,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     }, [whoData, babyData]);
 
     const unit = metric === 'weight' ? 'kg' : 'cm';
-    const label = metric === 'weight' ? 'Weight' : 'Height';
+    const label = metric === 'weight' ? t('growth.weight') : t('growth.height');
 
     // Custom tooltip
     const CustomTooltip = ({ active, payload }: any) => {
@@ -96,12 +98,12 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                 <div className="growth-chart-tooltip-title">{data.ageMonths} months</div>
                 {data.babyValue && (
                     <div className="growth-chart-tooltip-baby">
-                        Baby: <strong>{data.babyValue} {unit}</strong>
+                        {t('growth.baby', { value: data.babyValue, unit })}
                     </div>
                 )}
                 {data.p50 && (
                     <div className="growth-chart-tooltip-ref">
-                        50th percentile: {data.p50?.toFixed(1)} {unit}
+                        {t('growth.refPercentile', { value: data.p50?.toFixed(1), unit })}
                     </div>
                 )}
             </div>
@@ -111,7 +113,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     if (!birthDate) {
         return (
             <div className="growth-chart-empty">
-                Add baby's birth date to see growth chart
+                {t('growth.addBirthDate')}
             </div>
         );
     }
@@ -119,30 +121,30 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     return (
         <div className="growth-chart">
             <div className="growth-chart-header">
-                <h4>{label} for Age</h4>
+                <h4>{metric === 'weight' ? t('growth.weightForAge') : t('growth.heightForAge')}</h4>
                 <div className="growth-chart-tabs">
                     <button
                         className={`growth-chart-tab ${metric === 'weight' ? 'active' : ''}`}
                         onClick={() => setMetric('weight')}
                     >
-                        Weight
+                        {t('growth.weight')}
                     </button>
                     <button
                         className={`growth-chart-tab ${metric === 'height' ? 'active' : ''}`}
                         onClick={() => setMetric('height')}
                     >
-                        Height
+                        {t('growth.height')}
                     </button>
                 </div>
             </div>
 
             <div className="growth-chart-subtitle">
-                WHO standards ({gender === 'girl' ? 'Girls' : 'Boys'})
+                {t('growth.whoStandards', { gender: gender === 'girl' ? t('growth.girls') : t('growth.boys') })}
             </div>
 
             {babyData.length === 0 ? (
                 <div className="growth-chart-empty">
-                    No {metric} data recorded yet. Add a measurement above.
+                    {metric === 'weight' ? t('growth.noWeightData') : t('growth.noHeightData')}
                 </div>
             ) : (
                 <>
@@ -216,15 +218,15 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                     <div className="growth-chart-legend">
                         <span className="growth-chart-legend-item">
                             <span className="growth-chart-legend-dot baby"></span>
-                            Your baby
+                            {t('growth.yourBaby')}
                         </span>
                         <span className="growth-chart-legend-item">
                             <span className="growth-chart-legend-line"></span>
-                            50th percentile
+                            {t('growth.fiftiethPercentile')}
                         </span>
                         <span className="growth-chart-legend-item">
                             <span className="growth-chart-legend-range"></span>
-                            3rd-97th range
+                            {t('growth.thirdToNinetySeventh')}
                         </span>
                     </div>
                 </>

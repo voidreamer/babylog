@@ -269,7 +269,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">Amount (ml)</label>
+                                    <label className="form-label">{t('feeding.amountMl')}</label>
                                     <input
                                         type="number"
                                         className="form-input"
@@ -283,7 +283,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Notes</label>
+                                <label className="form-label">{t('modal.notes')}</label>
                                 <input
                                     type="text"
                                     className="form-input"
@@ -298,7 +298,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     {t('common:cancel')}
                                 </button>
                                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                                    {saving ? 'Saving...' : 'Save Pumping'}
+                                    {saving ? t('common:saving') : t('pumping.savePumping')}
                                 </button>
                             </div>
                         </form>

@@ -14,17 +14,11 @@ const parseUTCTime = (timeStr: any): Date => {
     return new Date(utcTime);
 };
 
-const resultOptions = [
-    { value: 'success', label: '✓ Success', color: '#10b981' },
-    { value: 'attempt', label: '~ Attempt', color: '#f59e0b' },
-    { value: 'accident', label: '✗ Accident', color: '#ef4444' },
-];
-
-const typeOptions = [
-    { value: 'pee', label: 'Pee' },
-    { value: 'poo', label: 'Poo' },
-    { value: 'both', label: 'Both' },
-];
+// Labels will be filled by component using t()
+const RESULT_VALUES = ['success', 'attempt', 'accident'] as const;
+const RESULT_ICONS = { success: '✓', attempt: '~', accident: '✗' };
+const RESULT_COLORS = { success: '#10b981', attempt: '#f59e0b', accident: '#ef4444' };
+const TYPE_VALUES = ['pee', 'poo', 'both'] as const;
 
 interface PottyModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PottyModal({ editEvent, onClose, onSave }: PottyModalProps) {
@@ -90,15 +84,15 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
                         <div className="form-group">
                             <label className="form-label">{t('potty.result')}</label>
                             <div className="type-selector">
-                                {resultOptions.map((opt) => (
+                                {RESULT_VALUES.map((val) => (
                                     <button
-                                        key={opt.value}
+                                        key={val}
                                         type="button"
-                                        className={`type-btn ${result === opt.value ? 'active' : ''}`}
-                                        onClick={() => setResult(opt.value)}
-                                        style={result === opt.value ? { borderColor: opt.color, color: opt.color } : {}}
+                                        className={`type-btn ${result === val ? 'active' : ''}`}
+                                        onClick={() => setResult(val)}
+                                        style={result === val ? { borderColor: RESULT_COLORS[val], color: RESULT_COLORS[val] } : {}}
                                     >
-                                        {opt.label}
+                                        {RESULT_ICONS[val]} {t(`potty.${val}Label`)}
                                     </button>
                                 ))}
                             </div>
@@ -108,14 +102,14 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
                         <div className="form-group">
                             <label className="form-label">{t('potty.typeOptional')}</label>
                             <div className="type-selector">
-                                {typeOptions.map((opt) => (
+                                {TYPE_VALUES.map((val) => (
                                     <button
-                                        key={opt.value}
+                                        key={val}
                                         type="button"
-                                        className={`type-btn ${pottyType === opt.value ? 'active' : ''}`}
-                                        onClick={() => setPottyType(pottyType === opt.value ? '' : opt.value)}
+                                        className={`type-btn ${pottyType === val ? 'active' : ''}`}
+                                        onClick={() => setPottyType(pottyType === val ? '' : val)}
                                     >
-                                        {opt.label}
+                                        {t(`potty.${val}`)}
                                     </button>
                                 ))}
                             </div>

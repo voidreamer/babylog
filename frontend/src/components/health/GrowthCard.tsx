@@ -104,7 +104,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             setIsAdding(false);
             if (onRecordAdded) onRecordAdded();
         } catch (error) {
-            toast.error('Failed to save: ' + (error as Error).message);
+            toast.error(t('failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -115,13 +115,13 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             <div className="health-card-header">
                 <h3 className="health-card-title">
                     <TrendingUp size={18} />
-                    Growth
+                    {t('growth.title')}
                 </h3>
                 <button
                     className="health-card-action"
                     onClick={() => setShowChart(!showChart)}
                 >
-                    {showChart ? 'Hide Chart' : 'Full Chart'}
+                    {showChart ? t('growth.hideChart') : t('growth.fullChart')}
                     <ChevronRight size={16} className={showChart ? 'rotated' : ''} />
                 </button>
             </div>
@@ -129,12 +129,12 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             {/* Metric Boxes */}
             <div className="growth-metrics">
                 <div className="growth-metric-box">
-                    <div className="growth-metric-label">Weight</div>
+                    <div className="growth-metric-label">{t('growth.weight')}</div>
                     <div className="growth-metric-value">
                         {latestRecord?.weight_kg ? `${parseFloat(latestRecord.weight_kg).toFixed(1)} kg` : '--'}
                     </div>
                     <div className="growth-metric-percentile">
-                        {getPercentileLabel(weightPosition)} percentile
+                        {getPercentileLabel(weightPosition)} {t('growth.percentile')}
                     </div>
                     <div className="percentile-bar">
                         <div
@@ -145,12 +145,12 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 </div>
 
                 <div className="growth-metric-box">
-                    <div className="growth-metric-label">Height</div>
+                    <div className="growth-metric-label">{t('growth.height')}</div>
                     <div className="growth-metric-value">
                         {latestRecord?.height_cm ? `${parseFloat(latestRecord.height_cm).toFixed(1)} cm` : '--'}
                     </div>
                     <div className="growth-metric-percentile">
-                        {getPercentileLabel(heightPosition)} percentile
+                        {getPercentileLabel(heightPosition)} {t('growth.percentile')}
                     </div>
                     <div className="percentile-bar">
                         <div
@@ -161,7 +161,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 </div>
 
                 <div className="growth-metric-box">
-                    <div className="growth-metric-label">Head</div>
+                    <div className="growth-metric-label">{t('growth.head')}</div>
                     <div className="growth-metric-value">
                         {latestRecord?.head_cm ? `${parseFloat(latestRecord.head_cm).toFixed(1)} cm` : '--'}
                     </div>
@@ -200,14 +200,14 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                         className="growth-input"
                     />
                     <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                        {saving ? '...' : 'Save'}
+                        {saving ? '...' : t('common:save')}
                     </button>
                     <button
                         type="button"
                         className="btn btn-ghost btn-sm"
                         onClick={() => setIsAdding(false)}
                     >
-                        Cancel
+                        {t('common:cancel')}
                     </button>
                 </form>
             ) : (
@@ -216,7 +216,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     onClick={() => setIsAdding(true)}
                 >
                     <Plus size={16} />
-                    Log Measurement
+                    {t('growth.logMeasurement')}
                 </button>
             )}
 

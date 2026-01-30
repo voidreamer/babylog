@@ -42,7 +42,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             setIsAdding(false);
             if (onMilestoneAdded) onMilestoneAdded();
         } catch (error) {
-            toast.error('Failed to save: ' + (error as Error).message);
+            toast.error(t('failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -54,7 +54,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             toast.success(t('toast_milestoneDeleted'));
             if (onMilestoneDeleted) onMilestoneDeleted();
         } catch (error) {
-            toast.error('Failed to delete: ' + (error as Error).message);
+            toast.error(t('failedToDelete'));
         }
     };
 
@@ -120,7 +120,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                     />
                     <div className="milestone-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? '...' : 'Add'}
+                            {saving ? '...' : t('common:add')}
                         </button>
                         <button
                             type="button"

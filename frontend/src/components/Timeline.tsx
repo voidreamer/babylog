@@ -5,16 +5,16 @@ import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 
 
-const EVENT_CONFIG: Record<string, { label: string }> = {
-    feeding: { label: 'Feeding' },
-    diaper: { label: 'Diaper' },
-    sleep: { label: 'Sleep' },
-    pumping: { label: 'Pumping' },
-};
-
 interface TimelineProps { events: any[]; onRefresh?: () => void; }
 export default function Timeline({ events, onRefresh }: TimelineProps) {
     const { t } = useTranslation('dashboard');
+
+    const EVENT_CONFIG: Record<string, { label: string }> = {
+        feeding: { label: t('feeding.title') },
+        diaper: { label: t('diaper.title') },
+        sleep: { label: t('sleep.title') },
+        pumping: { label: t('pumping.title') },
+    };
     if (!events || events.length === 0) {
         return (
             <div className="empty-state">

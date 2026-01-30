@@ -126,7 +126,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
     const getLastFeedingDetail = () => {
         if (!lastFeeding) return null;
         const type = lastFeeding.type === 'bottle' || lastFeeding.type === 'breastmilk_bottle'
-            ? 'Bottle'
+            ? t('feeding.bottle')
             : lastFeeding.type.charAt(0).toUpperCase() + lastFeeding.type.slice(1);
         return lastFeeding.duration_minutes ? `${type} • ${lastFeeding.duration_minutes}min` : type;
     };

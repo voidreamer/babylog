@@ -70,21 +70,21 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
     };
 
     const colorOptions = [
-        { value: 'yellow', label: 'Yellow', color: '#f4d03f' },
-        { value: 'brown', label: 'Brown', color: '#8b4513' },
-        { value: 'green', label: 'Green', color: '#27ae60' },
-        { value: 'orange', label: 'Orange', color: '#e67e22' },
-        { value: 'black', label: 'Black', color: '#2c3e50' },
-        { value: 'red', label: 'Red', color: '#e74c3c' },
-        { value: 'white', label: 'White', color: '#ecf0f1' },
+        { value: 'yellow', label: t('diaper.colors.yellow'), color: '#f4d03f' },
+        { value: 'brown', label: t('diaper.colors.brown'), color: '#8b4513' },
+        { value: 'green', label: t('diaper.colors.green'), color: '#27ae60' },
+        { value: 'orange', label: t('diaper.colors.orange'), color: '#e67e22' },
+        { value: 'black', label: t('diaper.colors.black'), color: '#2c3e50' },
+        { value: 'red', label: t('diaper.colors.red'), color: '#e74c3c' },
+        { value: 'white', label: t('diaper.colors.white'), color: '#ecf0f1' },
     ];
 
     const consistencyOptions = [
-        { value: 'liquid', label: 'Liquid' },
-        { value: 'soft', label: 'Soft' },
-        { value: 'formed', label: 'Formed' },
-        { value: 'hard', label: 'Hard' },
-        { value: 'pellets', label: 'Pellets' },
+        { value: 'liquid', label: t('diaper.consistencies.liquid') },
+        { value: 'soft', label: t('diaper.consistencies.soft') },
+        { value: 'formed', label: t('diaper.consistencies.formed') },
+        { value: 'hard', label: t('diaper.consistencies.hard') },
+        { value: 'pellets', label: t('diaper.consistencies.pellets') },
     ];
 
     const amountOptions = [

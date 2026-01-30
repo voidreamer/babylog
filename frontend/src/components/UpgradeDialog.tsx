@@ -7,13 +7,13 @@ import { useTranslation } from 'react-i18next';
 const MONTHLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_MONTHLY || 'price_1Sv6BoFddQLEQqx0mPG0LweR';
 const YEARLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_YEARLY || 'price_1Sv6BoFddQLEQqx0bOrKID81';
 
-const FEATURES = [
-  'AI-powered baby insights & predictions',
-  'Growth charts with WHO percentiles',
-  'Export all your data (CSV)',
-  'Share with unlimited caregivers',
-  'Track multiple babies',
-  'Priority support',
+const FEATURE_KEYS = [
+  'insights',
+  'growth',
+  'export',
+  'share',
+  'multiple',
+  'support',
 ];
 
 interface UpgradeDialogProps {
@@ -99,10 +99,10 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
 
         {/* Features */}
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--space-lg)' }}>
-          {FEATURES.map((f) => (
-            <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: '0.9rem' }}>
+          {FEATURE_KEYS.map((key) => (
+            <li key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: '0.9rem' }}>
               <Check size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
-              {f}
+              {t(`upgrade.premiumFeatures.${key}`)}
             </li>
           ))}
         </ul>
@@ -115,12 +115,12 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
             disabled={!!loading}
             style={{ ...cardBase, border: '2px solid var(--border)' }}
           >
-            <span style={promoBadgeStyle}>LIMITED TIME · 50% OFF</span>
+            <span style={promoBadgeStyle}>{t('upgrade.limitedTime')}</span>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginTop: 4 }}>
               $4.99/mo
             </div>
             <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$2.49</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per month</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('upgrade.perMonth')}</div>
           </button>
 
           {/* Yearly */}
@@ -129,7 +129,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
             disabled={!!loading}
             style={{ ...cardBase, border: '2px solid #f59e0b' }}
           >
-            <span style={promoBadgeStyle}>LIMITED TIME · 50% OFF</span>
+            <span style={promoBadgeStyle}>{t('upgrade.limitedTime')}</span>
             <span
               style={{
                 position: 'absolute',
@@ -143,13 +143,13 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
                 borderRadius: 8,
               }}
             >
-              BEST VALUE
+              {t('upgrade.bestValue')}
             </span>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginTop: 4 }}>
               $29.99/yr
             </div>
             <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$14.99</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per year</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('upgrade.perYear')}</div>
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>
               Just $1.25/mo
             </div>
@@ -169,7 +169,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
 
         {/* Footer */}
         <div style={{ textAlign: 'center', marginTop: 'var(--space-md)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          Cancel anytime · No commitment ·{' '}
+          {t('upgrade.cancelAnytime')} ·{' '}
           <button
             onClick={handleRestore}
             style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.78rem', textDecoration: 'underline', padding: 0 }}

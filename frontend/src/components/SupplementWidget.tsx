@@ -45,7 +45,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
     };
 
     const timeAgo = lastSupplement ? formatTimeAgo(lastSupplement.time) : null;
-    const supplementLabel = lastSupplement?.name?.replace('_', ' ') || 'Vitamin D';
+    const supplementLabel = lastSupplement?.name?.replace('_', ' ') || t('supplement.vitaminD');
 
     return (
         <div

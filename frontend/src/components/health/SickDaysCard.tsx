@@ -21,24 +21,25 @@ const COMMON_SYMPTOMS = [
     'sore_throat',
 ];
 
-const symptomLabels: Record<string, string> = {
-    fever: 'Fever',
-    cough: 'Cough',
-    runny_nose: 'Runny Nose',
-    congestion: 'Congestion',
-    vomiting: 'Vomiting',
-    diarrhea: 'Diarrhea',
-    rash: 'Rash',
-    ear_pain: 'Ear Pain',
-    fussy: 'Fussy',
-    poor_appetite: 'Poor Appetite',
-    lethargy: 'Lethargy',
-    sore_throat: 'Sore Throat',
-};
+// symptomLabels will be created inside component using t()
 
 interface SickDaysCardProps { baby: any; sickDays: any[]; onSickDayAdded?: () => void; onSickDayDeleted?: () => void; }
 export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDayDeleted }: SickDaysCardProps) {
     const { t } = useTranslation('health');
+    const symptomLabels: Record<string, string> = {
+        fever: t('sickDays.symptomLabels.fever'),
+        cough: t('sickDays.symptomLabels.cough'),
+        runny_nose: t('sickDays.symptomLabels.runny_nose'),
+        congestion: t('sickDays.symptomLabels.congestion'),
+        vomiting: t('sickDays.symptomLabels.vomiting'),
+        diarrhea: t('sickDays.symptomLabels.diarrhea'),
+        rash: t('sickDays.symptomLabels.rash'),
+        ear_pain: t('sickDays.symptomLabels.ear_pain'),
+        fussy: t('sickDays.symptomLabels.fussy'),
+        poor_appetite: t('sickDays.symptomLabels.poor_appetite'),
+        lethargy: t('sickDays.symptomLabels.lethargy'),
+        sore_throat: t('sickDays.symptomLabels.sore_throat'),
+    };
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState<{ date: string; symptoms: string[]; temperature: string; notes: string; }>({
@@ -89,7 +90,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             setIsAdding(false);
             if (onSickDayAdded) onSickDayAdded();
         } catch (error) {
-            toast.error('Failed to save: ' + (error as Error).message);
+            toast.error(t('failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -101,15 +102,15 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             toast.success(t('toast_sickDayRemoved'));
             if (onSickDayDeleted) onSickDayDeleted();
         } catch (error) {
-            toast.error('Failed to delete: ' + (error as Error).message);
+            toast.error(t('failedToDelete'));
         }
     };
 
     const formatSickDate = (dateStr: string): string => {
         try {
             const date = parseISO(dateStr);
-            if (isToday(date)) return 'Today';
-            if (isYesterday(date)) return 'Yesterday';
+            if (isToday(date)) return t('common:time.today');
+            if (isYesterday(date)) return t('common:time.yesterday');
             return format(date, 'MMM d');
         } catch {
             return dateStr;
@@ -130,10 +131,10 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             <div className="health-card-header">
                 <h3 className="health-card-title">
                     <Thermometer size={18} />
-                    Sick Days
+                    {t('sickDays.title')}
                 </h3>
                 {sickDays?.length > 0 && (
-                    <span className="health-card-count">{sickDays.length} recorded</span>
+                    <span className="health-card-count">{t('sickDays.recorded', { count: sickDays.length })}</span>
                 )}
             </div>
 
@@ -173,7 +174,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     ))}
                 </div>
             ) : (
-                <p className="health-card-empty">No sick days recorded - great!</p>
+                <p className="health-card-empty">{t('sickDays.noSickDays')}</p>
             )}
 
             {/* Add Form */}
@@ -223,14 +224,14 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
 
                     <div className="sick-day-form-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? 'Saving...' : 'Log Sick Day'}
+                            {saving ? t('common:saving') : t('sickDays.logSickDay')}
                         </button>
                         <button
                             type="button"
                             className="btn btn-ghost btn-sm"
                             onClick={() => setIsAdding(false)}
                         >
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                     </div>
                 </form>
@@ -240,7 +241,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     onClick={() => setIsAdding(true)}
                 >
                     <Plus size={16} />
-                    Log Sick Day
+                    {t('sickDays.logSickDay')}
                 </button>
             )}
         </div>

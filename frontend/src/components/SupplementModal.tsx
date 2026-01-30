@@ -11,13 +11,13 @@ import { useTranslation } from 'react-i18next';
 // Parse UTC time string to local Date
 
 // Common baby supplements
-const supplementOptions = [
-    { value: 'vitamin_d', label: 'Vitamin D', defaultDosage: '400 IU' },
-    { value: 'iron', label: 'Iron', defaultDosage: '1ml' },
-    { value: 'dha', label: 'DHA/Omega-3', defaultDosage: '' },
-    { value: 'probiotic', label: 'Probiotic', defaultDosage: '' },
-    { value: 'multivitamin', label: 'Multivitamin', defaultDosage: '' },
-    { value: 'other', label: 'Other', defaultDosage: '' },
+const SUPPLEMENT_VALUES = [
+    { value: 'vitamin_d', key: 'vitaminD', defaultDosage: '400 IU' },
+    { value: 'iron', key: 'iron', defaultDosage: '1ml' },
+    { value: 'dha', key: 'dhaOmega3', defaultDosage: '' },
+    { value: 'probiotic', key: 'probiotic', defaultDosage: '' },
+    { value: 'multivitamin', key: 'multivitamin', defaultDosage: '' },
+    { value: 'other', key: 'other', defaultDosage: '' },
 ];
 
 interface SupplementModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
@@ -45,7 +45,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
     // Update dosage when supplement type changes
     const handleSupplementChange = (value: string) => {
         setSupplementName(value);
-        const option = supplementOptions.find(o => o.value === value);
+        const option = SUPPLEMENT_VALUES.find(o => o.value === value);
         if (option?.defaultDosage && !isEditing) {
             setDosage(option.defaultDosage);
         }
@@ -80,7 +80,8 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
     };
 
     const getSupplementLabel = (value: string) => {
-        return supplementOptions.find(o => o.value === value)?.label || value;
+        const opt = SUPPLEMENT_VALUES.find(o => o.value === value);
+        return opt ? t(`supplement.${opt.key}`) : value;
     };
 
     return (
@@ -97,14 +98,14 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
                         <div className="form-group">
                             <label className="form-label">{t('supplement.title')}</label>
                             <div className="type-selector" style={{ flexWrap: 'wrap' }}>
-                                {supplementOptions.map((opt) => (
+                                {SUPPLEMENT_VALUES.map((opt) => (
                                     <button
                                         key={opt.value}
                                         type="button"
                                         className={`type-btn ${supplementName === opt.value ? 'active' : ''}`}
                                         onClick={() => handleSupplementChange(opt.value)}
                                     >
-                                        {opt.label}
+                                        {t(`supplement.${opt.key}`)}
                                     </button>
                                 ))}
                             </div>
