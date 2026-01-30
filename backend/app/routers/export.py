@@ -267,7 +267,7 @@ async def export_baby_data_csv(
     # Add metadata header
     metadata = io.StringIO()
     metadata_writer = csv.writer(metadata)
-    metadata_writer.writerow([f"SimpleBaby Data Export - {baby.name}"])
+    metadata_writer.writerow([f"HeyBub Data Export - {baby.name}"])
     metadata_writer.writerow([f"Exported: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC"])
     if baby.birth_date:
         metadata_writer.writerow([f"Birth Date: {format_date(baby.birth_date)}"])
@@ -281,7 +281,7 @@ async def export_baby_data_csv(
 
     # Generate filename
     timestamp = datetime.now().strftime("%Y%m%d")
-    filename = f"simplebaby_{baby.name.lower().replace(' ', '_')}_{timestamp}.csv"
+    filename = f"heybub_{baby.name.lower().replace(' ', '_')}_{timestamp}.csv"
 
     return StreamingResponse(
         io.BytesIO(full_output.encode('utf-8')),

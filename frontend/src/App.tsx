@@ -7,18 +7,19 @@ import { BabyProvider, useBaby } from './hooks/useBaby';
 import { useOfflineSync } from './hooks/useOfflineSync';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
-import Dashboard from './components/Dashboard';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
-import Login from './pages/Login';
-import Callback from './pages/Callback';
-import PrivacyPolicy from './pages/PrivacyPolicy';
+import LoadingSpinner from './components/LoadingSpinner';
 import Learn from './components/Learn';
 import LanguageSwitcher from './components/LanguageSwitcher';
 
-// Lazy load Health page - only loads when user clicks Health tab
+// Lazy load routes for bundle splitting
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const Login = lazy(() => import('./pages/Login'));
+const Callback = lazy(() => import('./pages/Callback'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
 import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
@@ -493,19 +494,21 @@ function App() {
                         },
                     }}
                 />
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/callback" element={<Callback />} />
-                    <Route path="/health-check" element={<Health />} />
-                    <Route
-                        path="/*"
-                        element={
-                            <ProtectedRoute>
-                                <AppContent />
-                            </ProtectedRoute>
-                        }
-                    />
-                </Routes>
+                <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/callback" element={<Callback />} />
+                        <Route path="/health-check" element={<Health />} />
+                        <Route
+                            path="/*"
+                            element={
+                                <ProtectedRoute>
+                                    <AppContent />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                </Suspense>
             </AuthProvider>
         </ErrorBoundary>
     );

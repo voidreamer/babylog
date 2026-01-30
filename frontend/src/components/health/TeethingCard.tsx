@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '../../utils/formatDate';
 
 // Baby teeth positions - 20 total
 // Upper: A-E (left to right from baby's perspective)
@@ -110,13 +111,6 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
         }
     };
 
-    const formatDate = (dateStr: string): string => {
-        try {
-            return format(parseISO(dateStr), 'MMM d, yyyy');
-        } catch {
-            return dateStr;
-        }
-    };
 
     const getToothStatus = (position: string, label: string): string => {
         if (emergedTeethMap[position]) return 'emerged';

@@ -6,13 +6,9 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Pill } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { parseUTCTime } from '../utils/parseTime';
 
 // Parse UTC time string to local Date
-const parseUTCTime = (timeStr: any): Date => {
-    if (!timeStr) return new Date();
-    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-    return new Date(utcTime);
-};
 
 // Common baby supplements
 const supplementOptions = [

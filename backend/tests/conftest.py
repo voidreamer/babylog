@@ -1,5 +1,5 @@
 """
-Pytest fixtures for SimpleBaby API tests.
+Pytest fixtures for HeyBub API tests.
 Uses PostgreSQL in CI, SQLite fallback for local development.
 """
 import os

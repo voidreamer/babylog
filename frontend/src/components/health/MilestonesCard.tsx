@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '../../utils/formatDate';
 
 interface MilestonesCardProps { baby: any; milestones: any[]; onMilestoneAdded?: () => void; onMilestoneDeleted?: () => void; }
 export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onMilestoneDeleted }: MilestonesCardProps) {

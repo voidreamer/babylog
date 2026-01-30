@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatTimeAgo } from '../utils/formatTime';
 import { useState, useEffect, useRef } from 'react';
 import { Sun, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
@@ -6,16 +7,6 @@ import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 
-function formatTimeAgo(dateStr: string | null): string | null {
-    if (!dateStr) return null;
-    const date = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-    const diffMins = Math.floor((new Date().getTime() - date.getTime()) / 60000);
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
-}
 
 function formatTimer(seconds: number): string {
     const mins = Math.floor(seconds / 60);

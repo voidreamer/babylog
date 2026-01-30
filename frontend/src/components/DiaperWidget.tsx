@@ -1,31 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatTimeAgo } from '../utils/formatTime';
 import { useState } from 'react';
 import { Droplets, CircleDot, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
-// Format time ago
-function formatTimeAgo(dateStr: string | null): string | null {
-    if (!dateStr) return null;
-    const date = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-
-    const diffHours = Math.floor(diffMins / 60);
-    const remainingMins = diffMins % 60;
-
-    if (diffHours < 24) {
-        return remainingMins > 0 ? `${diffHours}h ${remainingMins}m ago` : `${diffHours}h ago`;
-    }
-
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-}
 
 interface DiaperWidgetProps { babyId: number; lastDiaper: any; onDiaperChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpenModal, quickActionsEnabled = true }: DiaperWidgetProps) {

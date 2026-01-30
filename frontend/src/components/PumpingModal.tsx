@@ -5,13 +5,9 @@ import TimePicker from './TimePicker';
 import { Milk, Pencil, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { parseUTCTime } from '../utils/parseTime';
 
 // Helper to parse UTC time
-const parseUTCTime = (timeStr: any): Date => {
-    if (!timeStr) return new Date();
-    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-    return new Date(utcTime);
-};
 
 interface PumpingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PumpingModal({ babyId, editEvent, onClose, onSave }: PumpingModalProps) {
