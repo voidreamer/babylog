@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 import {
     TrendingUp, TrendingDown, Clock, Moon, Baby, Droplets,
     AlertCircle, CheckCircle2, Lock, Calendar, Minus, Activity
@@ -73,12 +72,11 @@ export function TrendIcon({ trend }: { trend: string }) {
 
 interface PredictionsSectionProps { predictions: any; isPremium: boolean; }
 export function PredictionsSection({ predictions, isPremium }: PredictionsSectionProps) {
-    const { t } = useTranslation('health');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <Clock size={18} />
-                <span>{t('insights.predictions.title')}</span>
+                <span>Predictions</span>
                 {!isPremium && <Lock size={14} className="premium-lock" />}
             </h2>
 
@@ -93,7 +91,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                             <Baby size={24} />
                         </div>
                         <div className="insight-card-content">
-                            <span className="insight-card-label">{t('insights.predictions.nextFeeding')}</span>
+                            <span className="insight-card-label">Next Feeding</span>
                             <span className="insight-card-value">
                                 {formatPrediction(predictions.next_feeding)?.text}
                             </span>
@@ -106,7 +104,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                                 </span>
                             )}
                             {predictions.next_feeding.past_due && (
-                                <span className="insight-card-alert">{t('insights.predictions.mayBeHungry')}</span>
+                                <span className="insight-card-alert">May be hungry!</span>
                             )}
                         </div>
                     </motion.div>
@@ -123,7 +121,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                             <Moon size={24} />
                         </div>
                         <div className="insight-card-content">
-                            <span className="insight-card-label">{t('insights.predictions.nextNap')}</span>
+                            <span className="insight-card-label">Next Nap</span>
                             <span className="insight-card-value">
                                 {formatNapPrediction(predictions.next_nap)?.text}
                             </span>
@@ -175,7 +173,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                             </div>
                         </div>
                         <div className="insight-card-content">
-                            <span className="insight-card-label">{t('insights.predictions.sleepPressure')}</span>
+                            <span className="insight-card-label">Sleep Pressure</span>
                             <span className="insight-card-value">
                                 {predictions.sleep_pressure.label}
                             </span>
@@ -193,7 +191,7 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
             {!isPremium && (
                 <div className="premium-overlay">
                     <Lock size={20} />
-                    <span>{t('insights.predictions.upgradeToSee')}</span>
+                    <span>Upgrade to see predictions</span>
                 </div>
             )}
         </section>
@@ -202,12 +200,11 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
 
 interface PatternsSectionProps { patterns: any; isPremium: boolean; }
 export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
-    const { t } = useTranslation('health');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <TrendingUp size={18} />
-                <span>{t('insights.patterns.title')}</span>
+                <span>Patterns</span>
                 {!isPremium && <Lock size={14} className="premium-lock" />}
             </h2>
 
@@ -250,7 +247,7 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
             {!isPremium && (
                 <div className="premium-overlay">
                     <Lock size={20} />
-                    <span>{t('insights.patterns.upgradeToSee')}</span>
+                    <span>Upgrade to see patterns</span>
                 </div>
             )}
         </section>
@@ -259,7 +256,6 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
 
 interface TrendsSectionProps { trends: any; isPremium: boolean; }
 export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
-    const { t } = useTranslation('health');
     if (!trends || (trends.sleep?.trend === 'insufficient_data' && trends.feeding?.trend === 'insufficient_data')) {
         return null;
     }
@@ -268,7 +264,7 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <Activity size={18} />
-                <span>{t('insights.trends.title')}</span>
+                <span>14-Day Trends</span>
                 {!isPremium && <Lock size={14} className="premium-lock" />}
             </h2>
 
@@ -299,7 +295,7 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
             {!isPremium && (
                 <div className="premium-overlay">
                     <Lock size={20} />
-                    <span>{t('insights.trends.upgradeToSee')}</span>
+                    <span>Upgrade to see trends</span>
                 </div>
             )}
         </section>
@@ -308,12 +304,11 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
 
 interface BenchmarksSectionProps { benchmarks: any; today_vs_average: any; }
 export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSectionProps) {
-    const { t } = useTranslation('health');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <CheckCircle2 size={18} />
-                <span>{t('insights.benchmarks.title')}</span>
+                <span>Age Guidelines</span>
                 <span className="age-badge">{benchmarks?.age_weeks} weeks</span>
             </h2>
 
@@ -322,7 +317,7 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
                 <div className="benchmark-card">
                     <div className="benchmark-header">
                         <Droplets size={20} style={{ color: 'var(--diaper)' }} />
-                        <span>{t('insights.benchmarks.diapersToday')}</span>
+                        <span>Diapers Today</span>
                     </div>
                     <div className="benchmark-comparison">
                         <div className="benchmark-actual">
@@ -353,7 +348,7 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
                 <div className="benchmark-card">
                     <div className="benchmark-header">
                         <Moon size={20} style={{ color: 'var(--sleep)' }} />
-                        <span>{t('insights.benchmarks.sleepToday')}</span>
+                        <span>Sleep Today</span>
                     </div>
                     <div className="benchmark-comparison">
                         <div className="benchmark-actual">
@@ -375,7 +370,7 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
                 <div className="benchmark-card">
                     <div className="benchmark-header">
                         <Baby size={20} style={{ color: 'var(--feeding)' }} />
-                        <span>{t('insights.benchmarks.feedingsToday')}</span>
+                        <span>Feedings Today</span>
                     </div>
                     <div className="benchmark-comparison">
                         <div className="benchmark-actual">
@@ -408,17 +403,16 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
 
 interface TodayVsAverageSectionProps { today_vs_average: any; }
 export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectionProps) {
-    const { t } = useTranslation('health');
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <Calendar size={18} />
-                <span>{t('insights.todayVsAverage.title')}</span>
+                <span>Today vs. Your Average</span>
             </h2>
 
             <div className="insights-comparison-grid">
                 <div className="comparison-item">
-                    <span className="comparison-label">{t('insights.todayVsAverage.feedings')}</span>
+                    <span className="comparison-label">Feedings</span>
                     <div className="comparison-values">
                         <span className="comparison-today">{today_vs_average?.feedings?.today}</span>
                         <span className="comparison-vs">vs</span>
@@ -426,7 +420,7 @@ export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectio
                     </div>
                 </div>
                 <div className="comparison-item">
-                    <span className="comparison-label">{t('insights.todayVsAverage.diapers')}</span>
+                    <span className="comparison-label">Diapers</span>
                     <div className="comparison-values">
                         <span className="comparison-today">{today_vs_average?.diapers?.today}</span>
                         <span className="comparison-vs">vs</span>
@@ -434,7 +428,7 @@ export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectio
                     </div>
                 </div>
                 <div className="comparison-item">
-                    <span className="comparison-label">{t('insights.todayVsAverage.sleep')}</span>
+                    <span className="comparison-label">Sleep</span>
                     <div className="comparison-values">
                         <span className="comparison-today">{today_vs_average?.sleep_hours?.today}h</span>
                         <span className="comparison-vs">vs</span>

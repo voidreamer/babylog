@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
@@ -13,7 +12,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
 import Learn from './components/Learn';
-import LanguageSwitcher from './components/LanguageSwitcher';
 
 // Lazy load routes for bundle splitting
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -27,43 +25,30 @@ import { Toaster, toast } from 'sonner';
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
 interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; promoCode: string; setPromoCode: (v: string) => void; promoLoading: boolean; handlePromoCode: () => void; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; }
 function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setPromoCode, promoLoading, handlePromoCode, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout }: SettingsPageProps) {
-    const { t } = useTranslation(['settings', 'common']);
     return (
         <div className="settings-page">
-            <h2 style={{ marginBottom: 'var(--space-lg)' }}>{t('settings:title')}</h2>
+            <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
 
             {/* Preferences */}
             <div className="settings-group">
-                <div className="settings-group-title">{t('settings:preferences')}</div>
+                <div className="settings-group-title">Preferences</div>
                 <div className="settings-row" onClick={toggleTheme}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box peach">
                             <Moon size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:darkMode')}</div>
-                            <div className="settings-row-desc">{t('settings:darkModeDesc')}</div>
+                            <div className="settings-row-label">Dark Mode</div>
+                            <div className="settings-row-desc">Easier on eyes at night</div>
                         </div>
                     </div>
                     <div className={`toggle-switch ${isDark ? 'active' : ''}`} />
-                </div>
-                <div className="settings-row">
-                    <div className="settings-row-left">
-                        <div className="settings-icon-box sky">
-                            <Home size={16} />
-                        </div>
-                        <div>
-                            <div className="settings-row-label">{t('settings:language')}</div>
-                            <div className="settings-row-desc">{t('settings:languageDesc')}</div>
-                        </div>
-                    </div>
-                    <LanguageSwitcher />
                 </div>
             </div>
 
             {/* Account */}
             <div className="settings-group">
-                <div className="settings-group-title">{t('settings:account')}</div>
+                <div className="settings-group-title">Account</div>
                 {user && (
                     <div className="settings-row">
                         <div className="settings-row-left">
@@ -72,7 +57,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                             </div>
                             <div>
                                 <div className="settings-row-label">{user.email}</div>
-                                <div className="settings-row-desc">{t('settings:signedIn')}</div>
+                                <div className="settings-row-desc">Signed in</div>
                             </div>
                         </div>
                     </div>
@@ -83,16 +68,16 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                             <Star size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:premiumPlan')}</div>
+                            <div className="settings-row-label">Premium Plan</div>
                             <div className="settings-row-desc">
-                                {isPremium ? t('settings:premiumActive') : t('settings:unlockAiInsights')}
+                                {isPremium ? 'Active' : 'Unlock AI insights'}
                             </div>
                         </div>
                     </div>
                     {isPremium ? (
-                        <span className="settings-badge mint">{t('settings:premiumActive')}</span>
+                        <span className="settings-badge mint">Active</span>
                     ) : (
-                        <span className="settings-badge lavender">{t('settings:upgrade')}</span>
+                        <span className="settings-badge lavender">Upgrade</span>
                     )}
                 </div>
                 {!isPremium && (
@@ -100,7 +85,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                         <input
                             type="text"
                             className="form-input"
-                            placeholder={t('settings:enterPromoCode')}
+                            placeholder="Enter promo code..."
                             value={promoCode}
                             onChange={(e) => setPromoCode(e.target.value)}
                         />
@@ -109,7 +94,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                             onClick={handlePromoCode}
                             disabled={!promoCode.trim() || promoLoading}
                         >
-                            {promoLoading ? '...' : t('common:apply')}
+                            {promoLoading ? '...' : 'Apply'}
                         </button>
                     </div>
                 )}
@@ -117,7 +102,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
 
             {/* Data */}
             <div className="settings-group">
-                <div className="settings-group-title">{t('settings:data')}</div>
+                <div className="settings-group-title">Data</div>
                 <div
                     className="settings-row"
                     onClick={handleExportCsv}
@@ -128,9 +113,9 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                             <Download size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:exportData')}</div>
+                            <div className="settings-row-label">Export Data</div>
                             <div className="settings-row-desc">
-                                {exportLoading ? t('settings:exporting') : t('settings:downloadCsv')}
+                                {exportLoading ? 'Exporting...' : 'Download as CSV'}
                             </div>
                         </div>
                     </div>
@@ -140,7 +125,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
 
             {/* Support */}
             <div className="settings-group">
-                <div className="settings-group-title">{t('settings:support')}</div>
+                <div className="settings-group-title">Support</div>
                 <button
                     className="settings-row"
                     onClick={() => setShowPrivacyPolicy(true)}
@@ -150,7 +135,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                             <Shield size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:privacyPolicy')}</div>
+                            <div className="settings-row-label">Privacy Policy</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -164,7 +149,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                             <LogOut size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:signOut')}</div>
+                            <div className="settings-row-label">Sign Out</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -205,7 +190,6 @@ function buildHubUrl(session, theme) {
 }
 
 function MainApp() {
-    const { t } = useTranslation(['common', 'settings']);
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
@@ -223,7 +207,7 @@ function MainApp() {
 
     const handlePromoCode = async () => {
         if (!promoCode.trim()) {
-            toast.error(t('common:validationErrors.enterPromoCode'));
+            toast.error('Please enter a promo code');
             return;
         }
 
@@ -231,7 +215,7 @@ function MainApp() {
         const rateLimit = checkRateLimit('promoCode', 3, 60000);
         if (!rateLimit.allowed) {
             const timeLeft = getTimeUntilReset(rateLimit.resetTime);
-            toast.error(t('common:errors.tooManyAttempts', { time: timeLeft }));
+            toast.error(`Too many attempts. Please wait ${timeLeft} and try again.`);
             return;
         }
 
@@ -247,12 +231,12 @@ function MainApp() {
                 setPromoCode('');
                 // Clear rate limit on success so user isn't penalized
                 clearRateLimit('promoCode');
-                toast.success(result.message || t('common:premium.unlocked'));
+                toast.success(result.message || 'Premium unlocked!');
             } else {
-                toast.error(result.message || t('common:premium.invalidCode'));
+                toast.error(result.message || 'Invalid code');
             }
         } catch (_error) {
-            toast.error(t('common:premium.failedToVerify'));
+            toast.error('Failed to verify code. Please try again.');
         } finally {
             setPromoLoading(false);
         }
@@ -260,7 +244,7 @@ function MainApp() {
 
     const handleExportCsv = async () => {
         if (!babies || babies.length === 0) {
-            toast.error(t('common:validationErrors.noBabyData'));
+            toast.error('No baby data to export');
             return;
         }
 
@@ -269,9 +253,9 @@ function MainApp() {
             // Export current baby's data
             const currentBaby = babies[0];
             await api.exportBabyDataCsv(currentBaby.id);
-            toast.success(t('common:export.complete'));
+            toast.success('Export complete! Check your downloads folder.');
         } catch (error) {
-            toast.error(t('common:export.failed', { error: (error as Error).message }));
+            toast.error('Export failed: ' + (error as Error).message);
         } finally {
             setExportLoading(false);
         }
@@ -348,9 +332,10 @@ function MainApp() {
                 />
                 <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
                     <div className="empty-state-icon">📡</div>
-                    <h2 className="empty-state-title">{t('common:offline.youreOffline')}</h2>
+                    <h2 className="empty-state-title">You're Offline</h2>
                     <p className="empty-state-text">
-                        {t('common:offline.offlineMessage')}
+                        Connect to the internet to load your baby data.
+                        Your data will sync automatically when you're back online.
                     </p>
                 </div>
             </div>
@@ -380,9 +365,9 @@ function MainApp() {
                 <div className="header-left">
                     <a href={buildHubUrl(session, theme)} className="hub-back-link">
                         <ArrowLeft size={16} />
-                        <span>{t('common:hub')}</span>
+                        <span>Hub</span>
                     </a>
-                    <span className="header-title">{t('common:babyTracker')}</span>
+                    <span className="header-title">Baby Tracker</span>
                 </div>
                 <div className="header-actions">
                     <button className="btn-icon theme-toggle" onClick={toggleTheme}>
@@ -397,14 +382,14 @@ function MainApp() {
                 onSync={syncPendingChanges}
             />
             <main>
-                {activeTab === 'home' && (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Dashboard />
-                    </Suspense>
-                )}
+                {activeTab === 'home' && <Dashboard />}
                 {activeTab === 'timeline' && <TimelineCalendar />}
                 {activeTab === 'health' && (
-                    <Suspense fallback={<LoadingSpinner />}>
+                    <Suspense fallback={
+                        <div className="loading">
+                            <div className="spinner"></div>
+                        </div>
+                    }>
                         <Health />
                     </Suspense>
                 )}
@@ -435,35 +420,35 @@ function MainApp() {
                     onClick={() => setActiveTab('home')}
                 >
                     <Home size={22} />
-                    <span>{t('common:nav.home')}</span>
+                    <span>Home</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
                     onClick={() => setActiveTab('timeline')}
                 >
                     <Clock size={22} />
-                    <span>{t('common:nav.timeline')}</span>
+                    <span>Timeline</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
                     onClick={() => setActiveTab('health')}
                 >
                     <Activity size={22} />
-                    <span>{t('common:nav.health')}</span>
+                    <span>Health</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
                     onClick={() => setActiveTab('learn')}
                 >
                     <PieChart size={22} />
-                    <span>{t('common:nav.insights')}</span>
+                    <span>Insights</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
                     onClick={() => setActiveTab('settings')}
                 >
                     <SettingsIcon size={22} />
-                    <span>{t('common:nav.settings')}</span>
+                    <span>Settings</span>
                 </button>
             </nav>
         </div>

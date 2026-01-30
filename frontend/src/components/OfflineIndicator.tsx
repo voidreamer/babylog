@@ -6,11 +6,9 @@
  */
 
 import { WifiOff, RefreshCw, Cloud, CloudOff } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 interface OfflineIndicatorProps { online: boolean; syncing: boolean; pendingCount: number; onSync: () => void; }
 export function OfflineIndicator({ online, syncing, pendingCount, onSync }: OfflineIndicatorProps) {
-    const { t } = useTranslation('common');
     // Don't show anything if online and no pending changes
     if (online && pendingCount === 0 && !syncing) {
         return null;
@@ -40,22 +38,22 @@ export function OfflineIndicator({ online, syncing, pendingCount, onSync }: Offl
             {!online ? (
                 <>
                     <WifiOff size={16} />
-                    <span>{t('offline.youreOffline')}</span>
+                    <span>You're offline</span>
                     {pendingCount > 0 && (
                         <span style={{ opacity: 0.8 }}>
-                            • {t('offline.changesPending', { count: pendingCount })}
+                            • {pendingCount} change{pendingCount !== 1 ? 's' : ''} pending
                         </span>
                     )}
                 </>
             ) : syncing ? (
                 <>
                     <RefreshCw size={16} className="spin" />
-                    <span>{t('offline.syncingChanges')}</span>
+                    <span>Syncing changes...</span>
                 </>
             ) : pendingCount > 0 ? (
                 <>
                     <Cloud size={16} />
-                    <span>{t('offline.changesToSync', { count: pendingCount })}</span>
+                    <span>{pendingCount} change{pendingCount !== 1 ? 's' : ''} to sync</span>
                     <button
                         onClick={onSync}
                         style={{

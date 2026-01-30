@@ -4,12 +4,10 @@ import { Star, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
-import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatDate';
 
 interface MilestonesCardProps { baby: any; milestones: any[]; onMilestoneAdded?: () => void; onMilestoneDeleted?: () => void; }
 export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onMilestoneDeleted }: MilestonesCardProps) {
-    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -24,7 +22,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
         e.preventDefault();
 
         if (!formData.milestone.trim()) {
-            toast.error(t('milestones.whatMilestone'));
+            toast.error('Please describe the milestone');
             return;
         }
 
@@ -37,7 +35,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             };
 
             await api.createMilestone(data);
-            toast.success(t('milestones.milestoneAdded'));
+            toast.success('Milestone added!');
             setFormData({ milestone: '', date: new Date().toISOString().split('T')[0] });
             setIsAdding(false);
             if (onMilestoneAdded) onMilestoneAdded();
@@ -51,7 +49,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
     const handleDelete = async (id: number) => {
         try {
             await api.deleteMilestone(id);
-            toast.success(t('milestones.milestoneDeleted'));
+            toast.success('Milestone deleted');
             if (onMilestoneDeleted) onMilestoneDeleted();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -74,7 +72,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                     Milestones
                 </h3>
                 {milestones?.length > 5 && (
-                    <span className="health-card-count">{t('milestones.total', { count: milestones.length })}</span>
+                    <span className="health-card-count">{milestones.length} total</span>
                 )}
             </div>
 
@@ -98,7 +96,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                     ))}
                 </div>
             ) : (
-                <p className="health-card-empty">{t('milestones.noMilestones')}</p>
+                <p className="health-card-empty">No milestones recorded yet</p>
             )}
 
             {/* Inline Quick Entry */}
@@ -106,7 +104,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                 <form onSubmit={handleSubmit} className="milestone-quick-entry">
                     <input
                         type="text"
-                        placeholder={t('milestones.whatMilestone')}
+                        placeholder="What milestone? (e.g., First steps)"
                         value={formData.milestone}
                         onChange={(e) => setFormData({ ...formData, milestone: e.target.value })}
                         className="milestone-input"

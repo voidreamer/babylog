@@ -4,7 +4,6 @@ import { AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
-import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatDate';
 
 const COMMON_ALLERGENS = [
@@ -27,7 +26,6 @@ const SEVERITY_LEVELS = [
 
 interface AllergiesCardProps { baby: any; allergies: any[]; onAllergyAdded?: () => void; onAllergyDeleted?: () => void; }
 export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAllergyDeleted }: AllergiesCardProps) {
-    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -42,7 +40,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
         e.preventDefault();
 
         if (!formData.allergen.trim()) {
-            toast.error(t('allergies.enterAllergen'));
+            toast.error('Please enter the allergen');
             return;
         }
 
@@ -60,7 +58,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             };
 
             await api.createAllergy(data);
-            toast.success(t('allergies.allergyRecorded'));
+            toast.success('Allergy recorded');
             setFormData({
                 allergen: '',
                 severity: 'mild',
@@ -80,7 +78,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
     const handleDelete = async (id: number) => {
         try {
             await api.deleteAllergy(id);
-            toast.success(t('allergies.allergyRemoved'));
+            toast.success('Allergy removed');
             if (onAllergyDeleted) onAllergyDeleted();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -112,7 +110,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     Allergies
                 </h3>
                 {allergies?.length > 0 && (
-                    <span className="health-card-count">{t('allergies.known', { count: allergies.length })}</span>
+                    <span className="health-card-count">{allergies.length} known</span>
                 )}
             </div>
 
@@ -147,7 +145,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     ))}
                 </div>
             ) : (
-                <p className="health-card-empty">{t('allergies.noAllergies')}</p>
+                <p className="health-card-empty">No known allergies</p>
             )}
 
             {/* Add Form */}
@@ -156,7 +154,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     <div className="allergy-form-main">
                         <input
                             type="text"
-                            placeholder={t('allergies.allergenPlaceholder')}
+                            placeholder="Allergen (e.g., Peanuts)"
                             value={formData.allergen}
                             onChange={(e) => setFormData({ ...formData, allergen: e.target.value })}
                             className="allergy-input"
@@ -185,7 +183,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
 
                     <input
                         type="text"
-                        placeholder={t('allergies.reactionPlaceholder')}
+                        placeholder="Reaction (e.g., hives, swelling)"
                         value={formData.reaction}
                         onChange={(e) => setFormData({ ...formData, reaction: e.target.value })}
                         className="allergy-reaction-input"
@@ -204,7 +202,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     </div>
 
                     <textarea
-                        placeholder={t('allergies.additionalNotes')}
+                        placeholder="Additional notes..."
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="allergy-notes-input"

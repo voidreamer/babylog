@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Baby, AlertCircle, Sparkles } from 'lucide-react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
-import { useTranslation } from 'react-i18next';
 import {
     PredictionsSection,
     PatternsSection,
@@ -16,7 +15,6 @@ import {
 interface BabyInsightsProps { isPremium?: boolean; }
 export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     const { selectedBaby } = useBaby();
-    const { t } = useTranslation('health');
     const [analytics, setAnalytics] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -51,7 +49,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
         return (
             <div className="insights-empty">
                 <Baby size={48} />
-                <p>{t('insights.selectBaby')}</p>
+                <p>Select a baby to see insights</p>
             </div>
         );
     }
@@ -60,7 +58,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
         return (
             <div className="insights-loading">
                 <div className="spinner"></div>
-                <p>{t('insights.analyzingPatterns')}</p>
+                <p>Analyzing patterns...</p>
             </div>
         );
     }
@@ -84,12 +82,13 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
                 <div className="insights-collecting-icon">
                     <Sparkles size={48} />
                 </div>
-                <h3>{t('insights.collectingData')}</h3>
+                <h3>Collecting Data</h3>
                 <p>
-                    {t('insights.collectingDataDesc')}
+                    Keep tracking for a few more days! We need at least 3-5 days of data
+                    to identify patterns and make predictions.
                 </p>
                 <div className="insights-collecting-progress">
-                    <span>{t('insights.dataPoints', { feedings: analytics?.data_points?.feedings || 0, sleeps: analytics?.data_points?.sleeps || 0 })}</span>
+                    <span>Data points: {analytics?.data_points?.feedings || 0} feedings, {analytics?.data_points?.sleeps || 0} sleeps</span>
                 </div>
             </motion.div>
         );

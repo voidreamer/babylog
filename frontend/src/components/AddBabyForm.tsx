@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { Scale, Ruler } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 /**
  * Reusable baby form component used by both Onboarding wizard and BabySelector.
@@ -27,7 +26,6 @@ export default function AddBabyForm({
     compact = false,
     initialData = null,
 }: AddBabyFormProps) {
-    const { t } = useTranslation('common');
     const [name, setName] = useState(initialData?.name || '');
     const [birthDate, setBirthDate] = useState(initialData?.birth_date ? initialData.birth_date.split('T')[0] : '');
     const [gender, setGender] = useState(initialData?.gender || '');
@@ -50,11 +48,11 @@ export default function AddBabyForm({
     return (
         <form onSubmit={handleSubmit} className={compact ? 'baby-form-compact' : ''}>
             <div className="form-group">
-                <label className="form-label">{t('form.babysName')} *</label>
+                <label className="form-label">Baby's Name *</label>
                 <input
                     type="text"
                     className="form-input"
-                    placeholder={t('form.enterName')}
+                    placeholder="Enter name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     autoFocus
@@ -63,7 +61,7 @@ export default function AddBabyForm({
             </div>
 
             <div className="form-group">
-                <label className="form-label">{t('form.birthDate')} *</label>
+                <label className="form-label">Birth Date *</label>
                 <input
                     type="date"
                     className="form-input"
@@ -74,7 +72,7 @@ export default function AddBabyForm({
             </div>
 
             <div className="form-group">
-                <label className="form-label">{t('form.gender')}</label>
+                <label className="form-label">Gender</label>
                 <div className="gender-selector">
                     <button
                         type="button"
@@ -91,17 +89,17 @@ export default function AddBabyForm({
                         Girl
                     </button>
                 </div>
-                <p className="form-hint">{t('form.genderHint')}</p>
+                <p className="form-hint">Optional - helps with accurate growth charts</p>
             </div>
 
             <div className="onboarding-section-label">
-                <span>{t('form.birthMeasurements')}</span>
+                <span>Birth Measurements (optional)</span>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
                     <label className="form-label">
-                        <Scale size={14} /> {t('form.weight')}
+                        <Scale size={14} /> Weight (kg)
                     </label>
                     <input
                         type="number"
@@ -114,7 +112,7 @@ export default function AddBabyForm({
                 </div>
                 <div className="form-group">
                     <label className="form-label">
-                        <Ruler size={14} /> {t('form.height')}
+                        <Ruler size={14} /> Height (cm)
                     </label>
                     <input
                         type="number"
@@ -142,7 +140,7 @@ export default function AddBabyForm({
                     className={`btn btn-primary ${!showCancel ? 'btn-lg' : ''}`}
                     disabled={saving || !name.trim()}
                 >
-                    {saving ? t('saving') : submitLabel}
+                    {saving ? 'Saving...' : submitLabel}
                 </button>
             </div>
         </form>

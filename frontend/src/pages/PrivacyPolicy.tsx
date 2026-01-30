@@ -1,24 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Shield, ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 interface PrivacyPolicyProps { onBack?: () => void; }
 export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
-    const { t } = useTranslation('settings');
     return (
         <div className="legal-page">
             <div className="legal-header">
                 {onBack && (
                     <button className="btn-link legal-back" onClick={onBack}>
                         <ArrowLeft size={18} />
-                        <span>{t('privacy.back')}</span>
+                        <span>Back</span>
                     </button>
                 )}
                 <div className="legal-icon">
                     <Shield size={32} />
                 </div>
-                <h1 className="legal-title">{t('privacy.title')}</h1>
-                <p className="legal-updated">{t('privacy.lastUpdated')}</p>
+                <h1 className="legal-title">Privacy Policy</h1>
+                <p className="legal-updated">Last updated: January 2026</p>
             </div>
 
             <div className="legal-content">

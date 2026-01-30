@@ -4,7 +4,6 @@ import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Droplets, CircleDot, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr: any): Date => {
@@ -16,7 +15,6 @@ const parseUTCTime = (timeStr: any): Date => {
 interface DiaperModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function DiaperModal({ babyId, editEvent, onClose, onSave }: DiaperModalProps) {
     const isEditing = !!editEvent;
-    const { t } = useTranslation('common');
     const [type, setType] = useState('pee');
     const [time, setTime] = useState(new Date());
     const [pooColor, setPooColor] = useState('');
@@ -63,7 +61,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to save diaper change');
         } finally {
             setSaving(false);
         }
@@ -98,35 +96,35 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editDiaper') : t('logDiaper')}</h2>
+                    <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Diaper Change</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
                         <div className="form-group">
-                            <label className="form-label">{t('type')}</label>
+                            <label className="form-label">Type</label>
                             <div className="type-selector">
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'pee' ? 'active' : ''}`}
                                     onClick={() => setType('pee')}
                                 >
-                                    <Droplets size={16} /> {t('diaperTypes.pee')}
+                                    <Droplets size={16} /> Pee
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'poo' ? 'active' : ''}`}
                                     onClick={() => setType('poo')}
                                 >
-                                    <CircleDot size={16} /> {t('diaperTypes.poo')}
+                                    <CircleDot size={16} /> Poo
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'mixed' ? 'active' : ''}`}
                                     onClick={() => setType('mixed')}
                                 >
-                                    <RefreshCw size={16} /> {t('diaperTypes.mixed')}
+                                    <RefreshCw size={16} /> Both
                                 </button>
                             </div>
                         </div>
@@ -134,7 +132,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                         {showPooDetails && (
                             <>
                                 <div className="form-group">
-                                    <label className="form-label">{t('color')}</label>
+                                    <label className="form-label">Color</label>
                                     <div className="type-selector" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
                                         {colorOptions.map(opt => (
                                             <button
@@ -165,7 +163,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">{t('consistency')}</label>
+                                    <label className="form-label">Consistency</label>
                                     <div className="type-selector" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
                                         {consistencyOptions.map(opt => (
                                             <button
@@ -186,7 +184,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">{t('amount')}</label>
+                                    <label className="form-label">Amount</label>
                                     <div className="type-selector">
                                         {amountOptions.map(opt => (
                                             <button
@@ -209,16 +207,16 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                         )}
 
                         <div className="form-group">
-                            <label className="form-label">{t('time')}</label>
+                            <label className="form-label">Time</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">{t('notes')}</label>
+                            <label className="form-label">Notes</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder={t('notesOptional')}
+                                placeholder="Optional notes..."
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />
@@ -230,7 +228,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? t('saving') : t('saveDiaperChange')}
+                            {saving ? 'Saving...' : 'Save Diaper Change'}
                         </button>
                     </div>
                 </form>

@@ -4,12 +4,10 @@ import { useState } from 'react';
 import { Droplets, CircleDot, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
 
 
 interface DiaperWidgetProps { babyId: number; lastDiaper: any; onDiaperChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpenModal, quickActionsEnabled = true }: DiaperWidgetProps) {
-    const { t } = useTranslation('common');
     const [saving, setSaving] = useState<string | null>(null); // null or 'pee'|'poo'|'mixed'
 
     const handleQuickLog = async (type: string, e: React.MouseEvent) => {
@@ -25,11 +23,11 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                 poo_amount: null,
                 notes: null,
             });
-            toast.success(t('diaperLogged', { type: t(`diaperTypes.${type}`) }));
+            toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} diaper logged`);
             onDiaperChange();
         } catch (error) {
             console.error('Failed to log diaper:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to log diaper');
         } finally {
             setSaving(null);
         }
@@ -40,7 +38,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
     // Format last diaper type for display
     const getLastDiaperType = () => {
         if (!lastDiaper?.type) return null;
-        const typeMap: Record<string, string> = { pee: t('diaperTypes.pee'), poo: t('diaperTypes.poo'), mixed: t('diaperTypes.mixed') };
+        const typeMap: Record<string, string> = { pee: 'Pee', poo: 'Poo', mixed: 'Both' };
         return typeMap[lastDiaper.type] || lastDiaper.type;
     };
 
@@ -70,7 +68,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                         alt="diaper"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
-                    <span className="widget-label">{t('widgets.diaper')}</span>
+                    <span className="widget-label">Diaper</span>
                 </div>
 
                 {lastDiaper ? (
@@ -79,7 +77,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                         <div className="widget-detail">{getLastDiaperType()}</div>
                     </>
                 ) : !quickActionsEnabled ? (
-                    <div className="widget-time-ago">{t('noDiapersYet')}</div>
+                    <div className="widget-time-ago">No diapers yet</div>
                 ) : null}
 
                 {/* Quick action buttons */}
@@ -91,7 +89,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                             disabled={saving !== null}
                         >
                             <Droplets size={14} />
-                            {saving === 'pee' ? '...' : t('diaperTypes.pee')}
+                            {saving === 'pee' ? '...' : 'Pee'}
                         </button>
                         <button
                             className="diaper-quick-btn poo"
@@ -99,14 +97,14 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                             disabled={saving !== null}
                         >
                             <CircleDot size={14} />
-                            {saving === 'poo' ? '...' : t('diaperTypes.poo')}
+                            {saving === 'poo' ? '...' : 'Poo'}
                         </button>
                         <button
                             className="diaper-quick-btn mixed"
                             onClick={(e) => handleQuickLog('mixed', e)}
                             disabled={saving !== null}
                         >
-                            {saving === 'mixed' ? '...' : t('diaperTypes.mixed')}
+                            {saving === 'mixed' ? '...' : 'Both'}
                         </button>
                     </div>
                 )}

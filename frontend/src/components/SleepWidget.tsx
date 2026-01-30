@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Moon, Sun, Plus, Clock } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
 
 // Format elapsed time as "Xh Ym" or "Ym"
 function formatElapsedTime(startTimeStr: string | null): string {
@@ -24,7 +23,6 @@ function formatElapsedTime(startTimeStr: string | null): string {
 
 interface SleepWidgetProps { babyId: number; currentSleep: any; lastSleep: any; onSleepChange: () => void; onOpenModal: () => void; }
 export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepChange, onOpenModal }: SleepWidgetProps) {
-    const { t } = useTranslation('common');
     const [saving, setSaving] = useState(false);
     const [elapsed, setElapsed] = useState('');
     const isSleeping = !!currentSleep;
@@ -52,11 +50,11 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                 end_time: null,
                 notes: null,
             });
-            toast.success(t('sleepStarted'));
+            toast.success('Sleep started');
             onSleepChange();
         } catch (error) {
             console.error('Failed to start sleep:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to start sleep');
         } finally {
             setSaving(false);
         }
@@ -68,11 +66,11 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
         setSaving(true);
         try {
             await api.endSleep(currentSleep.id);
-            toast.success(t('babyIsAwake'));
+            toast.success('Baby is awake!');
             onSleepChange();
         } catch (error) {
             console.error('Failed to end sleep:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to end sleep');
         } finally {
             setSaving(false);
         }
@@ -109,7 +107,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                         alt="sleep"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
-                    <span className="widget-label">{isSleeping ? t('sleepStates.sleeping') : t('widgets.sleep')}</span>
+                    <span className="widget-label">{isSleeping ? 'Sleeping' : 'Sleep'}</span>
                 </div>
 
                 {isSleeping ? (
@@ -125,7 +123,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                             disabled={saving}
                         >
                             <Sun size={16} />
-                            {saving ? t('waking') : t('wakeUp')}
+                            {saving ? 'Waking...' : 'Wake Up'}
                         </button>
                     </div>
                 ) : (
@@ -140,7 +138,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                             disabled={saving}
                         >
                             <Moon size={16} />
-                            {saving ? t('starting') : t('startSleep')}
+                            {saving ? 'Starting...' : 'Start Sleep'}
                         </button>
                     </div>
                 )}

@@ -5,7 +5,6 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { CircleDot } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -29,7 +28,6 @@ const typeOptions = [
 interface PottyModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PottyModal({ editEvent, onClose, onSave }: PottyModalProps) {
     const { selectedBaby } = useBaby();
-    const { t } = useTranslation('common');
     const isEditing = !!editEvent;
     const [result, setResult] = useState('success');
     const [pottyType, setPottyType] = useState('');
@@ -70,7 +68,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
             onSave();
         } catch (error) {
             console.error('Failed to log potty:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to save potty');
         } finally {
             setSaving(false);
         }
@@ -80,7 +78,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editPotty') : t('logPotty')}</h2>
+                    <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Potty</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -88,7 +86,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
                     <div className="modal-body">
                         {/* Result */}
                         <div className="form-group">
-                            <label className="form-label">{t('result')}</label>
+                            <label className="form-label">Result</label>
                             <div className="type-selector">
                                 {resultOptions.map((opt) => (
                                     <button
@@ -106,7 +104,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
 
                         {/* Type */}
                         <div className="form-group">
-                            <label className="form-label">{t('pottyType')}</label>
+                            <label className="form-label">Type (optional)</label>
                             <div className="type-selector">
                                 {typeOptions.map((opt) => (
                                     <button
@@ -123,17 +121,17 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
 
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">{t('time')}</label>
+                            <label className="form-label">Time</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">{t('notes')} ({t('optional')})</label>
+                            <label className="form-label">Notes (optional)</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder={t('anyNotes')}
+                                placeholder="Any notes..."
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />
@@ -145,7 +143,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? t('saving') : t('save')}
+                            {saving ? 'Saving...' : 'Save'}
                         </button>
                     </div>
                 </form>

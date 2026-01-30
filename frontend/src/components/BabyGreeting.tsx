@@ -6,7 +6,6 @@ import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil } from 'luci
 import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
 
 // Get time-based greeting
 function getGreeting() {
@@ -68,7 +67,6 @@ function getAvatarColor(name: string | null): string {
 interface BabyGreetingProps { summary: any; latestGrowth: any; }
 export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProps) {
     const { babies, selectedBaby, selectBaby, removeBaby, refresh } = useBaby();
-    const { t } = useTranslation('common');
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
@@ -104,10 +102,10 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
 
             await refresh();
             setShowAddForm(false);
-            toast.success(t('baby.babyAdded', { name: formData.name }));
+            toast.success(`${formData.name} added!`);
         } catch (error) {
             console.error('Failed to add baby:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to add baby');
         } finally {
             setSaving(false);
         }
@@ -125,10 +123,10 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
 
             await refresh();
             setShowEditForm(false);
-            toast.success(t('baby.babyUpdated', { name: formData.name }));
+            toast.success(`${formData.name} updated!`);
         } catch (error) {
             console.error('Failed to update baby:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to update baby');
         } finally {
             setSaving(false);
         }
@@ -140,10 +138,10 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
             <div className="baby-greeting baby-greeting-empty">
                 <div className="baby-greeting-header">
                     <span className="greeting-icon">👶</span>
-                    <span className="greeting-text">{t('baby.welcome')}</span>
+                    <span className="greeting-text">Welcome!</span>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>
-                    {t('baby.addFirstBaby')}
+                    Add your first baby to get started
                 </p>
                 <button
                     className="btn btn-primary"
@@ -157,7 +155,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                     <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
                         <div className="modal" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2 className="modal-title">{t('baby.addBaby')}</h2>
+                                <h2 className="modal-title">Add Baby</h2>
                                 <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                             </div>
                             <div className="modal-body">
@@ -230,7 +228,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 </div>
                                 <span className="baby-dropdown-name">{baby.name}</span>
                                 {!baby.is_owner && (
-                                    <span className="baby-dropdown-shared">{t('baby.shared')}</span>
+                                    <span className="baby-dropdown-shared">Shared</span>
                                 )}
                                 {baby.id === selectedBaby?.id && <Check size={16} />}
                             </div>
@@ -247,7 +245,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 }}
                             >
                                 <Share2 size={16} />
-                                <span>{t('baby.shareBaby', { name: selectedBaby.name })}</span>
+                                <span>Share {selectedBaby.name}</span>
                             </div>
                         )}
 
@@ -260,7 +258,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 }}
                             >
                                 <Pencil size={16} />
-                                <span>{t('baby.editBaby', { name: selectedBaby.name })}</span>
+                                <span>Edit {selectedBaby.name}</span>
                             </div>
                         )}
 
@@ -272,21 +270,21 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                             }}
                         >
                             <Plus size={16} />
-                            <span>{t('baby.addBaby')}</span>
+                            <span>Add Baby</span>
                         </div>
 
                         {selectedBaby?.is_owner && (
                             <div
                                 className="baby-dropdown-item danger"
                                 onClick={() => {
-                                    if (confirm(t('baby.deleteConfirmShort', { name: selectedBaby.name }))) {
+                                    if (confirm(`Delete ${selectedBaby.name}? This removes all data and cannot be undone.`)) {
                                         removeBaby(selectedBaby.id);
                                         setShowDropdown(false);
                                     }
                                 }}
                             >
                                 <Trash2 size={16} />
-                                <span>{t('baby.deleteBaby', { name: selectedBaby.name })}</span>
+                                <span>Delete {selectedBaby.name}</span>
                             </div>
                         )}
                     </div>
@@ -325,7 +323,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                 <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">{t('baby.addBaby')}</h2>
+                            <h2 className="modal-title">Add Baby</h2>
                             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                         </div>
                         <div className="modal-body">
@@ -343,7 +341,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                 <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">{t('baby.editBaby', { name: selectedBaby.name })}</h2>
+                            <h2 className="modal-title">Edit {selectedBaby.name}</h2>
                             <button className="modal-close" onClick={() => setShowEditForm(false)}>×</button>
                         </div>
                         <div className="modal-body">

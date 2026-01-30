@@ -5,7 +5,6 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Sun } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -25,7 +24,6 @@ const durationOptions = [
 interface TummyTimeModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTimeModalProps) {
     const { selectedBaby } = useBaby();
-    const { t } = useTranslation('common');
     const isEditing = !!editEvent;
     const [duration, setDuration] = useState(5);
     const [time, setTime] = useState(new Date());
@@ -63,7 +61,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
             onSave();
         } catch (error) {
             console.error('Failed to log tummy time:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to save tummy time');
         } finally {
             setSaving(false);
         }
@@ -73,7 +71,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('editTummyTime') : t('logTummyTime')}</h2>
+                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Tummy Time</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -81,7 +79,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                     <div className="modal-body">
                         {/* Duration */}
                         <div className="form-group">
-                            <label className="form-label">{t('duration')}</label>
+                            <label className="form-label">Duration</label>
                             <div className="type-selector">
                                 {durationOptions.map((opt) => (
                                     <button
@@ -98,7 +96,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                                 <input
                                     type="number"
                                     className="form-input"
-                                    placeholder={t('customMinutes')}
+                                    placeholder="Custom minutes"
                                     value={duration}
                                     onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
                                     min="1"
@@ -110,17 +108,17 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
 
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">{t('time')}</label>
+                            <label className="form-label">Time</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">{t('notes')} ({t('optional')})</label>
+                            <label className="form-label">Notes (optional)</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder={t('babysMood')}
+                                placeholder="Baby's mood, etc."
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />
@@ -132,7 +130,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? t('saving') : t('save')}
+                            {saving ? 'Saving...' : 'Save'}
                         </button>
                     </div>
                 </form>

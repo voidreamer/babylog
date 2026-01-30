@@ -2,7 +2,6 @@
 import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Syringe, Stethoscope, Pill, CalendarClock } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const ICONS: Record<string, any> = {
     vaccination: Syringe,
@@ -12,7 +11,6 @@ const ICONS: Record<string, any> = {
 
 interface ComingUpProps { items?: any[]; }
 export default function ComingUp({ items = [] }: ComingUpProps) {
-    const { t } = useTranslation('common');
     if (!items.length) return null;
 
     return (
@@ -24,7 +22,7 @@ export default function ComingUp({ items = [] }: ComingUpProps) {
         >
             <div className="coming-up-header">
                 <CalendarClock size={18} />
-                <h3>{t('comingUp.title')}</h3>
+                <h3>Coming Up</h3>
             </div>
             <div className="coming-up-list">
                 {items.map((item, i) => {
@@ -43,8 +41,8 @@ export default function ComingUp({ items = [] }: ComingUpProps) {
                                 </span>
                             </div>
                             <span className={`coming-up-badge ${item.color}`}>
-                                {item.type === 'medication' ? t('comingUp.active') :
-                                    item.type === 'vaccination' ? t('comingUp.vaccine') : t('comingUp.visit')}
+                                {item.type === 'medication' ? 'Active' :
+                                    item.type === 'vaccination' ? 'Vaccine' : 'Visit'}
                             </span>
                         </div>
                     );

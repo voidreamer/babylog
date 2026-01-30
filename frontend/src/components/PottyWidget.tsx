@@ -5,13 +5,11 @@ import { CircleDot, Plus, Check, X } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
-import { useTranslation } from 'react-i18next';
 
 
 interface PottyWidgetProps { lastPotty: any; onPottyChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, quickActionsEnabled = true }: PottyWidgetProps) {
     const { selectedBaby } = useBaby();
-    const { t } = useTranslation('common');
     const [saving, setSaving] = useState<string | null>(null);
 
     const handleQuickLog = async (result: string, e: React.MouseEvent) => {
@@ -26,11 +24,11 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                 result,
                 notes: null,
             });
-            toast.success(t('pottyLogged', { result: t(`pottyResults.${result}`) }));
+            toast.success(`Potty ${result} logged`);
             onPottyChange();
         } catch (error) {
             console.error('Failed to log potty:', error);
-            toast.error(t('errors.failedToSave'));
+            toast.error('Failed to log potty');
         } finally {
             setSaving(null);
         }
@@ -54,7 +52,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <CircleDot size={24} strokeWidth={2} />
-                    <span className="widget-label">{t('widgets.potty')}</span>
+                    <span className="widget-label">Potty</span>
                 </div>
 
                 {lastPotty ? (
@@ -63,7 +61,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                         <div className="widget-detail">{lastPotty.result}</div>
                     </>
                 ) : !quickActionsEnabled ? (
-                    <div className="widget-time-ago">{t('noPottyYet')}</div>
+                    <div className="widget-time-ago">No potty logs yet</div>
                 ) : null}
 
                 {/* Quick action buttons */}
@@ -76,7 +74,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                             style={{ background: '#16a34a' }}
                         >
                             <Check size={14} />
-                            {saving === 'success' ? '...' : t('yes')}
+                            {saving === 'success' ? '...' : 'Yes'}
                         </button>
                         <button
                             className="diaper-quick-btn poo"
@@ -85,7 +83,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                             style={{ background: '#6b7280' }}
                         >
                             <X size={14} />
-                            {saving === 'attempt' ? '...' : t('pottyResults.attempt')}
+                            {saving === 'attempt' ? '...' : 'Try'}
                         </button>
                     </div>
                 )}
