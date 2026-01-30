@@ -6,6 +6,7 @@ import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil } from 'luci
 import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 // Get time-based greeting
 function getGreeting() {
@@ -66,6 +67,7 @@ function getAvatarColor(name: string | null): string {
 
 interface BabyGreetingProps { summary: any; latestGrowth: any; }
 export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProps) {
+    const { t } = useTranslation('dashboard');
     const { babies, selectedBaby, selectBaby, removeBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -105,7 +107,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
             toast.success(`${formData.name} added!`);
         } catch (error) {
             console.error('Failed to add baby:', error);
-            toast.error('Failed to add baby');
+            toast.error(t('toast_failedToAddBaby'));
         } finally {
             setSaving(false);
         }
@@ -126,7 +128,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
             toast.success(`${formData.name} updated!`);
         } catch (error) {
             console.error('Failed to update baby:', error);
-            toast.error('Failed to update baby');
+            toast.error(t('toast_failedToUpdateBaby'));
         } finally {
             setSaving(false);
         }
@@ -349,7 +351,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 onSubmit={handleEditBaby}
                                 onCancel={() => setShowEditForm(false)}
                                 saving={saving}
-                                submitLabel="Save Changes"
+                                submitLabel={t('submitLabel_saveChanges')}
                                 initialData={selectedBaby}
                             />
                         </div>

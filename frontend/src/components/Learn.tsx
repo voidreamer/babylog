@@ -12,9 +12,11 @@ function calculateAgeInMonths(birthDate: string): number {
 }
 import { TrendingUp, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface LearnProps { isPremium?: boolean; }
 export default function Learn({ isPremium = false }: LearnProps) {
+    const { t } = useTranslation('common');
     const { selectedBaby } = useBaby();
 
     const babyAgeMonths = useMemo(() => {

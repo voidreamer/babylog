@@ -58,5 +58,11 @@
     "en": "English",
     "es-CO": "Español (Colombia)",
     "fr-CA": "Français (Canada)"
-  }
+  },
+  "placeholder_enterName": "Enter name",
+  "placeholder_35": "3.5",
+  "placeholder_50": "50",
+  "toast_failedToAddBaby": "Failed to add baby",
+  "submitLabel_addBaby": "Add Baby",
+  "submitLabel_saveChanges": "Save Changes"
 }

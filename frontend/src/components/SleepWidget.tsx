@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Moon, Sun, Plus, Clock } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 // Format elapsed time as "Xh Ym" or "Ym"
 function formatElapsedTime(startTimeStr: string | null): string {
@@ -23,6 +24,7 @@ function formatElapsedTime(startTimeStr: string | null): string {
 
 interface SleepWidgetProps { babyId: number; currentSleep: any; lastSleep: any; onSleepChange: () => void; onOpenModal: () => void; }
 export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepChange, onOpenModal }: SleepWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const [saving, setSaving] = useState(false);
     const [elapsed, setElapsed] = useState('');
     const isSleeping = !!currentSleep;
@@ -50,11 +52,11 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                 end_time: null,
                 notes: null,
             });
-            toast.success('Sleep started');
+            toast.success(t('toast_sleepStarted'));
             onSleepChange();
         } catch (error) {
             console.error('Failed to start sleep:', error);
-            toast.error('Failed to start sleep');
+            toast.error(t('toast_failedToStartSleep'));
         } finally {
             setSaving(false);
         }
@@ -66,11 +68,11 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
         setSaving(true);
         try {
             await api.endSleep(currentSleep.id);
-            toast.success('Baby is awake!');
+            toast.success(t('toast_babyIsAwake'));
             onSleepChange();
         } catch (error) {
             console.error('Failed to end sleep:', error);
-            toast.error('Failed to end sleep');
+            toast.error(t('toast_failedToEndSleep'));
         } finally {
             setSaving(false);
         }
@@ -96,7 +98,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
             </div>
 
             {/* Plus icon for manual logging */}
-            <div className="widget-add-icon" title="Log completed sleep">
+            <div className="widget-add-icon" title={t('title_logCompletedSleep')}>
                 <Plus size={18} />
             </div>
 

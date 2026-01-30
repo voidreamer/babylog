@@ -58,5 +58,11 @@
     "en": "Inglés",
     "es-CO": "English (Colombia)",
     "fr-CA": "Français (Canadá)"
-  }
+  },
+  "placeholder_enterName": "Introduzca el nombre",
+  "placeholder_35": "3.5",
+  "placeholder_50": "50",
+  "toast_failedToAddBaby": "No se ha podido añadir el bebé",
+  "submitLabel_addBaby": "Añadir bebé",
+  "submitLabel_saveChanges": "Guardar cambios"
 }

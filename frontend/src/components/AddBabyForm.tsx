@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { Scale, Ruler } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Reusable baby form component used by both Onboarding wizard and BabySelector.
@@ -26,6 +27,7 @@ export default function AddBabyForm({
     compact = false,
     initialData = null,
 }: AddBabyFormProps) {
+    const { t } = useTranslation('common');
     const [name, setName] = useState(initialData?.name || '');
     const [birthDate, setBirthDate] = useState(initialData?.birth_date ? initialData.birth_date.split('T')[0] : '');
     const [gender, setGender] = useState(initialData?.gender || '');
@@ -52,7 +54,7 @@ export default function AddBabyForm({
                 <input
                     type="text"
                     className="form-input"
-                    placeholder="Enter name"
+                    placeholder={t('placeholder_enterName')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     autoFocus
@@ -105,7 +107,7 @@ export default function AddBabyForm({
                         type="number"
                         step="0.01"
                         className="form-input"
-                        placeholder="3.5"
+                        placeholder={t('placeholder_35')}
                         value={birthWeight}
                         onChange={(e) => setBirthWeight(e.target.value)}
                     />
@@ -118,7 +120,7 @@ export default function AddBabyForm({
                         type="number"
                         step="0.1"
                         className="form-input"
-                        placeholder="50"
+                        placeholder={t('placeholder_50')}
                         value={birthHeight}
                         onChange={(e) => setBirthHeight(e.target.value)}
                     />

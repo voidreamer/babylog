@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 describe('LoadingSpinner', () => {
+    const { t } = useTranslation('common');
   it('renders full page spinner by default', () => {
     const { container } = render(<LoadingSpinner />);
     expect(container.querySelector('.loading')).toBeInTheDocument();

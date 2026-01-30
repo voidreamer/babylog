@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Icon from './Icon';
+import { useTranslation } from 'react-i18next';
 
 interface QuickActionsProps { onFeeding: () => void; onDiaper: () => void; onSleep: () => void; onPumping: () => void; }
 export default function QuickActions({ onFeeding, onDiaper, onSleep, onPumping }: QuickActionsProps) {
+    const { t } = useTranslation('dashboard');
     return (
         <div className="quick-actions">
             <button className="action-btn feeding" onClick={onFeeding}>

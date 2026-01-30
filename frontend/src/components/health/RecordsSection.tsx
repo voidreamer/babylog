@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isFuture } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
+import { useTranslation } from 'react-i18next';
 
 const VISIT_TYPES = [
     { value: 'checkup', label: 'Checkup' },
@@ -16,6 +17,7 @@ const VISIT_TYPES = [
 
 interface RecordsSectionProps { baby: any; visits: any[]; vaccinations: any[]; medications: any[]; onDataChanged?: () => void; }
 export default function RecordsSection({ baby, visits, vaccinations, medications, onDataChanged }: RecordsSectionProps) {
+    const { t } = useTranslation('health');
     const [activeTab, setActiveTab] = useState('visits');
 
     return (
@@ -100,7 +102,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
             };
 
             await api.createDoctorVisit(data);
-            toast.success('Visit recorded');
+            toast.success(t('toast_visitRecorded'));
             setFormData({
                 visit_date: new Date().toISOString().split('T')[0],
                 visit_type: 'checkup',
@@ -123,7 +125,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
     const handleDelete = async (id: number) => {
         try {
             await api.deleteDoctorVisit(id);
-            toast.success('Visit deleted');
+            toast.success(t('toast_visitDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -143,7 +145,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                                 <button
                                     className="record-delete"
                                     onClick={() => handleDelete(visit.id)}
-                                    aria-label="Delete visit"
+                                    aria-label={t('arialabel_deleteVisit')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -190,7 +192,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                     </div>
                     <input
                         type="text"
-                        placeholder="Doctor name"
+                        placeholder={t('placeholder_doctorName')}
                         value={formData.doctor_name}
                         onChange={(e) => setFormData({ ...formData, doctor_name: e.target.value })}
                         className="record-text-input"
@@ -199,7 +201,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         <input
                             type="number"
                             step="0.01"
-                            placeholder="Weight (kg)"
+                            placeholder={t('growth.weightKg')}
                             value={formData.weight_kg}
                             onChange={(e) => setFormData({ ...formData, weight_kg: e.target.value })}
                             className="record-number-input"
@@ -207,7 +209,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         <input
                             type="number"
                             step="0.1"
-                            placeholder="Height (cm)"
+                            placeholder={t('growth.heightCm')}
                             value={formData.height_cm}
                             onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
                             className="record-number-input"
@@ -215,7 +217,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         <input
                             type="number"
                             step="0.1"
-                            placeholder="Head (cm)"
+                            placeholder={t('placeholder_headCm')}
                             value={formData.head_cm}
                             onChange={(e) => setFormData({ ...formData, head_cm: e.target.value })}
                             className="record-number-input"
@@ -231,7 +233,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         />
                     </div>
                     <textarea
-                        placeholder="Notes..."
+                        placeholder={t('placeholder_notes')}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="record-notes-input"
@@ -280,7 +282,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
         e.preventDefault();
 
         if (!formData.vaccine_name.trim()) {
-            toast.error('Please enter vaccine name');
+            toast.error(t('toast_pleaseEnterVaccineName'));
             return;
         }
 
@@ -299,7 +301,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
             };
 
             await api.createVaccination(data);
-            toast.success('Vaccination recorded');
+            toast.success(t('toast_vaccinationRecorded'));
             setFormData({
                 vaccine_name: '',
                 dose_number: '1',
@@ -320,7 +322,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
     const handleDelete = async (id: number) => {
         try {
             await api.deleteVaccination(id);
-            toast.success('Vaccination deleted');
+            toast.success(t('toast_vaccinationDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -368,7 +370,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                                 <button
                                     className="record-delete"
                                     onClick={() => handleDelete(vax.id)}
-                                    aria-label="Delete vaccination"
+                                    aria-label={t('arialabel_deleteVaccination')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -394,7 +396,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                     <div className="record-form-row">
                         <input
                             type="text"
-                            placeholder="Vaccine name"
+                            placeholder={t('placeholder_vaccineName')}
                             value={formData.vaccine_name}
                             onChange={(e) => setFormData({ ...formData, vaccine_name: e.target.value })}
                             className="record-text-input"
@@ -403,7 +405,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                         <input
                             type="number"
                             min="1"
-                            placeholder="Dose #"
+                            placeholder={t('placeholder_dose')}
                             value={formData.dose_number}
                             onChange={(e) => setFormData({ ...formData, dose_number: e.target.value })}
                             className="record-number-input dose"
@@ -431,13 +433,13 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                     </div>
                     <input
                         type="text"
-                        placeholder="Administered by"
+                        placeholder={t('placeholder_administeredBy')}
                         value={formData.administered_by}
                         onChange={(e) => setFormData({ ...formData, administered_by: e.target.value })}
                         className="record-text-input"
                     />
                     <textarea
-                        placeholder="Notes..."
+                        placeholder={t('placeholder_notes')}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="record-notes-input"
@@ -486,7 +488,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
         e.preventDefault();
 
         if (!formData.medication_name.trim()) {
-            toast.error('Please enter medication name');
+            toast.error(t('toast_pleaseEnterMedicationName'));
             return;
         }
 
@@ -506,7 +508,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             };
 
             await api.createMedication(data);
-            toast.success('Medication added');
+            toast.success(t('toast_medicationAdded'));
             setFormData({
                 medication_name: '',
                 dosage: '',
@@ -527,7 +529,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
     const handleDelete = async (id: number) => {
         try {
             await api.deleteMedication(id);
-            toast.success('Medication deleted');
+            toast.success(t('toast_medicationDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -569,14 +571,14 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                                 <button
                                     className="medication-toggle"
                                     onClick={() => handleToggleActive(med)}
-                                    title="Mark as stopped"
+                                    title={t('title_markAsStopped')}
                                 >
                                     Stop
                                 </button>
                                 <button
                                     className="record-delete"
                                     onClick={() => handleDelete(med.id)}
-                                    aria-label="Delete medication"
+                                    aria-label={t('arialabel_deleteMedication')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -606,14 +608,14 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                                 <button
                                     className="medication-toggle"
                                     onClick={() => handleToggleActive(med)}
-                                    title="Reactivate"
+                                    title={t('title_reactivate')}
                                 >
                                     Restart
                                 </button>
                                 <button
                                     className="record-delete"
                                     onClick={() => handleDelete(med.id)}
-                                    aria-label="Delete medication"
+                                    aria-label={t('arialabel_deleteMedication')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -632,7 +634,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                 <form onSubmit={handleSubmit} className="record-form">
                     <input
                         type="text"
-                        placeholder="Medication name"
+                        placeholder={t('placeholder_medicationName')}
                         value={formData.medication_name}
                         onChange={(e) => setFormData({ ...formData, medication_name: e.target.value })}
                         className="record-text-input"
@@ -641,14 +643,14 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                     <div className="record-form-row">
                         <input
                             type="text"
-                            placeholder="Dosage (e.g., 2.5ml)"
+                            placeholder={t('placeholder_dosageEg25ml')}
                             value={formData.dosage}
                             onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
                             className="record-text-input"
                         />
                         <input
                             type="text"
-                            placeholder="Frequency (e.g., twice daily)"
+                            placeholder={t('placeholder_frequencyEgTwiceDaily')}
                             value={formData.frequency}
                             onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
                             className="record-text-input"
@@ -675,7 +677,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                         </label>
                     </div>
                     <textarea
-                        placeholder="Notes..."
+                        placeholder={t('placeholder_notes')}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="record-notes-input"

@@ -3,6 +3,7 @@ import { useState, lazy, Suspense } from 'react';
 import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { useTranslation } from 'react-i18next';
 
 // Lazy load the GrowthChart component - only loads when user clicks "Full Chart"
 const GrowthChart = lazy(() => import('./GrowthChart'));
@@ -36,6 +37,7 @@ function getPercentileLabel(position: number | null): string {
 
 interface GrowthCardProps { baby: any; growthRecords: any[]; onRecordAdded?: () => void; whoData?: any; }
 export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData }: GrowthCardProps) {
+    const { t } = useTranslation('health');
     const [showChart, setShowChart] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -82,7 +84,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
         e.preventDefault();
 
         if (!formData.weight && !formData.height && !formData.head) {
-            toast.error('Please enter at least one measurement');
+            toast.error(t('toast_pleaseEnterAtLeastOneMeasurement'));
             return;
         }
 
@@ -97,7 +99,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             };
 
             await api.createGrowthRecord(data);
-            toast.success('Growth recorded!');
+            toast.success(t('toast_growthRecorded'));
             setFormData({ weight: '', height: '', head: '' });
             setIsAdding(false);
             if (onRecordAdded) onRecordAdded();
@@ -176,7 +178,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <input
                         type="number"
                         step="0.01"
-                        placeholder="kg"
+                        placeholder={t('placeholder_kg')}
                         value={formData.weight}
                         onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                         className="growth-input"
@@ -184,7 +186,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <input
                         type="number"
                         step="0.1"
-                        placeholder="cm"
+                        placeholder={t('placeholder_cm')}
                         value={formData.height}
                         onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                         className="growth-input"
@@ -192,7 +194,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <input
                         type="number"
                         step="0.1"
-                        placeholder="head"
+                        placeholder={t('placeholder_head')}
                         value={formData.head}
                         onChange={(e) => setFormData({ ...formData, head: e.target.value })}
                         className="growth-input"

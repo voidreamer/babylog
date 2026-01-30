@@ -5,11 +5,13 @@ import TimePicker from './TimePicker';
 import { Baby, Pencil, Timer, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 // Helper to parse UTC time
 
 interface FeedingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function FeedingModal({ babyId, editEvent, onClose, onSave }: FeedingModalProps) {
+    const { t } = useTranslation('dashboard');
     const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
 
@@ -114,13 +116,13 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
         // Validate amount if provided
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
-            toast.error('Amount must be between 0 and 500 ml');
+            toast.error(t('toast_amountMustBeBetween0And500Ml'));
             return;
         }
 
         // Validate notes length
         if (notes && notes.length > 500) {
-            toast.error('Notes must be less than 500 characters');
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
             return;
         }
 
@@ -136,7 +138,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             });
             onSave();
         } catch (error) {
-            toast.error('Failed to save feeding');
+            toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
         }
@@ -147,19 +149,19 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
         // Validate duration if provided
         if (duration && (isNaN(parseInt(duration)) || parseInt(duration) < 0 || parseInt(duration) > 120)) {
-            toast.error('Duration must be between 0 and 120 minutes');
+            toast.error(t('toast_durationMustBeBetween0And120Minute'));
             return;
         }
 
         // Validate amount if provided
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
-            toast.error('Amount must be between 0 and 500 ml');
+            toast.error(t('toast_amountMustBeBetween0And500Ml'));
             return;
         }
 
         // Validate notes length
         if (notes && notes.length > 500) {
-            toast.error('Notes must be less than 500 characters');
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
             return;
         }
 
@@ -182,7 +184,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save feeding');
+            toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
         }
@@ -315,7 +317,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                     <input
                                         type="number"
                                         className="form-input"
-                                        placeholder="Optional"
+                                        placeholder={t('placeholder_optional')}
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         min="0"
@@ -329,7 +331,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Optional notes..."
+                                    placeholder={t('placeholder_optionalNotes')}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                     maxLength={500}
@@ -350,7 +352,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                     <input
                                         type="number"
                                         className="form-input"
-                                        placeholder="Optional"
+                                        placeholder={t('placeholder_optional')}
                                         value={duration}
                                         onChange={(e) => setDuration(e.target.value)}
                                         min="0"
@@ -364,7 +366,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                         <input
                                             type="number"
                                             className="form-input"
-                                            placeholder="Optional"
+                                            placeholder={t('placeholder_optional')}
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
                                             min="0"
@@ -379,7 +381,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Optional notes..."
+                                    placeholder={t('placeholder_optionalNotes')}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                     maxLength={500}

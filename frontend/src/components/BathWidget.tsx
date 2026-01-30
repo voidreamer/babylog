@@ -5,10 +5,12 @@ import { ShowerHead, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 
 interface BathWidgetProps { lastBath: any; onBathChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickActionsEnabled = true }: BathWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
 
@@ -23,11 +25,11 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
                 time: new Date().toISOString(),
                 notes: null,
             });
-            toast.success('Bath logged');
+            toast.success(t('toast_bathLogged'));
             onBathChange();
         } catch (error) {
             console.error('Failed to log bath:', error);
-            toast.error('Failed to log bath');
+            toast.error(t('toast_failedToLogBath'));
         } finally {
             setSaving(false);
         }
@@ -44,7 +46,7 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
                 <ShowerHead size={80} strokeWidth={1} />
             </div>
 
-            <div className="widget-add-icon" title="Log with notes">
+            <div className="widget-add-icon" title={t('title_logWithNotes')}>
                 <Plus size={18} />
             </div>
 

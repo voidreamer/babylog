@@ -5,6 +5,7 @@ import { Sun, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 
 function formatTimer(seconds: number): string {
@@ -17,6 +18,7 @@ const ACTIVE_TUMMY_KEY = 'activeTummy';
 
 interface TummyTimeWidgetProps { lastTummy: any; onTummyChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal, quickActionsEnabled = true }: TummyTimeWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -57,7 +59,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
         const newActive = { babyId: selectedBaby.id, startTime: Date.now() };
         setActiveTummy(newActive);
         localStorage.setItem(ACTIVE_TUMMY_KEY, JSON.stringify(newActive));
-        toast.success('Tummy time started');
+        toast.success(t('toast_tummyTimeStarted'));
     };
 
     const handleStopTummy = async (e: React.MouseEvent) => {
@@ -81,7 +83,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
             onTummyChange();
         } catch (error) {
             console.error('Failed to save tummy time:', error);
-            toast.error('Failed to save tummy time');
+            toast.error(t('toast_failedToSaveTummyTime'));
         } finally {
             setSaving(false);
         }
@@ -110,7 +112,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                 <Sun size={80} strokeWidth={1} />
             </div>
 
-            <div className="widget-add-icon" title="Log tummy time manually">
+            <div className="widget-add-icon" title={t('title_logTummyTimeManually')}>
                 <Plus size={18} />
             </div>
 

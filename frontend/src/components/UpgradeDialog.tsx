@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Check, Sparkles, Crown } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const MONTHLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_MONTHLY || 'price_1Sv6BoFddQLEQqx0mPG0LweR';
 const YEARLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_YEARLY || 'price_1Sv6BoFddQLEQqx0bOrKID81';
@@ -20,6 +21,7 @@ interface UpgradeDialogProps {
 }
 
 export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
+    const { t } = useTranslation('settings');
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleCheckout = async (priceId: string) => {
@@ -33,7 +35,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
       );
       window.location.href = result.checkout_url;
     } catch {
-      toast.error('Could not start checkout. Please try again.');
+      toast.error(t('toast_couldNotStartCheckoutPleaseTryAgai'));
       setLoading(null);
     }
   };
@@ -43,13 +45,13 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
       const res = await api.getBillingSubscription();
       if (res.is_premium) {
         localStorage.setItem('isPremium', 'true');
-        toast.success('Premium restored! Reloading…');
+        toast.success(t('toast_premiumRestoredReloading'));
         setTimeout(() => window.location.reload(), 1000);
       } else {
-        toast.info('No active subscription found for this account.');
+        toast.info(t('toast_noActiveSubscriptionFoundForThisAc'));
       }
     } catch {
-      toast.error('Could not check subscription.');
+      toast.error(t('toast_couldNotCheckSubscription'));
     }
   };
 

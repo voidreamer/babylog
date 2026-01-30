@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AddBabyForm from '../components/AddBabyForm';
+import { useTranslation } from 'react-i18next';
 
 describe('AddBabyForm', () => {
+    const { t } = useTranslation('common');
   it('renders all form fields', () => {
     render(<AddBabyForm onSubmit={vi.fn()} />);
     expect(screen.getByPlaceholderText('Enter name')).toBeInTheDocument();
@@ -49,7 +51,7 @@ describe('AddBabyForm', () => {
   });
 
   it('uses custom submit label', () => {
-    render(<AddBabyForm onSubmit={vi.fn()} submitLabel="Save Changes" />);
+    render(<AddBabyForm onSubmit={vi.fn()} submitLabel={t('submitLabel_saveChanges')} />);
     expect(screen.getByText('Save Changes')).toBeInTheDocument();
   });
 

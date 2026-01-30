@@ -2,6 +2,7 @@
 import { format } from 'date-fns';
 import Icon from './Icon';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 
 const EVENT_CONFIG: Record<string, { label: string }> = {
@@ -13,6 +14,7 @@ const EVENT_CONFIG: Record<string, { label: string }> = {
 
 interface TimelineProps { events: any[]; onRefresh?: () => void; }
 export default function Timeline({ events, onRefresh }: TimelineProps) {
+    const { t } = useTranslation('dashboard');
     if (!events || events.length === 0) {
         return (
             <div className="empty-state">

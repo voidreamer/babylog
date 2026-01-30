@@ -14,6 +14,7 @@ import SupplementModal from './SupplementModal';
 import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -35,6 +36,7 @@ const EVENT_CONFIG: Record<string, any> = {
 };
 
 export default function TimelineCalendar() {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [events, setEvents] = useState<any[]>([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -130,10 +132,10 @@ export default function TimelineCalendar() {
                     await api.deleteSupplement(event.id);
                     break;
             }
-            toast.success('Deleted successfully');
+            toast.success(t('toast_deletedSuccessfully'));
             loadEvents();
         } catch (error) {
-            toast.error('Failed to delete');
+            toast.error(t('toast_failedToDelete'));
         }
         setConfirmDelete(null);
     };

@@ -5,10 +5,12 @@ import { Pill, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 
 interface SupplementWidgetProps { lastSupplement: any; onSupplementChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function SupplementWidget({ lastSupplement, onSupplementChange, onOpenModal, quickActionsEnabled = true }: SupplementWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
 
@@ -32,11 +34,11 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                 notes: null,
             });
             localStorage.setItem('lastSupplementType', supplementType);
-            toast.success('Supplement logged');
+            toast.success(t('toast_supplementLogged'));
             onSupplementChange();
         } catch (error) {
             console.error('Failed to log supplement:', error);
-            toast.error('Failed to log supplement');
+            toast.error(t('toast_failedToLogSupplement'));
         } finally {
             setSaving(false);
         }
@@ -54,7 +56,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                 <Pill size={80} strokeWidth={1} />
             </div>
 
-            <div className="widget-add-icon" title="Log different supplement">
+            <div className="widget-add-icon" title={t('title_logDifferentSupplement')}>
                 <Plus size={18} />
             </div>
 

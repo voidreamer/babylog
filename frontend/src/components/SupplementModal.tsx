@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Pill } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 
@@ -21,6 +22,7 @@ const supplementOptions = [
 
 interface SupplementModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function SupplementModal({ editEvent, onClose, onSave }: SupplementModalProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const isEditing = !!editEvent;
     const [supplementName, setSupplementName] = useState('vitamin_d');
@@ -71,7 +73,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
             onSave();
         } catch (error) {
             console.error('Failed to log supplement:', error);
-            toast.error('Failed to save supplement');
+            toast.error(t('toast_failedToSaveSupplement'));
         } finally {
             setSaving(false);
         }
@@ -114,7 +116,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="e.g., 400 IU, 1ml"
+                                placeholder={t('placeholder_eg400Iu1ml')}
                                 value={dosage}
                                 onChange={(e) => setDosage(e.target.value)}
                             />
@@ -132,7 +134,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Any notes..."
+                                placeholder={t('placeholder_anyNotes')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />

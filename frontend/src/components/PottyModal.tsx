@@ -5,6 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { CircleDot } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -27,6 +28,7 @@ const typeOptions = [
 
 interface PottyModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PottyModal({ editEvent, onClose, onSave }: PottyModalProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const isEditing = !!editEvent;
     const [result, setResult] = useState('success');
@@ -68,7 +70,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
             onSave();
         } catch (error) {
             console.error('Failed to log potty:', error);
-            toast.error('Failed to save potty');
+            toast.error(t('toast_failedToSavePotty'));
         } finally {
             setSaving(false);
         }
@@ -131,7 +133,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Any notes..."
+                                placeholder={t('placeholder_anyNotes')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />

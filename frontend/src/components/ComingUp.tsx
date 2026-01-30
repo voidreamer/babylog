@@ -2,6 +2,7 @@
 import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Syringe, Stethoscope, Pill, CalendarClock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ICONS: Record<string, any> = {
     vaccination: Syringe,
@@ -11,6 +12,7 @@ const ICONS: Record<string, any> = {
 
 interface ComingUpProps { items?: any[]; }
 export default function ComingUp({ items = [] }: ComingUpProps) {
+    const { t } = useTranslation('dashboard');
     if (!items.length) return null;
 
     return (

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
 import { formatTimeAgo } from '../utils/formatTime';
+import { useTranslation } from 'react-i18next';
 
 // Map widget types to PNG icons (null means use Lucide fallback)
 const pngIcons: Record<string, string | null> = {
@@ -49,6 +50,7 @@ function WidgetIcon({ type, size, className, strokeWidth }: WidgetIconProps) {
 
 interface WidgetProps { type: string; label: string; value: string; detail?: string; isSleeping?: boolean; onClick: () => void; lastTime?: string; }
 export default function Widget({ type, label, value, detail, isSleeping, onClick, lastTime }: WidgetProps) {
+    const { t } = useTranslation('dashboard');
     const timeAgo = formatTimeAgo(lastTime ?? null);
     const isEmpty = !lastTime && value === 'Never';
 

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Timeline from '../components/Timeline';
 import { mockTimelineEvents } from '../test/mocks';
+import { useTranslation } from 'react-i18next';
 
 // Mock Icon component
 vi.mock('../components/Icon', () => ({
@@ -11,6 +12,7 @@ vi.mock('../components/Icon', () => ({
 // Mock date-fns format to return predictable output
 vi.mock('date-fns', () => ({
   format: (date: Date, fmt: string) => {
+    const { t } = useTranslation('dashboard');
     const h = date.getHours();
     const m = date.getMinutes().toString().padStart(2, '0');
     const ampm = h >= 12 ? 'PM' : 'AM';

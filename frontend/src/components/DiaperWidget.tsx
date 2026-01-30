@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { Droplets, CircleDot, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 
 interface DiaperWidgetProps { babyId: number; lastDiaper: any; onDiaperChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpenModal, quickActionsEnabled = true }: DiaperWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const [saving, setSaving] = useState<string | null>(null); // null or 'pee'|'poo'|'mixed'
 
     const handleQuickLog = async (type: string, e: React.MouseEvent) => {
@@ -27,7 +29,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
             onDiaperChange();
         } catch (error) {
             console.error('Failed to log diaper:', error);
-            toast.error('Failed to log diaper');
+            toast.error(t('toast_failedToLogDiaper'));
         } finally {
             setSaving(null);
         }
@@ -57,7 +59,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
             </div>
 
             {/* Plus icon for full modal */}
-            <div className="widget-add-icon" title="Log with details">
+            <div className="widget-add-icon" title={t('title_logWithDetails')}>
                 <Plus size={18} />
             </div>
 

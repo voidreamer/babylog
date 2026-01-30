@@ -47,5 +47,9 @@
     "applyPromo": "Solicitar",
     "subscribe": "Suscríbase a",
     "manageSub": "No se ha podido abrir la gestión de suscripciones."
-  }
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "No se ha podido iniciar el pago. Por favor, inténtelo de nuevo.",
+  "toast_premiumRestoredReloading": "¡Premium restaurado! Recargando...",
+  "toast_noActiveSubscriptionFoundForThisAc": "No se ha encontrado ninguna suscripción activa para esta cuenta.",
+  "toast_couldNotCheckSubscription": "No se ha podido comprobar la suscripción."
 }

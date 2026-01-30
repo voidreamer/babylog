@@ -4,6 +4,7 @@ import { Thermometer, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const COMMON_SYMPTOMS = [
     'fever',
@@ -37,6 +38,7 @@ const symptomLabels: Record<string, string> = {
 
 interface SickDaysCardProps { baby: any; sickDays: any[]; onSickDayAdded?: () => void; onSickDayDeleted?: () => void; }
 export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDayDeleted }: SickDaysCardProps) {
+    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState<{ date: string; symptoms: string[]; temperature: string; notes: string; }>({
@@ -62,7 +64,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
         e.preventDefault();
 
         if (formData.symptoms.length === 0 && !formData.temperature && !formData.notes) {
-            toast.error('Please add at least one symptom, temperature, or note');
+            toast.error(t('toast_pleaseAddAtLeastOneSymptomTemperat'));
             return;
         }
 
@@ -77,7 +79,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             };
 
             await api.createSickDay(data);
-            toast.success('Sick day logged');
+            toast.success(t('toast_sickDayLogged'));
             setFormData({
                 date: new Date().toISOString().split('T')[0],
                 symptoms: [],
@@ -96,7 +98,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
     const handleDelete = async (id: number) => {
         try {
             await api.deleteSickDay(id);
-            toast.success('Sick day removed');
+            toast.success(t('toast_sickDayRemoved'));
             if (onSickDayDeleted) onSickDayDeleted();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -150,7 +152,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 <button
                                     className="sick-day-delete"
                                     onClick={() => handleDelete(day.id)}
-                                    aria-label="Delete sick day"
+                                    aria-label={t('arialabel_deleteSickDay')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -190,7 +192,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 step="0.1"
                                 min="35"
                                 max="42"
-                                placeholder="Temp °C"
+                                placeholder={t('placeholder_tempC')}
                                 value={formData.temperature}
                                 onChange={(e) => setFormData({ ...formData, temperature: e.target.value })}
                                 className="sick-day-temp-input"
@@ -212,7 +214,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     </div>
 
                     <textarea
-                        placeholder="Additional notes..."
+                        placeholder={t('placeholder_additionalNotes')}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="sick-day-notes-input"

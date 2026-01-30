@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Baby, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 
 // Format timer display
@@ -18,6 +19,7 @@ const ACTIVE_FEEDING_KEY = 'activeFeeding';
 
 interface FeedingWidgetProps { babyId: number; lastFeeding: any; onFeedingChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, onOpenModal, quickActionsEnabled = true }: FeedingWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [activeFeeding, setActiveFeeding] = useState<any>(null);
@@ -73,7 +75,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
         setActiveFeeding(newActiveFeeding);
         localStorage.setItem(ACTIVE_FEEDING_KEY, JSON.stringify(newActiveFeeding));
-        toast.success('Feeding started');
+        toast.success(t('toast_feedingStarted'));
     };
 
     const handleStopFeeding = async (e: React.MouseEvent) => {
@@ -102,7 +104,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             onFeedingChange();
         } catch (error) {
             console.error('Failed to save feeding:', error);
-            toast.error('Failed to save feeding');
+            toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
         }
@@ -146,7 +148,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             </div>
 
             {/* Plus icon for manual logging */}
-            <div className="widget-add-icon" title="Log feeding manually">
+            <div className="widget-add-icon" title={t('title_logFeedingManually')}>
                 <Plus size={18} />
             </div>
 

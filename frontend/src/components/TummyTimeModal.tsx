@@ -5,6 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -23,6 +24,7 @@ const durationOptions = [
 
 interface TummyTimeModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTimeModalProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const isEditing = !!editEvent;
     const [duration, setDuration] = useState(5);
@@ -61,7 +63,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
             onSave();
         } catch (error) {
             console.error('Failed to log tummy time:', error);
-            toast.error('Failed to save tummy time');
+            toast.error(t('toast_failedToSaveTummyTime'));
         } finally {
             setSaving(false);
         }
@@ -96,7 +98,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                                 <input
                                     type="number"
                                     className="form-input"
-                                    placeholder="Custom minutes"
+                                    placeholder={t('placeholder_customMinutes')}
                                     value={duration}
                                     onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
                                     min="1"
@@ -118,7 +120,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Baby's mood, etc."
+                                placeholder={t('placeholder_babysMoodEtc')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />

@@ -5,9 +5,11 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
+import { useTranslation } from 'react-i18next';
 
 interface MilestonesCardProps { baby: any; milestones: any[]; onMilestoneAdded?: () => void; onMilestoneDeleted?: () => void; }
 export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onMilestoneDeleted }: MilestonesCardProps) {
+    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -22,7 +24,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
         e.preventDefault();
 
         if (!formData.milestone.trim()) {
-            toast.error('Please describe the milestone');
+            toast.error(t('toast_pleaseDescribeTheMilestone'));
             return;
         }
 
@@ -35,7 +37,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             };
 
             await api.createMilestone(data);
-            toast.success('Milestone added!');
+            toast.success(t('toast_milestoneAdded'));
             setFormData({ milestone: '', date: new Date().toISOString().split('T')[0] });
             setIsAdding(false);
             if (onMilestoneAdded) onMilestoneAdded();
@@ -49,7 +51,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
     const handleDelete = async (id: number) => {
         try {
             await api.deleteMilestone(id);
-            toast.success('Milestone deleted');
+            toast.success(t('toast_milestoneDeleted'));
             if (onMilestoneDeleted) onMilestoneDeleted();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -88,7 +90,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                             <button
                                 className="milestone-delete"
                                 onClick={() => handleDelete(milestone.id)}
-                                aria-label="Delete milestone"
+                                aria-label={t('arialabel_deleteMilestone')}
                             >
                                 <Trash2 size={14} />
                             </button>
@@ -104,7 +106,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                 <form onSubmit={handleSubmit} className="milestone-quick-entry">
                     <input
                         type="text"
-                        placeholder="What milestone? (e.g., First steps)"
+                        placeholder={t('placeholder_whatMilestoneEgFirstSteps')}
                         value={formData.milestone}
                         onChange={(e) => setFormData({ ...formData, milestone: e.target.value })}
                         className="milestone-input"

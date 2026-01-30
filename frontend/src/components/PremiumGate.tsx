@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Lock } from 'lucide-react';
 import { usePremium } from '../hooks/usePremium';
 import UpgradeDialog from './UpgradeDialog';
+import { useTranslation } from 'react-i18next';
 
 interface PremiumGateProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface PremiumGateProps {
 }
 
 export default function PremiumGate({ children, feature }: PremiumGateProps) {
+    const { t } = useTranslation('settings');
   const { isPremium, isLoading } = usePremium();
   const [showUpgrade, setShowUpgrade] = useState(false);
 

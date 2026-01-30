@@ -6,9 +6,11 @@
  */
 
 import { WifiOff, RefreshCw, Cloud, CloudOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OfflineIndicatorProps { online: boolean; syncing: boolean; pendingCount: number; onSync: () => void; }
 export function OfflineIndicator({ online, syncing, pendingCount, onSync }: OfflineIndicatorProps) {
+    const { t } = useTranslation('common');
     // Don't show anything if online and no pending changes
     if (online && pendingCount === 0 && !syncing) {
         return null;

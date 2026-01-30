@@ -4,6 +4,7 @@ import { Smile, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { formatDate } from '../../utils/formatDate';
+import { useTranslation } from 'react-i18next';
 
 // Baby teeth positions - 20 total
 // Upper: A-E (left to right from baby's perspective)
@@ -46,6 +47,7 @@ const ERUPTION_AGES: Record<string, { min: number; max: number; avg: number }> =
 
 interface TeethingCardProps { baby: any; teeth: any[]; onToothAdded?: () => void; onToothDeleted?: () => void; }
 export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted }: TeethingCardProps) {
+    const { t } = useTranslation('health');
     const [selectedTooth, setSelectedTooth] = useState<any>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [emergedDate, setEmergedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -100,7 +102,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
     const handleDelete = async (toothId: number) => {
         try {
             await api.deleteTooth(toothId);
-            toast.success('Tooth record removed');
+            toast.success(t('toast_toothRecordRemoved'));
             setSelectedTooth(null);
             if (onToothDeleted) onToothDeleted();
         } catch (error) {

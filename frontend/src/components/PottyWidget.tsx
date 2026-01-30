@@ -5,10 +5,12 @@ import { CircleDot, Plus, Check, X } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 
 interface PottyWidgetProps { lastPotty: any; onPottyChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, quickActionsEnabled = true }: PottyWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState<string | null>(null);
 
@@ -28,7 +30,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
             onPottyChange();
         } catch (error) {
             console.error('Failed to log potty:', error);
-            toast.error('Failed to log potty');
+            toast.error(t('toast_failedToLogPotty'));
         } finally {
             setSaving(null);
         }
@@ -45,7 +47,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                 <CircleDot size={80} strokeWidth={1} />
             </div>
 
-            <div className="widget-add-icon" title="Log with details">
+            <div className="widget-add-icon" title={t('title_logWithDetails')}>
                 <Plus size={18} />
             </div>
 

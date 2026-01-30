@@ -47,5 +47,9 @@
     "applyPromo": "Apply",
     "subscribe": "Subscribe",
     "manageSub": "Could not open subscription management."
-  }
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "Could not start checkout. Please try again.",
+  "toast_premiumRestoredReloading": "Premium restored! Reloading…",
+  "toast_noActiveSubscriptionFoundForThisAc": "No active subscription found for this account.",
+  "toast_couldNotCheckSubscription": "Could not check subscription."
 }

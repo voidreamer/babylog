@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Baby, AlertCircle, Sparkles } from 'lucide-react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 import {
     PredictionsSection,
     PatternsSection,
@@ -14,6 +15,7 @@ import {
 
 interface BabyInsightsProps { isPremium?: boolean; }
 export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [analytics, setAnalytics] = useState<any>(null);
     const [loading, setLoading] = useState(true);

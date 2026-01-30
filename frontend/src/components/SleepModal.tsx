@@ -5,10 +5,12 @@ import { Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 
 interface SleepModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function SleepModal({ babyId, editEvent, onClose, onSave }: SleepModalProps) {
+    const { t } = useTranslation('dashboard');
     const isEditing = !!editEvent;
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
@@ -47,7 +49,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);
-            toast.error('Failed to log sleep');
+            toast.error(t('toast_failedToLogSleep'));
         } finally {
             setSaving(false);
         }
@@ -78,7 +80,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Optional notes..."
+                                placeholder={t('placeholder_optionalNotes')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />

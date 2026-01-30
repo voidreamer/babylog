@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import api from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 interface ShareModalProps { baby: any; onClose: () => void; onShare: () => void; }
 export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) {
+    const { t } = useTranslation('dashboard');
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -53,7 +55,7 @@ export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) 
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="partner@example.com"
+                                placeholder={t('placeholder_partnerexamplecom')}
                                 disabled={loading}
                                 style={{ flex: 1 }}
                             />

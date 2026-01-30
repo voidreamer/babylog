@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Shield, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PrivacyPolicyProps { onBack?: () => void; }
 export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
+    const { t } = useTranslation('common');
     return (
         <div className="legal-page">
             <div className="legal-header">

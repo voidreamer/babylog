@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
     TrendingUp, TrendingDown, Clock, Moon, Baby, Droplets,
     AlertCircle, CheckCircle2, Lock, Calendar, Minus, Activity
@@ -61,6 +62,7 @@ export const getPressureColor = (score: number): string => {
 // ============================================================================
 
 export function TrendIcon({ trend }: { trend: string }) {
+    const { t } = useTranslation('dashboard');
     if (trend === 'improving') return <TrendingUp size={16} className="trend-icon trend-up" />;
     if (trend === 'declining') return <TrendingDown size={16} className="trend-icon trend-down" />;
     return <Minus size={16} className="trend-icon trend-stable" />;

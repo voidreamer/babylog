@@ -5,6 +5,7 @@ import { Heart, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 
 function formatTimer(seconds: number): string {
@@ -17,6 +18,7 @@ const ACTIVE_PUMPING_KEY = 'activePumping';
 
 interface PumpingWidgetProps { lastPumping: any; onPumpingChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModal, quickActionsEnabled = true }: PumpingWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -64,7 +66,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
         };
         setActivePumping(newActivePumping);
         localStorage.setItem(ACTIVE_PUMPING_KEY, JSON.stringify(newActivePumping));
-        toast.success('Pumping started');
+        toast.success(t('toast_pumpingStarted'));
     };
 
     const handleStopPumping = async (e: React.MouseEvent) => {
@@ -89,7 +91,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
             onPumpingChange();
         } catch (error) {
             console.error('Failed to save pumping:', error);
-            toast.error('Failed to save pumping');
+            toast.error(t('toast_failedToSavePumping'));
         } finally {
             setSaving(false);
         }
@@ -118,7 +120,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                 <img src="/icons/pumping.png" alt="pumping" style={{ width: 80, height: 80, objectFit: 'contain' }} />
             </div>
 
-            <div className="widget-add-icon" title="Log pumping manually">
+            <div className="widget-add-icon" title={t('title_logPumpingManually')}>
                 <Plus size={18} />
             </div>
 

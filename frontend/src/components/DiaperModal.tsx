@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Droplets, CircleDot, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr: any): Date => {
@@ -14,6 +15,7 @@ const parseUTCTime = (timeStr: any): Date => {
 
 interface DiaperModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function DiaperModal({ babyId, editEvent, onClose, onSave }: DiaperModalProps) {
+    const { t } = useTranslation('dashboard');
     const isEditing = !!editEvent;
     const [type, setType] = useState('pee');
     const [time, setTime] = useState(new Date());
@@ -61,7 +63,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);
-            toast.error('Failed to save diaper change');
+            toast.error(t('toast_failedToSaveDiaperChange'));
         } finally {
             setSaving(false);
         }
@@ -216,7 +218,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Optional notes..."
+                                placeholder={t('placeholder_optionalNotes')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />

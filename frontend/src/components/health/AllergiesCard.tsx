@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
+import { useTranslation } from 'react-i18next';
 
 const COMMON_ALLERGENS = [
     'Dairy',
@@ -26,6 +27,7 @@ const SEVERITY_LEVELS = [
 
 interface AllergiesCardProps { baby: any; allergies: any[]; onAllergyAdded?: () => void; onAllergyDeleted?: () => void; }
 export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAllergyDeleted }: AllergiesCardProps) {
+    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -40,7 +42,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
         e.preventDefault();
 
         if (!formData.allergen.trim()) {
-            toast.error('Please enter the allergen');
+            toast.error(t('toast_pleaseEnterTheAllergen'));
             return;
         }
 
@@ -58,7 +60,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             };
 
             await api.createAllergy(data);
-            toast.success('Allergy recorded');
+            toast.success(t('toast_allergyRecorded'));
             setFormData({
                 allergen: '',
                 severity: 'mild',
@@ -78,7 +80,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
     const handleDelete = async (id: number) => {
         try {
             await api.deleteAllergy(id);
-            toast.success('Allergy removed');
+            toast.success(t('toast_allergyRemoved'));
             if (onAllergyDeleted) onAllergyDeleted();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -127,7 +129,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                                 <button
                                     className="allergy-delete"
                                     onClick={() => handleDelete(allergy.id)}
-                                    aria-label="Delete allergy"
+                                    aria-label={t('arialabel_deleteAllergy')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -154,7 +156,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     <div className="allergy-form-main">
                         <input
                             type="text"
-                            placeholder="Allergen (e.g., Peanuts)"
+                            placeholder={t('placeholder_allergenEgPeanuts')}
                             value={formData.allergen}
                             onChange={(e) => setFormData({ ...formData, allergen: e.target.value })}
                             className="allergy-input"
@@ -183,7 +185,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
 
                     <input
                         type="text"
-                        placeholder="Reaction (e.g., hives, swelling)"
+                        placeholder={t('placeholder_reactionEgHivesSwelling')}
                         value={formData.reaction}
                         onChange={(e) => setFormData({ ...formData, reaction: e.target.value })}
                         className="allergy-reaction-input"
@@ -202,7 +204,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     </div>
 
                     <textarea
-                        placeholder="Additional notes..."
+                        placeholder={t('placeholder_additionalNotes')}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="allergy-notes-input"

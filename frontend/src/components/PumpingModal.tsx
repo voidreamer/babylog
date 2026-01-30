@@ -5,11 +5,13 @@ import TimePicker from './TimePicker';
 import { Milk, Pencil, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 // Helper to parse UTC time
 
 interface PumpingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PumpingModal({ babyId, editEvent, onClose, onSave }: PumpingModalProps) {
+    const { t } = useTranslation('dashboard');
     const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
     const [time, setTime] = useState(new Date());
@@ -85,7 +87,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             });
             onSave();
         } catch (error) {
-            toast.error('Failed to save pumping');
+            toast.error(t('toast_failedToSavePumping'));
         } finally {
             setSaving(false);
         }
@@ -112,7 +114,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             onSave();
         } catch (error) {
             console.error('Failed to save pumping:', error);
-            toast.error('Failed to save pumping');
+            toast.error(t('toast_failedToSavePumping'));
         } finally {
             setSaving(false);
         }
@@ -206,7 +208,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         <input
                                             type="number"
                                             className="form-input"
-                                            placeholder="Optional"
+                                            placeholder={t('placeholder_optional')}
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
                                             min="0"
@@ -219,7 +221,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         <input
                                             type="text"
                                             className="form-input"
-                                            placeholder="Optional notes..."
+                                            placeholder={t('placeholder_optionalNotes')}
                                             value={notes}
                                             onChange={(e) => setNotes(e.target.value)}
                                         />
@@ -258,7 +260,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     <input
                                         type="number"
                                         className="form-input"
-                                        placeholder="Optional"
+                                        placeholder={t('placeholder_optional')}
                                         value={duration}
                                         onChange={(e) => setDuration(e.target.value)}
                                         min="0"
@@ -271,7 +273,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     <input
                                         type="number"
                                         className="form-input"
-                                        placeholder="Optional"
+                                        placeholder={t('placeholder_optional')}
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         min="0"
@@ -285,7 +287,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Optional notes..."
+                                    placeholder={t('placeholder_optionalNotes')}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                 />

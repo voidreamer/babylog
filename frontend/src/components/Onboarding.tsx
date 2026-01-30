@@ -6,9 +6,11 @@ import { api } from '../api/client';
 import AddBabyForm from './AddBabyForm';
 import { Baby, ArrowRight, Sparkles, LogOut, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface OnboardingProps { onComplete: () => void; }
 export default function Onboarding({ onComplete }: OnboardingProps) {
+    const { t } = useTranslation('common');
     const { refresh } = useBaby();
     const { logout, user } = useAuth();
     const [step, setStep] = useState(1);
@@ -61,7 +63,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             setStep(4); // Success step
         } catch (error) {
             console.error('Failed to create baby:', error);
-            toast.error('Failed to add baby');
+            toast.error(t('toast_failedToAddBaby'));
         } finally {
             setSaving(false);
         }
@@ -161,7 +163,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <AddBabyForm
                         onSubmit={handleBabySubmit}
                         saving={saving}
-                        submitLabel="Add Baby"
+                        submitLabel={t('submitLabel_addBaby')}
                         showCancel={false}
                     />
                 </div>

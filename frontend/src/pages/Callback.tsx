@@ -3,8 +3,10 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 export default function Callback() {
+    const { t } = useTranslation('auth');
     const { user, loading } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();

@@ -26,11 +26,13 @@ import BabyGreeting from './BabyGreeting';
 import ComingUp from './ComingUp';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Default visible widgets - stored in localStorage
 const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
 
 export default function Dashboard() {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [dashboard, setDashboard] = useState<any>(null);
     const [latestGrowth, setLatestGrowth] = useState<any>(null);

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
     Settings, X, Baby, Droplets, Moon, Heart,
     Toilet, Timer, Bath as BathIcon, Check, Plus, Pill, Zap
@@ -19,6 +20,7 @@ const ALL_WIDGETS = [
 
 interface WidgetSettingsProps { visibleWidgets: string[]; onToggle: (id: string) => void; quickActionsEnabled: boolean; onToggleQuickActions: () => void; }
 export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsEnabled, onToggleQuickActions }: WidgetSettingsProps) {
+    const { t } = useTranslation('dashboard');
     const [isOpen, setIsOpen] = useState(false);
 
     const enabledCount = visibleWidgets.length;

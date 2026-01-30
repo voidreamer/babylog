@@ -6,11 +6,13 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { ShowerHead } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 
 interface BathModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function BathModal({ editEvent, onClose, onSave }: BathModalProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const isEditing = !!editEvent;
     const [time, setTime] = useState(new Date());
@@ -46,7 +48,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
             onSave();
         } catch (error) {
             console.error('Failed to log bath:', error);
-            toast.error('Failed to save bath');
+            toast.error(t('toast_failedToSaveBath'));
         } finally {
             setSaving(false);
         }
@@ -74,7 +76,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder="Products used, etc."
+                                placeholder={t('placeholder_productsUsedEtc')}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                             />

@@ -4,9 +4,11 @@ import { Baby, Droplets, Moon, Heart, BarChart3, Toilet, Timer, Bath as BathIcon
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, subDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface DailySummaryProps { summary: any; visibleWidgets?: string[]; }
 export default function DailySummary({ summary, visibleWidgets = ['feeding', 'diaper', 'sleep', 'pumping'] }: DailySummaryProps) {
+    const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [activeTab, setActiveTab] = useState('today');
     const [yesterdaySummary, setYesterdaySummary] = useState<any>(null);

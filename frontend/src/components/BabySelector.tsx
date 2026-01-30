@@ -6,8 +6,10 @@ import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 import UpgradeDialog from './UpgradeDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function BabySelector(): React.ReactElement | null {
+    const { t } = useTranslation('common');
     const { babies, selectedBaby, selectBaby, refresh, removeBaby } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -49,7 +51,7 @@ export default function BabySelector(): React.ReactElement | null {
             toast.success(`${formData.name} added!`);
         } catch (error) {
             console.error('Failed to add baby:', error);
-            toast.error('Failed to add baby');
+            toast.error(t('toast_failedToAddBaby'));
         } finally {
             setSaving(false);
         }
