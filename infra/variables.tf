@@ -41,6 +41,32 @@ variable "admin_api_key" {
   default     = ""
 }
 
+variable "stripe_secret_key" {
+  description = "Stripe secret API key"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "stripe_webhook_secret" {
+  description = "Stripe webhook signing secret"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "stripe_price_monthly" {
+  description = "Stripe price ID for monthly plan"
+  type        = string
+  default     = ""
+}
+
+variable "stripe_price_yearly" {
+  description = "Stripe price ID for yearly plan"
+  type        = string
+  default     = ""
+}
+
 variable "custom_domain" {
   description = "Custom domain for CloudFront (e.g. app.heybub.app). Leave empty for no custom domain."
   type        = string

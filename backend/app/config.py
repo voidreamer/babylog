@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str = ""
     # CORS origins - comma-separated list of allowed origins
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_monthly: str = ""
+    stripe_price_yearly: str = ""
 
     class Config:
         env_file = ".env"
