@@ -1,0 +1,22 @@
+{
+  "feeding": "Alimentation",
+  "sleep": "Sommeil",
+  "diaper": "Couche",
+  "bath": "Bain",
+  "pumping": "Tire-lait",
+  "supplement": "Supplément",
+  "tummyTime": "Temps sur le Ventre",
+  "potty": "Pot",
+  "start": "Démarrer",
+  "stop": "Arrêter",
+  "save": "Sauvegarder",
+  "duration": "Durée",
+  "notes": "Notes",
+  "time": "Heure",
+  "type": "Type",
+  "amount": "Quantité",
+  "lastFed": "Dernier repas",
+  "lastSlept": "Dernier sommeil",
+  "lastDiaper": "Dernière couche",
+  "noEntries": "Aucune entrée pour le moment"
+}

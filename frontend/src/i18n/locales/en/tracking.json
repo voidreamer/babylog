@@ -1,0 +1,22 @@
+{
+  "feeding": "Feeding",
+  "sleep": "Sleep",
+  "diaper": "Diaper",
+  "bath": "Bath",
+  "pumping": "Pumping",
+  "supplement": "Supplement",
+  "tummyTime": "Tummy Time",
+  "potty": "Potty",
+  "start": "Start",
+  "stop": "Stop",
+  "save": "Save",
+  "duration": "Duration",
+  "notes": "Notes",
+  "time": "Time",
+  "type": "Type",
+  "amount": "Amount",
+  "lastFed": "Last fed",
+  "lastSlept": "Last slept",
+  "lastDiaper": "Last diaper",
+  "noEntries": "No entries yet"
+}

@@ -21,35 +21,43 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
 import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown } from 'lucide-react';
 import UpgradeDialog from './components/UpgradeDialog';
+import LanguageSwitcher from './components/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
 interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
 function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
+    const { t } = useTranslation('settings');
     return (
         <div className="settings-page">
-            <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
+            <h2 style={{ marginBottom: 'var(--space-lg)' }}>{t('title')}</h2>
 
             {/* Preferences */}
             <div className="settings-group">
-                <div className="settings-group-title">Preferences</div>
+                <div className="settings-group-title">{t('preferences')}</div>
                 <div className="settings-row" onClick={toggleTheme}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box peach">
                             <Moon size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Dark Mode</div>
-                            <div className="settings-row-desc">Easier on eyes at night</div>
+                            <div className="settings-row-label">{t('darkMode')}</div>
+                            <div className="settings-row-desc">{t('darkModeDesc')}</div>
                         </div>
                     </div>
                     <div className={`toggle-switch ${isDark ? 'active' : ''}`} />
                 </div>
             </div>
 
+            {/* Language */}
+            <div className="settings-group">
+                <LanguageSwitcher />
+            </div>
+
             {/* Account */}
             <div className="settings-group">
-                <div className="settings-group-title">Account</div>
+                <div className="settings-group-title">{t('account')}</div>
                 {user && (
                     <div className="settings-row">
                         <div className="settings-row-left">
@@ -58,7 +66,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             </div>
                             <div>
                                 <div className="settings-row-label">{user.email}</div>
-                                <div className="settings-row-desc">Signed in</div>
+                                <div className="settings-row-desc">{t('signedIn')}</div>
                             </div>
                         </div>
                     </div>
@@ -69,18 +77,18 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <Crown size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Premium Plan</div>
+                            <div className="settings-row-label">{t('premiumPlan')}</div>
                             <div className="settings-row-desc">
                                 {isPremium
                                     ? hasStripeSubscription
-                                        ? 'Active — Manage subscription'
-                                        : 'Active — Promo code'
-                                    : 'Unlock AI insights & more'}
+                                        ? t('premiumActive')
+                                        : t('premiumPromo')
+                                    : t('premiumUnlock')}
                             </div>
                         </div>
                     </div>
                     {isPremium ? (
-                        <span className="settings-badge mint">Active</span>
+                        <span className="settings-badge mint">{t('premiumBadge')}</span>
                     ) : (
                         <ChevronRight size={18} className="settings-arrow" />
                     )}
@@ -89,7 +97,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
             {/* Data */}
             <div className="settings-group">
-                <div className="settings-group-title">Data</div>
+                <div className="settings-group-title">{t('data')}</div>
                 <div
                     className="settings-row"
                     onClick={handleExportCsv}
@@ -100,9 +108,9 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <Download size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Export Data</div>
+                            <div className="settings-row-label">{t('exportData')}</div>
                             <div className="settings-row-desc">
-                                {exportLoading ? 'Exporting...' : 'Download as CSV'}
+                                {exportLoading ? t('exporting') : t('downloadCsv')}
                             </div>
                         </div>
                     </div>
@@ -112,7 +120,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
             {/* Support */}
             <div className="settings-group">
-                <div className="settings-group-title">Support</div>
+                <div className="settings-group-title">{t('support')}</div>
                 <button
                     className="settings-row"
                     onClick={() => setShowPrivacyPolicy(true)}
@@ -122,7 +130,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <Shield size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Privacy Policy</div>
+                            <div className="settings-row-label">{t('privacyPolicy')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -136,7 +144,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <LogOut size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Sign Out</div>
+                            <div className="settings-row-label">{t('signOut')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -177,6 +185,7 @@ function buildHubUrl(session, theme) {
 }
 
 function MainApp() {
+    const { t } = useTranslation('common');
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
@@ -303,10 +312,9 @@ function MainApp() {
                 />
                 <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
                     <div className="empty-state-icon">📡</div>
-                    <h2 className="empty-state-title">You're Offline</h2>
+                    <h2 className="empty-state-title">{t('offline.title')}</h2>
                     <p className="empty-state-text">
-                        Connect to the internet to load your baby data.
-                        Your data will sync automatically when you're back online.
+                        {t('offline.message')}
                     </p>
                 </div>
             </div>
@@ -336,9 +344,9 @@ function MainApp() {
                 <div className="header-left">
                     <a href={buildHubUrl(session, theme)} className="hub-back-link">
                         <ArrowLeft size={16} />
-                        <span>Hub</span>
+                        <span>{t('hub')}</span>
                     </a>
-                    <span className="header-title">Baby Tracker</span>
+                    <span className="header-title">{t('babyTracker')}</span>
                 </div>
                 <div className="header-actions">
                     <button className="btn-icon theme-toggle" onClick={toggleTheme}>
@@ -392,35 +400,35 @@ function MainApp() {
                     onClick={() => setActiveTab('home')}
                 >
                     <Home size={22} />
-                    <span>Home</span>
+                    <span>{t('nav.home')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
                     onClick={() => setActiveTab('timeline')}
                 >
                     <Clock size={22} />
-                    <span>Timeline</span>
+                    <span>{t('nav.timeline')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
                     onClick={() => setActiveTab('health')}
                 >
                     <Activity size={22} />
-                    <span>Health</span>
+                    <span>{t('nav.health')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
                     onClick={() => setActiveTab('learn')}
                 >
                     <PieChart size={22} />
-                    <span>Insights</span>
+                    <span>{t('nav.insights')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
                     onClick={() => setActiveTab('settings')}
                 >
                     <SettingsIcon size={22} />
-                    <span>Settings</span>
+                    <span>{t('nav.settings')}</span>
                 </button>
             </nav>
         </div>

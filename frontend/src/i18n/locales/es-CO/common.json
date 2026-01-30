@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "timeline": "Cronología",
+    "health": "Salud",
+    "insights": "Análisis",
+    "settings": "Ajustes"
+  },
+  "hub": "Hub",
+  "babyTracker": "Seguimiento del Bebé",
+  "loading": "Cargando...",
+  "offline": {
+    "title": "Sin conexión",
+    "message": "Conéctate a internet para cargar los datos de tu bebé. Tus datos se sincronizarán automáticamente cuando vuelvas a estar en línea."
+  },
+  "language": "Idioma",
+  "languageName": "Español (Colombia)",
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "back": "Volver",
+  "confirm": "Confirmar",
+  "yes": "Sí",
+  "no": "No"
+}

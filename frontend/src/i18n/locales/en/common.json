@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Home",
+    "timeline": "Timeline",
+    "health": "Health",
+    "insights": "Insights",
+    "settings": "Settings"
+  },
+  "hub": "Hub",
+  "babyTracker": "Baby Tracker",
+  "loading": "Loading...",
+  "offline": {
+    "title": "You're Offline",
+    "message": "Connect to the internet to load your baby data. Your data will sync automatically when you're back online."
+  },
+  "language": "Language",
+  "languageName": "English",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "back": "Back",
+  "confirm": "Confirm",
+  "yes": "Yes",
+  "no": "No"
+}

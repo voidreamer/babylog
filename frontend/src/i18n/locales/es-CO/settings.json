@@ -1,0 +1,22 @@
+{
+  "title": "Ajustes",
+  "preferences": "Preferencias",
+  "darkMode": "Modo Oscuro",
+  "darkModeDesc": "Más suave para los ojos de noche",
+  "account": "Cuenta",
+  "signedIn": "Sesión iniciada",
+  "premiumPlan": "Plan Premium",
+  "premiumActive": "Activo — Administrar suscripción",
+  "premiumPromo": "Activo — Código promocional",
+  "premiumUnlock": "Desbloquea análisis con IA y más",
+  "premiumBadge": "Activo",
+  "data": "Datos",
+  "exportData": "Exportar Datos",
+  "exporting": "Exportando...",
+  "downloadCsv": "Descargar como CSV",
+  "support": "Soporte",
+  "privacyPolicy": "Política de Privacidad",
+  "signOut": "Cerrar Sesión",
+  "language": "Idioma",
+  "languageDesc": "Elige tu idioma preferido"
+}

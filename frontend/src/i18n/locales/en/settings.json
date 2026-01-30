@@ -1,0 +1,22 @@
+{
+  "title": "Settings",
+  "preferences": "Preferences",
+  "darkMode": "Dark Mode",
+  "darkModeDesc": "Easier on eyes at night",
+  "account": "Account",
+  "signedIn": "Signed in",
+  "premiumPlan": "Premium Plan",
+  "premiumActive": "Active — Manage subscription",
+  "premiumPromo": "Active — Promo code",
+  "premiumUnlock": "Unlock AI insights & more",
+  "premiumBadge": "Active",
+  "data": "Data",
+  "exportData": "Export Data",
+  "exporting": "Exporting...",
+  "downloadCsv": "Download as CSV",
+  "support": "Support",
+  "privacyPolicy": "Privacy Policy",
+  "signOut": "Sign Out",
+  "language": "Language",
+  "languageDesc": "Choose your preferred language"
+}

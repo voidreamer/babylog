@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "timeline": "Chronologie",
+    "health": "Santé",
+    "insights": "Analyses",
+    "settings": "Paramètres"
+  },
+  "hub": "Hub",
+  "babyTracker": "Suivi du Bébé",
+  "loading": "Chargement...",
+  "offline": {
+    "title": "Hors ligne",
+    "message": "Connectez-vous à Internet pour charger les données de votre bébé. Vos données se synchroniseront automatiquement lorsque vous serez de nouveau en ligne."
+  },
+  "language": "Langue",
+  "languageName": "Français (Canada)",
+  "save": "Sauvegarder",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "back": "Retour",
+  "confirm": "Confirmer",
+  "yes": "Oui",
+  "no": "Non"
+}

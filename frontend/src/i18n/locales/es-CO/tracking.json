@@ -1,0 +1,22 @@
+{
+  "feeding": "Alimentación",
+  "sleep": "Sueño",
+  "diaper": "Pañal",
+  "bath": "Baño",
+  "pumping": "Extracción",
+  "supplement": "Suplemento",
+  "tummyTime": "Tiempo Boca Abajo",
+  "potty": "Bacinilla",
+  "start": "Iniciar",
+  "stop": "Detener",
+  "save": "Guardar",
+  "duration": "Duración",
+  "notes": "Notas",
+  "time": "Hora",
+  "type": "Tipo",
+  "amount": "Cantidad",
+  "lastFed": "Última alimentación",
+  "lastSlept": "Último sueño",
+  "lastDiaper": "Último pañal",
+  "noEntries": "Sin registros aún"
+}

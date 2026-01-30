@@ -1,0 +1,9 @@
+{
+  "title": "Analyses",
+  "dailySummary": "Résumé Quotidien",
+  "weeklyTrends": "Tendances Hebdomadaires",
+  "feedingPatterns": "Habitudes d'Alimentation",
+  "sleepPatterns": "Habitudes de Sommeil",
+  "noData": "Pas encore assez de données",
+  "premiumRequired": "Fonction premium"
+}
