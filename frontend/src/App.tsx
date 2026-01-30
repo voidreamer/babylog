@@ -397,14 +397,14 @@ function MainApp() {
                 onSync={syncPendingChanges}
             />
             <main>
-                {activeTab === 'home' && <Dashboard />}
+                {activeTab === 'home' && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Dashboard />
+                    </Suspense>
+                )}
                 {activeTab === 'timeline' && <TimelineCalendar />}
                 {activeTab === 'health' && (
-                    <Suspense fallback={
-                        <div className="loading">
-                            <div className="spinner"></div>
-                        </div>
-                    }>
+                    <Suspense fallback={<LoadingSpinner />}>
                         <Health />
                     </Suspense>
                 )}
