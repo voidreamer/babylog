@@ -4,13 +4,8 @@ import { api } from '../../api/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
+import { parseUTCTime } from '../../utils/parseTime';
 
-// Parse time from API (UTC) to local Date object
-const parseUTCTime = (timeStr: any): Date => {
-    if (!timeStr) return new Date();
-    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-    return new Date(utcTime);
-};
 
 const MILESTONE_OPTIONS = [
     'First smile', 'First laugh', 'Rolled over', 'Sat up independently',

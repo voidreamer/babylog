@@ -5,13 +5,9 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { ShowerHead } from 'lucide-react';
+import { parseUTCTime } from '../utils/parseTime';
 
 // Parse UTC time string to local Date
-const parseUTCTime = (timeStr: any): Date => {
-    if (!timeStr) return new Date();
-    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-    return new Date(utcTime);
-};
 
 interface BathModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function BathModal({ editEvent, onClose, onSave }: BathModalProps) {

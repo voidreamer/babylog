@@ -31,7 +31,7 @@ export default function Callback() {
         if (hashParams && hashParams.includes('access_token')) {
             // Supabase should auto-detect and process the hash
             // Wait for onAuthStateChange to fire
-            console.log('[Callback] OAuth hash detected, waiting for Supabase to process...');
+            if (import.meta.env.DEV) console.log('[Callback] OAuth hash detected, waiting for Supabase to process...');
         }
 
         // Give Supabase time to process the OAuth response
@@ -50,10 +50,10 @@ export default function Callback() {
             }
 
             if (session) {
-                console.log('[Callback] Session found, redirecting to home');
+                if (import.meta.env.DEV) console.log('[Callback] Session found, redirecting to home');
                 navigate('/', { replace: true });
             } else {
-                console.log('[Callback] No session found after processing');
+                if (import.meta.env.DEV) console.log('[Callback] No session found after processing');
                 setProcessing(false);
             }
         };

@@ -4,13 +4,8 @@ import { api } from '../api/client';
 import { Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import TimePicker from './TimePicker';
+import { parseUTCTime } from '../utils/parseTime';
 
-// Parse time from API (UTC) to local Date object
-const parseUTCTime = (timeStr: any): Date => {
-    if (!timeStr) return new Date();
-    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-    return new Date(utcTime);
-};
 
 interface SleepModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function SleepModal({ babyId, editEvent, onClose, onSave }: SleepModalProps) {

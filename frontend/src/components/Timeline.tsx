@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { format } from 'date-fns';
 import Icon from './Icon';
+import { parseUTCTime } from '../utils/parseTime';
 
-// Parse time from API (UTC) to local Date object
-const parseUTCTime = (timeStr: any): Date => {
-    if (!timeStr) return new Date();
-    const utcTime = timeStr.endsWith('Z') ? timeStr : timeStr + 'Z';
-    return new Date(utcTime);
-};
 
 const EVENT_CONFIG: Record<string, { label: string }> = {
     feeding: { label: 'Feeding' },
