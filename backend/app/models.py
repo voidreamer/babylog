@@ -27,6 +27,10 @@ class User(Base):
     is_premium = Column(Boolean, default=False, nullable=False)
     premium_since = Column(DateTime, nullable=True)  # When premium was activated
     promo_code_used = Column(String, nullable=True)  # Which promo code was redeemed
+    stripe_customer_id = Column(String, nullable=True, index=True)
+    stripe_subscription_id = Column(String, nullable=True)
+    premium_plan = Column(String, nullable=True)  # 'monthly' or 'yearly'
+    premium_expires_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utc_now)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 

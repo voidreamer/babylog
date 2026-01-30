@@ -44,8 +44,12 @@ resource "aws_lambda_function" "api" {
       DATABASE_URL        = var.database_url
       ENVIRONMENT         = var.environment
       SUPABASE_JWT_SECRET = var.supabase_jwt_secret
-      CORS_ORIGINS        = var.cors_origins
-      ADMIN_API_KEY       = var.admin_api_key
+      CORS_ORIGINS           = var.cors_origins
+      ADMIN_API_KEY          = var.admin_api_key
+      STRIPE_SECRET_KEY      = var.stripe_secret_key
+      STRIPE_WEBHOOK_SECRET  = var.stripe_webhook_secret
+      STRIPE_PRICE_MONTHLY   = var.stripe_price_monthly
+      STRIPE_PRICE_YEARLY    = var.stripe_price_yearly
     }
   }
 }

@@ -20,12 +20,9 @@ settings = get_settings()
 # Rate limiter for this router
 limiter = Limiter(key_func=get_remote_address)
 
-# Promo codes stored server-side
-# Format: code -> {premium: bool, description: str}
-VALID_PROMO_CODES = {
-    "SIMPLEBABY2026": {"premium": True, "description": "Launch promo"},
-    "BETATESTER": {"premium": True, "description": "Beta tester reward"},
-}
+# Promo codes removed — premium access is now handled via Stripe subscriptions.
+# See billing.py for the Stripe integration.
+VALID_PROMO_CODES: dict = {}
 
 
 class PromoCodeRequest(BaseModel):

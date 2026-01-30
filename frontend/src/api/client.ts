@@ -403,6 +403,18 @@ class ApiClient {
 
     // Upcoming
     async getUpcoming(babyId: number): Promise<any> { return this.request(`/health/upcoming/?baby_id=${babyId}`); }
+
+    // Billing
+    async createCheckoutSession(priceId: string, successUrl: string, cancelUrl: string): Promise<any> {
+        return this.request('/billing/create-checkout-session', {
+            method: 'POST',
+            body: JSON.stringify({ price_id: priceId, success_url: successUrl, cancel_url: cancelUrl }),
+        });
+    }
+    async getBillingSubscription(): Promise<any> { return this.request('/billing/subscription'); }
+    async createBillingPortal(): Promise<any> {
+        return this.request('/billing/portal', { method: 'POST' });
+    }
 }
 
 export const api = new ApiClient();

@@ -3,8 +3,8 @@ import { X, Check, Sparkles, Crown } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 
-const MONTHLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_MONTHLY || 'price_1Sv61yFddQLEQqx0uo4FwMA3';
-const YEARLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_YEARLY || 'price_1Sv61yFddQLEQqx0chj3KdAC';
+const MONTHLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_MONTHLY || 'price_1Sv65tFddQLEQqx0hqT4xvb1';
+const YEARLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_YEARLY || 'price_1Sv65xFddQLEQqx0G4B4XQbv';
 
 const FEATURES = [
   'AI-powered baby insights & predictions',
@@ -93,9 +93,28 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
               background: 'var(--surface)',
               cursor: loading ? 'wait' : 'pointer',
               textAlign: 'center',
+              position: 'relative',
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$4.99</div>
+            <span
+              style={{
+                position: 'absolute',
+                top: -10,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: '#ef4444',
+                color: '#fff',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 8,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              LIMITED TIME · 50% OFF
+            </span>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>$4.99</div>
+            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$2.49</div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per month</div>
           </button>
 
@@ -118,19 +137,36 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
               style={{
                 position: 'absolute',
                 top: -10,
+                left: -6,
+                background: '#ef4444',
+                color: '#fff',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 8,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              LIMITED TIME · 50% OFF
+            </span>
+            <span
+              style={{
+                position: 'absolute',
+                top: -10,
                 right: -6,
                 background: '#f59e0b',
                 color: '#fff',
-                fontSize: '0.65rem',
+                fontSize: '0.6rem',
                 fontWeight: 700,
                 padding: '2px 6px',
                 borderRadius: 8,
               }}
             >
-              SAVE 50%
+              BEST VALUE
             </span>
-            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$29.99</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per year</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>$29.99</div>
+            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$14.99</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per year ($1.25/mo)</div>
           </button>
         </div>
 

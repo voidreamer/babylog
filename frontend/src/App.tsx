@@ -19,12 +19,13 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown } from 'lucide-react';
+import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; promoCode: string; setPromoCode: (v: string) => void; promoLoading: boolean; handlePromoCode: () => void; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setPromoCode, promoLoading, handlePromoCode, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
     return (
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
@@ -62,42 +63,24 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, promoCode, setProm
                         </div>
                     </div>
                 )}
-                <div className="settings-row">
+                <div className="settings-row" onClick={isPremium ? onManage : onUpgrade} style={{ cursor: 'pointer' }}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box butter">
-                            <Star size={16} />
+                            <Crown size={16} />
                         </div>
                         <div>
                             <div className="settings-row-label">Premium Plan</div>
                             <div className="settings-row-desc">
-                                {isPremium ? 'Active' : 'Unlock AI insights'}
+                                {isPremium ? 'Active — Manage subscription' : 'Unlock AI insights & more'}
                             </div>
                         </div>
                     </div>
                     {isPremium ? (
                         <span className="settings-badge mint">Active</span>
                     ) : (
-                        <span className="settings-badge lavender">Upgrade</span>
+                        <ChevronRight size={18} className="settings-arrow" />
                     )}
                 </div>
-                {!isPremium && (
-                    <div className="settings-promo-row">
-                        <input
-                            type="text"
-                            className="form-input"
-                            placeholder="Enter promo code..."
-                            value={promoCode}
-                            onChange={(e) => setPromoCode(e.target.value)}
-                        />
-                        <button
-                            className="btn btn-primary btn-sm"
-                            onClick={handlePromoCode}
-                            disabled={!promoCode.trim() || promoLoading}
-                        >
-                            {promoLoading ? '...' : 'Apply'}
-                        </button>
-                    </div>
-                )}
             </div>
 
             {/* Data */}
@@ -196,8 +179,7 @@ function MainApp() {
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
-    const [promoCode, setPromoCode] = useState('');
-    const [promoLoading, setPromoLoading] = useState(false);
+    const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
 
     // Premium state
@@ -205,40 +187,12 @@ function MainApp() {
         return localStorage.getItem('isPremium') === 'true';
     });
 
-    const handlePromoCode = async () => {
-        if (!promoCode.trim()) {
-            toast.error('Please enter a promo code');
-            return;
-        }
-
-        // Check rate limit: 3 attempts per minute
-        const rateLimit = checkRateLimit('promoCode', 3, 60000);
-        if (!rateLimit.allowed) {
-            const timeLeft = getTimeUntilReset(rateLimit.resetTime);
-            toast.error(`Too many attempts. Please wait ${timeLeft} and try again.`);
-            return;
-        }
-
-        setPromoLoading(true);
-        // Record this attempt before making the API call
-        recordAttempt('promoCode', 60000);
-
+    const handleManageSubscription = async () => {
         try {
-            const result = await api.redeemPromoCode(promoCode);
-            if (result.valid && result.premium) {
-                setIsPremium(true);
-                localStorage.setItem('isPremium', 'true');
-                setPromoCode('');
-                // Clear rate limit on success so user isn't penalized
-                clearRateLimit('promoCode');
-                toast.success(result.message || 'Premium unlocked!');
-            } else {
-                toast.error(result.message || 'Invalid code');
-            }
-        } catch (_error) {
-            toast.error('Failed to verify code. Please try again.');
-        } finally {
-            setPromoLoading(false);
+            const result = await api.createBillingPortal();
+            window.location.href = result.portal_url;
+        } catch {
+            toast.error('Could not open subscription management.');
         }
     };
 
@@ -400,18 +354,18 @@ function MainApp() {
                         isDark={theme === 'dark'}
                         toggleTheme={toggleTheme}
                         isPremium={isPremium}
-                        promoCode={promoCode}
-                        setPromoCode={setPromoCode}
-                        promoLoading={promoLoading}
-                        handlePromoCode={handlePromoCode}
                         exportLoading={exportLoading}
                         handleExportCsv={handleExportCsv}
                         babies={babies}
                         setShowPrivacyPolicy={setShowPrivacyPolicy}
                         logout={logout}
+                        onUpgrade={() => setShowUpgradeDialog(true)}
+                        onManage={handleManageSubscription}
                     />
                 )}
             </main>
+
+            {showUpgradeDialog && <UpgradeDialog onClose={() => setShowUpgradeDialog(false)} />}
 
             {/* Bottom Navigation */}
             <nav className="bottom-nav">
