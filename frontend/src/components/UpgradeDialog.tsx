@@ -3,8 +3,8 @@ import { X, Check, Sparkles, Crown } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 
-const MONTHLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_MONTHLY || 'price_1Sv61yFddQLEQqx0uo4FwMA3';
-const YEARLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_YEARLY || 'price_1Sv6AkFddQLEQqx0xkflIacB';
+const MONTHLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_MONTHLY || 'price_1Sv6BoFddQLEQqx0mPG0LweR';
+const YEARLY_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_YEARLY || 'price_1Sv6BoFddQLEQqx0bOrKID81';
 
 const FEATURES = [
   'AI-powered baby insights & predictions',
@@ -53,6 +53,32 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
     }
   };
 
+  const promoBadgeStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: -10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+    color: '#fff',
+    fontSize: '0.58rem',
+    fontWeight: 800,
+    padding: '2px 7px',
+    borderRadius: 8,
+    whiteSpace: 'nowrap',
+    letterSpacing: '0.03em',
+    boxShadow: '0 2px 6px rgba(239,68,68,0.35)',
+  };
+
+  const cardBase: React.CSSProperties = {
+    flex: 1,
+    borderRadius: 'var(--radius-lg)',
+    padding: 'var(--space-md)',
+    background: 'var(--surface)',
+    cursor: loading ? 'wait' : 'pointer',
+    textAlign: 'center',
+    position: 'relative',
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -85,68 +111,45 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
           <button
             onClick={() => handleCheckout(MONTHLY_PRICE_ID)}
             disabled={!!loading}
-            style={{
-              flex: 1,
-              border: '2px solid var(--border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-md)',
-              background: 'var(--surface)',
-              cursor: loading ? 'wait' : 'pointer',
-              textAlign: 'center',
-            }}
+            style={{ ...cardBase, border: '2px solid var(--border)' }}
           >
-            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$4.99</div>
+            <span style={promoBadgeStyle}>LIMITED TIME · 50% OFF</span>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginTop: 4 }}>
+              $4.99/mo
+            </div>
+            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$2.49</div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per month</div>
           </button>
 
-          {/* Yearly — launch promo */}
+          {/* Yearly */}
           <button
             onClick={() => handleCheckout(YEARLY_PRICE_ID)}
             disabled={!!loading}
-            style={{
-              flex: 1,
-              border: '2px solid #f59e0b',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-md)',
-              background: 'var(--surface)',
-              cursor: loading ? 'wait' : 'pointer',
-              textAlign: 'center',
-              position: 'relative',
-            }}
+            style={{ ...cardBase, border: '2px solid #f59e0b' }}
           >
+            <span style={promoBadgeStyle}>LIMITED TIME · 50% OFF</span>
             <span
               style={{
                 position: 'absolute',
-                top: -12,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                top: -10,
+                right: -6,
+                background: '#f59e0b',
                 color: '#fff',
-                fontSize: '0.6rem',
+                fontSize: '0.58rem',
                 fontWeight: 800,
-                padding: '3px 8px',
+                padding: '2px 7px',
                 borderRadius: 8,
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.03em',
-                boxShadow: '0 2px 6px rgba(239,68,68,0.4)',
               }}
             >
-              LIMITED TIME — 50% OFF
+              BEST VALUE
             </span>
-            <div
-              style={{
-                fontSize: '0.8rem',
-                color: 'var(--text-muted)',
-                textDecoration: 'line-through',
-                marginTop: 2,
-              }}
-            >
-              $49.99/yr
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginTop: 4 }}>
+              $29.99/yr
             </div>
-            <div style={{ fontWeight: 700, fontSize: '1.25rem', color: '#16a34a' }}>$24.99</div>
+            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$14.99</div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>per year</div>
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>
-              Just $2.08/mo
+              Just $1.25/mo
             </div>
           </button>
         </div>
