@@ -66,6 +66,9 @@ i18n
     interpolation: {
       escapeValue: false, // React already escapes
     },
+    react: {
+      useSuspense: false, // Don't require Suspense wrapper for useTranslation
+    },
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       lookupLocalStorage: 'i18nextLng',
