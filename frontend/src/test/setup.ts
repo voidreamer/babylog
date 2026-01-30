@@ -1,5 +1,32 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+// Initialize i18n for tests
+i18n.use(initReactI18next).init({
+  lng: 'en',
+  fallbackLng: 'en',
+  ns: ['common', 'dashboard', 'health', 'settings', 'auth'],
+  defaultNS: 'common',
+  resources: {
+    en: {
+      common: {
+        placeholder_enterName: 'Enter name',
+        save: 'Save',
+        cancel: 'Cancel',
+        add: 'Add',
+        loading: 'Loading...',
+      },
+      dashboard: {
+        'feeding.title': 'Feeding',
+        'diaper.title': 'Diaper',
+        'sleep.title': 'Sleep',
+      },
+    },
+  },
+  interpolation: { escapeValue: false },
+});
 
 // Mock import.meta.env
 vi.stubGlobal('import', { meta: { env: { DEV: true, VITE_API_URL: 'http://localhost:8000', VITE_SUPABASE_URL: 'https://test.supabase.co', VITE_SUPABASE_ANON_KEY: 'test-key' } } });

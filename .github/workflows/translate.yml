@@ -8,6 +8,9 @@ on:
       - staging
       - 'feature/i18n-*'
 
+permissions:
+  contents: write
+
 jobs:
   translate:
     runs-on: ubuntu-latest

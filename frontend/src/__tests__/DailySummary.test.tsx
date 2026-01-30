@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import DailySummary from '../components/DailySummary';
 import { mockDailySummary, mockUseBaby } from '../test/mocks';
-import { useTranslation } from 'react-i18next';
 
 vi.mock('../hooks/useBaby', () => ({
   useBaby: () => mockUseBaby,
@@ -18,7 +17,6 @@ vi.mock('date-fns', () => ({
 }));
 
 describe('DailySummary', () => {
-    const { t } = useTranslation('dashboard');
   it('returns null when no summary', () => {
     const { container } = render(<DailySummary summary={null} />);
     expect(container.firstChild).toBeNull();

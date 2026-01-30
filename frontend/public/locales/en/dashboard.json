@@ -1,6 +1,6 @@
 {
   "title": "Dashboard",
-  "dailySummary": "Today's Summary",
+  "dailySummary": "Daily Summary",
   "comingUp": "Coming Up",
   "widgetSettings": "Widget Settings",
   "quickActions": "Quick Actions",
@@ -22,7 +22,20 @@
     "amount": "Amount",
     "duration": "Duration",
     "notes": "Notes",
-    "type": "Type"
+    "type": "Type",
+    "saveFeeding": "Save Feeding",
+    "breastMilk": "Breast Milk",
+    "formula": "Formula",
+    "quickLog": "Quick Log",
+    "timer": "Timer",
+    "method": "Method",
+    "bottleContents": "Bottle Contents",
+    "durationMin": "Duration (min)",
+    "amountMl": "Amount (ml)",
+    "startedAt": "Started at {{time}}",
+    "stop": "Stop",
+    "noFeedingsYet": "No feedings yet",
+    "feedingLogged": "Feeding logged ({{duration}} min)"
   },
   "diaper": {
     "title": "Diaper",
@@ -33,7 +46,34 @@
     "mixed": "Mixed",
     "dry": "Dry",
     "color": "Color",
-    "notes": "Notes"
+    "notes": "Notes",
+    "pee": "Pee",
+    "poo": "Poo",
+    "both": "Both",
+    "saveDiaperChange": "Save Diaper Change",
+    "diaperChange": "Diaper Change",
+    "type": "Type",
+    "consistency": "Consistency",
+    "amount": "Amount",
+    "time": "Time",
+    "noDiapersYet": "No diapers yet",
+    "colors": {
+      "yellow": "Yellow",
+      "brown": "Brown",
+      "green": "Green",
+      "orange": "Orange",
+      "black": "Black",
+      "red": "Red",
+      "white": "White"
+    },
+    "consistencies": {
+      "liquid": "Liquid",
+      "soft": "Soft",
+      "formed": "Formed",
+      "hard": "Hard",
+      "pellets": "Pellets"
+    },
+    "diaperLogged": "{{type}} diaper logged"
   },
   "sleep": {
     "title": "Sleep",
@@ -46,7 +86,13 @@
     "nap": "Nap",
     "nightSleep": "Night Sleep",
     "duration": "Duration",
-    "notes": "Notes"
+    "notes": "Notes",
+    "wakeUp": "Wake Up",
+    "waking": "Waking...",
+    "starting": "Starting...",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "saveChanges": "Save Changes"
   },
   "pumping": {
     "title": "Pumping",
@@ -56,7 +102,11 @@
     "logPumping": "Log Pumping",
     "amount": "Amount",
     "duration": "Duration",
-    "notes": "Notes"
+    "notes": "Notes",
+    "savePumping": "Save Pumping",
+    "start": "Start",
+    "noPumpingsYet": "No pumpings yet",
+    "pumpingLogged": "Pumping logged ({{duration}} min)"
   },
   "potty": {
     "title": "Potty",
@@ -64,7 +114,19 @@
     "logPotty": "Log Potty",
     "success": "Success",
     "accident": "Accident",
-    "notes": "Notes"
+    "notes": "Notes",
+    "result": "Result",
+    "typeOptional": "Type (optional)",
+    "pee": "Pee",
+    "poo": "Poo",
+    "both": "Both",
+    "successLabel": "✓ Success",
+    "attemptLabel": "~ Attempt",
+    "accidentLabel": "✗ Accident",
+    "noPottyYet": "No potty logs yet",
+    "pottyLogged": "Potty {{result}} logged",
+    "yes": "Yes",
+    "try": "Try"
   },
   "tummyTime": {
     "title": "Tummy Time",
@@ -73,13 +135,19 @@
     "stopTummyTime": "Stop Tummy Time",
     "logTummyTime": "Log Tummy Time",
     "duration": "Duration",
-    "notes": "Notes"
+    "notes": "Notes",
+    "tummy": "Tummy",
+    "start": "Start",
+    "noTummyTimeYet": "No tummy time yet",
+    "tummyTimeLogged": "Tummy time logged ({{duration}} min)"
   },
   "bath": {
     "title": "Bath",
     "lastBath": "Last bath",
     "logBath": "Log Bath",
-    "notes": "Notes"
+    "notes": "Notes",
+    "noBathsYet": "No baths yet",
+    "logging": "Logging..."
   },
   "supplement": {
     "title": "Supplement",
@@ -87,18 +155,183 @@
     "logSupplement": "Log Supplement",
     "name": "Name",
     "dosage": "Dosage",
-    "notes": "Notes"
+    "notes": "Notes",
+    "dosageOptional": "Dosage (optional)",
+    "noSupplementsYet": "No supplements yet",
+    "vitaminD": "Vitamin D",
+    "iron": "Iron",
+    "dhaOmega3": "DHA/Omega-3",
+    "probiotic": "Probiotic",
+    "multivitamin": "Multivitamin",
+    "other": "Other"
   },
   "summary": {
+    "feedings": "feedings",
+    "diapers": "diapers",
+    "sleepTotal": "sleep",
+    "pumpings": "pumps",
+    "pottyTrips": "potty",
+    "tummyTimeSessions": "tummy time",
+    "baths": "baths",
+    "supplements": "Supplements",
+    "naps": "{{count}} naps",
+    "successCount": "{{count}} success",
+    "bath": "bath"
+  },
+  "dailySummarySection": {
+    "title": "Daily Summary",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "loading": "Loading...",
+    "noData": "No data for {{period}}",
+    "wet": "{{count}} wet",
+    "dirty": "{{count}} dirty",
+    "mixed": "{{count}} mixed"
+  },
+  "comingUpSection": {
+    "active": "Active",
+    "vaccine": "Vaccine",
+    "visit": "Visit",
+    "ongoing": "Ongoing"
+  },
+  "timeline": {
+    "noEventsToday": "No events logged today",
+    "noEventsRecorded": "No events recorded",
+    "addFromDashboard": "Add activities from the dashboard to see them here",
+    "inProgress": "in progress",
+    "sleeping": "Sleeping...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete {{type}}?",
+    "deleteConfirmMessage": "This action cannot be undone.",
+    "tummyTime": "Tummy Time",
+    "breastmilkBottle": "Breastmilk Bottle",
+    "attempt": "Attempt"
+  },
+  "greeting": {
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "welcome": "Welcome!",
+    "addFirstBaby": "Add your first baby to get started",
+    "addBaby": "Add Baby",
+    "shared": "Shared",
+    "shareName": "Share {{name}}",
+    "editName": "Edit {{name}}",
+    "deleteName": "Delete {{name}}",
+    "deleteConfirm": "Delete {{name}}? This removes all data and cannot be undone.",
+    "babyAdded": "{{name}} added!",
+    "babyUpdated": "{{name}} updated!",
+    "editBaby": "Edit {{name}}"
+  },
+  "age": {
+    "bornToday": "Born today!",
+    "daysOld": "{{count}} day old",
+    "daysOld_plural": "{{count}} days old",
+    "weeksOld": "{{count}} week old",
+    "weeksOld_plural": "{{count}} weeks old",
+    "monthsOld": "{{count}} month old",
+    "monthsOld_plural": "{{count}} months old",
+    "yearsMonthsOld": "{{years}}y {{months}}m old",
+    "yearsOld": "{{count}} year old",
+    "yearsOld_plural": "{{count}} years old"
+  },
+  "encouragement": {
+    "letsTrack": "Let's track today's activities!",
+    "readyToLog": "Ready to log today's first event!",
+    "greatStart": "Great start to the day!",
+    "doingAmazing": "You're doing amazing!",
+    "superParent": "Super parent! Keep it up!"
+  },
+  "widgetSettingsSection": {
+    "editActivities": "Edit Activities",
+    "hidden": "{{count}} hidden",
+    "allVisible": "All visible",
+    "dashboardActivities": "Dashboard Activities",
+    "tapToShowHide": "Tap to show or hide activities on your dashboard",
+    "quickActions": "Quick Actions",
+    "oneTapButtons": "One-tap buttons on widgets"
+  },
+  "insights": {
+    "selectBaby": "Select a baby to see insights",
+    "analyzingPatterns": "Analyzing patterns...",
+    "unableToLoad": "Unable to load insights",
+    "collectingData": "Collecting Data",
+    "collectingDataDesc": "Keep tracking for a few more days! We need at least 3-5 days of data to identify patterns and make predictions.",
+    "dataPoints": "Data points: {{feedings}} feedings, {{sleeps}} sleeps",
+    "predictions": "Predictions",
+    "nextFeeding": "Next Feeding",
+    "nextNap": "Next Nap",
+    "sleepPressure": "Sleep Pressure",
+    "pastDue": "Past due",
+    "sleepingNow": "Sleeping now",
+    "mayBeHungry": "May be hungry!",
+    "wakeWindow": "Wake window: {{min}}-{{max}} min",
+    "minutesAwake": "{{count}} min awake",
+    "upgradeToSeePredictions": "Upgrade to see predictions",
+    "patterns": "Patterns",
+    "wakesUp": "Wakes up",
+    "everyHours": "Every {{hours}} hours",
+    "usuallyWakesUp": "Usually wakes up",
+    "usualBedtime": "Usual bedtime",
+    "feedsEvery": "Feeds every",
+    "hours": "{{hours}} hours",
+    "avgNapLength": "Avg nap length",
+    "minutes": "{{minutes}} min",
+    "upgradeToseePatterns": "Upgrade to see patterns",
+    "fourteenDayTrends": "14-Day Trends",
+    "sleep": "Sleep",
+    "feeding": "Feeding",
+    "upgradeToSeeTrends": "Upgrade to see trends",
+    "ageGuidelines": "Age Guidelines",
+    "weeks": "{{count}} weeks",
+    "diapersToday": "Diapers Today",
+    "wet": "wet",
+    "expected": "expected",
+    "sleepToday": "Sleep Today",
+    "hours_label": "hours",
+    "feedingsToday": "Feedings Today",
+    "feeds": "feeds",
+    "todayVsAverage": "Today vs. Your Average",
     "feedings": "Feedings",
     "diapers": "Diapers",
-    "sleepTotal": "Sleep Total",
-    "pumpings": "Pumpings",
-    "pottyTrips": "Potty Trips",
-    "tummyTimeSessions": "Tummy Time",
-    "baths": "Baths",
-    "supplements": "Supplements"
+    "vs": "vs",
+    "perDay": "{{value}}/day"
   },
+  "learn": {
+    "insights": "Insights",
+    "forBaby": "For {{name}}, {{months}} {{monthLabel}} old",
+    "month": "month",
+    "months": "months"
+  },
+  "share": {
+    "shareTitle": "Share {{name}}",
+    "addByEmail": "Add by email",
+    "share": "Share",
+    "sharedWith": "Shared with",
+    "remove": "Remove",
+    "shareHint": "Enter an email to share access to {{name}} with another person.",
+    "done": "Done"
+  },
+  "babySelector": {
+    "addBaby": "+ Add Baby",
+    "addYourBaby": "Add Your Baby",
+    "selectBaby": "Select Baby",
+    "shared": "Shared",
+    "shareName": "Share {{name}}",
+    "deleteName": "Delete {{name}}",
+    "deleteConfirm": "Are you sure you want to delete {{name}}? This will remove all feeding, diaper, sleep, and health records. This cannot be undone.",
+    "addAnotherBaby": "+ Add Another Baby"
+  },
+  "quickActionsSection": {
+    "feeding": "Feeding",
+    "diaper": "Diaper",
+    "sleep": "Sleep",
+    "pump": "Pump"
+  },
+  "failedToLoadDashboard": "Failed to load dashboard",
+  "failedToLoadDashboardDesc": "Please check your connection and try again.",
+  "tapToLog": "Tap to log",
   "toast_failedToAddBaby": "Failed to add baby",
   "toast_failedToUpdateBaby": "Failed to update baby",
   "submitLabel_saveChanges": "Save Changes",
@@ -142,5 +375,12 @@
   "placeholder_customMinutes": "Custom minutes",
   "placeholder_babysMoodEtc": "Baby's mood, etc.",
   "toast_tummyTimeStarted": "Tummy time started",
-  "title_logTummyTimeManually": "Log tummy time manually"
+  "title_logTummyTimeManually": "Log tummy time manually",
+  "modal": {
+    "edit": "Edit",
+    "log": "Log",
+    "time": "Time",
+    "notesOptional": "Notes (optional)",
+    "notes": "Notes"
+  }
 }

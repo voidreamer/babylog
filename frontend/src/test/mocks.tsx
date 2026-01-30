@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
-import { useTranslation } from 'react-i18next';
 
 // Mock baby data
 export const mockBaby = { id: 1, name: 'Luna', birth_date: '2024-06-15T00:00:00Z', gender: 'girl', is_owner: true, shared_with_emails: [] };

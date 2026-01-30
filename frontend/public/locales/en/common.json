@@ -4,6 +4,7 @@
   "hub": "Hub",
   "loading": "Loading...",
   "save": "Save",
+  "saving": "Saving...",
   "cancel": "Cancel",
   "delete": "Delete",
   "edit": "Edit",
@@ -28,8 +29,10 @@
   "addBabyPrompt": "Add your baby to start tracking",
   "noBabySelected": "No baby selected",
   "errorBoundaryTitle": "Something went wrong",
-  "errorBoundaryMessage": "An unexpected error occurred. Please try refreshing the page.",
+  "errorBoundaryMessage": "We're sorry, but something unexpected happened. Please try again.",
   "refresh": "Refresh",
+  "tryAgain": "Try Again",
+  "now": "Now",
   "nav": {
     "home": "Home",
     "timeline": "Timeline",
@@ -64,5 +67,23 @@
   "placeholder_50": "50",
   "toast_failedToAddBaby": "Failed to add baby",
   "submitLabel_addBaby": "Add Baby",
-  "submitLabel_saveChanges": "Save Changes"
+  "submitLabel_saveChanges": "Save Changes",
+  "addBabyForm": {
+    "babysName": "Baby's Name *",
+    "birthDate": "Birth Date *",
+    "gender": "Gender",
+    "boy": "Boy",
+    "girl": "Girl",
+    "genderHint": "Optional - helps with accurate growth charts",
+    "birthMeasurements": "Birth Measurements (optional)",
+    "weightKg": "Weight (kg)",
+    "heightCm": "Height (cm)"
+  },
+  "offlineIndicator": {
+    "youreOffline": "You're offline",
+    "changesPending": "{{count}} change{{s}} pending",
+    "syncingChanges": "Syncing changes...",
+    "changesToSync": "{{count}} change{{s}} to sync",
+    "syncNow": "Sync now"
+  }
 }

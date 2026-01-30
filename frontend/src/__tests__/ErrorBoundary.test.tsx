@@ -1,10 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ErrorBoundary from '../components/ErrorBoundary';
-import { useTranslation } from 'react-i18next';
 
 function ThrowingComponent({ shouldThrow }: { shouldThrow: boolean }) {
-    const { t } = useTranslation('common');
   if (shouldThrow) throw new Error('Test error');
   return <div>No error</div>;
 }
