@@ -24,8 +24,8 @@ import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
     return (
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
@@ -63,7 +63,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, exportLoading, han
                         </div>
                     </div>
                 )}
-                <div className="settings-row" onClick={isPremium ? onManage : onUpgrade} style={{ cursor: 'pointer' }}>
+                <div className="settings-row" onClick={isPremium && !hasStripeSubscription ? undefined : (isPremium ? onManage : onUpgrade)} style={{ cursor: isPremium && !hasStripeSubscription ? 'default' : 'pointer' }}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box butter">
                             <Crown size={16} />
@@ -71,7 +71,11 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, exportLoading, han
                         <div>
                             <div className="settings-row-label">Premium Plan</div>
                             <div className="settings-row-desc">
-                                {isPremium ? 'Active — Manage subscription' : 'Unlock AI insights & more'}
+                                {isPremium
+                                    ? hasStripeSubscription
+                                        ? 'Active — Manage subscription'
+                                        : 'Active — Promo code'
+                                    : 'Unlock AI insights & more'}
                             </div>
                         </div>
                     </div>
@@ -186,6 +190,9 @@ function MainApp() {
     const [isPremium, setIsPremium] = useState(() => {
         return localStorage.getItem('isPremium') === 'true';
     });
+    const [hasStripeSubscription, setHasStripeSubscription] = useState(() => {
+        return localStorage.getItem('hasStripeSubscription') === 'true';
+    });
 
     const handleManageSubscription = async () => {
         try {
@@ -247,6 +254,16 @@ function MainApp() {
                     // (could be cache was cleared but user never had premium)
                     setIsPremium(false);
                     localStorage.setItem('isPremium', 'false');
+                }
+                // Check if premium came from Stripe (has active billing subscription)
+                try {
+                    const billing = await api.getBillingSubscription();
+                    const hasSub = billing.is_premium && !!billing.plan;
+                    setHasStripeSubscription(hasSub);
+                    localStorage.setItem('hasStripeSubscription', hasSub ? 'true' : 'false');
+                } catch {
+                    setHasStripeSubscription(false);
+                    localStorage.setItem('hasStripeSubscription', 'false');
                 }
             } catch (error) {
                 // On error, keep localStorage value as fallback
@@ -354,6 +371,7 @@ function MainApp() {
                         isDark={theme === 'dark'}
                         toggleTheme={toggleTheme}
                         isPremium={isPremium}
+                        hasStripeSubscription={hasStripeSubscription}
                         exportLoading={exportLoading}
                         handleExportCsv={handleExportCsv}
                         babies={babies}
