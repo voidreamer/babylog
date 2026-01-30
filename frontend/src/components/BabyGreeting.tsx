@@ -11,9 +11,9 @@ import { useTranslation } from 'react-i18next';
 // Get time-based greeting
 function getGreeting() {
     const hour = new Date().getHours();
-    if (hour < 12) return { text: 'Good morning', icon: '☀️' };
-    if (hour < 17) return { text: 'Good afternoon', icon: '🌤️' };
-    return { text: 'Good evening', icon: '🌙' };
+    if (hour < 12) return { text: 'goodMorning', icon: '☀️' };
+    if (hour < 17) return { text: 'goodAfternoon', icon: '🌤️' };
+    return { text: 'goodEvening', icon: '🌙' };
 }
 
 // Calculate age from birth date
@@ -26,32 +26,32 @@ function calculateAge(birthDate: string | null): string | null {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) return null;
-    if (diffDays === 0) return 'Born today!';
-    if (diffDays === 1) return '1 day old';
-    if (diffDays < 7) return `${diffDays} days old`;
+    if (diffDays === 0) return null; // handled by t()
+    if (diffDays === 1) return null;
+    if (diffDays < 7) return null;
 
     const weeks = Math.floor(diffDays / 7);
-    if (weeks < 12) return `${weeks} week${weeks > 1 ? 's' : ''} old`;
+    if (weeks < 12) return null;
 
     const months = Math.floor(diffDays / 30.44);
-    if (months < 24) return `${months} month${months > 1 ? 's' : ''} old`;
+    if (months < 24) return null;
 
     const years = Math.floor(months / 12);
     const remainingMonths = months % 12;
-    if (remainingMonths === 0) return `${years} year${years > 1 ? 's' : ''} old`;
-    return `${years}y ${remainingMonths}m old`;
+    if (remainingMonths === 0) return null;
+    return null;
 }
 
 // Get encouraging message based on daily stats
 function getEncouragement(summary: any): string {
-    if (!summary) return "Let's track today's activities!";
+    if (!summary) return 'letsTrack';
 
     const total = (summary.total_feedings || 0) + (summary.total_diapers || 0) + (summary.sleep_count || 0);
 
-    if (total === 0) return "Ready to log today's first event!";
-    if (total <= 3) return "Great start to the day!";
-    if (total <= 8) return "You're doing amazing!";
-    return "Super parent! Keep it up!";
+    if (total === 0) return 'readyToLog';
+    if (total <= 3) return 'greatStart';
+    if (total <= 8) return 'doingAmazing';
+    return 'superParent';
 }
 
 // Generate consistent pastel color from name
@@ -104,7 +104,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
 
             await refresh();
             setShowAddForm(false);
-            toast.success(`${formData.name} added!`);
+            toast.success(t('greeting.babyAdded', { name: formData.name }));
         } catch (error) {
             console.error('Failed to add baby:', error);
             toast.error(t('toast_failedToAddBaby'));
@@ -125,7 +125,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
 
             await refresh();
             setShowEditForm(false);
-            toast.success(`${formData.name} updated!`);
+            toast.success(t('greeting.babyUpdated', { name: formData.name }));
         } catch (error) {
             console.error('Failed to update baby:', error);
             toast.error(t('toast_failedToUpdateBaby'));
@@ -140,24 +140,24 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
             <div className="baby-greeting baby-greeting-empty">
                 <div className="baby-greeting-header">
                     <span className="greeting-icon">👶</span>
-                    <span className="greeting-text">Welcome!</span>
+                    <span className="greeting-text">{t('greeting.welcome')}</span>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>
-                    Add your first baby to get started
+                    {t('greeting.addFirstBaby')}
                 </p>
                 <button
                     className="btn btn-primary"
                     onClick={() => setShowAddForm(true)}
                 >
                     <Plus size={18} />
-                    Add Baby
+                    {t('greeting.addBaby')}
                 </button>
 
                 {showAddForm && (
                     <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
                         <div className="modal" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2 className="modal-title">Add Baby</h2>
+                                <h2 className="modal-title">{t('greeting.addBaby')}</h2>
                                 <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                             </div>
                             <div className="modal-body">
@@ -186,7 +186,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
             <div className="baby-greeting">
                 <div className="baby-greeting-header">
                     <span className="greeting-icon">{greeting.icon}</span>
-                    <span className="greeting-text">{greeting.text}!</span>
+                    <span className="greeting-text">{t(`greeting.${greeting.text}`)}!</span>
                 </div>
 
                 {/* Tappable baby selector */}
@@ -206,7 +206,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                             {selectedBaby.name}
                             <ChevronDown size={20} className="baby-greeting-chevron" />
                         </div>
-                        {age && <div className="baby-greeting-age">{age}</div>}
+                        {selectedBaby?.birth_date && <div className="baby-greeting-age">{(() => { const birth = new Date(selectedBaby.birth_date); const now = new Date(); const diffMs = now.getTime() - birth.getTime(); const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); if (diffDays < 0) return null; if (diffDays === 0) return t('age.bornToday'); if (diffDays === 1) return t('age.daysOld', { count: 1 }); if (diffDays < 7) return t('age.daysOld_plural', { count: diffDays }); const weeks = Math.floor(diffDays / 7); if (weeks < 12) return weeks > 1 ? t('age.weeksOld_plural', { count: weeks }) : t('age.weeksOld', { count: weeks }); const months = Math.floor(diffDays / 30.44); if (months < 24) return months > 1 ? t('age.monthsOld_plural', { count: months }) : t('age.monthsOld', { count: months }); const years = Math.floor(months / 12); const rm = months % 12; if (rm === 0) return years > 1 ? t('age.yearsOld_plural', { count: years }) : t('age.yearsOld', { count: years }); return t('age.yearsMonthsOld', { years, months: rm }); })()}</div>}
                     </div>
                 </div>
 
@@ -230,7 +230,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 </div>
                                 <span className="baby-dropdown-name">{baby.name}</span>
                                 {!baby.is_owner && (
-                                    <span className="baby-dropdown-shared">Shared</span>
+                                    <span className="baby-dropdown-shared">{t('greeting.shared')}</span>
                                 )}
                                 {baby.id === selectedBaby?.id && <Check size={16} />}
                             </div>
@@ -247,7 +247,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 }}
                             >
                                 <Share2 size={16} />
-                                <span>Share {selectedBaby.name}</span>
+                                <span>{t('greeting.shareName', { name: selectedBaby.name })}</span>
                             </div>
                         )}
 
@@ -260,7 +260,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                                 }}
                             >
                                 <Pencil size={16} />
-                                <span>Edit {selectedBaby.name}</span>
+                                <span>{t('greeting.editName', { name: selectedBaby.name })}</span>
                             </div>
                         )}
 
@@ -272,21 +272,21 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                             }}
                         >
                             <Plus size={16} />
-                            <span>Add Baby</span>
+                            <span>{t('greeting.addBaby')}</span>
                         </div>
 
                         {selectedBaby?.is_owner && (
                             <div
                                 className="baby-dropdown-item danger"
                                 onClick={() => {
-                                    if (confirm(`Delete ${selectedBaby.name}? This removes all data and cannot be undone.`)) {
+                                    if (confirm(t('greeting.deleteConfirm', { name: selectedBaby.name }))) {
                                         removeBaby(selectedBaby.id);
                                         setShowDropdown(false);
                                     }
                                 }}
                             >
                                 <Trash2 size={16} />
-                                <span>Delete {selectedBaby.name}</span>
+                                <span>{t('greeting.deleteName', { name: selectedBaby.name })}</span>
                             </div>
                         )}
                     </div>
@@ -294,7 +294,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
 
                 <div className="baby-greeting-encouragement">
                     <Sparkles size={14} />
-                    <span>{encouragement}</span>
+                    <span>{t(`encouragement.${encouragement}`)}</span>
                 </div>
 
                 {latestGrowth && (latestGrowth.weight_kg || latestGrowth.height_cm || latestGrowth.head_cm) && (
@@ -314,7 +314,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                         {latestGrowth.head_cm && (
                             <div className="baby-stat-pill">
                                 <span className="baby-stat-value">{latestGrowth.head_cm}</span>
-                                <span className="baby-stat-unit">cm head</span>
+                                <span className="baby-stat-unit">{t('health:growth.head').toLowerCase()}</span>
                             </div>
                         )}
                     </div>
@@ -325,7 +325,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                 <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">Add Baby</h2>
+                            <h2 className="modal-title">{t('greeting.addBaby')}</h2>
                             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                         </div>
                         <div className="modal-body">
@@ -343,7 +343,7 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                 <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">Edit {selectedBaby.name}</h2>
+                            <h2 className="modal-title">{t('greeting.editBaby', { name: selectedBaby.name })}</h2>
                             <button className="modal-close" onClick={() => setShowEditForm(false)}>×</button>
                         </div>
                         <div className="modal-body">

@@ -83,7 +83,7 @@ export default function Health() {
         return (
             <div className="empty-state">
                 <Baby size={48} style={{ opacity: 0.5, marginBottom: 'var(--space-md)' }} />
-                <h2 className="empty-state-title">No baby selected</h2>
+                <h2 className="empty-state-title">{t('common:noBabySelected')}</h2>
             </div>
         );
     }

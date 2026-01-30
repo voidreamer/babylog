@@ -9,22 +9,22 @@ export default function QuickActions({ onFeeding, onDiaper, onSleep, onPumping }
         <div className="quick-actions">
             <button className="action-btn feeding" onClick={onFeeding}>
                 <Icon name="feeding" size={36} />
-                <span>Feeding</span>
+                <span>{t('quickActionsSection.feeding')}</span>
             </button>
 
             <button className="action-btn diaper" onClick={onDiaper}>
                 <Icon name="diaper" size={36} />
-                <span>Diaper</span>
+                <span>{t('quickActionsSection.diaper')}</span>
             </button>
 
             <button className="action-btn sleep" onClick={onSleep}>
                 <Icon name="sleep" size={36} />
-                <span>Sleep</span>
+                <span>{t('quickActionsSection.sleep')}</span>
             </button>
 
             <button className="action-btn pumping" onClick={onPumping}>
                 <Icon name="pumping" size={36} />
-                <span>Pump</span>
+                <span>{t('quickActionsSection.pump')}</span>
             </button>
         </div>
     );

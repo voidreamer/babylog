@@ -59,24 +59,24 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Sleep</h2>
+                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('sleep.title')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
                         <div className="form-group">
-                            <label className="form-label">Start Time</label>
+                            <label className="form-label">{t('sleep.startTime')}</label>
                             <TimePicker value={startTime} onChange={setStartTime} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">End Time</label>
+                            <label className="form-label">{t('sleep.endTime')}</label>
                             <TimePicker value={endTime} onChange={setEndTime} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">Notes</label>
+                            <label className="form-label">{t('modal.notes')}</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -89,10 +89,10 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : (isEditing ? 'Save Changes' : 'Log Sleep')}
+                            {saving ? t('common:saving') : (isEditing ? t('sleep.saveChanges') : t('sleep.logSleep'))}
                         </button>
                     </div>
                 </form>

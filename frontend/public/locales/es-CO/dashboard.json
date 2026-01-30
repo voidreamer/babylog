@@ -122,7 +122,7 @@
     "both": "Ambos",
     "successLabel": "✓ Éxito",
     "attemptLabel": "~ Attempt",
-    "accidentLabel": "Accidente",
+    "accidentLabel": "✗ Accidente",
     "noPottyYet": "Aún no hay registros de orinales",
     "pottyLogged": "Orinal {{result}} registrado",
     "yes": "Sí",
@@ -197,7 +197,7 @@
   "timeline": {
     "noEventsToday": "Hoy no se ha registrado ningún evento",
     "noEventsRecorded": "Ningún evento registrado",
-    "addFromDashboard": "Añada actividades desde el panel de control para verlas aquí",
+    "addFromDashboard": "Añadir actividades desde el cuadro de mandos para verlas aquí",
     "inProgress": "en curso",
     "sleeping": "Durmiendo...",
     "edit": "Editar",

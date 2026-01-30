@@ -92,7 +92,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Crown size={24} style={{ color: '#f59e0b' }} />
-            <h2 style={{ margin: 0 }}>HeyBub Premium</h2>
+            <h2 style={{ margin: 0 }}>{t('upgrade.heyBubPremium')}</h2>
           </div>
           <button className="btn-icon" onClick={onClose}><X size={20} /></button>
         </div>
@@ -164,7 +164,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
           style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
           <Sparkles size={16} />
-          {loading ? 'Redirecting…' : 'Start 7-Day Free Trial'}
+          {loading ? t('upgrade.redirecting') : t('upgrade.startTrial')}
         </button>
 
         {/* Footer */}
@@ -174,7 +174,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
             onClick={handleRestore}
             style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.78rem', textDecoration: 'underline', padding: 0 }}
           >
-            Restore Purchase
+            {t('upgrade.restorePurchase')}
           </button>
         </div>
       </div>

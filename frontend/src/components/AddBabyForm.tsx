@@ -50,7 +50,7 @@ export default function AddBabyForm({
     return (
         <form onSubmit={handleSubmit} className={compact ? 'baby-form-compact' : ''}>
             <div className="form-group">
-                <label className="form-label">Baby's Name *</label>
+                <label className="form-label">{t('auth:addBaby.name')} *</label>
                 <input
                     type="text"
                     className="form-input"
@@ -63,7 +63,7 @@ export default function AddBabyForm({
             </div>
 
             <div className="form-group">
-                <label className="form-label">Birth Date *</label>
+                <label className="form-label">{t('auth:addBaby.birthDate')} *</label>
                 <input
                     type="date"
                     className="form-input"
@@ -74,34 +74,34 @@ export default function AddBabyForm({
             </div>
 
             <div className="form-group">
-                <label className="form-label">Gender</label>
+                <label className="form-label">{t('auth:addBaby.gender')}</label>
                 <div className="gender-selector">
                     <button
                         type="button"
                         className={`gender-btn ${gender === 'boy' ? 'active boy' : ''}`}
                         onClick={() => setGender(gender === 'boy' ? '' : 'boy')}
                     >
-                        Boy
+                        {t('auth:addBaby.genderBoy')}
                     </button>
                     <button
                         type="button"
                         className={`gender-btn ${gender === 'girl' ? 'active girl' : ''}`}
                         onClick={() => setGender(gender === 'girl' ? '' : 'girl')}
                     >
-                        Girl
+                        {t('auth:addBaby.genderGirl')}
                     </button>
                 </div>
-                <p className="form-hint">Optional - helps with accurate growth charts</p>
+                <p className="form-hint">{t('addBabyForm.genderHint')}</p>
             </div>
 
             <div className="onboarding-section-label">
-                <span>Birth Measurements (optional)</span>
+                <span>{t('addBabyForm.birthMeasurements')}</span>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
                     <label className="form-label">
-                        <Scale size={14} /> Weight (kg)
+                        <Scale size={14} /> {t('addBabyForm.weightKg')}
                     </label>
                     <input
                         type="number"
@@ -114,7 +114,7 @@ export default function AddBabyForm({
                 </div>
                 <div className="form-group">
                     <label className="form-label">
-                        <Ruler size={14} /> Height (cm)
+                        <Ruler size={14} /> {t('addBabyForm.heightCm')}
                     </label>
                     <input
                         type="number"
@@ -134,7 +134,7 @@ export default function AddBabyForm({
                         className="btn btn-secondary"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('cancel')}
                     </button>
                 )}
                 <button
@@ -142,7 +142,7 @@ export default function AddBabyForm({
                     className={`btn btn-primary ${!showCancel ? 'btn-lg' : ''}`}
                     disabled={saving || !name.trim()}
                 >
-                    {saving ? 'Saving...' : submitLabel}
+                    {saving ? t('saving') : submitLabel}
                 </button>
             </div>
         </form>

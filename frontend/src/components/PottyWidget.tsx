@@ -26,7 +26,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                 result,
                 notes: null,
             });
-            toast.success(`Potty ${result} logged`);
+            toast.success(t('potty.pottyLogged', { result }));
             onPottyChange();
         } catch (error) {
             console.error('Failed to log potty:', error);
@@ -54,7 +54,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <CircleDot size={24} strokeWidth={2} />
-                    <span className="widget-label">Potty</span>
+                    <span className="widget-label">{t('potty.title')}</span>
                 </div>
 
                 {lastPotty ? (
@@ -63,7 +63,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                         <div className="widget-detail">{lastPotty.result}</div>
                     </>
                 ) : !quickActionsEnabled ? (
-                    <div className="widget-time-ago">No potty logs yet</div>
+                    <div className="widget-time-ago">{t('potty.noPottyYet')}</div>
                 ) : null}
 
                 {/* Quick action buttons */}
@@ -76,7 +76,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                             style={{ background: '#16a34a' }}
                         >
                             <Check size={14} />
-                            {saving === 'success' ? '...' : 'Yes'}
+                            {saving === 'success' ? '...' : t('potty.yes')}
                         </button>
                         <button
                             className="diaper-quick-btn poo"
@@ -85,7 +85,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                             style={{ background: '#6b7280' }}
                         >
                             <X size={14} />
-                            {saving === 'attempt' ? '...' : 'Try'}
+                            {saving === 'attempt' ? '...' : t('potty.try')}
                         </button>
                     </div>
                 )}

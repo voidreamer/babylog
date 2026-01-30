@@ -63,7 +63,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <Pill size={24} strokeWidth={2} />
-                    <span className="widget-label">Supplement</span>
+                    <span className="widget-label">{t('supplement.title')}</span>
                 </div>
 
                 <div className="feeding-widget-idle">
@@ -73,7 +73,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                             <div className="widget-detail">{supplementLabel}</div>
                         </>
                     ) : (
-                        <div className="widget-time-ago">No supplements yet</div>
+                        <div className="widget-time-ago">{t('supplement.noSupplementsYet')}</div>
                     )}
                 </div>
             </div>

@@ -46,9 +46,9 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
     // Build diaper detail string including mixed
     const buildDiaperDetail = (data: any): string | null => {
         const parts = [];
-        if (data.pee_count > 0) parts.push(`${data.pee_count} wet`);
-        if (data.poo_count > 0) parts.push(`${data.poo_count} dirty`);
-        if (data.mixed_count > 0) parts.push(`${data.mixed_count} mixed`);
+        if (data.pee_count > 0) parts.push(t('dailySummarySection.wet', { count: data.pee_count }));
+        if (data.poo_count > 0) parts.push(t('dailySummarySection.dirty', { count: data.poo_count }));
+        if (data.mixed_count > 0) parts.push(t('dailySummarySection.mixed', { count: data.mixed_count }));
         return parts.length > 0 ? parts.join(', ') : null;
     };
 
@@ -59,7 +59,7 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 id: 'feeding',
                 icon: Baby,
                 value: data.total_feedings || 0,
-                label: 'feedings',
+                label: t('summary.feedings'),
                 color: 'var(--feeding)',
                 extra: data.total_ml > 0 ? `${data.total_ml}ml` : null
             },
@@ -67,7 +67,7 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 id: 'diaper',
                 icon: Droplets,
                 value: data.total_diapers || 0,
-                label: 'diapers',
+                label: t('summary.diapers'),
                 color: 'var(--diaper)',
                 extra: buildDiaperDetail(data)
             },
@@ -75,15 +75,15 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 id: 'sleep',
                 icon: Moon,
                 value: formatTime(data.total_sleep_minutes),
-                label: 'sleep',
+                label: t('summary.sleepTotal'),
                 color: 'var(--sleep)',
-                extra: `${data.sleep_count || 0} naps`
+                extra: t('summary.naps', { count: data.sleep_count || 0 })
             },
             ...(data.pumping_count > 0 ? [{
                 id: 'pumping',
                 icon: Heart,
                 value: data.pumping_count,
-                label: 'pumps',
+                label: t('summary.pumpings'),
                 color: 'var(--pumping)',
                 extra: data.total_pumping_ml > 0 ? `${data.total_pumping_ml}ml` : null
             }] : []),
@@ -91,15 +91,15 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 id: 'potty',
                 icon: Toilet,
                 value: data.potty_count,
-                label: 'potty',
+                label: t('summary.pottyTrips'),
                 color: 'var(--potty)',
-                extra: data.potty_success_count > 0 ? `${data.potty_success_count} success` : null
+                extra: data.potty_success_count > 0 ? t('summary.successCount', { count: data.potty_success_count }) : null
             }] : []),
             ...(data.tummy_count > 0 ? [{
                 id: 'tummy',
                 icon: Timer,
                 value: data.tummy_count,
-                label: 'tummy time',
+                label: t('summary.tummyTimeSessions'),
                 color: 'var(--tummy)',
                 extra: data.tummy_minutes > 0 ? formatTime(data.tummy_minutes) : null
             }] : []),
@@ -107,7 +107,7 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 id: 'bath',
                 icon: BathIcon,
                 value: data.bath_count,
-                label: data.bath_count === 1 ? 'bath' : 'baths',
+                label: data.bath_count === 1 ? t('summary.bath') : t('summary.baths'),
                 color: 'var(--bath)',
                 extra: null
             }] : [])
@@ -124,7 +124,7 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
             <div className="daily-summary-header">
                 <div className="daily-summary-title">
                     <BarChart3 size={18} />
-                    <span>Daily Summary</span>
+                    <span>{t('dailySummarySection.title')}</span>
                 </div>
 
                 {/* Tab Switcher */}
@@ -133,20 +133,20 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                         className={`summary-tab ${activeTab === 'today' ? 'active' : ''}`}
                         onClick={() => setActiveTab('today')}
                     >
-                        Today
+                        {t('dailySummarySection.today')}
                     </button>
                     <button
                         className={`summary-tab ${activeTab === 'yesterday' ? 'active' : ''}`}
                         onClick={() => setActiveTab('yesterday')}
                     >
-                        Yesterday
+                        {t('dailySummarySection.yesterday')}
                     </button>
                 </div>
             </div>
 
             <div className="daily-summary-content">
                 {loadingYesterday ? (
-                    <div className="daily-summary-loading">Loading...</div>
+                    <div className="daily-summary-loading">{t('common:loading')}</div>
                 ) : stats.length > 0 ? (
                     stats.map((stat, index) => (
                         <div key={index} className="daily-summary-stat">
@@ -162,7 +162,7 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                     ))
                 ) : (
                     <div className="daily-summary-empty">
-                        No data for {activeTab === 'today' ? 'today' : 'yesterday'}
+                        {t('dailySummarySection.noData', { period: activeTab === 'today' ? t('dailySummarySection.today') : t('dailySummarySection.yesterday') })}
                     </div>
                 )}
             </div>

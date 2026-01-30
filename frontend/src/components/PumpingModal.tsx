@@ -124,7 +124,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Pumping</h2>
+                    <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('pumping.title')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -138,14 +138,14 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     className={`type-btn ${mode === 'quick' ? 'active' : ''}`}
                                     onClick={() => { setMode('quick'); handleStopTimer(); }}
                                 >
-                                    <Pencil size={16} /> Quick Log
+                                    <Pencil size={16} /> {t('feeding.quickLog')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${mode === 'timer' ? 'active' : ''}`}
                                     onClick={() => setMode('timer')}
                                 >
-                                    <Timer size={16} /> Timer
+                                    <Timer size={16} /> {t('feeding.timer')}
                                 </button>
                             </div>
                         </div>
@@ -187,7 +187,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         style={{ background: 'var(--pumping)' }}
                                         disabled={saving}
                                     >
-                                        ▶️ Start Pumping
+                                        ▶️ {t('pumping.startPumping')}
                                     </button>
                                 ) : (
                                     <button
@@ -195,7 +195,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         className="btn btn-secondary btn-block btn-lg"
                                         onClick={handleStopTimer}
                                     >
-                                        ⏹️ Stop
+                                        ⏹️ {t('feeding.stop')}
                                     </button>
                                 )}
                             </div>
@@ -204,7 +204,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                             {(timerRunning || timerSeconds > 0) && (
                                 <>
                                     <div className="form-group">
-                                        <label className="form-label">Amount (ml)</label>
+                                        <label className="form-label">{t('feeding.amountMl')}</label>
                                         <input
                                             type="number"
                                             className="form-input"
@@ -217,7 +217,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     </div>
 
                                     <div className="form-group">
-                                        <label className="form-label">Notes</label>
+                                        <label className="form-label">{t('modal.notes')}</label>
                                         <input
                                             type="text"
                                             className="form-input"
@@ -233,7 +233,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                             {!timerRunning && timerSeconds > 0 && (
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" onClick={onClose}>
-                                        Cancel
+                                        {t('common:cancel')}
                                     </button>
                                     <button
                                         type="button"
@@ -241,7 +241,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         onClick={handleSaveTimer}
                                         disabled={saving}
                                     >
-                                        {saving ? 'Saving...' : 'Save Pumping'}
+                                        {saving ? t('common:saving') : t('pumping.savePumping')}
                                     </button>
                                 </div>
                             )}
@@ -250,13 +250,13 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                         /* Quick Log Mode */
                         <form onSubmit={handleSubmitQuick}>
                             <div className="form-group">
-                                <label className="form-label">Time</label>
+                                <label className="form-label">{t('modal.time')}</label>
                                 <TimePicker value={time} onChange={setTime} />
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label className="form-label">Duration (min)</label>
+                                    <label className="form-label">{t('feeding.durationMin')}</label>
                                     <input
                                         type="number"
                                         className="form-input"
@@ -295,7 +295,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
 
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={onClose}>
-                                    Cancel
+                                    {t('common:cancel')}
                                 </button>
                                 <button type="submit" className="btn btn-primary" disabled={saving}>
                                     {saving ? 'Saving...' : 'Save Pumping'}

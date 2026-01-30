@@ -81,7 +81,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
 
                 {isEmpty ? (
                     <div className="widget-empty">
-                        <span className="widget-empty-text">Tap to log</span>
+                        <span className="widget-empty-text">{t('tapToLog')}</span>
                     </div>
                 ) : (
                     <>

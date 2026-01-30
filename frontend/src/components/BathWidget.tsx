@@ -53,19 +53,19 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <ShowerHead size={24} strokeWidth={2} />
-                    <span className="widget-label">Bath</span>
+                    <span className="widget-label">{t('bath.title')}</span>
                 </div>
 
                 <div className="feeding-widget-idle">
                     {lastBath ? (
                         <div className="widget-time-ago">{timeAgo}</div>
                     ) : !quickActionsEnabled ? (
-                        <div className="widget-time-ago">No baths yet</div>
+                        <div className="widget-time-ago">{t('bath.noBathsYet')}</div>
                     ) : null}
                     {quickActionsEnabled && (
                         <button className="feeding-start-btn" onClick={handleQuickLog} disabled={saving}>
                             <Check size={14} />
-                            {saving ? 'Logging...' : 'Log Bath'}
+                            {saving ? t('bath.logging') : t('bath.logBath')}
                         </button>
                     )}
                 </div>

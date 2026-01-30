@@ -300,7 +300,7 @@ export default function TimelineCalendar() {
                     const mins = details.duration_minutes % 60;
                     return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
                 }
-                return details.end_time ? '' : 'Sleeping...';
+                return details.end_time ? '' : t('timeline.sleeping');
             case 'pumping':
                 const pumpParts = [];
                 if (details.duration_minutes) pumpParts.push(`${details.duration_minutes}min`);
@@ -326,7 +326,7 @@ export default function TimelineCalendar() {
         return (
             <div className="empty-state">
                 <div className="empty-state-icon">👶</div>
-                <h2 className="empty-state-title">No baby selected</h2>
+                <h2 className="empty-state-title">{t('common:noBabySelected')}</h2>
             </div>
         );
     }
@@ -435,7 +435,7 @@ export default function TimelineCalendar() {
                                                         handleEdit(event);
                                                     }}
                                                 >
-                                                    <Pencil size={14} /> Edit
+                                                    <Pencil size={14} /> {t('timeline.edit')}
                                                 </button>
                                                 <button
                                                     className="timeline-action-btn delete"
@@ -444,7 +444,7 @@ export default function TimelineCalendar() {
                                                         handleDeleteClick(event);
                                                     }}
                                                 >
-                                                    <Trash2 size={14} /> Delete
+                                                    <Trash2 size={14} /> {t('timeline.delete')}
                                                 </button>
                                             </div>
                                         )}
@@ -456,8 +456,8 @@ export default function TimelineCalendar() {
                             {events.length === 0 && (
                                 <div className="timeline-empty-state">
                                     <Calendar size={48} strokeWidth={1.5} />
-                                    <p>No events recorded</p>
-                                    <span>Add activities from the dashboard to see them here</span>
+                                    <p>{t('timeline.noEventsRecorded')}</p>
+                                    <span>{t('timeline.addFromDashboard')}</span>
                                 </div>
                             )}
                         </div>
@@ -556,20 +556,20 @@ export default function TimelineCalendar() {
                             </button>
                             <div className="confirm-modal-content">
                                 <Trash2 size={32} className="confirm-icon" />
-                                <h3>Delete {EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event'}?</h3>
-                                <p>This action cannot be undone.</p>
+                                <h3>{t('timeline.deleteConfirmTitle', { type: EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event' })}</h3>
+                                <p>{t('timeline.deleteConfirmMessage')}</p>
                                 <div className="confirm-modal-actions">
                                     <button
                                         className="btn btn-secondary"
                                         onClick={() => setConfirmDelete(null)}
                                     >
-                                        Cancel
+                                        {t('common:cancel')}
                                     </button>
                                     <button
                                         className="btn btn-danger"
                                         onClick={handleDeleteConfirm}
                                     >
-                                        Delete
+                                        {t('common:delete')}
                                     </button>
                                 </div>
                             </div>

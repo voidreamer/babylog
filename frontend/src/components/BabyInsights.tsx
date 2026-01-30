@@ -38,7 +38,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
                 if (import.meta.env.DEV) {
                     console.error('Failed to load analytics:', err);
                 }
-                setError('Unable to load insights');
+                setError(t('insights.unableToLoad'));
             } finally {
                 setLoading(false);
             }
@@ -51,7 +51,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
         return (
             <div className="insights-empty">
                 <Baby size={48} />
-                <p>Select a baby to see insights</p>
+                <p>{t('insights.selectBaby')}</p>
             </div>
         );
     }
@@ -60,7 +60,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
         return (
             <div className="insights-loading">
                 <div className="spinner"></div>
-                <p>Analyzing patterns...</p>
+                <p>{t('insights.analyzingPatterns')}</p>
             </div>
         );
     }
@@ -84,13 +84,12 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
                 <div className="insights-collecting-icon">
                     <Sparkles size={48} />
                 </div>
-                <h3>Collecting Data</h3>
+                <h3>{t('insights.collectingData')}</h3>
                 <p>
-                    Keep tracking for a few more days! We need at least 3-5 days of data
-                    to identify patterns and make predictions.
+                    {t('insights.collectingDataDesc')}
                 </p>
                 <div className="insights-collecting-progress">
-                    <span>Data points: {analytics?.data_points?.feedings || 0} feedings, {analytics?.data_points?.sleeps || 0} sleeps</span>
+                    <span>{t('insights.dataPoints', { feedings: analytics?.data_points?.feedings || 0, sleeps: analytics?.data_points?.sleeps || 0 })}</span>
                 </div>
             </motion.div>
         );

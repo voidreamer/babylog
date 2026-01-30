@@ -100,7 +100,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
             localStorage.removeItem(ACTIVE_FEEDING_KEY);
             setActiveFeeding(null);
-            toast.success(`Feeding logged (${durationMinutes} min)`);
+            toast.success(t('feeding.feedingLogged', { duration: durationMinutes }));
             onFeedingChange();
         } catch (error) {
             console.error('Failed to save feeding:', error);
@@ -159,7 +159,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                         alt="feeding"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
-                    <span className="widget-label">{isFeeding ? 'Feeding' : 'Feeding'}</span>
+                    <span className="widget-label">{t('feeding.title')}</span>
                 </div>
 
                 {isFeeding ? (
@@ -174,7 +174,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                             disabled={saving}
                         >
                             <Square size={14} fill="currentColor" />
-                            {saving ? 'Saving...' : 'Done'}
+                            {saving ? t('common:saving') : t('common:done')}
                         </button>
                     </div>
                 ) : (
@@ -186,7 +186,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                                 <div className="widget-detail">{getLastFeedingDetail()}</div>
                             </>
                         ) : (
-                            <div className="widget-time-ago">No feedings yet</div>
+                            <div className="widget-time-ago">{t('feeding.noFeedingsYet')}</div>
                         )}
                     </div>
                 )}

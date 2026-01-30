@@ -38,7 +38,7 @@
     "title": "Pasar a Premium",
     "subtitle": "Desbloquea todas las funciones",
     "features": {
-      "insights": "Información sobre bebés basada en IA",
+      "insights": "Información sobre bebés basada en inteligencia artificial",
       "export": "Exportar datos como CSV",
       "more": "Y pronto más..."
     },
@@ -46,7 +46,28 @@
     "promoPlaceholder": "Introduzca el código promocional",
     "applyPromo": "Solicitar",
     "subscribe": "Suscríbase a",
-    "manageSub": "No se ha podido abrir la gestión de suscripciones."
+    "manageSub": "No se ha podido abrir la gestión de suscripciones.",
+    "heyBubPremium": "HeyBub Premium",
+    "premiumFeatures": {
+      "insights": "Información y predicciones sobre bebés basadas en IA",
+      "growth": "Gráficos de crecimiento con percentiles de la OMS",
+      "export": "Exporte todos sus datos (CSV)",
+      "share": "Compartir con un número ilimitado de cuidadores",
+      "multiple": "Seguimiento de varios bebés",
+      "support": "Asistencia prioritaria"
+    },
+    "limitedTime": "TIEMPO LIMITADO - 50% DE DESCUENTO",
+    "bestValue": "MEJOR VALOR",
+    "perMonth": "al mes",
+    "perYear": "al año",
+    "justPerMonth": "Sólo 1,25 $ al mes",
+    "redirecting": "Redirigiendo...",
+    "startTrial": "Iniciar prueba gratuita de 7 días",
+    "cancelAnytime": "Cancele cuando quiera - Sin compromiso",
+    "restorePurchase": "Restaurar compra",
+    "premiumFeature": "Característica Premium",
+    "upgradeToUnlock": "Actualizar para desbloquear {{feature}}",
+    "upgradeBtn": "Actualizar"
   },
   "toast_couldNotStartCheckoutPleaseTryAgai": "No se ha podido iniciar el pago. Por favor, inténtelo de nuevo.",
   "toast_premiumRestoredReloading": "¡Premium restaurado! Recargando...",

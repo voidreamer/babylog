@@ -19,7 +19,7 @@ export default function Timeline({ events, onRefresh }: TimelineProps) {
         return (
             <div className="empty-state">
                 <div className="empty-state-icon" style={{ fontSize: '2rem', opacity: 0.5 }}>📝</div>
-                <p className="empty-state-text">No events logged today</p>
+                <p className="empty-state-text">{t('timeline.noEventsToday')}</p>
             </div>
         );
     }

@@ -109,7 +109,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                         alt="sleep"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
-                    <span className="widget-label">{isSleeping ? 'Sleeping' : 'Sleep'}</span>
+                    <span className="widget-label">{isSleeping ? t('sleep.sleeping') : t('sleep.title')}</span>
                 </div>
 
                 {isSleeping ? (
@@ -125,7 +125,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                             disabled={saving}
                         >
                             <Sun size={16} />
-                            {saving ? 'Waking...' : 'Wake Up'}
+                            {saving ? t('sleep.waking') : t('sleep.wakeUp')}
                         </button>
                     </div>
                 ) : (
@@ -140,7 +140,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                             disabled={saving}
                         >
                             <Moon size={16} />
-                            {saving ? 'Starting...' : 'Start Sleep'}
+                            {saving ? t('sleep.starting') : t('sleep.startSleep')}
                         </button>
                     </div>
                 )}

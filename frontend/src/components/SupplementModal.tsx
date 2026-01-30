@@ -87,7 +87,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Supplement</h2>
+                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('supplement.title')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -95,7 +95,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
                     <div className="modal-body">
                         {/* Supplement Type */}
                         <div className="form-group">
-                            <label className="form-label">Supplement</label>
+                            <label className="form-label">{t('supplement.title')}</label>
                             <div className="type-selector" style={{ flexWrap: 'wrap' }}>
                                 {supplementOptions.map((opt) => (
                                     <button
@@ -112,7 +112,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
 
                         {/* Dosage */}
                         <div className="form-group">
-                            <label className="form-label">Dosage (optional)</label>
+                            <label className="form-label">{t('supplement.dosageOptional')}</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -124,13 +124,13 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
 
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">Time</label>
+                            <label className="form-label">{t('modal.time')}</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">Notes (optional)</label>
+                            <label className="form-label">{t('modal.notesOptional')}</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -143,10 +143,10 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
+                            {saving ? t('common:saving') : t('common:save')}
                         </button>
                     </div>
                 </form>

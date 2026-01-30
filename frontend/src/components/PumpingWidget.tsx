@@ -87,7 +87,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
 
             localStorage.removeItem(ACTIVE_PUMPING_KEY);
             setActivePumping(null);
-            toast.success(`Pumping logged (${durationMinutes} min)`);
+            toast.success(t('pumping.pumpingLogged', { duration: durationMinutes }));
             onPumpingChange();
         } catch (error) {
             console.error('Failed to save pumping:', error);
@@ -127,7 +127,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <img src="/icons/pumping.png" alt="pumping" style={{ width: 24, height: 24, objectFit: 'contain' }} />
-                    <span className="widget-label">Pumping</span>
+                    <span className="widget-label">{t('pumping.title')}</span>
                 </div>
 
                 {isPumping ? (
@@ -135,7 +135,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                         <div className="feeding-timer">{formatTimer(timerSeconds)}</div>
                         <button className="feeding-stop-btn" onClick={handleStopPumping} disabled={saving}>
                             <Square size={14} fill="currentColor" />
-                            {saving ? 'Saving...' : 'Done'}
+                            {saving ? t('common:saving') : t('common:done')}
                         </button>
                     </div>
                 ) : quickActionsEnabled ? (
@@ -150,7 +150,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                         ) : null}
                         <button className="feeding-start-btn" onClick={handleStartPumping} disabled={saving}>
                             <Play size={14} fill="currentColor" />
-                            Start
+                            {t('pumping.start')}
                         </button>
                     </div>
                 ) : (
@@ -163,7 +163,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                                 </div>
                             </>
                         ) : (
-                            <div className="widget-time-ago">No pumpings yet</div>
+                            <div className="widget-time-ago">{t('pumping.noPumpingsYet')}</div>
                         )}
                     </div>
                 )}

@@ -25,7 +25,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                 poo_amount: null,
                 notes: null,
             });
-            toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} diaper logged`);
+            toast.success(t('diaper.diaperLogged', { type: type.charAt(0).toUpperCase() + type.slice(1) }));
             onDiaperChange();
         } catch (error) {
             console.error('Failed to log diaper:', error);
@@ -70,7 +70,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                         alt="diaper"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
-                    <span className="widget-label">Diaper</span>
+                    <span className="widget-label">{t('diaper.title')}</span>
                 </div>
 
                 {lastDiaper ? (
@@ -79,7 +79,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                         <div className="widget-detail">{getLastDiaperType()}</div>
                     </>
                 ) : !quickActionsEnabled ? (
-                    <div className="widget-time-ago">No diapers yet</div>
+                    <div className="widget-time-ago">{t('diaper.noDiapersYet')}</div>
                 ) : null}
 
                 {/* Quick action buttons */}
@@ -91,7 +91,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                             disabled={saving !== null}
                         >
                             <Droplets size={14} />
-                            {saving === 'pee' ? '...' : 'Pee'}
+                            {saving === 'pee' ? '...' : t('diaper.pee')}
                         </button>
                         <button
                             className="diaper-quick-btn poo"
@@ -99,14 +99,14 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                             disabled={saving !== null}
                         >
                             <CircleDot size={14} />
-                            {saving === 'poo' ? '...' : 'Poo'}
+                            {saving === 'poo' ? '...' : t('diaper.poo')}
                         </button>
                         <button
                             className="diaper-quick-btn mixed"
                             onClick={(e) => handleQuickLog('mixed', e)}
                             disabled={saving !== null}
                         >
-                            {saving === 'mixed' ? '...' : 'Both'}
+                            {saving === 'mixed' ? '...' : t('diaper.both')}
                         </button>
                     </div>
                 )}

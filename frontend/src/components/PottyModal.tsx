@@ -80,7 +80,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Potty</h2>
+                    <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('potty.title')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -88,7 +88,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
                     <div className="modal-body">
                         {/* Result */}
                         <div className="form-group">
-                            <label className="form-label">Result</label>
+                            <label className="form-label">{t('potty.result')}</label>
                             <div className="type-selector">
                                 {resultOptions.map((opt) => (
                                     <button
@@ -106,7 +106,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
 
                         {/* Type */}
                         <div className="form-group">
-                            <label className="form-label">Type (optional)</label>
+                            <label className="form-label">{t('potty.typeOptional')}</label>
                             <div className="type-selector">
                                 {typeOptions.map((opt) => (
                                     <button
@@ -123,13 +123,13 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
 
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">Time</label>
+                            <label className="form-label">{t('modal.time')}</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">Notes (optional)</label>
+                            <label className="form-label">{t('modal.notesOptional')}</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -142,10 +142,10 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
+                            {saving ? t('common:saving') : t('common:save')}
                         </button>
                     </div>
                 </form>

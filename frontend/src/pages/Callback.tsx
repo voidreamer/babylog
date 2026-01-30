@@ -83,9 +83,9 @@ export default function Callback() {
     if (error) {
         return (
             <div style={{ padding: '2rem', textAlign: 'center' }}>
-                <h2>Authentication Error</h2>
+                <h2>{t('callback.authError')}</h2>
                 <p style={{ color: 'red' }}>{error}</p>
-                <button onClick={() => navigate('/login')}>Back to Login</button>
+                <button onClick={() => navigate('/login')}>{t('callback.backToLogin')}</button>
             </div>
         );
     }

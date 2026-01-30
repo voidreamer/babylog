@@ -79,7 +79,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
 
             localStorage.removeItem(ACTIVE_TUMMY_KEY);
             setActiveTummy(null);
-            toast.success(`Tummy time logged (${durationMinutes} min)`);
+            toast.success(t('tummyTime.tummyTimeLogged', { duration: durationMinutes }));
             onTummyChange();
         } catch (error) {
             console.error('Failed to save tummy time:', error);
@@ -119,7 +119,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <Sun size={24} strokeWidth={2} />
-                    <span className="widget-label">Tummy</span>
+                    <span className="widget-label">{t('tummyTime.tummy')}</span>
                 </div>
 
                 {isActive ? (
@@ -127,7 +127,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                         <div className="feeding-timer">{formatTimer(timerSeconds)}</div>
                         <button className="feeding-stop-btn" onClick={handleStopTummy} disabled={saving}>
                             <Square size={14} fill="currentColor" />
-                            {saving ? 'Saving...' : 'Done'}
+                            {saving ? t('common:saving') : t('common:done')}
                         </button>
                     </div>
                 ) : quickActionsEnabled ? (
@@ -140,7 +140,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                         ) : null}
                         <button className="feeding-start-btn" onClick={handleStartTummy} disabled={saving}>
                             <Play size={14} fill="currentColor" />
-                            Start
+                            {t('tummyTime.start')}
                         </button>
                     </div>
                 ) : (
@@ -151,7 +151,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                                 <div className="widget-detail">{lastTummy.duration_minutes}min</div>
                             </>
                         ) : (
-                            <div className="widget-time-ago">No tummy time yet</div>
+                            <div className="widget-time-ago">{t('tummyTime.noTummyTimeYet')}</div>
                         )}
                     </div>
                 )}

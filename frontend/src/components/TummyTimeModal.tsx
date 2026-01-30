@@ -73,7 +73,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Tummy Time</h2>
+                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('tummyTime.title')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -81,7 +81,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                     <div className="modal-body">
                         {/* Duration */}
                         <div className="form-group">
-                            <label className="form-label">Duration</label>
+                            <label className="form-label">{t('tummyTime.duration')}</label>
                             <div className="type-selector">
                                 {durationOptions.map((opt) => (
                                     <button
@@ -110,13 +110,13 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
 
                         {/* Time */}
                         <div className="form-group">
-                            <label className="form-label">Time</label>
+                            <label className="form-label">{t('modal.time')}</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">Notes (optional)</label>
+                            <label className="form-label">{t('modal.notesOptional')}</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -129,10 +129,10 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
+                            {saving ? t('common:saving') : t('common:save')}
                         </button>
                     </div>
                 </form>

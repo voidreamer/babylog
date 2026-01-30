@@ -33,11 +33,11 @@ export default function Learn({ isPremium = false }: LearnProps) {
             >
                 <div className="learn-header">
                     <h1 className="learn-title">
-                        <TrendingUp size={24} /> Insights
+                        <TrendingUp size={24} /> {t('dashboard:learn.insights')}
                     </h1>
                     {selectedBaby && babyAgeMonths !== null && (
                         <p className="learn-subtitle">
-                            <Sparkles size={14} /> For {selectedBaby.name}, {babyAgeMonths} {babyAgeMonths === 1 ? 'month' : 'months'} old
+                            <Sparkles size={14} /> {t('dashboard:learn.forBaby', { name: selectedBaby.name, months: babyAgeMonths, monthLabel: babyAgeMonths === 1 ? t('dashboard:learn.month') : t('dashboard:learn.months') })}
                         </p>
                     )}
                 </div>

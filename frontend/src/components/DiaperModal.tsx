@@ -98,35 +98,35 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Diaper Change</h2>
+                    <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('diaper.diaperChange')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
                         <div className="form-group">
-                            <label className="form-label">Type</label>
+                            <label className="form-label">{t('diaper.type')}</label>
                             <div className="type-selector">
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'pee' ? 'active' : ''}`}
                                     onClick={() => setType('pee')}
                                 >
-                                    <Droplets size={16} /> Pee
+                                    <Droplets size={16} /> {t('diaper.pee')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'poo' ? 'active' : ''}`}
                                     onClick={() => setType('poo')}
                                 >
-                                    <CircleDot size={16} /> Poo
+                                    <CircleDot size={16} /> {t('diaper.poo')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${type === 'mixed' ? 'active' : ''}`}
                                     onClick={() => setType('mixed')}
                                 >
-                                    <RefreshCw size={16} /> Both
+                                    <RefreshCw size={16} /> {t('diaper.both')}
                                 </button>
                             </div>
                         </div>
@@ -134,7 +134,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                         {showPooDetails && (
                             <>
                                 <div className="form-group">
-                                    <label className="form-label">Color</label>
+                                    <label className="form-label">{t('diaper.color')}</label>
                                     <div className="type-selector" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
                                         {colorOptions.map(opt => (
                                             <button
@@ -165,7 +165,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">Consistency</label>
+                                    <label className="form-label">{t('diaper.consistency')}</label>
                                     <div className="type-selector" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
                                         {consistencyOptions.map(opt => (
                                             <button
@@ -186,7 +186,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">Amount</label>
+                                    <label className="form-label">{t('diaper.amount')}</label>
                                     <div className="type-selector">
                                         {amountOptions.map(opt => (
                                             <button
@@ -209,12 +209,12 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
                         )}
 
                         <div className="form-group">
-                            <label className="form-label">Time</label>
+                            <label className="form-label">{t('modal.time')}</label>
                             <TimePicker value={time} onChange={setTime} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">Notes</label>
+                            <label className="form-label">{t('modal.notes')}</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -227,10 +227,10 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Diaper Change'}
+                            {saving ? t('common:saving') : t('diaper.saveDiaperChange')}
                         </button>
                     </div>
                 </form>
