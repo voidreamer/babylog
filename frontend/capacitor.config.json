@@ -17,7 +17,7 @@
     "scheme": "heybub"
   },
   "android": {
-    "allowMixedContent": true,
+    "allowMixedContent": false,
     "backgroundColor": "#18181b",
     "buildOptions": {
       "keystorePath": null,
