@@ -4,6 +4,7 @@ import { Star, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
+import { formatDate } from '../../utils/formatDate';
 
 interface MilestonesCardProps { baby: any; milestones: any[]; onMilestoneAdded?: () => void; onMilestoneDeleted?: () => void; }
 export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onMilestoneDeleted }: MilestonesCardProps) {

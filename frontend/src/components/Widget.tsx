@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
+import { formatTimeAgo } from '../utils/formatTime';
 
 // Map widget types to PNG icons (null means use Lucide fallback)
 const pngIcons: Record<string, string | null> = {
@@ -25,28 +26,6 @@ const lucideIcons: Record<string, any> = {
     supplement: Pill,
 };
 
-// Format time ago from a date
-function formatTimeAgo(dateStr: string | null): string | null {
-    if (!dateStr) return null;
-
-    const date = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-
-    const diffHours = Math.floor(diffMins / 60);
-    const remainingMins = diffMins % 60;
-
-    if (diffHours < 24) {
-        return remainingMins > 0 ? `${diffHours}h ${remainingMins}m ago` : `${diffHours}h ago`;
-    }
-
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-}
 
 // Icon component that uses PNG if available, otherwise Lucide
 interface WidgetIconProps { type: string; size: number; className?: string; strokeWidth?: number; }

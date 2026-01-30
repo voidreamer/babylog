@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatTimeAgo } from '../utils/formatTime';
 import { useState, useEffect } from 'react';
 import { Moon, Sun, Plus, Clock } from 'lucide-react';
 import { api } from '../api/client';
@@ -19,27 +20,6 @@ function formatElapsedTime(startTimeStr: string | null): string {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 }
 
-// Format time ago
-function formatTimeAgo(dateStr: string | null): string | null {
-    if (!dateStr) return null;
-    const date = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-
-    const diffHours = Math.floor(diffMins / 60);
-    const remainingMins = diffMins % 60;
-
-    if (diffHours < 24) {
-        return remainingMins > 0 ? `${diffHours}h ${remainingMins}m ago` : `${diffHours}h ago`;
-    }
-
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-}
 
 interface SleepWidgetProps { babyId: number; currentSleep: any; lastSleep: any; onSleepChange: () => void; onOpenModal: () => void; }
 export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepChange, onOpenModal }: SleepWidgetProps) {

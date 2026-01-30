@@ -1,5 +1,5 @@
 """
-API endpoint tests for SimpleBaby.
+API endpoint tests for HeyBub.
 Tests core CRUD operations for babies, feedings, diapers, and sleeps.
 """
 import pytest

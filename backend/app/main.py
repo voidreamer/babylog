@@ -27,7 +27,7 @@ def get_real_client_ip(request: Request) -> str:
 limiter = Limiter(key_func=get_real_client_ip)
 
 app = FastAPI(
-    title="SimpleBaby Baby Tracker API",
+    title="HeyBub Baby Tracker API",
     description="API for tracking baby sleep, feeding, and diaper changes",
     version="1.0.0",
     root_path="/api" if settings.environment in ("prod", "staging") else ""
@@ -72,7 +72,7 @@ def health_check():
 @app.get("/")
 def root():
     """Root endpoint."""
-    return {"message": "SimpleBaby Baby Tracker API", "docs": "/docs"}
+    return {"message": "HeyBub Baby Tracker API", "docs": "/docs"}
 
 
 # Lambda handler

@@ -4,6 +4,7 @@ import { AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
+import { formatDate } from '../../utils/formatDate';
 
 const COMMON_ALLERGENS = [
     'Dairy',

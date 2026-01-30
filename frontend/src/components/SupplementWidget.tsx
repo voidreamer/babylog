@@ -1,20 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatTimeAgo } from '../utils/formatTime';
 import { useState } from 'react';
 import { Pill, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 
-function formatTimeAgo(dateStr: string | null): string | null {
-    if (!dateStr) return null;
-    const date = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-    const diffMins = Math.floor((new Date().getTime() - date.getTime()) / 60000);
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
-}
 
 interface SupplementWidgetProps { lastSupplement: any; onSupplementChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function SupplementWidget({ lastSupplement, onSupplementChange, onOpenModal, quickActionsEnabled = true }: SupplementWidgetProps) {
