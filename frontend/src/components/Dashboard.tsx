@@ -26,11 +26,13 @@ import BabyGreeting from './BabyGreeting';
 import ComingUp from './ComingUp';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Default visible widgets - stored in localStorage
 const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
 
 export default function Dashboard() {
+    const { t } = useTranslation('common');
     const { selectedBaby } = useBaby();
     const [dashboard, setDashboard] = useState<any>(null);
     const [latestGrowth, setLatestGrowth] = useState<any>(null);
@@ -115,8 +117,8 @@ export default function Dashboard() {
             setUpcoming(upcomingData?.upcoming || []);
         } catch (error) {
             console.error('Failed to load dashboard:', error);
-            toast.error('Failed to load dashboard', {
-                description: 'Please check your connection and try again.'
+            toast.error(t('errors.failedToLoad'), {
+                description: t('errors.checkConnection')
             });
         } finally {
             setLoading(false);
@@ -155,8 +157,8 @@ export default function Dashboard() {
                 transition={{ duration: 0.4 }}
             >
                 <div className="empty-state-icon"><Baby size={48} /></div>
-                <h2 className="empty-state-title">No baby added yet</h2>
-                <p className="empty-state-text">Add your baby to start tracking</p>
+                <h2 className="empty-state-title">{t('empty.noBabyAdded')}</h2>
+                <p className="empty-state-text">{t('empty.addBabyToStart')}</p>
             </motion.div>
         );
     }

@@ -14,6 +14,7 @@ import SupplementModal from './SupplementModal';
 import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -36,6 +37,7 @@ const EVENT_CONFIG: Record<string, any> = {
 
 export default function TimelineCalendar() {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const [events, setEvents] = useState<any[]>([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
@@ -130,10 +132,10 @@ export default function TimelineCalendar() {
                     await api.deleteSupplement(event.id);
                     break;
             }
-            toast.success('Deleted successfully');
+            toast.success(t('deletedSuccessfully'));
             loadEvents();
         } catch (error) {
-            toast.error('Failed to delete');
+            toast.error(t('errors.failedToDelete'));
         }
         setConfirmDelete(null);
     };
@@ -324,7 +326,7 @@ export default function TimelineCalendar() {
         return (
             <div className="empty-state">
                 <div className="empty-state-icon">👶</div>
-                <h2 className="empty-state-title">No baby selected</h2>
+                <h2 className="empty-state-title">{t('empty.noBabySelected')}</h2>
             </div>
         );
     }
@@ -433,7 +435,7 @@ export default function TimelineCalendar() {
                                                         handleEdit(event);
                                                     }}
                                                 >
-                                                    <Pencil size={14} /> Edit
+                                                    <Pencil size={14} /> {t('edit')}
                                                 </button>
                                                 <button
                                                     className="timeline-action-btn delete"
@@ -442,7 +444,7 @@ export default function TimelineCalendar() {
                                                         handleDeleteClick(event);
                                                     }}
                                                 >
-                                                    <Trash2 size={14} /> Delete
+                                                    <Trash2 size={14} /> {t('delete')}
                                                 </button>
                                             </div>
                                         )}
@@ -454,8 +456,8 @@ export default function TimelineCalendar() {
                             {events.length === 0 && (
                                 <div className="timeline-empty-state">
                                     <Calendar size={48} strokeWidth={1.5} />
-                                    <p>No events recorded</p>
-                                    <span>Add activities from the dashboard to see them here</span>
+                                    <p>{t('empty.noEventsRecorded')}</p>
+                                    <span>{t('empty.addFromDashboard')}</span>
                                 </div>
                             )}
                         </div>
@@ -554,8 +556,8 @@ export default function TimelineCalendar() {
                             </button>
                             <div className="confirm-modal-content">
                                 <Trash2 size={32} className="confirm-icon" />
-                                <h3>Delete {EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event'}?</h3>
-                                <p>This action cannot be undone.</p>
+                                <h3>{t('deleteEvent', { type: EVENT_CONFIG[confirmDelete.event_type]?.label || '' })}</h3>
+                                <p>{t('deleteCannotUndo')}</p>
                                 <div className="confirm-modal-actions">
                                     <button
                                         className="btn btn-secondary"

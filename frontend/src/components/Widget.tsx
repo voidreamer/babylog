@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { formatTimeAgo } from '../utils/formatTime';
 
 // Map widget types to PNG icons (null means use Lucide fallback)
@@ -49,6 +50,7 @@ function WidgetIcon({ type, size, className, strokeWidth }: WidgetIconProps) {
 
 interface WidgetProps { type: string; label: string; value: string; detail?: string; isSleeping?: boolean; onClick: () => void; lastTime?: string; }
 export default function Widget({ type, label, value, detail, isSleeping, onClick, lastTime }: WidgetProps) {
+    const { t } = useTranslation('common');
     const timeAgo = formatTimeAgo(lastTime ?? null);
     const isEmpty = !lastTime && value === 'Never';
 
@@ -79,7 +81,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
 
                 {isEmpty ? (
                     <div className="widget-empty">
-                        <span className="widget-empty-text">Tap to log</span>
+                        <span className="widget-empty-text">{t('empty.tapToLog')}</span>
                     </div>
                 ) : (
                     <>

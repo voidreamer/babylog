@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { format } from 'date-fns';
 import Icon from './Icon';
+import { useTranslation } from 'react-i18next';
 import { parseUTCTime } from '../utils/parseTime';
 
 
@@ -13,11 +14,12 @@ const EVENT_CONFIG: Record<string, { label: string }> = {
 
 interface TimelineProps { events: any[]; onRefresh?: () => void; }
 export default function Timeline({ events, onRefresh }: TimelineProps) {
+    const { t } = useTranslation('common');
     if (!events || events.length === 0) {
         return (
             <div className="empty-state">
                 <div className="empty-state-icon" style={{ fontSize: '2rem', opacity: 0.5 }}>📝</div>
-                <p className="empty-state-text">No events logged today</p>
+                <p className="empty-state-text">{t('empty.noEventsToday')}</p>
             </div>
         );
     }

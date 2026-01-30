@@ -12,10 +12,12 @@ function calculateAgeInMonths(birthDate: string): number {
 }
 import { TrendingUp, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface LearnProps { isPremium?: boolean; }
 export default function Learn({ isPremium = false }: LearnProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('health');
 
     const babyAgeMonths = useMemo(() => {
         if (!selectedBaby?.birth_date) return null;
@@ -31,11 +33,11 @@ export default function Learn({ isPremium = false }: LearnProps) {
             >
                 <div className="learn-header">
                     <h1 className="learn-title">
-                        <TrendingUp size={24} /> Insights
+                        <TrendingUp size={24} /> {t('insights.title')}
                     </h1>
                     {selectedBaby && babyAgeMonths !== null && (
                         <p className="learn-subtitle">
-                            <Sparkles size={14} /> For {selectedBaby.name}, {babyAgeMonths} {babyAgeMonths === 1 ? 'month' : 'months'} old
+                            <Sparkles size={14} /> {t('insights.forBaby', { name: selectedBaby.name, age: babyAgeMonths, ageUnit: t('insights.month', { count: babyAgeMonths }) })}
                         </p>
                     )}
                 </div>

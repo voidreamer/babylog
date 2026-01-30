@@ -4,6 +4,7 @@ import { api } from '../../api/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { parseUTCTime } from '../../utils/parseTime';
 
 
@@ -16,6 +17,7 @@ const MILESTONE_OPTIONS = [
 
 interface VisitModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProps) {
+    const { t } = useTranslation('health');
     const [visitDate, setVisitDate] = useState(
         editData ? format(parseUTCTime(editData.visit_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
     );
@@ -48,10 +50,10 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
 
             if (editData) {
                 await api.updateDoctorVisit(editData.id, data);
-                toast.success('Visit updated');
+                toast.success(t('records.modals.visitUpdated'));
             } else {
                 await api.createDoctorVisit(data);
-                toast.success('Visit logged');
+                toast.success(t('records.modals.visitLogged'));
             }
             onSave();
         } catch (error) {
@@ -65,7 +67,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Doctor Visit</h2>
+                    <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> {editData ? t('records.modals.editDoctorVisit') : t('records.modals.logDoctorVisit')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -123,6 +125,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
 
 interface VaccModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps) {
+    const { t } = useTranslation('health');
     const [vaccineName, setVaccineName] = useState(editData?.vaccine_name || '');
     const [doseNumber, setDoseNumber] = useState(editData?.dose_number || 1);
     const [givenDate, setGivenDate] = useState(
@@ -151,10 +154,10 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
 
             if (editData) {
                 await api.updateVaccination(editData.id, data);
-                toast.success('Vaccination updated');
+                toast.success(t('records.modals.vaccinationUpdated'));
             } else {
                 await api.createVaccination(data);
-                toast.success('Vaccination logged');
+                toast.success(t('records.modals.vaccinationLogged'));
             }
             onSave();
         } catch (error) {
@@ -168,7 +171,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Vaccination</h2>
+                    <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> {editData ? t('records.modals.editVaccination') : t('records.modals.logVaccination')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -212,6 +215,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
 
 interface MedModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
+    const { t } = useTranslation('health');
     const [medicationName, setMedicationName] = useState(editData?.medication_name || '');
     const [dosage, setDosage] = useState(editData?.dosage || '');
     const [frequency, setFrequency] = useState(editData?.frequency || '');
@@ -237,10 +241,10 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
 
             if (editData) {
                 await api.updateMedication(editData.id, data);
-                toast.success('Medication updated');
+                toast.success(t('records.modals.medicationUpdated'));
             } else {
                 await api.createMedication(data);
-                toast.success('Medication added');
+                toast.success(t('records.modals.medicationAdded'));
             }
             onSave();
         } catch (error) {
@@ -254,7 +258,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Add'} Medication</h2>
+                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {editData ? t('records.modals.editMedication') : t('records.modals.addMedication')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -294,6 +298,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
 
 interface MilestoneModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneModalProps) {
+    const { t } = useTranslation('health');
     const isCustomMilestone = editData && !MILESTONE_OPTIONS.includes(editData.milestone_type);
     const [milestoneType, setMilestoneType] = useState(
         editData ? (isCustomMilestone ? 'Other' : editData.milestone_type) : ''
@@ -318,10 +323,10 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
 
             if (editData) {
                 await api.updateMilestone(editData.id, data);
-                toast.success('Milestone updated');
+                toast.success(t('milestones.milestoneUpdated'));
             } else {
                 await api.createMilestone(data);
-                toast.success('Milestone logged');
+                toast.success(t('milestones.milestoneLogged'));
             }
             onSave();
         } catch (error) {
@@ -335,7 +340,7 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Star size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Milestone</h2>
+                    <h2 className="modal-title"><Star size={20} style={{ marginRight: '8px' }} /> {editData ? t('milestones.editMilestone') : t('milestones.logMilestone')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -376,6 +381,7 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
 
 interface GrowthModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalProps) {
+    const { t } = useTranslation('health');
     const [recordedDate, setRecordedDate] = useState(
         editData ? format(parseUTCTime(editData.recorded_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
     );
@@ -400,10 +406,10 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
 
             if (editData) {
                 await api.updateGrowthRecord(editData.id, data);
-                toast.success('Growth record updated');
+                toast.success(t('growth.growthRecordUpdated'));
             } else {
                 await api.createGrowthRecord(data);
-                toast.success('Growth record logged');
+                toast.success(t('growth.growthRecordLogged'));
             }
             onSave();
         } catch (error) {
@@ -417,7 +423,7 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Growth</h2>
+                    <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> {editData ? t('growth.editGrowth') : t('growth.logGrowth')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>

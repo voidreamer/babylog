@@ -5,11 +5,13 @@ import { Pill, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
+import { useTranslation } from 'react-i18next';
 
 
 interface SupplementWidgetProps { lastSupplement: any; onSupplementChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function SupplementWidget({ lastSupplement, onSupplementChange, onOpenModal, quickActionsEnabled = true }: SupplementWidgetProps) {
     const { selectedBaby } = useBaby();
+    const { t } = useTranslation('common');
     const [saving, setSaving] = useState(false);
 
     // Get last used supplement or default to Vitamin D
@@ -32,11 +34,11 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                 notes: null,
             });
             localStorage.setItem('lastSupplementType', supplementType);
-            toast.success('Supplement logged');
+            toast.success(t('supplementLogged'));
             onSupplementChange();
         } catch (error) {
             console.error('Failed to log supplement:', error);
-            toast.error('Failed to log supplement');
+            toast.error(t('errors.failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -61,7 +63,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <Pill size={24} strokeWidth={2} />
-                    <span className="widget-label">Supplement</span>
+                    <span className="widget-label">{t('widgets.supplement')}</span>
                 </div>
 
                 <div className="feeding-widget-idle">
@@ -71,7 +73,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                             <div className="widget-detail">{supplementLabel}</div>
                         </>
                     ) : (
-                        <div className="widget-time-ago">No supplements yet</div>
+                        <div className="widget-time-ago">{t('noSupplementsYet')}</div>
                     )}
                 </div>
             </div>
