@@ -4,6 +4,7 @@ import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp } from
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isFuture } from 'date-fns';
+import { formatDate } from '../../utils/formatDate';
 
 const VISIT_TYPES = [
     { value: 'checkup', label: 'Checkup' },
@@ -129,13 +130,6 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
         }
     };
 
-    const formatDate = (dateStr: string): string => {
-        try {
-            return format(parseISO(dateStr), 'MMM d, yyyy');
-        } catch {
-            return dateStr;
-        }
-    };
 
     return (
         <div className="records-panel">
@@ -333,13 +327,6 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
         }
     };
 
-    const formatDate = (dateStr: string): string => {
-        try {
-            return format(parseISO(dateStr), 'MMM d, yyyy');
-        } catch {
-            return dateStr;
-        }
-    };
 
     // Group by vaccine name
     const groupedVaccines: Record<string, any[]> = {};
