@@ -97,7 +97,7 @@
     "moderate": "Modéré",
     "severe": "Sévère",
     "mildDesc": "Symptômes mineurs, aucun traitement n'est nécessaire",
-    "moderateDesc": "Symptômes perceptibles, pouvant nécessiter des médicaments",
+    "moderateDesc": "Symptômes perceptibles, pouvant nécessiter la prise de médicaments",
     "severeDesc": "Réaction grave, nécessitant une attention immédiate",
     "reactionLabel": "Réaction : {{reaction}}",
     "discoveredLabel": "Découvert : {{date}}",
@@ -113,7 +113,7 @@
     "addVaccination": "Ajouter la vaccination",
     "addMedication": "Ajouter un médicament",
     "noVisits": "Aucune visite chez le médecin n'a été enregistrée",
-    "noVaccinations": "Pas de vaccinations enregistrées",
+    "noVaccinations": "Aucune vaccination n'a été enregistrée",
     "noMedications": "Pas de médicaments enregistrés",
     "saveVisit": "Sauvegarder la visite",
     "saveVaccination": "Sauver la vaccination",
@@ -141,7 +141,7 @@
     },
     "given": "Compte tenu de ce qui précède :",
     "nextDueField": "Prochaine échéance :",
-    "startField": "Démarrage :",
+    "startField": "Début :",
     "endField": "Fin :"
   },
   "modals": {

@@ -125,7 +125,7 @@
     "nextVisit": "Próxima visita: {{date}}",
     "dr": "Dr. {{name}}",
     "headMeasurement": "Cabeza: {{value}} cm",
-    "started": "Comenzó: {{date}}",
+    "started": "Iniciado: {{date}}",
     "active": "Activo",
     "past": "Anterior",
     "stop": "Stop",
