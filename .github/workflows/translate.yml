@@ -1,0 +1,38 @@
+name: Auto-Translate i18n
+
+on:
+  push:
+    paths:
+      - 'frontend/public/locales/en/**'
+    branches:
+      - staging
+      - 'feature/i18n-*'
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run DeepL translation
+        env:
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+        run: node scripts/translate.js
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet frontend/public/locales/ || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit translations
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/locales/
+          git commit -m "chore(i18n): auto-translate via DeepL"
+          git push

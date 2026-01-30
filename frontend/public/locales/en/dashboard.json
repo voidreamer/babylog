@@ -1,0 +1,102 @@
+{
+  "title": "Dashboard",
+  "dailySummary": "Today's Summary",
+  "comingUp": "Coming Up",
+  "widgetSettings": "Widget Settings",
+  "quickActions": "Quick Actions",
+  "quickActionsEnabled": "Quick Actions",
+  "quickActionsDesc": "Show quick action buttons on widgets",
+  "noUpcoming": "Nothing coming up",
+  "feeding": {
+    "title": "Feeding",
+    "lastFed": "Last fed",
+    "startFeeding": "Start Feeding",
+    "stopFeeding": "Stop Feeding",
+    "logFeeding": "Log Feeding",
+    "breast": "Breast",
+    "bottle": "Bottle",
+    "solid": "Solid",
+    "left": "Left",
+    "right": "Right",
+    "both": "Both",
+    "amount": "Amount",
+    "duration": "Duration",
+    "notes": "Notes",
+    "type": "Type"
+  },
+  "diaper": {
+    "title": "Diaper",
+    "lastChange": "Last change",
+    "logDiaper": "Log Diaper",
+    "wet": "Wet",
+    "dirty": "Dirty",
+    "mixed": "Mixed",
+    "dry": "Dry",
+    "color": "Color",
+    "notes": "Notes"
+  },
+  "sleep": {
+    "title": "Sleep",
+    "lastSleep": "Last sleep",
+    "sleeping": "Sleeping",
+    "awake": "Awake",
+    "startSleep": "Start Sleep",
+    "endSleep": "End Sleep",
+    "logSleep": "Log Sleep",
+    "nap": "Nap",
+    "nightSleep": "Night Sleep",
+    "duration": "Duration",
+    "notes": "Notes"
+  },
+  "pumping": {
+    "title": "Pumping",
+    "lastPump": "Last pump",
+    "startPumping": "Start Pumping",
+    "stopPumping": "Stop Pumping",
+    "logPumping": "Log Pumping",
+    "amount": "Amount",
+    "duration": "Duration",
+    "notes": "Notes"
+  },
+  "potty": {
+    "title": "Potty",
+    "lastPotty": "Last potty",
+    "logPotty": "Log Potty",
+    "success": "Success",
+    "accident": "Accident",
+    "notes": "Notes"
+  },
+  "tummyTime": {
+    "title": "Tummy Time",
+    "lastSession": "Last session",
+    "startTummyTime": "Start Tummy Time",
+    "stopTummyTime": "Stop Tummy Time",
+    "logTummyTime": "Log Tummy Time",
+    "duration": "Duration",
+    "notes": "Notes"
+  },
+  "bath": {
+    "title": "Bath",
+    "lastBath": "Last bath",
+    "logBath": "Log Bath",
+    "notes": "Notes"
+  },
+  "supplement": {
+    "title": "Supplement",
+    "lastSupplement": "Last supplement",
+    "logSupplement": "Log Supplement",
+    "name": "Name",
+    "dosage": "Dosage",
+    "notes": "Notes"
+  },
+  "summary": {
+    "feedings": "Feedings",
+    "diapers": "Diapers",
+    "sleepTotal": "Sleep Total",
+    "pumpings": "Pumpings",
+    "pottyTrips": "Potty Trips",
+    "tummyTimeSessions": "Tummy Time",
+    "baths": "Baths",
+    "supplements": "Supplements"
+  }
+}

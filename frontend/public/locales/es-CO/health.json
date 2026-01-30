@@ -1,0 +1,57 @@
+{
+  "title": "Salud",
+  "growth": {
+    "title": "Crecimiento",
+    "weight": "Peso",
+    "height": "Altura",
+    "headCircumference": "Circunferencia de la cabeza",
+    "addRecord": "Añadir registro",
+    "recordDate": "Fecha",
+    "notes": "Notas",
+    "chart": "Tabla de crecimiento",
+    "weightKg": "Peso (kg)",
+    "heightCm": "Altura (cm)"
+  },
+  "milestones": {
+    "title": "Hitos",
+    "addMilestone": "Añadir hito",
+    "category": "Categoría",
+    "date": "Fecha",
+    "description": "Descripción",
+    "noMilestones": "Aún no se han registrado hitos"
+  },
+  "teething": {
+    "title": "Dentición",
+    "addTooth": "Añadir diente",
+    "toothName": "Diente",
+    "date": "Fecha de aparición",
+    "noTeeth": "Aún no hay dientes registrados"
+  },
+  "sickDays": {
+    "title": "Días de enfermedad",
+    "addSickDay": "Añadir día de enfermedad",
+    "symptoms": "Síntomas",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha final",
+    "notes": "Notas",
+    "noSickDays": "No se registran días de enfermedad"
+  },
+  "allergies": {
+    "title": "Alergias",
+    "addAllergy": "Añadir alergia",
+    "allergen": "Alérgenos",
+    "reaction": "Reacción",
+    "severity": "Gravedad",
+    "noAllergies": "No se han registrado alergias"
+  },
+  "records": {
+    "title": "Historiales médicos",
+    "visits": "Visitas al médico",
+    "vaccinations": "Vacunas",
+    "medications": "Medicamentos",
+    "addVisit": "Añadir visita",
+    "addVaccination": "Añadir vacunación",
+    "addMedication": "Añadir medicación"
+  },
+  "failedToLoad": "Error al cargar los datos sanitarios"
+}

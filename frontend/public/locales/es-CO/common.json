@@ -1,0 +1,62 @@
+{
+  "appName": "HeyBub",
+  "babyTracker": "Rastreador de bebés",
+  "hub": "Cubo",
+  "loading": "Cargando...",
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "delete": "Borrar",
+  "edit": "Editar",
+  "add": "Añadir",
+  "close": "Cerrar",
+  "confirm": "Confirme",
+  "back": "Volver",
+  "next": "Siguiente",
+  "done": "Hecho",
+  "yes": "Sí",
+  "no": "No",
+  "ok": "OK",
+  "error": "Error",
+  "success": "Éxito",
+  "retry": "Reintentar",
+  "noData": "Aún no hay datos",
+  "offline": "Estás desconectado",
+  "offlineMessage": "Conéctate a Internet para cargar los datos de tu bebé. Tus datos se sincronizarán automáticamente cuando vuelvas a conectarte.",
+  "syncPending": "{{count}} cambios pendientes",
+  "syncing": "Sincronización...",
+  "noBabyAdded": "Aún no se ha añadido ningún bebé",
+  "addBabyPrompt": "Añade a tu bebé para iniciar el seguimiento",
+  "noBabySelected": "Ningún bebé seleccionado",
+  "errorBoundaryTitle": "Algo salió mal",
+  "errorBoundaryMessage": "Se ha producido un error inesperado. Intente actualizar la página.",
+  "refresh": "Actualizar",
+  "nav": {
+    "home": "Inicio",
+    "timeline": "Cronología",
+    "health": "Salud",
+    "insights": "Perspectivas",
+    "settings": "Ajustes"
+  },
+  "widgets": {
+    "feeding": "Alimentación",
+    "diaper": "Pañales",
+    "sleep": "Dormir",
+    "pumping": "Bombeo",
+    "potty": "Orinal",
+    "tummyTime": "Hora del vientre",
+    "bath": "Baño",
+    "supplement": "Suplemento"
+  },
+  "time": {
+    "justNow": "Ahora mismo",
+    "minutesAgo": "Hace {{count}}m",
+    "hoursAgo": "Hace {{count}}h",
+    "today": "Hoy",
+    "yesterday": "Ayer"
+  },
+  "language": {
+    "en": "Inglés",
+    "es-CO": "English (Colombia)",
+    "fr-CA": "Français (Canadá)"
+  }
+}

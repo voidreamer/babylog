@@ -1,0 +1,51 @@
+{
+  "title": "Paramètres",
+  "preferences": {
+    "title": "Préférences",
+    "darkMode": "Mode sombre",
+    "darkModeDesc": "Plus facile pour les yeux la nuit",
+    "language": "Langue",
+    "languageDesc": "Choisissez votre langue"
+  },
+  "account": {
+    "title": "Compte",
+    "signedIn": "Signé en",
+    "premiumMember": "Membre Premium ⭐",
+    "premium": {
+      "title": "Plan Premium",
+      "active": "Actif",
+      "activeManage": "Actif - Gérer l'abonnement",
+      "activePromo": "Actif - Code promo",
+      "unlock": "Débloquer des informations sur l'IA et plus encore"
+    }
+  },
+  "data": {
+    "title": "Données",
+    "export": "Exportation de données",
+    "exportDesc": "Télécharger en CSV",
+    "exporting": "Exporter...",
+    "upgradeToExport": "Mise à niveau pour l'exportation",
+    "exportSuccess": "Exportation terminée ! Vérifiez votre dossier de téléchargements.",
+    "exportFailed": "Échec de l'exportation",
+    "noDataToExport": "Pas de données sur les bébés à exporter"
+  },
+  "support": {
+    "title": "Soutien",
+    "privacyPolicy": "Politique de confidentialité",
+    "signOut": "S'inscrire"
+  },
+  "upgrade": {
+    "title": "Passer à la version Premium",
+    "subtitle": "Déverrouiller toutes les fonctionnalités",
+    "features": {
+      "insights": "Des informations sur les bébés alimentées par l'IA",
+      "export": "Exporter les données au format CSV",
+      "more": "Et d'autres à venir bientôt..."
+    },
+    "promoCode": "Code promo",
+    "promoPlaceholder": "Saisir le code promo",
+    "applyPromo": "Appliquer",
+    "subscribe": "S'abonner",
+    "manageSub": "Impossible d'ouvrir la gestion des abonnements."
+  }
+}

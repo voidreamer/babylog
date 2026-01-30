@@ -1,0 +1,51 @@
+{
+  "title": "Ajustes",
+  "preferences": {
+    "title": "Preferencias",
+    "darkMode": "Modo oscuro",
+    "darkModeDesc": "Más cómodo para los ojos por la noche",
+    "language": "Idioma",
+    "languageDesc": "Elija su idioma"
+  },
+  "account": {
+    "title": "Cuenta",
+    "signedIn": "Firmado en",
+    "premiumMember": "Miembro Premium ⭐",
+    "premium": {
+      "title": "Plan Premium",
+      "active": "Activo",
+      "activeManage": "Activo - Gestionar la suscripción",
+      "activePromo": "Activo - Código promocional",
+      "unlock": "Descubra la inteligencia artificial y mucho más"
+    }
+  },
+  "data": {
+    "title": "Datos",
+    "export": "Exportar datos",
+    "exportDesc": "Descargar como CSV",
+    "exporting": "Exportar...",
+    "upgradeToExport": "Actualizar para exportar",
+    "exportSuccess": "¡Exportación completada! Compruebe su carpeta de descargas.",
+    "exportFailed": "Error de exportación",
+    "noDataToExport": "No hay datos de bebés para exportar"
+  },
+  "support": {
+    "title": "Ayuda",
+    "privacyPolicy": "Política de privacidad",
+    "signOut": "Cerrar sesión"
+  },
+  "upgrade": {
+    "title": "Pasar a Premium",
+    "subtitle": "Desbloquea todas las funciones",
+    "features": {
+      "insights": "Información sobre bebés basada en IA",
+      "export": "Exportar datos como CSV",
+      "more": "Y pronto más..."
+    },
+    "promoCode": "Código promocional",
+    "promoPlaceholder": "Introduzca el código promocional",
+    "applyPromo": "Solicitar",
+    "subscribe": "Suscríbase a",
+    "manageSub": "No se ha podido abrir la gestión de suscripciones."
+  }
+}

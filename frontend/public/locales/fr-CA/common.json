@@ -1,0 +1,62 @@
+{
+  "appName": "HeyBub",
+  "babyTracker": "Baby Tracker",
+  "hub": "Hub",
+  "loading": "Chargement...",
+  "save": "Économiser",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "edit": "Editer",
+  "add": "Ajouter",
+  "close": "Fermer",
+  "confirm": "Confirmer",
+  "back": "Retour",
+  "next": "Suivant",
+  "done": "Terminé",
+  "yes": "Oui",
+  "no": "Non",
+  "ok": "OK",
+  "error": "Erreur",
+  "success": "Succès",
+  "retry": "Réessayer",
+  "noData": "Pas encore de données",
+  "offline": "Vous êtes hors ligne",
+  "offlineMessage": "Connectez-vous à Internet pour charger les données de votre bébé. Vos données se synchroniseront automatiquement lorsque vous serez de nouveau en ligne.",
+  "syncPending": "{{count}} en attente de modifications",
+  "syncing": "Synchronisation...",
+  "noBabyAdded": "Aucun bébé n'a encore été ajouté",
+  "addBabyPrompt": "Ajoutez votre bébé pour commencer le suivi",
+  "noBabySelected": "Pas de bébé sélectionné",
+  "errorBoundaryTitle": "Quelque chose n'a pas fonctionné",
+  "errorBoundaryMessage": "Une erreur inattendue s'est produite. Veuillez essayer d'actualiser la page.",
+  "refresh": "Rafraîchir",
+  "nav": {
+    "home": "Accueil",
+    "timeline": "Chronologie",
+    "health": "Santé",
+    "insights": "Perspectives",
+    "settings": "Paramètres"
+  },
+  "widgets": {
+    "feeding": "Alimentation",
+    "diaper": "Couche",
+    "sleep": "Sommeil",
+    "pumping": "Pompage",
+    "potty": "Pot",
+    "tummyTime": "L'heure du ventre",
+    "bath": "Bain",
+    "supplement": "Supplément"
+  },
+  "time": {
+    "justNow": "A l'instant",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  },
+  "language": {
+    "en": "Anglais",
+    "es-CO": "Español (Colombie)",
+    "fr-CA": "Français (Canada)"
+  }
+}

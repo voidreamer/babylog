@@ -1,0 +1,102 @@
+{
+  "title": "Cuadro de mandos",
+  "dailySummary": "Resumen de hoy",
+  "comingUp": "Próximamente",
+  "widgetSettings": "Configuración del widget",
+  "quickActions": "Acciones rápidas",
+  "quickActionsEnabled": "Acciones rápidas",
+  "quickActionsDesc": "Mostrar botones de acción rápida en los widgets",
+  "noUpcoming": "No hay nada",
+  "feeding": {
+    "title": "Alimentación",
+    "lastFed": "Último alimentado",
+    "startFeeding": "Iniciar la alimentación",
+    "stopFeeding": "Dejar de alimentar",
+    "logFeeding": "Alimentación de troncos",
+    "breast": "Pecho",
+    "bottle": "Botella",
+    "solid": "Sólido",
+    "left": "Izquierda",
+    "right": "Derecha",
+    "both": "Ambos",
+    "amount": "Importe",
+    "duration": "Duración",
+    "notes": "Notas",
+    "type": "Tipo"
+  },
+  "diaper": {
+    "title": "Pañales",
+    "lastChange": "Último cambio",
+    "logDiaper": "Pañal de troncos",
+    "wet": "Mojado",
+    "dirty": "Sucio",
+    "mixed": "Mixto",
+    "dry": "Seco",
+    "color": "Color",
+    "notes": "Notas"
+  },
+  "sleep": {
+    "title": "Dormir",
+    "lastSleep": "Último sueño",
+    "sleeping": "Para dormir",
+    "awake": "Despierta",
+    "startSleep": "Inicio Sueño",
+    "endSleep": "Fin del sueño",
+    "logSleep": "Log Sleep",
+    "nap": "Siesta",
+    "nightSleep": "Sueño nocturno",
+    "duration": "Duración",
+    "notes": "Notas"
+  },
+  "pumping": {
+    "title": "Bombeo",
+    "lastPump": "Última bomba",
+    "startPumping": "Iniciar bombeo",
+    "stopPumping": "Detener el bombeo",
+    "logPumping": "Bombeo de troncos",
+    "amount": "Importe",
+    "duration": "Duración",
+    "notes": "Notas"
+  },
+  "potty": {
+    "title": "Orinal",
+    "lastPotty": "Último orinal",
+    "logPotty": "Orinal de troncos",
+    "success": "Éxito",
+    "accident": "Accidente",
+    "notes": "Notas"
+  },
+  "tummyTime": {
+    "title": "Hora del vientre",
+    "lastSession": "Última sesión",
+    "startTummyTime": "Hora de acostarse boca abajo",
+    "stopTummyTime": "Stop Tummy Time",
+    "logTummyTime": "Log Tummy Time",
+    "duration": "Duración",
+    "notes": "Notas"
+  },
+  "bath": {
+    "title": "Baño",
+    "lastBath": "Último baño",
+    "logBath": "Baño de troncos",
+    "notes": "Notas"
+  },
+  "supplement": {
+    "title": "Suplemento",
+    "lastSupplement": "Último suplemento",
+    "logSupplement": "Suplemento de registro",
+    "name": "Nombre",
+    "dosage": "Dosificación",
+    "notes": "Notas"
+  },
+  "summary": {
+    "feedings": "Alimentación",
+    "diapers": "Pañales",
+    "sleepTotal": "Dormir Total",
+    "pumpings": "Bombeos",
+    "pottyTrips": "Viajes al orinal",
+    "tummyTimeSessions": "Hora del vientre",
+    "baths": "Baños",
+    "supplements": "Suplementos"
+  }
+}

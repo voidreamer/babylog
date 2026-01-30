@@ -1,0 +1,57 @@
+{
+  "title": "Santé",
+  "growth": {
+    "title": "Croissance",
+    "weight": "Poids",
+    "height": "Hauteur",
+    "headCircumference": "Tour de tête",
+    "addRecord": "Ajouter un enregistrement",
+    "recordDate": "Date",
+    "notes": "Notes",
+    "chart": "Tableau de croissance",
+    "weightKg": "Poids (kg)",
+    "heightCm": "Hauteur (cm)"
+  },
+  "milestones": {
+    "title": "Jalons",
+    "addMilestone": "Ajouter un jalon",
+    "category": "Catégorie",
+    "date": "Date",
+    "description": "Description",
+    "noMilestones": "Aucune étape n'a encore été enregistrée"
+  },
+  "teething": {
+    "title": "Dentition",
+    "addTooth": "Ajouter une dent",
+    "toothName": "Dent",
+    "date": "Date d'apparition",
+    "noTeeth": "Aucune dent n'a encore été enregistrée"
+  },
+  "sickDays": {
+    "title": "Jours de maladie",
+    "addSickDay": "Ajouter un jour de maladie",
+    "symptoms": "Symptômes",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "notes": "Notes",
+    "noSickDays": "Pas de jours de maladie enregistrés"
+  },
+  "allergies": {
+    "title": "Allergies",
+    "addAllergy": "Ajouter l'allergie",
+    "allergen": "Allergène",
+    "reaction": "Réaction",
+    "severity": "Sévérité",
+    "noAllergies": "Aucune allergie n'a été enregistrée"
+  },
+  "records": {
+    "title": "Dossiers médicaux",
+    "visits": "Visites chez le médecin",
+    "vaccinations": "Vaccinations",
+    "medications": "Médicaments",
+    "addVisit": "Ajouter une visite",
+    "addVaccination": "Ajouter la vaccination",
+    "addMedication": "Ajouter un médicament"
+  },
+  "failedToLoad": "Échec du chargement des données de santé"
+}

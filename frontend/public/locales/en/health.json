@@ -1,0 +1,57 @@
+{
+  "title": "Health",
+  "growth": {
+    "title": "Growth",
+    "weight": "Weight",
+    "height": "Height",
+    "headCircumference": "Head Circumference",
+    "addRecord": "Add Record",
+    "recordDate": "Date",
+    "notes": "Notes",
+    "chart": "Growth Chart",
+    "weightKg": "Weight (kg)",
+    "heightCm": "Height (cm)"
+  },
+  "milestones": {
+    "title": "Milestones",
+    "addMilestone": "Add Milestone",
+    "category": "Category",
+    "date": "Date",
+    "description": "Description",
+    "noMilestones": "No milestones recorded yet"
+  },
+  "teething": {
+    "title": "Teething",
+    "addTooth": "Add Tooth",
+    "toothName": "Tooth",
+    "date": "Date Appeared",
+    "noTeeth": "No teeth recorded yet"
+  },
+  "sickDays": {
+    "title": "Sick Days",
+    "addSickDay": "Add Sick Day",
+    "symptoms": "Symptoms",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "notes": "Notes",
+    "noSickDays": "No sick days recorded"
+  },
+  "allergies": {
+    "title": "Allergies",
+    "addAllergy": "Add Allergy",
+    "allergen": "Allergen",
+    "reaction": "Reaction",
+    "severity": "Severity",
+    "noAllergies": "No allergies recorded"
+  },
+  "records": {
+    "title": "Medical Records",
+    "visits": "Doctor Visits",
+    "vaccinations": "Vaccinations",
+    "medications": "Medications",
+    "addVisit": "Add Visit",
+    "addVaccination": "Add Vaccination",
+    "addMedication": "Add Medication"
+  },
+  "failedToLoad": "Failed to load health data"
+}
