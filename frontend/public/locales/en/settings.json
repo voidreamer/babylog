@@ -1,0 +1,76 @@
+{
+  "title": "Settings",
+  "preferences": {
+    "title": "Preferences",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Easier on eyes at night",
+    "language": "Language",
+    "languageDesc": "Choose your language"
+  },
+  "account": {
+    "title": "Account",
+    "signedIn": "Signed in",
+    "premiumMember": "Premium member ⭐",
+    "premium": {
+      "title": "Premium Plan",
+      "active": "Active",
+      "activeManage": "Active — Manage subscription",
+      "activePromo": "Active — Promo code",
+      "unlock": "Unlock AI insights & more"
+    }
+  },
+  "data": {
+    "title": "Data",
+    "export": "Export Data",
+    "exportDesc": "Download as CSV",
+    "exporting": "Exporting...",
+    "upgradeToExport": "Upgrade to export",
+    "exportSuccess": "Export complete! Check your downloads folder.",
+    "exportFailed": "Export failed",
+    "noDataToExport": "No baby data to export"
+  },
+  "support": {
+    "title": "Support",
+    "privacyPolicy": "Privacy Policy",
+    "signOut": "Sign Out"
+  },
+  "upgrade": {
+    "title": "Upgrade to Premium",
+    "subtitle": "Unlock all features",
+    "features": {
+      "insights": "AI-powered baby insights",
+      "export": "Export data as CSV",
+      "more": "And more coming soon..."
+    },
+    "promoCode": "Promo Code",
+    "promoPlaceholder": "Enter promo code",
+    "applyPromo": "Apply",
+    "subscribe": "Subscribe",
+    "manageSub": "Could not open subscription management.",
+    "heyBubPremium": "HeyBub Premium",
+    "premiumFeatures": {
+      "insights": "AI-powered baby insights & predictions",
+      "growth": "Growth charts with WHO percentiles",
+      "export": "Export all your data (CSV)",
+      "share": "Share with unlimited caregivers",
+      "multiple": "Track multiple babies",
+      "support": "Priority support"
+    },
+    "limitedTime": "LIMITED TIME · 50% OFF",
+    "bestValue": "BEST VALUE",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "justPerMonth": "Just $1.25/mo",
+    "redirecting": "Redirecting…",
+    "startTrial": "Start 7-Day Free Trial",
+    "cancelAnytime": "Cancel anytime · No commitment",
+    "restorePurchase": "Restore Purchase",
+    "premiumFeature": "Premium Feature",
+    "upgradeToUnlock": "Upgrade to unlock {{feature}}",
+    "upgradeBtn": "Upgrade"
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "Could not start checkout. Please try again.",
+  "toast_premiumRestoredReloading": "Premium restored! Reloading…",
+  "toast_noActiveSubscriptionFoundForThisAc": "No active subscription found for this account.",
+  "toast_couldNotCheckSubscription": "Could not check subscription."
+}

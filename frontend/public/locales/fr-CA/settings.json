@@ -1,0 +1,76 @@
+{
+  "title": "Paramètres",
+  "preferences": {
+    "title": "Préférences",
+    "darkMode": "Mode sombre",
+    "darkModeDesc": "Plus facile pour les yeux la nuit",
+    "language": "Langue",
+    "languageDesc": "Choisissez votre langue"
+  },
+  "account": {
+    "title": "Compte",
+    "signedIn": "Signé en",
+    "premiumMember": "Membre Premium ⭐",
+    "premium": {
+      "title": "Plan Premium",
+      "active": "Actif",
+      "activeManage": "Actif - Gérer l'abonnement",
+      "activePromo": "Actif - Code promo",
+      "unlock": "Débloquer des informations sur l'IA et plus encore"
+    }
+  },
+  "data": {
+    "title": "Données",
+    "export": "Exportation de données",
+    "exportDesc": "Télécharger en CSV",
+    "exporting": "Exporter...",
+    "upgradeToExport": "Passer à l'exportation",
+    "exportSuccess": "Exportation terminée ! Vérifiez votre dossier de téléchargements.",
+    "exportFailed": "Échec de l'exportation",
+    "noDataToExport": "Pas de données sur les bébés à exporter"
+  },
+  "support": {
+    "title": "Soutien",
+    "privacyPolicy": "Politique de confidentialité",
+    "signOut": "S'inscrire"
+  },
+  "upgrade": {
+    "title": "Passer à la version Premium",
+    "subtitle": "Déverrouiller toutes les fonctionnalités",
+    "features": {
+      "insights": "Des informations sur les bébés alimentées par l'IA",
+      "export": "Exporter les données au format CSV",
+      "more": "Et d'autres à venir bientôt..."
+    },
+    "promoCode": "Code promo",
+    "promoPlaceholder": "Saisir le code promo",
+    "applyPromo": "Appliquer",
+    "subscribe": "S'abonner",
+    "manageSub": "Impossible d'ouvrir la gestion des abonnements.",
+    "heyBubPremium": "HeyBub Premium",
+    "premiumFeatures": {
+      "insights": "Perspectives et prédictions sur les bébés alimentées par l'IA",
+      "growth": "Courbes de croissance avec les percentiles de l'OMS",
+      "export": "Exporter toutes vos données (CSV)",
+      "share": "Partager avec un nombre illimité de soignants",
+      "multiple": "Suivre plusieurs bébés",
+      "support": "Soutien prioritaire"
+    },
+    "limitedTime": "DURÉE LIMITÉE - 50% DE RÉDUCTION",
+    "bestValue": "MEILLEUR RAPPORT QUALITÉ-PRIX",
+    "perMonth": "par mois",
+    "perYear": "par an",
+    "justPerMonth": "Seulement 1,25 $/mois",
+    "redirecting": "Redirection...",
+    "startTrial": "Démarrer l'essai gratuit de 7 jours",
+    "cancelAnytime": "Annulation à tout moment - Pas d'engagement",
+    "restorePurchase": "Rétablir l'achat",
+    "premiumFeature": "Fonctionnalité Premium",
+    "upgradeToUnlock": "Mettre à niveau pour débloquer {{feature}}",
+    "upgradeBtn": "Mise à niveau"
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "Impossible de lancer le paiement. Veuillez réessayer.",
+  "toast_premiumRestoredReloading": "Premium restauré ! Rechargement...",
+  "toast_noActiveSubscriptionFoundForThisAc": "Aucun abonnement actif n'a été trouvé pour ce compte.",
+  "toast_couldNotCheckSubscription": "Impossible de vérifier l'abonnement."
+}

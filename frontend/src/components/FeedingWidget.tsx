@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Baby, Play, Square, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 
 // Format timer display
@@ -18,6 +19,7 @@ const ACTIVE_FEEDING_KEY = 'activeFeeding';
 
 interface FeedingWidgetProps { babyId: number; lastFeeding: any; onFeedingChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, onOpenModal, quickActionsEnabled = true }: FeedingWidgetProps) {
+    const { t } = useTranslation('dashboard');
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [activeFeeding, setActiveFeeding] = useState<any>(null);
@@ -73,7 +75,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
         setActiveFeeding(newActiveFeeding);
         localStorage.setItem(ACTIVE_FEEDING_KEY, JSON.stringify(newActiveFeeding));
-        toast.success('Feeding started');
+        toast.success(t('toast_feedingStarted'));
     };
 
     const handleStopFeeding = async (e: React.MouseEvent) => {
@@ -98,11 +100,11 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
             localStorage.removeItem(ACTIVE_FEEDING_KEY);
             setActiveFeeding(null);
-            toast.success(`Feeding logged (${durationMinutes} min)`);
+            toast.success(t('feeding.feedingLogged', { duration: durationMinutes }));
             onFeedingChange();
         } catch (error) {
             console.error('Failed to save feeding:', error);
-            toast.error('Failed to save feeding');
+            toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
         }
@@ -124,7 +126,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
     const getLastFeedingDetail = () => {
         if (!lastFeeding) return null;
         const type = lastFeeding.type === 'bottle' || lastFeeding.type === 'breastmilk_bottle'
-            ? 'Bottle'
+            ? t('feeding.bottle')
             : lastFeeding.type.charAt(0).toUpperCase() + lastFeeding.type.slice(1);
         return lastFeeding.duration_minutes ? `${type} • ${lastFeeding.duration_minutes}min` : type;
     };
@@ -146,7 +148,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             </div>
 
             {/* Plus icon for manual logging */}
-            <div className="widget-add-icon" title="Log feeding manually">
+            <div className="widget-add-icon" title={t('title_logFeedingManually')}>
                 <Plus size={18} />
             </div>
 
@@ -157,7 +159,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                         alt="feeding"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
-                    <span className="widget-label">{isFeeding ? 'Feeding' : 'Feeding'}</span>
+                    <span className="widget-label">{t('feeding.title')}</span>
                 </div>
 
                 {isFeeding ? (
@@ -172,7 +174,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                             disabled={saving}
                         >
                             <Square size={14} fill="currentColor" />
-                            {saving ? 'Saving...' : 'Done'}
+                            {saving ? t('common:saving') : t('common:done')}
                         </button>
                     </div>
                 ) : (
@@ -184,7 +186,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                                 <div className="widget-detail">{getLastFeedingDetail()}</div>
                             </>
                         ) : (
-                            <div className="widget-time-ago">No feedings yet</div>
+                            <div className="widget-time-ago">{t('feeding.noFeedingsYet')}</div>
                         )}
                     </div>
                 )}

@@ -6,9 +6,11 @@
  */
 
 import { WifiOff, RefreshCw, Cloud, CloudOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OfflineIndicatorProps { online: boolean; syncing: boolean; pendingCount: number; onSync: () => void; }
 export function OfflineIndicator({ online, syncing, pendingCount, onSync }: OfflineIndicatorProps) {
+    const { t } = useTranslation('common');
     // Don't show anything if online and no pending changes
     if (online && pendingCount === 0 && !syncing) {
         return null;
@@ -38,22 +40,22 @@ export function OfflineIndicator({ online, syncing, pendingCount, onSync }: Offl
             {!online ? (
                 <>
                     <WifiOff size={16} />
-                    <span>You're offline</span>
+                    <span>{t('offlineIndicator.youreOffline')}</span>
                     {pendingCount > 0 && (
                         <span style={{ opacity: 0.8 }}>
-                            • {pendingCount} change{pendingCount !== 1 ? 's' : ''} pending
+                            • {t('offlineIndicator.changesPending', { count: pendingCount, s: pendingCount !== 1 ? 's' : '' })}
                         </span>
                     )}
                 </>
             ) : syncing ? (
                 <>
                     <RefreshCw size={16} className="spin" />
-                    <span>Syncing changes...</span>
+                    <span>{t('offlineIndicator.syncingChanges')}</span>
                 </>
             ) : pendingCount > 0 ? (
                 <>
                     <Cloud size={16} />
-                    <span>{pendingCount} change{pendingCount !== 1 ? 's' : ''} to sync</span>
+                    <span>{t('offlineIndicator.changesToSync', { count: pendingCount, s: pendingCount !== 1 ? 's' : '' })}</span>
                     <button
                         onClick={onSync}
                         style={{
@@ -66,7 +68,7 @@ export function OfflineIndicator({ online, syncing, pendingCount, onSync }: Offl
                             fontSize: '0.8rem'
                         }}
                     >
-                        Sync now
+                        {t('offlineIndicator.syncNow')}
                     </button>
                 </>
             ) : null}

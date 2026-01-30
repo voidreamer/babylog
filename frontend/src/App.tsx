@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
 import { useOfflineSync } from './hooks/useOfflineSync';
@@ -12,6 +13,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
 import Learn from './components/Learn';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 // Lazy load routes for bundle splitting
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -23,33 +25,36 @@ import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, Chev
 import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
-// SettingsPage component - defined outside MainApp to prevent re-mounting on state changes
+// SettingsPage component
 interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
 function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
+    const { t } = useTranslation(['settings', 'common']);
+
     return (
         <div className="settings-page">
-            <h2 style={{ marginBottom: 'var(--space-lg)' }}>Settings</h2>
+            <h2 style={{ marginBottom: 'var(--space-lg)' }}>{t('settings:title')}</h2>
 
             {/* Preferences */}
             <div className="settings-group">
-                <div className="settings-group-title">Preferences</div>
+                <div className="settings-group-title">{t('settings:preferences.title')}</div>
                 <div className="settings-row" onClick={toggleTheme}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box peach">
                             <Moon size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Dark Mode</div>
-                            <div className="settings-row-desc">Easier on eyes at night</div>
+                            <div className="settings-row-label">{t('settings:preferences.darkMode')}</div>
+                            <div className="settings-row-desc">{t('settings:preferences.darkModeDesc')}</div>
                         </div>
                     </div>
                     <div className={`toggle-switch ${isDark ? 'active' : ''}`} />
                 </div>
+                <LanguageSwitcher />
             </div>
 
             {/* Account */}
             <div className="settings-group">
-                <div className="settings-group-title">Account</div>
+                <div className="settings-group-title">{t('settings:account.title')}</div>
                 {user && (
                     <div className="settings-row">
                         <div className="settings-row-left">
@@ -57,8 +62,8 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                                 <User size={16} />
                             </div>
                             <div>
-                                <div className="settings-row-label">{user.email}</div>
-                                <div className="settings-row-desc">Signed in</div>
+                                <div className="settings-row-label">{user.email} {isPremium && <span style={{ fontSize: 11, background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#fff', padding: '1px 6px', borderRadius: 8, marginLeft: 6, fontWeight: 600 }}>PRO</span>}</div>
+                                <div className="settings-row-desc">{isPremium ? t('settings:account.premiumMember') : t('settings:account.signedIn')}</div>
                             </div>
                         </div>
                     </div>
@@ -69,18 +74,18 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <Crown size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Premium Plan</div>
+                            <div className="settings-row-label">{t('settings:account.premium.title')}</div>
                             <div className="settings-row-desc">
                                 {isPremium
                                     ? hasStripeSubscription
-                                        ? 'Active — Manage subscription'
-                                        : 'Active — Promo code'
-                                    : 'Unlock AI insights & more'}
+                                        ? t('settings:account.premium.activeManage')
+                                        : t('settings:account.premium.activePromo')
+                                    : t('settings:account.premium.unlock')}
                             </div>
                         </div>
                     </div>
                     {isPremium ? (
-                        <span className="settings-badge mint">Active</span>
+                        <span className="settings-badge mint">{t('settings:account.premium.active')}</span>
                     ) : (
                         <ChevronRight size={18} className="settings-arrow" />
                     )}
@@ -89,20 +94,20 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
             {/* Data */}
             <div className="settings-group">
-                <div className="settings-group-title">Data</div>
+                <div className="settings-group-title">{t('settings:data.title')}</div>
                 <div
                     className="settings-row"
-                    onClick={handleExportCsv}
-                    style={{ cursor: exportLoading || !babies || babies.length === 0 ? 'not-allowed' : 'pointer' }}
+                    onClick={isPremium ? handleExportCsv : onUpgrade}
+                    style={{ cursor: exportLoading || (!isPremium && false) || !babies || babies.length === 0 ? 'not-allowed' : 'pointer', opacity: isPremium ? 1 : 0.6 }}
                 >
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
                             <Download size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Export Data</div>
+                            <div className="settings-row-label">{t('settings:data.export')} {!isPremium && <span className="settings-badge mint" style={{ fontSize: 10, marginLeft: 6 }}>PRO</span>}</div>
                             <div className="settings-row-desc">
-                                {exportLoading ? 'Exporting...' : 'Download as CSV'}
+                                {!isPremium ? t('settings:data.upgradeToExport') : exportLoading ? t('settings:data.exporting') : t('settings:data.exportDesc')}
                             </div>
                         </div>
                     </div>
@@ -112,7 +117,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
             {/* Support */}
             <div className="settings-group">
-                <div className="settings-group-title">Support</div>
+                <div className="settings-group-title">{t('settings:support.title')}</div>
                 <button
                     className="settings-row"
                     onClick={() => setShowPrivacyPolicy(true)}
@@ -122,7 +127,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <Shield size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Privacy Policy</div>
+                            <div className="settings-row-label">{t('settings:support.privacyPolicy')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -136,7 +141,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <LogOut size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Sign Out</div>
+                            <div className="settings-row-label">{t('settings:support.signOut')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -177,6 +182,7 @@ function buildHubUrl(session, theme) {
 }
 
 function MainApp() {
+    const { t } = useTranslation('common');
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
@@ -186,7 +192,6 @@ function MainApp() {
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
 
-    // Premium state
     const [isPremium, setIsPremium] = useState(() => {
         return localStorage.getItem('isPremium') === 'true';
     });
@@ -199,30 +204,28 @@ function MainApp() {
             const result = await api.createBillingPortal();
             window.location.href = result.portal_url;
         } catch {
-            toast.error('Could not open subscription management.');
+            toast.error(t('settings:upgrade.manageSub', { ns: 'settings' }));
         }
     };
 
     const handleExportCsv = async () => {
         if (!babies || babies.length === 0) {
-            toast.error('No baby data to export');
+            toast.error(t('settings:data.noDataToExport', { ns: 'settings' }));
             return;
         }
 
         setExportLoading(true);
         try {
-            // Export current baby's data
             const currentBaby = babies[0];
             await api.exportBabyDataCsv(currentBaby.id);
-            toast.success('Export complete! Check your downloads folder.');
+            toast.success(t('settings:data.exportSuccess', { ns: 'settings' }));
         } catch (error) {
-            toast.error('Export failed: ' + (error as Error).message);
+            toast.error(t('settings:data.exportFailed', { ns: 'settings' }) + ': ' + (error as Error).message);
         } finally {
             setExportLoading(false);
         }
     };
 
-    // Theme state with migration from old theme values
     const [theme, setTheme] = useState(() => {
         const saved = localStorage.getItem('theme');
         if (saved === 'handwritten') return 'light';
@@ -232,14 +235,11 @@ function MainApp() {
 
     const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
-    // Apply theme on mount and when it changes
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
     }, [theme]);
 
-    // Check premium status from server on app load
-    // This ensures premium persists across cache clears and devices
     useEffect(() => {
         const checkPremiumStatus = async () => {
             if (!user || !online) return;
@@ -250,12 +250,9 @@ function MainApp() {
                     setIsPremium(true);
                     localStorage.setItem('isPremium', 'true');
                 } else {
-                    // Server says not premium - update local state
-                    // (could be cache was cleared but user never had premium)
                     setIsPremium(false);
                     localStorage.setItem('isPremium', 'false');
                 }
-                // Check if premium came from Stripe (has active billing subscription)
                 try {
                     const billing = await api.getBillingSubscription();
                     const hasSub = billing.is_premium && !!billing.plan;
@@ -266,7 +263,6 @@ function MainApp() {
                     localStorage.setItem('hasStripeSubscription', 'false');
                 }
             } catch (error) {
-                // On error, keep localStorage value as fallback
                 console.warn('Failed to check premium status:', error);
             }
         };
@@ -274,15 +270,12 @@ function MainApp() {
         checkPremiumStatus();
     }, [user, online]);
 
-    // Check if we should show onboarding (no babies yet)
-    // Only show onboarding when online - if offline with no cached babies, show offline message instead
     useEffect(() => {
         if (!babiesLoading && babies.length === 0 && online) {
             setShowOnboarding(true);
         }
     }, [babies, babiesLoading, online]);
 
-    // Show onboarding for first-time users (only when online)
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (
             <Onboarding
@@ -291,7 +284,6 @@ function MainApp() {
         );
     }
 
-    // Show offline message if offline with no cached babies
     if (!babiesLoading && babies.length === 0 && !online) {
         return (
             <div className="app-container">
@@ -303,17 +295,15 @@ function MainApp() {
                 />
                 <div className="empty-state" style={{ paddingTop: 'var(--space-2xl)' }}>
                     <div className="empty-state-icon">📡</div>
-                    <h2 className="empty-state-title">You're Offline</h2>
+                    <h2 className="empty-state-title">{t('offline')}</h2>
                     <p className="empty-state-text">
-                        Connect to the internet to load your baby data.
-                        Your data will sync automatically when you're back online.
+                        {t('offlineMessage')}
                     </p>
                 </div>
             </div>
         );
     }
 
-    // Show privacy policy if requested
     if (showPrivacyPolicy) {
         return (
             <div className="app-container" style={{ paddingBottom: 'var(--space-xl)' }}>
@@ -336,9 +326,9 @@ function MainApp() {
                 <div className="header-left">
                     <a href={buildHubUrl(session, theme)} className="hub-back-link">
                         <ArrowLeft size={16} />
-                        <span>Hub</span>
+                        <span>{t('hub')}</span>
                     </a>
-                    <span className="header-title">Baby Tracker</span>
+                    <span className="header-title">{t('babyTracker')}</span>
                 </div>
                 <div className="header-actions">
                     <button className="btn-icon theme-toggle" onClick={toggleTheme}>
@@ -392,35 +382,35 @@ function MainApp() {
                     onClick={() => setActiveTab('home')}
                 >
                     <Home size={22} />
-                    <span>Home</span>
+                    <span>{t('nav.home')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
                     onClick={() => setActiveTab('timeline')}
                 >
                     <Clock size={22} />
-                    <span>Timeline</span>
+                    <span>{t('nav.timeline')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
                     onClick={() => setActiveTab('health')}
                 >
                     <Activity size={22} />
-                    <span>Health</span>
+                    <span>{t('nav.health')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
                     onClick={() => setActiveTab('learn')}
                 >
                     <PieChart size={22} />
-                    <span>Insights</span>
+                    <span>{t('nav.insights')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
                     onClick={() => setActiveTab('settings')}
                 >
                     <SettingsIcon size={22} />
-                    <span>Settings</span>
+                    <span>{t('nav.settings')}</span>
                 </button>
             </nav>
         </div>

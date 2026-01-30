@@ -6,8 +6,10 @@ import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 import UpgradeDialog from './UpgradeDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function BabySelector(): React.ReactElement | null {
+    const { t } = useTranslation('common');
     const { babies, selectedBaby, selectBaby, refresh, removeBaby } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -46,10 +48,10 @@ export default function BabySelector(): React.ReactElement | null {
             await refresh();
             setShowAddForm(false);
             setShowDropdown(false);
-            toast.success(`${formData.name} added!`);
+            toast.success(t('greeting.babyAdded', { name: formData.name }));
         } catch (error) {
             console.error('Failed to add baby:', error);
-            toast.error('Failed to add baby');
+            toast.error(t('toast_failedToAddBaby'));
         } finally {
             setSaving(false);
         }
@@ -62,14 +64,14 @@ export default function BabySelector(): React.ReactElement | null {
                     className="btn btn-primary"
                     onClick={() => setShowAddForm(true)}
                 >
-                    + Add Baby
+                    {t('babySelector.addBaby')}
                 </button>
 
                 {showAddForm && (
                     <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
                         <div className="modal" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2 className="modal-title">Add Your Baby</h2>
+                                <h2 className="modal-title">{t('babySelector.addYourBaby')}</h2>
                                 <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                             </div>
                             <div className="modal-body">
@@ -97,7 +99,7 @@ export default function BabySelector(): React.ReactElement | null {
                 <div className="baby-avatar">
                     {selectedBaby ? getInitial(selectedBaby.name) : '?'}
                 </div>
-                <span className="baby-name">{selectedBaby?.name || 'Select Baby'}</span>
+                <span className="baby-name">{selectedBaby?.name || t('babySelector.selectBaby')}</span>
                 <span style={{ marginLeft: 'auto' }}>▼</span>
             </div>
 
@@ -143,7 +145,7 @@ export default function BabySelector(): React.ReactElement | null {
                                     padding: '2px 6px',
                                     borderRadius: '4px',
                                 }}>
-                                    Shared
+                                    {t('babySelector.shared')}
                                 </span>
                             )}
                             {baby.id === selectedBaby?.id && <span style={{ marginLeft: 'auto' }}>✓</span>}
@@ -163,7 +165,7 @@ export default function BabySelector(): React.ReactElement | null {
                                 setShowDropdown(false);
                             }}
                         >
-                            Share {selectedBaby?.name}
+                            {t('babySelector.shareName', { name: selectedBaby?.name })}
                         </div>
                     )}
 
@@ -175,13 +177,13 @@ export default function BabySelector(): React.ReactElement | null {
                                 color: 'var(--danger)',
                             }}
                             onClick={() => {
-                                if (confirm(`Are you sure you want to delete ${selectedBaby.name}? This will remove all feeding, diaper, sleep, and health records. This cannot be undone.`)) {
+                                if (confirm(t('babySelector.deleteConfirm', { name: selectedBaby.name }))) {
                                     removeBaby(selectedBaby.id);
                                     setShowDropdown(false);
                                 }
                             }}
                         >
-                            Delete {selectedBaby?.name}
+                            {t('babySelector.deleteName', { name: selectedBaby?.name })}
                         </div>
                     )}
 
@@ -203,7 +205,7 @@ export default function BabySelector(): React.ReactElement | null {
                             }
                         }}
                     >
-                        + Add Another Baby
+                        {t('babySelector.addAnotherBaby')}
                     </div>
                 </div>
             )}
@@ -212,7 +214,7 @@ export default function BabySelector(): React.ReactElement | null {
                 <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">Add Baby</h2>
+                            <h2 className="modal-title">{t('greeting.addBaby')}</h2>
                             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
                         </div>
                         <div className="modal-body">

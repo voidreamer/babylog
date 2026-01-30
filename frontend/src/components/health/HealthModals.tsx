@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
 import { parseUTCTime } from '../../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 
 const MILESTONE_OPTIONS = [
@@ -16,6 +17,7 @@ const MILESTONE_OPTIONS = [
 
 interface VisitModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProps) {
+    const { t } = useTranslation('health');
     const [visitDate, setVisitDate] = useState(
         editData ? format(parseUTCTime(editData.visit_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
     );
@@ -48,14 +50,14 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
 
             if (editData) {
                 await api.updateDoctorVisit(editData.id, data);
-                toast.success('Visit updated');
+                toast.success(t('toast_visitUpdated'));
             } else {
                 await api.createDoctorVisit(data);
-                toast.success('Visit logged');
+                toast.success(t('toast_visitLogged'));
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save');
+            toast.error(t('toast_failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -86,20 +88,20 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
                         </div>
                         <div className="form-group">
                             <label className="form-label">Doctor Name</label>
-                            <input type="text" className="form-input" value={doctorName} onChange={e => setDoctorName(e.target.value)} placeholder="Optional" />
+                            <input type="text" className="form-input" value={doctorName} onChange={e => setDoctorName(e.target.value)} placeholder={t('placeholder_optional')} />
                         </div>
                         <div className="form-row">
                             <div className="form-group">
                                 <label className="form-label">Weight (kg)</label>
-                                <input type="number" step="0.01" className="form-input" value={weight} onChange={e => setWeight(e.target.value)} placeholder="3.5" />
+                                <input type="number" step="0.01" className="form-input" value={weight} onChange={e => setWeight(e.target.value)} placeholder={t('placeholder_35')} />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Height (cm)</label>
-                                <input type="number" step="0.1" className="form-input" value={height} onChange={e => setHeight(e.target.value)} placeholder="50" />
+                                <input type="number" step="0.1" className="form-input" value={height} onChange={e => setHeight(e.target.value)} placeholder={t('placeholder_50')} />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Head (cm)</label>
-                                <input type="number" step="0.1" className="form-input" value={head} onChange={e => setHead(e.target.value)} placeholder="35" />
+                                <input type="number" step="0.1" className="form-input" value={head} onChange={e => setHead(e.target.value)} placeholder={t('placeholder_35')} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -108,7 +110,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>
-                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional" maxLength={500} />
+                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('placeholder_optional')} maxLength={500} />
                         </div>
                     </div>
                     <div className="modal-footer">
@@ -151,14 +153,14 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
 
             if (editData) {
                 await api.updateVaccination(editData.id, data);
-                toast.success('Vaccination updated');
+                toast.success(t('toast_vaccinationUpdated'));
             } else {
                 await api.createVaccination(data);
-                toast.success('Vaccination logged');
+                toast.success(t('toast_vaccinationLogged'));
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save');
+            toast.error(t('toast_failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -175,7 +177,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
                     <div className="modal-body">
                         <div className="form-group">
                             <label className="form-label">Vaccine Name</label>
-                            <input type="text" className="form-input" value={vaccineName} onChange={e => setVaccineName(e.target.value)} placeholder="e.g., DTaP, MMR" required />
+                            <input type="text" className="form-input" value={vaccineName} onChange={e => setVaccineName(e.target.value)} placeholder={t('placeholder_egDtapMmr')} required />
                         </div>
                         <div className="form-row">
                             <div className="form-group">
@@ -189,7 +191,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
                         </div>
                         <div className="form-group">
                             <label className="form-label">Administered By</label>
-                            <input type="text" className="form-input" value={administeredBy} onChange={e => setAdministeredBy(e.target.value)} placeholder="Doctor/Clinic name" />
+                            <input type="text" className="form-input" value={administeredBy} onChange={e => setAdministeredBy(e.target.value)} placeholder={t('placeholder_doctorclinicName')} />
                         </div>
                         <div className="form-group">
                             <label className="form-label">Next Due Date</label>
@@ -197,7 +199,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>
-                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional" maxLength={500} />
+                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('placeholder_optional')} maxLength={500} />
                         </div>
                     </div>
                     <div className="modal-footer">
@@ -237,14 +239,14 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
 
             if (editData) {
                 await api.updateMedication(editData.id, data);
-                toast.success('Medication updated');
+                toast.success(t('toast_medicationUpdated'));
             } else {
                 await api.createMedication(data);
-                toast.success('Medication added');
+                toast.success(t('toast_medicationAdded'));
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save');
+            toast.error(t('toast_failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -266,11 +268,11 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
                         <div className="form-row">
                             <div className="form-group">
                                 <label className="form-label">Dosage</label>
-                                <input type="text" className="form-input" value={dosage} onChange={e => setDosage(e.target.value)} placeholder="e.g., 2.5ml" />
+                                <input type="text" className="form-input" value={dosage} onChange={e => setDosage(e.target.value)} placeholder={t('placeholder_eg25ml')} />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Frequency</label>
-                                <input type="text" className="form-input" value={frequency} onChange={e => setFrequency(e.target.value)} placeholder="e.g., Twice daily" />
+                                <input type="text" className="form-input" value={frequency} onChange={e => setFrequency(e.target.value)} placeholder={t('placeholder_egTwiceDaily')} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -279,7 +281,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>
-                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional" maxLength={500} />
+                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('placeholder_optional')} maxLength={500} />
                         </div>
                     </div>
                     <div className="modal-footer">
@@ -318,14 +320,14 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
 
             if (editData) {
                 await api.updateMilestone(editData.id, data);
-                toast.success('Milestone updated');
+                toast.success(t('toast_milestoneUpdated'));
             } else {
                 await api.createMilestone(data);
-                toast.success('Milestone logged');
+                toast.success(t('toast_milestoneLogged'));
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save');
+            toast.error(t('toast_failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -361,7 +363,7 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>
-                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional" maxLength={500} />
+                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('placeholder_optional')} maxLength={500} />
                         </div>
                     </div>
                     <div className="modal-footer">
@@ -400,14 +402,14 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
 
             if (editData) {
                 await api.updateGrowthRecord(editData.id, data);
-                toast.success('Growth record updated');
+                toast.success(t('toast_growthRecordUpdated'));
             } else {
                 await api.createGrowthRecord(data);
-                toast.success('Growth record logged');
+                toast.success(t('toast_growthRecordLogged'));
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save');
+            toast.error(t('toast_failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -429,20 +431,20 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
                         <div className="form-row">
                             <div className="form-group">
                                 <label className="form-label">Weight (kg)</label>
-                                <input type="number" step="0.01" className="form-input" value={weight} onChange={e => setWeight(e.target.value)} placeholder="3.5" min="0" max="50" />
+                                <input type="number" step="0.01" className="form-input" value={weight} onChange={e => setWeight(e.target.value)} placeholder={t('placeholder_35')} min="0" max="50" />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Height (cm)</label>
-                                <input type="number" step="0.1" className="form-input" value={height} onChange={e => setHeight(e.target.value)} placeholder="50" min="0" max="200" />
+                                <input type="number" step="0.1" className="form-input" value={height} onChange={e => setHeight(e.target.value)} placeholder={t('placeholder_50')} min="0" max="200" />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Head (cm)</label>
-                                <input type="number" step="0.1" className="form-input" value={head} onChange={e => setHead(e.target.value)} placeholder="35" min="0" max="100" />
+                                <input type="number" step="0.1" className="form-input" value={head} onChange={e => setHead(e.target.value)} placeholder={t('placeholder_35')} min="0" max="100" />
                             </div>
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>
-                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional" maxLength={500} />
+                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('placeholder_optional')} maxLength={500} />
                         </div>
                     </div>
                     <div className="modal-footer">

@@ -1,5 +1,24 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import common from '../../public/locales/en/common.json';
+import dashboard from '../../public/locales/en/dashboard.json';
+import health from '../../public/locales/en/health.json';
+import settings from '../../public/locales/en/settings.json';
+import auth from '../../public/locales/en/auth.json';
+
+// Initialize i18n for tests with full translation files
+i18n.use(initReactI18next).init({
+  lng: 'en',
+  fallbackLng: 'en',
+  ns: ['common', 'dashboard', 'health', 'settings', 'auth'],
+  defaultNS: 'common',
+  resources: {
+    en: { common, dashboard, health, settings, auth },
+  },
+  interpolation: { escapeValue: false },
+});
 
 // Mock import.meta.env
 vi.stubGlobal('import', { meta: { env: { DEV: true, VITE_API_URL: 'http://localhost:8000', VITE_SUPABASE_URL: 'https://test.supabase.co', VITE_SUPABASE_ANON_KEY: 'test-key' } } });

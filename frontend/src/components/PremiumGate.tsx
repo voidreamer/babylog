@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Lock } from 'lucide-react';
 import { usePremium } from '../hooks/usePremium';
 import UpgradeDialog from './UpgradeDialog';
+import { useTranslation } from 'react-i18next';
 
 interface PremiumGateProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface PremiumGateProps {
 }
 
 export default function PremiumGate({ children, feature }: PremiumGateProps) {
+    const { t } = useTranslation('settings');
   const { isPremium, isLoading } = usePremium();
   const [showUpgrade, setShowUpgrade] = useState(false);
 
@@ -31,17 +33,17 @@ export default function PremiumGate({ children, feature }: PremiumGateProps) {
         }}
       >
         <Lock size={24} style={{ color: 'var(--text-muted)', marginBottom: 'var(--space-sm)' }} />
-        <p style={{ fontWeight: 600, margin: 0 }}>Premium Feature</p>
+        <p style={{ fontWeight: 600, margin: 0 }}>{t('upgrade.premiumFeature')}</p>
         {feature && (
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '4px 0 0' }}>
-            Upgrade to unlock {feature}
+            {t('upgrade.upgradeToUnlock', { feature })}
           </p>
         )}
         <span
           className="settings-badge lavender"
           style={{ marginTop: 'var(--space-sm)', display: 'inline-block' }}
         >
-          Upgrade
+          {t('upgrade.upgradeBtn')}
         </span>
       </div>
       {showUpgrade && <UpgradeDialog onClose={() => setShowUpgrade(false)} />}

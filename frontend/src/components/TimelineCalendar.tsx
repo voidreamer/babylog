@@ -14,6 +14,7 @@ import SupplementModal from './SupplementModal';
 import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -22,19 +23,20 @@ const parseUTCTime = (timeStr: any): Date => {
     return new Date(utcTime);
 };
 
-// Event type config with Lucide icons
-const EVENT_CONFIG: Record<string, any> = {
-    feeding: { icon: Baby, color: 'var(--feeding)', bg: 'var(--feeding-bg)', label: 'Feeding' },
-    diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: 'Diaper' },
-    sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: 'Sleep' },
-    pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: 'Pumping' },
-    potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: 'Potty' },
-    tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: 'Tummy Time' },
-    bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: 'Bath' },
-    supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: 'Supplement' },
-};
-
 export default function TimelineCalendar() {
+    const { t } = useTranslation('dashboard');
+
+    // Event type config with Lucide icons
+    const EVENT_CONFIG: Record<string, any> = {
+        feeding: { icon: Baby, color: 'var(--feeding)', bg: 'var(--feeding-bg)', label: t('feeding.title') },
+        diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: t('diaper.title') },
+        sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: t('sleep.title') },
+        pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: t('pumping.title') },
+        potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: t('potty.title') },
+        tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: t('tummyTime.title') },
+        bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: t('bath.title') },
+        supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: t('supplement.title') },
+    };
     const { selectedBaby } = useBaby();
     const [events, setEvents] = useState<any[]>([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -130,10 +132,10 @@ export default function TimelineCalendar() {
                     await api.deleteSupplement(event.id);
                     break;
             }
-            toast.success('Deleted successfully');
+            toast.success(t('toast_deletedSuccessfully'));
             loadEvents();
         } catch (error) {
-            toast.error('Failed to delete');
+            toast.error(t('toast_failedToDelete'));
         }
         setConfirmDelete(null);
     };
@@ -279,10 +281,10 @@ export default function TimelineCalendar() {
                 let feedType = details.type || '';
                 // Format the type for display
                 if (feedType === 'breastmilk_bottle') {
-                    feedType = 'Breastmilk Bottle';
+                    feedType = t('timeline.breastmilkBottle');
                 } else if (feedType === 'bottle') {
                     // Legacy data - treat as breastmilk bottle
-                    feedType = 'Breastmilk Bottle';
+                    feedType = t('timeline.breastmilkBottle');
                 } else {
                     feedType = feedType.charAt(0).toUpperCase() + feedType.slice(1);
                 }
@@ -290,7 +292,7 @@ export default function TimelineCalendar() {
                 return feedType + duration;
             case 'diaper':
                 const diaperType = details.type || '';
-                const diaperLabel = ({ pee: 'Pee', poo: 'Poo', mixed: 'Both' } as Record<string, string>)[diaperType] || diaperType;
+                const diaperLabel = ({ pee: t('diaper.pee'), poo: t('diaper.poo'), mixed: t('diaper.both') } as Record<string, string>)[diaperType] || diaperType;
                 return diaperLabel;
             case 'sleep':
                 if (details.duration_minutes) {
@@ -298,21 +300,21 @@ export default function TimelineCalendar() {
                     const mins = details.duration_minutes % 60;
                     return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
                 }
-                return details.end_time ? '' : 'Sleeping...';
+                return details.end_time ? '' : t('timeline.sleeping');
             case 'pumping':
                 const pumpParts = [];
                 if (details.duration_minutes) pumpParts.push(`${details.duration_minutes}min`);
                 if (details.amount_ml) pumpParts.push(`${details.amount_ml}ml`);
                 return pumpParts.join(' • ') || 'Pumping';
             case 'potty':
-                const resultLabel = ({ success: 'Success', attempt: 'Attempt' } as Record<string, string>)[details.result] || details.result || '';
+                const resultLabel = ({ success: t('potty.success'), attempt: t('timeline.attempt') } as Record<string, string>)[details.result] || details.result || '';
                 return resultLabel;
             case 'tummy':
                 return details.duration_minutes ? `Tummy Time • ${details.duration_minutes}min` : 'Tummy Time';
             case 'bath':
                 return details.notes ? `Bath • ${details.notes}` : 'Bath';
             case 'supplement':
-                const supName = details.name ? details.name.replace('_', ' ') : 'Supplement';
+                const supName = details.name ? details.name.replace('_', ' ') : t('supplement.title');
                 const supNameFormatted = supName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 return details.dosage ? `${supNameFormatted} • ${details.dosage}` : supNameFormatted;
             default:
@@ -324,7 +326,7 @@ export default function TimelineCalendar() {
         return (
             <div className="empty-state">
                 <div className="empty-state-icon">👶</div>
-                <h2 className="empty-state-title">No baby selected</h2>
+                <h2 className="empty-state-title">{t('common:noBabySelected')}</h2>
             </div>
         );
     }
@@ -433,7 +435,7 @@ export default function TimelineCalendar() {
                                                         handleEdit(event);
                                                     }}
                                                 >
-                                                    <Pencil size={14} /> Edit
+                                                    <Pencil size={14} /> {t('timeline.edit')}
                                                 </button>
                                                 <button
                                                     className="timeline-action-btn delete"
@@ -442,7 +444,7 @@ export default function TimelineCalendar() {
                                                         handleDeleteClick(event);
                                                     }}
                                                 >
-                                                    <Trash2 size={14} /> Delete
+                                                    <Trash2 size={14} /> {t('timeline.delete')}
                                                 </button>
                                             </div>
                                         )}
@@ -454,8 +456,8 @@ export default function TimelineCalendar() {
                             {events.length === 0 && (
                                 <div className="timeline-empty-state">
                                     <Calendar size={48} strokeWidth={1.5} />
-                                    <p>No events recorded</p>
-                                    <span>Add activities from the dashboard to see them here</span>
+                                    <p>{t('timeline.noEventsRecorded')}</p>
+                                    <span>{t('timeline.addFromDashboard')}</span>
                                 </div>
                             )}
                         </div>
@@ -554,20 +556,20 @@ export default function TimelineCalendar() {
                             </button>
                             <div className="confirm-modal-content">
                                 <Trash2 size={32} className="confirm-icon" />
-                                <h3>Delete {EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event'}?</h3>
-                                <p>This action cannot be undone.</p>
+                                <h3>{t('timeline.deleteConfirmTitle', { type: EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event' })}</h3>
+                                <p>{t('timeline.deleteConfirmMessage')}</p>
                                 <div className="confirm-modal-actions">
                                     <button
                                         className="btn btn-secondary"
                                         onClick={() => setConfirmDelete(null)}
                                     >
-                                        Cancel
+                                        {t('common:cancel')}
                                     </button>
                                     <button
                                         className="btn btn-danger"
                                         onClick={handleDeleteConfirm}
                                     >
-                                        Delete
+                                        {t('common:delete')}
                                     </button>
                                 </div>
                             </div>

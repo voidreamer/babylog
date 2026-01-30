@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import api from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 interface ShareModalProps { baby: any; onClose: () => void; onShare: () => void; }
 export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) {
+    const { t } = useTranslation('dashboard');
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -41,24 +43,24 @@ export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) 
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Share {baby.name}</h2>
+                    <h2>{t('share.shareTitle', { name: baby.name })}</h2>
                     <button className="close-btn" onClick={onClose}>×</button>
                 </div>
 
                 <form onSubmit={handleShare}>
                     <div className="form-group">
-                        <label>Add by email</label>
+                        <label>{t('share.addByEmail')}</label>
                         <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="partner@example.com"
+                                placeholder={t('placeholder_partnerexamplecom')}
                                 disabled={loading}
                                 style={{ flex: 1 }}
                             />
                             <button type="submit" className="btn btn-primary" disabled={loading || !email.trim()}>
-                                {loading ? '...' : 'Share'}
+                                {loading ? '...' : t('share.share')}
                             </button>
                         </div>
                         {error && <p style={{ color: 'var(--error)', marginTop: 'var(--space-xs)' }}>{error}</p>}
@@ -67,7 +69,7 @@ export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) 
 
                 {sharedEmails.length > 0 && (
                     <div className="form-group" style={{ marginTop: 'var(--space-lg)' }}>
-                        <label>Shared with</label>
+                        <label>{t('share.sharedWith')}</label>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
                             {sharedEmails.map((sharedEmail) => (
                                 <div
@@ -87,7 +89,7 @@ export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) 
                                         className="btn btn-secondary"
                                         style={{ padding: 'var(--space-xs) var(--space-sm)', fontSize: '0.875rem' }}
                                     >
-                                        Remove
+                                        {t('share.remove')}
                                     </button>
                                 </div>
                             ))}
@@ -97,13 +99,13 @@ export default function ShareModal({ baby, onClose, onShare }: ShareModalProps) 
 
                 {sharedEmails.length === 0 && (
                     <p style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-md)' }}>
-                        Enter an email to share access to {baby.name} with another person.
+                        {t('share.shareHint', { name: baby.name })}
                     </p>
                 )}
 
                 <div className="modal-actions">
                     <button type="button" className="btn btn-secondary" onClick={onClose}>
-                        Done
+                        {t('share.done')}
                     </button>
                 </div>
             </div>

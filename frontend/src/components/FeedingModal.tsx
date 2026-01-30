@@ -5,11 +5,13 @@ import TimePicker from './TimePicker';
 import { Baby, Pencil, Timer, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
+import { useTranslation } from 'react-i18next';
 
 // Helper to parse UTC time
 
 interface FeedingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function FeedingModal({ babyId, editEvent, onClose, onSave }: FeedingModalProps) {
+    const { t } = useTranslation('dashboard');
     const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
 
@@ -114,13 +116,13 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
         // Validate amount if provided
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
-            toast.error('Amount must be between 0 and 500 ml');
+            toast.error(t('toast_amountMustBeBetween0And500Ml'));
             return;
         }
 
         // Validate notes length
         if (notes && notes.length > 500) {
-            toast.error('Notes must be less than 500 characters');
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
             return;
         }
 
@@ -136,7 +138,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             });
             onSave();
         } catch (error) {
-            toast.error('Failed to save feeding');
+            toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
         }
@@ -147,19 +149,19 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
         // Validate duration if provided
         if (duration && (isNaN(parseInt(duration)) || parseInt(duration) < 0 || parseInt(duration) > 120)) {
-            toast.error('Duration must be between 0 and 120 minutes');
+            toast.error(t('toast_durationMustBeBetween0And120Minute'));
             return;
         }
 
         // Validate amount if provided
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
-            toast.error('Amount must be between 0 and 500 ml');
+            toast.error(t('toast_amountMustBeBetween0And500Ml'));
             return;
         }
 
         // Validate notes length
         if (notes && notes.length > 500) {
-            toast.error('Notes must be less than 500 characters');
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
             return;
         }
 
@@ -182,7 +184,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             }
             onSave();
         } catch (error) {
-            toast.error('Failed to save feeding');
+            toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
         }
@@ -192,7 +194,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Baby size={20} style={{ marginRight: '8px' }} /> {isEditing ? 'Edit' : 'Log'} Feeding</h2>
+                    <h2 className="modal-title"><Baby size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('feeding.title')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
@@ -205,35 +207,35 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                 className={`type-btn ${mode === 'quick' ? 'active' : ''}`}
                                 onClick={() => { setMode('quick'); handleStopTimer(); }}
                             >
-                                <Pencil size={16} /> Quick Log
+                                <Pencil size={16} /> {t('feeding.quickLog')}
                             </button>
                             <button
                                 type="button"
                                 className={`type-btn ${mode === 'timer' ? 'active' : ''}`}
                                 onClick={() => setMode('timer')}
                             >
-                                <Timer size={16} /> Timer
+                                <Timer size={16} /> {t('feeding.timer')}
                             </button>
                         </div>
                     </div>
 
                     {/* Feeding Method Selection */}
                     <div className="form-group">
-                        <label className="form-label">Method</label>
+                        <label className="form-label">{t('feeding.method')}</label>
                         <div className="type-selector">
                             <button
                                 type="button"
                                 className={`type-btn ${feedMethod === 'breast' ? 'active' : ''}`}
                                 onClick={() => handleFeedMethodChange('breast')}
                             >
-                                <User size={16} /> Breast
+                                <User size={16} /> {t('feeding.breast')}
                             </button>
                             <button
                                 type="button"
                                 className={`type-btn ${feedMethod === 'bottle' ? 'active' : ''}`}
                                 onClick={() => handleFeedMethodChange('bottle')}
                             >
-                                <Baby size={16} /> Bottle
+                                <Baby size={16} /> {t('feeding.bottle')}
                             </button>
                         </div>
                     </div>
@@ -241,21 +243,21 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                     {/* Bottle Type Sub-selection */}
                     {feedMethod === 'bottle' && (
                         <div className="form-group">
-                            <label className="form-label">Bottle Contents</label>
+                            <label className="form-label">{t('feeding.bottleContents')}</label>
                             <div className="type-selector">
                                 <button
                                     type="button"
                                     className={`type-btn ${bottleType === 'breastmilk' ? 'active' : ''}`}
                                     onClick={() => handleBottleTypeChange('breastmilk')}
                                 >
-                                    Breast Milk
+                                    {t('feeding.breastMilk')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`type-btn ${bottleType === 'formula' ? 'active' : ''}`}
                                     onClick={() => handleBottleTypeChange('formula')}
                                 >
-                                    Formula
+                                    {t('feeding.formula')}
                                 </button>
                             </div>
                         </div>
@@ -295,7 +297,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                         onClick={handleStartTimer}
                                         style={{ background: 'var(--feeding)' }}
                                     >
-                                        ▶️ Start Feeding
+                                        ▶️ {t('feeding.startFeeding')}
                                     </button>
                                 ) : (
                                     <button
@@ -303,7 +305,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                         className="btn btn-secondary btn-block btn-lg"
                                         onClick={handleStopTimer}
                                     >
-                                        ⏹️ Stop
+                                        ⏹️ {t('feeding.stop')}
                                     </button>
                                 )}
                             </div>
@@ -311,11 +313,11 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                             {/* Amount for bottle */}
                             {feedMethod === 'bottle' && (
                                 <div className="form-group">
-                                    <label className="form-label">Amount (ml)</label>
+                                    <label className="form-label">{t('feeding.amountMl')}</label>
                                     <input
                                         type="number"
                                         className="form-input"
-                                        placeholder="Optional"
+                                        placeholder={t('placeholder_optional')}
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         min="0"
@@ -325,11 +327,11 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                             )}
 
                             <div className="form-group">
-                                <label className="form-label">Notes</label>
+                                <label className="form-label">{t('modal.notes')}</label>
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Optional notes..."
+                                    placeholder={t('placeholder_optionalNotes')}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                     maxLength={500}
@@ -340,17 +342,17 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                         /* Quick Log Mode */
                         <form id="quick-form" onSubmit={handleSubmitQuick}>
                             <div className="form-group">
-                                <label className="form-label">Time</label>
+                                <label className="form-label">{t('modal.time')}</label>
                                 <TimePicker value={time} onChange={setTime} />
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label className="form-label">Duration (min)</label>
+                                    <label className="form-label">{t('feeding.durationMin')}</label>
                                     <input
                                         type="number"
                                         className="form-input"
-                                        placeholder="Optional"
+                                        placeholder={t('placeholder_optional')}
                                         value={duration}
                                         onChange={(e) => setDuration(e.target.value)}
                                         min="0"
@@ -360,11 +362,11 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
                                 {feedMethod === 'bottle' && (
                                     <div className="form-group">
-                                        <label className="form-label">Amount (ml)</label>
+                                        <label className="form-label">{t('feeding.amountMl')}</label>
                                         <input
                                             type="number"
                                             className="form-input"
-                                            placeholder="Optional"
+                                            placeholder={t('placeholder_optional')}
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
                                             min="0"
@@ -375,11 +377,11 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Notes</label>
+                                <label className="form-label">{t('modal.notes')}</label>
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Optional notes..."
+                                    placeholder={t('placeholder_optionalNotes')}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                     maxLength={500}
@@ -391,7 +393,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
                 <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={onClose}>
-                        Cancel
+                        {t('common:cancel')}
                     </button>
                     {mode === 'timer' ? (
                         <button
@@ -400,11 +402,11 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                             disabled={saving || timerSeconds < 1}
                             onClick={handleSaveTimer}
                         >
-                            {saving ? 'Saving...' : 'Save Feeding'}
+                            {saving ? t('common:saving') : t('feeding.saveFeeding')}
                         </button>
                     ) : (
                         <button type="submit" form="quick-form" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Feeding'}
+                            {saving ? t('common:saving') : t('feeding.saveFeeding')}
                         </button>
                     )}
                 </div>

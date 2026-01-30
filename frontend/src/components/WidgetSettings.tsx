@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
     Settings, X, Baby, Droplets, Moon, Heart,
     Toilet, Timer, Bath as BathIcon, Check, Plus, Pill, Zap
@@ -19,6 +20,7 @@ const ALL_WIDGETS = [
 
 interface WidgetSettingsProps { visibleWidgets: string[]; onToggle: (id: string) => void; quickActionsEnabled: boolean; onToggleQuickActions: () => void; }
 export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsEnabled, onToggleQuickActions }: WidgetSettingsProps) {
+    const { t } = useTranslation('dashboard');
     const [isOpen, setIsOpen] = useState(false);
 
     const enabledCount = visibleWidgets.length;
@@ -36,9 +38,9 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                     <Settings size={24} />
                 </div>
                 <div className="widget-settings-btn-text">
-                    <span className="widget-settings-btn-title">Edit Activities</span>
+                    <span className="widget-settings-btn-title">{t('widgetSettingsSection.editActivities')}</span>
                     <span className="widget-settings-btn-subtitle">
-                        {disabledCount > 0 ? `${disabledCount} hidden` : 'All visible'}
+                        {disabledCount > 0 ? t('widgetSettingsSection.hidden', { count: disabledCount }) : t('widgetSettingsSection.allVisible')}
                     </span>
                 </div>
             </motion.button>
@@ -61,7 +63,7 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                             exit={{ opacity: 0 }}
                         >
                             <div className="modal-header">
-                                <h3>Dashboard Activities</h3>
+                                <h3>{t('widgetSettingsSection.dashboardActivities')}</h3>
                                 <button
                                     className="modal-close"
                                     onClick={() => setIsOpen(false)}
@@ -71,7 +73,7 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                             </div>
 
                             <p className="widget-settings-hint">
-                                Tap to show or hide activities on your dashboard
+                                {t('widgetSettingsSection.tapToShowHide')}
                             </p>
 
                             <div className="widget-settings-grid">
@@ -115,9 +117,9 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                                         <Zap size={18} />
                                     </div>
                                     <div className="widget-settings-toggle-text">
-                                        <span className="widget-settings-toggle-label">Quick Actions</span>
+                                        <span className="widget-settings-toggle-label">{t('widgetSettingsSection.quickActions')}</span>
                                         <span className="widget-settings-toggle-hint">
-                                            One-tap buttons on widgets
+                                            {t('widgetSettingsSection.oneTapButtons')}
                                         </span>
                                     </div>
                                     <div className={`widget-settings-switch ${quickActionsEnabled ? 'on' : ''}`}>

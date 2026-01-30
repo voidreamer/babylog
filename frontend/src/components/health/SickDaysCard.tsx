@@ -4,6 +4,7 @@ import { Thermometer, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const COMMON_SYMPTOMS = [
     'fever',
@@ -20,23 +21,25 @@ const COMMON_SYMPTOMS = [
     'sore_throat',
 ];
 
-const symptomLabels: Record<string, string> = {
-    fever: 'Fever',
-    cough: 'Cough',
-    runny_nose: 'Runny Nose',
-    congestion: 'Congestion',
-    vomiting: 'Vomiting',
-    diarrhea: 'Diarrhea',
-    rash: 'Rash',
-    ear_pain: 'Ear Pain',
-    fussy: 'Fussy',
-    poor_appetite: 'Poor Appetite',
-    lethargy: 'Lethargy',
-    sore_throat: 'Sore Throat',
-};
+// symptomLabels will be created inside component using t()
 
 interface SickDaysCardProps { baby: any; sickDays: any[]; onSickDayAdded?: () => void; onSickDayDeleted?: () => void; }
 export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDayDeleted }: SickDaysCardProps) {
+    const { t } = useTranslation('health');
+    const symptomLabels: Record<string, string> = {
+        fever: t('sickDays.symptomLabels.fever'),
+        cough: t('sickDays.symptomLabels.cough'),
+        runny_nose: t('sickDays.symptomLabels.runny_nose'),
+        congestion: t('sickDays.symptomLabels.congestion'),
+        vomiting: t('sickDays.symptomLabels.vomiting'),
+        diarrhea: t('sickDays.symptomLabels.diarrhea'),
+        rash: t('sickDays.symptomLabels.rash'),
+        ear_pain: t('sickDays.symptomLabels.ear_pain'),
+        fussy: t('sickDays.symptomLabels.fussy'),
+        poor_appetite: t('sickDays.symptomLabels.poor_appetite'),
+        lethargy: t('sickDays.symptomLabels.lethargy'),
+        sore_throat: t('sickDays.symptomLabels.sore_throat'),
+    };
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState<{ date: string; symptoms: string[]; temperature: string; notes: string; }>({
@@ -62,7 +65,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
         e.preventDefault();
 
         if (formData.symptoms.length === 0 && !formData.temperature && !formData.notes) {
-            toast.error('Please add at least one symptom, temperature, or note');
+            toast.error(t('toast_pleaseAddAtLeastOneSymptomTemperat'));
             return;
         }
 
@@ -77,7 +80,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             };
 
             await api.createSickDay(data);
-            toast.success('Sick day logged');
+            toast.success(t('toast_sickDayLogged'));
             setFormData({
                 date: new Date().toISOString().split('T')[0],
                 symptoms: [],
@@ -87,7 +90,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             setIsAdding(false);
             if (onSickDayAdded) onSickDayAdded();
         } catch (error) {
-            toast.error('Failed to save: ' + (error as Error).message);
+            toast.error(t('failedToSave'));
         } finally {
             setSaving(false);
         }
@@ -96,18 +99,18 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
     const handleDelete = async (id: number) => {
         try {
             await api.deleteSickDay(id);
-            toast.success('Sick day removed');
+            toast.success(t('toast_sickDayRemoved'));
             if (onSickDayDeleted) onSickDayDeleted();
         } catch (error) {
-            toast.error('Failed to delete: ' + (error as Error).message);
+            toast.error(t('failedToDelete'));
         }
     };
 
     const formatSickDate = (dateStr: string): string => {
         try {
             const date = parseISO(dateStr);
-            if (isToday(date)) return 'Today';
-            if (isYesterday(date)) return 'Yesterday';
+            if (isToday(date)) return t('common:time.today');
+            if (isYesterday(date)) return t('common:time.yesterday');
             return format(date, 'MMM d');
         } catch {
             return dateStr;
@@ -128,10 +131,10 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             <div className="health-card-header">
                 <h3 className="health-card-title">
                     <Thermometer size={18} />
-                    Sick Days
+                    {t('sickDays.title')}
                 </h3>
                 {sickDays?.length > 0 && (
-                    <span className="health-card-count">{sickDays.length} recorded</span>
+                    <span className="health-card-count">{t('sickDays.recorded', { count: sickDays.length })}</span>
                 )}
             </div>
 
@@ -150,7 +153,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 <button
                                     className="sick-day-delete"
                                     onClick={() => handleDelete(day.id)}
-                                    aria-label="Delete sick day"
+                                    aria-label={t('arialabel_deleteSickDay')}
                                 >
                                     <Trash2 size={14} />
                                 </button>
@@ -171,7 +174,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     ))}
                 </div>
             ) : (
-                <p className="health-card-empty">No sick days recorded - great!</p>
+                <p className="health-card-empty">{t('sickDays.noSickDays')}</p>
             )}
 
             {/* Add Form */}
@@ -190,7 +193,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 step="0.1"
                                 min="35"
                                 max="42"
-                                placeholder="Temp °C"
+                                placeholder={t('placeholder_tempC')}
                                 value={formData.temperature}
                                 onChange={(e) => setFormData({ ...formData, temperature: e.target.value })}
                                 className="sick-day-temp-input"
@@ -212,7 +215,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     </div>
 
                     <textarea
-                        placeholder="Additional notes..."
+                        placeholder={t('placeholder_additionalNotes')}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="sick-day-notes-input"
@@ -221,14 +224,14 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
 
                     <div className="sick-day-form-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? 'Saving...' : 'Log Sick Day'}
+                            {saving ? t('common:saving') : t('sickDays.logSickDay')}
                         </button>
                         <button
                             type="button"
                             className="btn btn-ghost btn-sm"
                             onClick={() => setIsAdding(false)}
                         >
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                     </div>
                 </form>
@@ -238,7 +241,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     onClick={() => setIsAdding(true)}
                 >
                     <Plus size={16} />
-                    Log Sick Day
+                    {t('sickDays.logSickDay')}
                 </button>
             )}
         </div>

@@ -1,0 +1,76 @@
+{
+  "title": "Ajustes",
+  "preferences": {
+    "title": "Preferencias",
+    "darkMode": "Modo oscuro",
+    "darkModeDesc": "Más cómodo para los ojos por la noche",
+    "language": "Idioma",
+    "languageDesc": "Elija su idioma"
+  },
+  "account": {
+    "title": "Cuenta",
+    "signedIn": "Firmado en",
+    "premiumMember": "Miembro Premium ⭐",
+    "premium": {
+      "title": "Plan Premium",
+      "active": "Activo",
+      "activeManage": "Activo - Gestionar la suscripción",
+      "activePromo": "Activo - Código promocional",
+      "unlock": "Descubra la inteligencia artificial y mucho más"
+    }
+  },
+  "data": {
+    "title": "Datos",
+    "export": "Exportar datos",
+    "exportDesc": "Descargar como CSV",
+    "exporting": "Exportar...",
+    "upgradeToExport": "Actualizar para exportar",
+    "exportSuccess": "¡Exportación completada! Compruebe su carpeta de descargas.",
+    "exportFailed": "Error de exportación",
+    "noDataToExport": "No hay datos de bebés para exportar"
+  },
+  "support": {
+    "title": "Ayuda",
+    "privacyPolicy": "Política de privacidad",
+    "signOut": "Cerrar sesión"
+  },
+  "upgrade": {
+    "title": "Pasar a Premium",
+    "subtitle": "Desbloquea todas las funciones",
+    "features": {
+      "insights": "Información sobre bebés basada en IA",
+      "export": "Exportar datos como CSV",
+      "more": "Y pronto más..."
+    },
+    "promoCode": "Código promocional",
+    "promoPlaceholder": "Introduzca el código promocional",
+    "applyPromo": "Solicitar",
+    "subscribe": "Suscríbase a",
+    "manageSub": "No se ha podido abrir la gestión de suscripciones.",
+    "heyBubPremium": "HeyBub Premium",
+    "premiumFeatures": {
+      "insights": "Información y predicciones sobre bebés basadas en IA",
+      "growth": "Gráficos de crecimiento con percentiles de la OMS",
+      "export": "Exporte todos sus datos (CSV)",
+      "share": "Compartir con un número ilimitado de cuidadores",
+      "multiple": "Seguimiento de varios bebés",
+      "support": "Asistencia prioritaria"
+    },
+    "limitedTime": "TIEMPO LIMITADO - 50% DE DESCUENTO",
+    "bestValue": "MEJOR VALOR",
+    "perMonth": "al mes",
+    "perYear": "al año",
+    "justPerMonth": "Sólo 1,25 $ al mes",
+    "redirecting": "Redirigiendo...",
+    "startTrial": "Iniciar prueba gratuita de 7 días",
+    "cancelAnytime": "Cancele en cualquier momento - Sin compromiso",
+    "restorePurchase": "Restaurar compra",
+    "premiumFeature": "Característica Premium",
+    "upgradeToUnlock": "Actualizar para desbloquear {{feature}}",
+    "upgradeBtn": "Actualizar"
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "No se ha podido iniciar el pago. Por favor, inténtelo de nuevo.",
+  "toast_premiumRestoredReloading": "¡Premium restaurado! Recargando...",
+  "toast_noActiveSubscriptionFoundForThisAc": "No se ha encontrado ninguna suscripción activa para esta cuenta.",
+  "toast_couldNotCheckSubscription": "No se ha podido comprobar la suscripción."
+}
