@@ -57,8 +57,8 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                                 <User size={16} />
                             </div>
                             <div>
-                                <div className="settings-row-label">{user.email}</div>
-                                <div className="settings-row-desc">Signed in</div>
+                                <div className="settings-row-label">{user.email} {isPremium && <span style={{ fontSize: 11, background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#fff', padding: '1px 6px', borderRadius: 8, marginLeft: 6, fontWeight: 600 }}>PRO</span>}</div>
+                                <div className="settings-row-desc">{isPremium ? 'Premium member ⭐' : 'Signed in'}</div>
                             </div>
                         </div>
                     </div>
@@ -92,17 +92,17 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 <div className="settings-group-title">Data</div>
                 <div
                     className="settings-row"
-                    onClick={handleExportCsv}
-                    style={{ cursor: exportLoading || !babies || babies.length === 0 ? 'not-allowed' : 'pointer' }}
+                    onClick={isPremium ? handleExportCsv : onUpgrade}
+                    style={{ cursor: exportLoading || (!isPremium && false) || !babies || babies.length === 0 ? 'not-allowed' : 'pointer', opacity: isPremium ? 1 : 0.6 }}
                 >
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
                             <Download size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Export Data</div>
+                            <div className="settings-row-label">Export Data {!isPremium && <span className="settings-badge mint" style={{ fontSize: 10, marginLeft: 6 }}>PRO</span>}</div>
                             <div className="settings-row-desc">
-                                {exportLoading ? 'Exporting...' : 'Download as CSV'}
+                                {!isPremium ? 'Upgrade to export' : exportLoading ? 'Exporting...' : 'Download as CSV'}
                             </div>
                         </div>
                     </div>
