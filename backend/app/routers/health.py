@@ -70,9 +70,16 @@ def update_doctor_visit(
     visit_id: int,
     visit_data: schemas.DoctorVisitCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    visit = db.query(models.DoctorVisit).filter(models.DoctorVisit.id == visit_id).first()
+    visit = db.query(models.DoctorVisit).join(models.Baby).filter(
+        models.DoctorVisit.id == visit_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
 
@@ -89,9 +96,16 @@ def update_doctor_visit(
 def delete_doctor_visit(
     visit_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    visit = db.query(models.DoctorVisit).filter(models.DoctorVisit.id == visit_id).first()
+    visit = db.query(models.DoctorVisit).join(models.Baby).filter(
+        models.DoctorVisit.id == visit_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
 
@@ -143,9 +157,16 @@ def update_vaccination(
     vaccination_id: int,
     vaccination_data: schemas.VaccinationCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    vacc = db.query(models.Vaccination).filter(models.Vaccination.id == vaccination_id).first()
+    vacc = db.query(models.Vaccination).join(models.Baby).filter(
+        models.Vaccination.id == vaccination_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not vacc:
         raise HTTPException(status_code=404, detail="Vaccination not found")
 
@@ -162,9 +183,16 @@ def update_vaccination(
 def delete_vaccination(
     vaccination_id: int, 
     db: Session = Depends(get_db), 
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    vacc = db.query(models.Vaccination).filter(models.Vaccination.id == vaccination_id).first()
+    vacc = db.query(models.Vaccination).join(models.Baby).filter(
+        models.Vaccination.id == vaccination_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not vacc:
         raise HTTPException(status_code=404, detail="Vaccination not found")
     
@@ -219,9 +247,16 @@ def update_medication(
     medication_id: int,
     medication_data: schemas.MedicationCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    med = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    med = db.query(models.Medication).join(models.Baby).filter(
+        models.Medication.id == medication_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
 
@@ -238,9 +273,16 @@ def update_medication(
 def toggle_medication_active(
     medication_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    med = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    med = db.query(models.Medication).join(models.Baby).filter(
+        models.Medication.id == medication_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
 
@@ -254,9 +296,16 @@ def toggle_medication_active(
 def delete_medication(
     medication_id: int, 
     db: Session = Depends(get_db), 
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    med = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    med = db.query(models.Medication).join(models.Baby).filter(
+        models.Medication.id == medication_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
     
@@ -308,9 +357,16 @@ def update_milestone(
     milestone_id: int,
     milestone_data: schemas.MilestoneCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    milestone = db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
+    milestone = db.query(models.Milestone).join(models.Baby).filter(
+        models.Milestone.id == milestone_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not milestone:
         raise HTTPException(status_code=404, detail="Milestone not found")
 
@@ -327,9 +383,16 @@ def update_milestone(
 def delete_milestone(
     milestone_id: int, 
     db: Session = Depends(get_db), 
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    milestone = db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
+    milestone = db.query(models.Milestone).join(models.Baby).filter(
+        models.Milestone.id == milestone_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not milestone:
         raise HTTPException(status_code=404, detail="Milestone not found")
     
@@ -381,9 +444,16 @@ def update_growth_record(
     record_id: int,
     record_data: schemas.GrowthRecordCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    record = db.query(models.GrowthRecord).filter(models.GrowthRecord.id == record_id).first()
+    record = db.query(models.GrowthRecord).join(models.Baby).filter(
+        models.GrowthRecord.id == record_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
 
@@ -400,9 +470,16 @@ def update_growth_record(
 def delete_growth_record(
     record_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    record = db.query(models.GrowthRecord).filter(models.GrowthRecord.id == record_id).first()
+    record = db.query(models.GrowthRecord).join(models.Baby).filter(
+        models.GrowthRecord.id == record_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
 
@@ -462,9 +539,16 @@ def update_tooth(
     tooth_id: int,
     tooth_data: schemas.ToothCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    tooth = db.query(models.Tooth).filter(models.Tooth.id == tooth_id).first()
+    tooth = db.query(models.Tooth).join(models.Baby).filter(
+        models.Tooth.id == tooth_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not tooth:
         raise HTTPException(status_code=404, detail="Tooth not found")
 
@@ -481,9 +565,16 @@ def update_tooth(
 def delete_tooth(
     tooth_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    tooth = db.query(models.Tooth).filter(models.Tooth.id == tooth_id).first()
+    tooth = db.query(models.Tooth).join(models.Baby).filter(
+        models.Tooth.id == tooth_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not tooth:
         raise HTTPException(status_code=404, detail="Tooth not found")
 
@@ -535,9 +626,16 @@ def update_sick_day(
     sick_day_id: int,
     sick_day_data: schemas.SickDayCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    sick_day = db.query(models.SickDay).filter(models.SickDay.id == sick_day_id).first()
+    sick_day = db.query(models.SickDay).join(models.Baby).filter(
+        models.SickDay.id == sick_day_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not sick_day:
         raise HTTPException(status_code=404, detail="Sick day not found")
 
@@ -554,9 +652,16 @@ def update_sick_day(
 def delete_sick_day(
     sick_day_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    sick_day = db.query(models.SickDay).filter(models.SickDay.id == sick_day_id).first()
+    sick_day = db.query(models.SickDay).join(models.Baby).filter(
+        models.SickDay.id == sick_day_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not sick_day:
         raise HTTPException(status_code=404, detail="Sick day not found")
 
@@ -608,9 +713,16 @@ def update_allergy(
     allergy_id: int,
     allergy_data: schemas.AllergyCreate,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    allergy = db.query(models.Allergy).filter(models.Allergy.id == allergy_id).first()
+    allergy = db.query(models.Allergy).join(models.Baby).filter(
+        models.Allergy.id == allergy_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not allergy:
         raise HTTPException(status_code=404, detail="Allergy not found")
 
@@ -627,9 +739,16 @@ def update_allergy(
 def delete_allergy(
     allergy_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    user_id: str = Depends(get_user_id),
+    user_email: str = Depends(get_user_email)
 ):
-    allergy = db.query(models.Allergy).filter(models.Allergy.id == allergy_id).first()
+    allergy = db.query(models.Allergy).join(models.Baby).filter(
+        models.Allergy.id == allergy_id,
+        or_(
+            models.Baby.user_id == user_id,
+            models.Baby.shared_with_emails.any(user_email)
+        )
+    ).first()
     if not allergy:
         raise HTTPException(status_code=404, detail="Allergy not found")
 

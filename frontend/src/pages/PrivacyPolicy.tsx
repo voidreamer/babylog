@@ -52,7 +52,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                     </p>
                     <ul>
                         <li>AWS cloud infrastructure with encryption at rest</li>
-                        <li>Secure authentication via AWS Cognito</li>
+                        <li>Secure authentication via Supabase Auth and Google OAuth</li>
                         <li>HTTPS encryption for all data transmission</li>
                     </ul>
                 </section>

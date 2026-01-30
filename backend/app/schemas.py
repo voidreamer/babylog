@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime, timezone
 from typing import Optional, List, Literal
 
@@ -20,7 +20,7 @@ def serialize_datetime(dt: datetime) -> str:
 GenderEnum = Literal["boy", "girl"]
 
 class BabyBase(BaseModel):
-    name: str
+    name: str = Field(..., max_length=200)
     birth_date: Optional[datetime] = None
     gender: Optional[GenderEnum] = None
 
@@ -64,7 +64,7 @@ class FeedingBase(BaseModel):
     type: FeedingTypeEnum
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class FeedingCreate(FeedingBase):
@@ -76,7 +76,7 @@ class FeedingUpdate(BaseModel):
     type: Optional[FeedingTypeEnum] = None
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class FeedingResponse(FeedingBase):
@@ -105,7 +105,7 @@ class DiaperBase(BaseModel):
     poo_color: Optional[PooColorEnum] = None
     poo_consistency: Optional[PooConsistencyEnum] = None
     poo_amount: Optional[PooAmountEnum] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class DiaperCreate(DiaperBase):
@@ -118,7 +118,7 @@ class DiaperUpdate(BaseModel):
     poo_color: Optional[PooColorEnum] = None
     poo_consistency: Optional[PooConsistencyEnum] = None
     poo_amount: Optional[PooAmountEnum] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class DiaperResponse(DiaperBase):
@@ -139,7 +139,7 @@ class DiaperResponse(DiaperBase):
 class SleepBase(BaseModel):
     start_time: datetime
     end_time: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class SleepCreate(SleepBase):
@@ -149,7 +149,7 @@ class SleepCreate(SleepBase):
 class SleepUpdate(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class SleepResponse(SleepBase):
@@ -172,7 +172,7 @@ class PumpingBase(BaseModel):
     time: datetime
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class PumpingCreate(PumpingBase):
@@ -183,7 +183,7 @@ class PumpingUpdate(BaseModel):
     time: Optional[datetime] = None
     duration_minutes: Optional[int] = None
     amount_ml: Optional[int] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class PumpingResponse(PumpingBase):
@@ -269,7 +269,7 @@ class DoctorVisitBase(BaseModel):
     height_cm: Optional[float] = None
     head_cm: Optional[float] = None
     next_visit_date: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class DoctorVisitCreate(DoctorVisitBase):
@@ -295,16 +295,16 @@ class DoctorVisitUpdate(BaseModel):
     height_cm: Optional[float] = None
     head_cm: Optional[float] = None
     next_visit_date: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class VaccinationBase(BaseModel):
-    vaccine_name: str
+    vaccine_name: str = Field(..., max_length=200)
     dose_number: int = 1
     given_date: datetime
     next_due_date: Optional[datetime] = None
     administered_by: Optional[str] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class VaccinationCreate(VaccinationBase):
@@ -328,17 +328,17 @@ class VaccinationUpdate(BaseModel):
     given_date: Optional[datetime] = None
     next_due_date: Optional[datetime] = None
     administered_by: Optional[str] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class MedicationBase(BaseModel):
-    medication_name: str
+    medication_name: str = Field(..., max_length=200)
     dosage: Optional[str] = None
     frequency: Optional[str] = None
     start_date: datetime
     end_date: Optional[datetime] = None
     is_active: bool = True
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class MedicationCreate(MedicationBase):
@@ -363,13 +363,13 @@ class MedicationUpdate(BaseModel):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     is_active: Optional[bool] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class MilestoneBase(BaseModel):
-    milestone_type: str
+    milestone_type: str = Field(..., max_length=200)
     achieved_date: datetime
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class MilestoneCreate(MilestoneBase):
@@ -390,7 +390,7 @@ class MilestoneResponse(MilestoneBase):
 class MilestoneUpdate(BaseModel):
     milestone_type: Optional[str] = None
     achieved_date: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class GrowthRecordBase(BaseModel):
@@ -398,7 +398,7 @@ class GrowthRecordBase(BaseModel):
     weight_kg: Optional[float] = None
     height_cm: Optional[float] = None
     head_cm: Optional[float] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class GrowthRecordCreate(GrowthRecordBase):
@@ -421,7 +421,7 @@ class GrowthRecordUpdate(BaseModel):
     weight_kg: Optional[float] = None
     height_cm: Optional[float] = None
     head_cm: Optional[float] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 # ============================================================================
@@ -435,7 +435,7 @@ class PottyBase(BaseModel):
     time: datetime
     result: PottyResultEnum
     potty_type: Optional[PottyTypeEnum] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class PottyCreate(PottyBase):
@@ -456,7 +456,7 @@ class PottyResponse(PottyBase):
 class TummyTimeBase(BaseModel):
     start_time: datetime
     duration_minutes: Optional[int] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class TummyTimeCreate(TummyTimeBase):
@@ -476,7 +476,7 @@ class TummyTimeResponse(TummyTimeBase):
 
 class BathBase(BaseModel):
     time: datetime
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class BathCreate(BathBase):
@@ -504,7 +504,7 @@ class SupplementBase(BaseModel):
     time: datetime
     name: SupplementNameEnum
     dosage: Optional[str] = None  # e.g., "400 IU", "1ml"
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class SupplementCreate(SupplementBase):
@@ -526,7 +526,7 @@ class SupplementUpdate(BaseModel):
     time: Optional[datetime] = None
     name: Optional[SupplementNameEnum] = None
     dosage: Optional[str] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 # ============================================================================
@@ -536,7 +536,7 @@ class SupplementUpdate(BaseModel):
 class ToothBase(BaseModel):
     position: str  # e.g., "upper_A_left", "lower_E_right"
     emerged_date: datetime
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class ToothCreate(ToothBase):
@@ -562,7 +562,7 @@ class SickDayBase(BaseModel):
     date: datetime
     symptoms: Optional[List[str]] = []  # ["fever", "cough", "runny_nose"]
     temperature: Optional[float] = None  # e.g., 38.5
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class SickDayCreate(SickDayBase):
@@ -585,11 +585,11 @@ class SickDayResponse(SickDayBase):
 # ============================================================================
 
 class AllergyBase(BaseModel):
-    allergen: str  # "Dairy", "Peanuts", "Eggs"
+    allergen: str = Field(..., max_length=200)  # "Dairy", "Peanuts", "Eggs"
     severity: Optional[str] = None  # "mild", "moderate", "severe"
     reaction: Optional[str] = None  # "hives", "vomiting", "swelling"
     discovered_date: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 class AllergyCreate(AllergyBase):
