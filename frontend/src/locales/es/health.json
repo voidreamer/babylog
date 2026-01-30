@@ -1,0 +1,312 @@
+{
+  "title": "Salud",
+  "noBabySelected": "No hay bebé seleccionado",
+
+  "growth": {
+    "title": "Crecimiento",
+    "weight": "Peso",
+    "height": "Talla",
+    "head": "Cabeza",
+    "percentile": "percentil",
+    "fullChart": "Gráfica completa",
+    "hideChart": "Ocultar gráfica",
+    "logMeasurement": "Registrar medida",
+    "addBirthDate": "Agrega la fecha de nacimiento del bebé para ver la gráfica de crecimiento",
+    "noWeightData": "Aún no hay datos de peso. Agrega una medida arriba.",
+    "noHeightData": "Aún no hay datos de talla. Agrega una medida arriba.",
+    "weightForAge": "Peso para la edad",
+    "heightForAge": "Talla para la edad",
+    "whoStandards": "Estándares OMS ({{gender}})",
+    "boys": "Niños",
+    "girls": "Niñas",
+    "months": "meses",
+    "yourBaby": "Tu bebé",
+    "50thPercentile": "Percentil 50",
+    "3rdTo97thRange": "Rango del 3 al 97",
+    "baby": "Bebé",
+    "growthRecorded": "¡Crecimiento registrado!",
+    "logGrowth": "Registrar crecimiento",
+    "editGrowth": "Editar crecimiento",
+    "growthRecordUpdated": "Registro de crecimiento actualizado",
+    "growthRecordLogged": "Registro de crecimiento guardado",
+    "enterOneMeasurement": "Ingresa al menos una medida",
+    "percentileLabels": {
+      "below3": "<3ro",
+      "around10": "~10mo",
+      "around25": "~25to",
+      "around50": "~50mo",
+      "around75": "~75to",
+      "around90": "~90mo",
+      "above97": ">97mo",
+      "unknown": "--"
+    }
+  },
+
+  "milestones": {
+    "title": "Hitos",
+    "total": "{{count}} en total",
+    "noMilestones": "Aún no hay hitos registrados",
+    "addMilestone": "Agregar hito",
+    "whatMilestone": "¿Qué hito? (ej., Primeros pasos)",
+    "milestoneAdded": "¡Hito agregado!",
+    "milestoneDeleted": "Hito eliminado",
+    "logMilestone": "Registrar hito",
+    "editMilestone": "Editar hito",
+    "milestoneUpdated": "Hito actualizado",
+    "milestoneLogged": "Hito registrado",
+    "selectMilestone": "Selecciona un hito...",
+    "customMilestone": "Hito personalizado",
+    "dateAchieved": "Fecha lograda",
+    "options": {
+      "firstSmile": "Primera sonrisa",
+      "firstLaugh": "Primera carcajada",
+      "rolledOver": "Se volteó solo",
+      "satUp": "Se sentó solo",
+      "firstTooth": "Primer diente",
+      "startedCrawling": "Empezó a gatear",
+      "firstSteps": "Primeros pasos",
+      "firstWord": "Primera palabra",
+      "firstSolidFood": "Primera comida sólida",
+      "sleptThroughNight": "Durmió toda la noche",
+      "wavedGoodbye": "Dijo adiós con la mano",
+      "clappedHands": "Aplaudió",
+      "other": "Otro"
+    }
+  },
+
+  "teething": {
+    "title": "Dentición",
+    "teethCount": "{{count}}/20 dientes",
+    "upper": "Superior",
+    "lower": "Inferior",
+    "emerged": "Salió",
+    "expected": "Esperado",
+    "future": "Futuro",
+    "markEmerged": "Marcar {{name}} como salido",
+    "markedEmerged": "¡{{name}} marcado como salido!",
+    "removeRecord": "Eliminar registro",
+    "toothRemoved": "Registro de diente eliminado",
+    "toothNames": {
+      "centralIncisor": "Incisivo central",
+      "lateralIncisor": "Incisivo lateral",
+      "canine": "Canino",
+      "firstMolar": "1er Molar",
+      "secondMolar": "2do Molar"
+    }
+  },
+
+  "allergies": {
+    "title": "Alergias",
+    "known": "{{count}} conocidas",
+    "noAllergies": "No hay alergias conocidas",
+    "addAllergy": "Agregar alergia",
+    "allergyRecorded": "Alergia registrada",
+    "allergyRemoved": "Alergia eliminada",
+    "enterAllergen": "Ingresa el alérgeno",
+    "allergenPlaceholder": "Alérgeno (ej., Maní)",
+    "reactionPlaceholder": "Reacción (ej., ronchas, hinchazón)",
+    "discovered": "Descubierta:",
+    "reaction": "Reacción: {{reaction}}",
+    "additionalNotes": "Notas adicionales...",
+    "severity": {
+      "mild": "Leve",
+      "mildDesc": "Síntomas menores, sin tratamiento necesario",
+      "moderate": "Moderada",
+      "moderateDesc": "Síntomas notorios, puede necesitar medicamento",
+      "severe": "Severa",
+      "severeDesc": "Reacción seria, necesita atención inmediata",
+      "unknown": "Desconocida"
+    },
+    "commonAllergens": {
+      "dairy": "Lácteos",
+      "eggs": "Huevos",
+      "peanuts": "Maní",
+      "treeNuts": "Frutos secos",
+      "soy": "Soya",
+      "wheat": "Trigo",
+      "fish": "Pescado",
+      "shellfish": "Mariscos",
+      "sesame": "Ajonjolí"
+    }
+  },
+
+  "sickDays": {
+    "title": "Días de enfermedad",
+    "recorded": "{{count}} registrados",
+    "noSickDays": "No hay días de enfermedad registrados - ¡genial!",
+    "logSickDay": "Registrar día de enfermedad",
+    "sickDayLogged": "Día de enfermedad registrado",
+    "sickDayRemoved": "Día de enfermedad eliminado",
+    "addSymptom": "Agrega al menos un síntoma, temperatura o nota",
+    "tempPlaceholder": "Temp °C",
+    "additionalNotes": "Notas adicionales...",
+    "symptoms": {
+      "fever": "Fiebre",
+      "cough": "Tos",
+      "runnyNose": "Moqueo",
+      "congestion": "Congestión",
+      "vomiting": "Vómito",
+      "diarrhea": "Diarrea",
+      "rash": "Sarpullido",
+      "earPain": "Dolor de oído",
+      "fussy": "Irritable",
+      "poorAppetite": "Poco apetito",
+      "lethargy": "Decaimiento",
+      "soreThroat": "Dolor de garganta"
+    }
+  },
+
+  "records": {
+    "visits": "Citas",
+    "vaccines": "Vacunas",
+    "meds": "Medicamentos",
+    "noVisits": "No hay citas médicas registradas",
+    "noVaccinations": "No hay vacunas registradas",
+    "noMedications": "No hay medicamentos registrados",
+    "addVisit": "Agregar cita",
+    "addVaccination": "Agregar vacuna",
+    "addMedication": "Agregar medicamento",
+    "visitRecorded": "Cita registrada",
+    "visitDeleted": "Cita eliminada",
+    "vaccinationRecorded": "Vacuna registrada",
+    "vaccinationDeleted": "Vacuna eliminada",
+    "medicationAdded": "Medicamento agregado",
+    "medicationDeleted": "Medicamento eliminado",
+    "medicationStopped": "Medicamento suspendido",
+    "medicationReactivated": "Medicamento reactivado",
+    "nextVisit": "Próxima cita: {{date}}",
+    "nextDue": "Próxima dosis: {{date}}",
+    "upcoming": "Próximamente",
+    "active": "Activos",
+    "past": "Anteriores",
+    "stop": "Suspender",
+    "restart": "Reactivar",
+    "started": "Inicio: {{date}}",
+    "dose": "Dosis {{number}}",
+    "dr": "Dr. {{name}}",
+    "by": "Por: {{name}}",
+
+    "visitTypes": {
+      "checkup": "Control",
+      "sick": "Cita por enfermedad",
+      "vaccination": "Vacunación",
+      "specialist": "Especialista",
+      "emergency": "Urgencia"
+    },
+
+    "visitForm": {
+      "doctorName": "Nombre del doctor",
+      "weightKg": "Peso (kg)",
+      "heightCm": "Talla (cm)",
+      "headCm": "Cabeza (cm)",
+      "nextVisitDate": "Próxima cita",
+      "saveVisit": "Guardar cita"
+    },
+
+    "vaccineForm": {
+      "vaccineName": "Nombre de la vacuna",
+      "vaccineNamePlaceholder": "ej., DPT, SRP",
+      "doseNumber": "Dosis #",
+      "dateGiven": "Fecha aplicada",
+      "nextDueDate": "Próxima dosis",
+      "administeredBy": "Aplicada por",
+      "administeredByPlaceholder": "Nombre del doctor/clínica",
+      "given": "Aplicada:",
+      "nextDue": "Próxima dosis:",
+      "saveVaccination": "Guardar vacuna"
+    },
+
+    "medForm": {
+      "medicationName": "Nombre del medicamento",
+      "dosage": "Dosis",
+      "dosagePlaceholder": "ej., 2.5ml",
+      "frequency": "Frecuencia",
+      "frequencyPlaceholder": "ej., dos veces al día",
+      "startDate": "Fecha de inicio",
+      "start": "Inicio:",
+      "end": "Fin:",
+      "notesPlaceholder": "Notas..."
+    },
+
+    "modals": {
+      "logDoctorVisit": "Registrar cita médica",
+      "editDoctorVisit": "Editar cita médica",
+      "visitUpdated": "Cita actualizada",
+      "visitLogged": "Cita registrada",
+      "logVaccination": "Registrar vacuna",
+      "editVaccination": "Editar vacuna",
+      "vaccinationUpdated": "Vacuna actualizada",
+      "vaccinationLogged": "Vacuna registrada",
+      "addMedication": "Agregar medicamento",
+      "editMedication": "Editar medicamento",
+      "medicationUpdated": "Medicamento actualizado",
+      "medicationAdded": "Medicamento agregado"
+    }
+  },
+
+  "insights": {
+    "title": "Estadísticas",
+    "forBaby": "Para {{name}}, {{age}} {{ageUnit}} de nacido",
+    "month_one": "mes",
+    "month_other": "meses",
+    "selectBaby": "Selecciona un bebé para ver estadísticas",
+    "analyzingPatterns": "Analizando patrones...",
+    "unableToLoad": "No se pudieron cargar las estadísticas",
+    "collectingData": "Recopilando datos",
+    "collectingDataDesc": "¡Sigue registrando por unos días más! Necesitamos al menos 3-5 días de datos para identificar patrones y hacer predicciones.",
+    "dataPoints": "Datos: {{feedings}} alimentaciones, {{sleeps}} sueños",
+
+    "predictions": {
+      "title": "Predicciones",
+      "nextFeeding": "Próxima alimentación",
+      "nextNap": "Próxima siesta",
+      "sleepPressure": "Presión de sueño",
+      "pastDue": "Pasado de hora",
+      "mayBeHungry": "¡Puede tener hambre!",
+      "inMinutes": "en {{count}} min",
+      "inHoursMinutes": "en {{hours}}h {{minutes}}m",
+      "inHours": "en {{hours}}h",
+      "minutesAwake": "{{count}} min despierto",
+      "upgradeToSee": "Mejora tu plan para ver predicciones",
+      "wakeWindow": "Ventana de vigilia: {{min}}-{{max}} min"
+    },
+
+    "patterns": {
+      "title": "Patrones",
+      "wakesUpEvery": "Cada {{hours}} horas",
+      "usuallyWakesUp": "Suele despertar",
+      "usualBedtime": "Hora habitual de dormir",
+      "feedsEvery": "Come cada",
+      "avgNapLength": "Duración promedio de siesta",
+      "upgradeToSee": "Mejora tu plan para ver patrones"
+    },
+
+    "trends": {
+      "title": "Tendencias de 14 días",
+      "sleep": "Sueño",
+      "feeding": "Alimentación",
+      "upgradeToSee": "Mejora tu plan para ver tendencias"
+    },
+
+    "benchmarks": {
+      "title": "Guías por edad",
+      "weeks": "{{count}} semanas",
+      "diapersToday": "Pañales hoy",
+      "sleepToday": "Sueño hoy",
+      "feedingsToday": "Alimentaciones hoy",
+      "wet": "pipí",
+      "hours": "horas",
+      "feeds": "tomas",
+      "expected": "esperado"
+    },
+
+    "todayVsAverage": {
+      "title": "Hoy vs. tu promedio",
+      "feedings": "Alimentaciones",
+      "diapers": "Pañales",
+      "sleep": "Sueño",
+      "vs": "vs",
+      "perDay": "/día"
+    }
+  }
+}

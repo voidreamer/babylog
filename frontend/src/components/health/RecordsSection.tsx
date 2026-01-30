@@ -4,6 +4,7 @@ import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp } from
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isFuture } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatDate';
 
 const VISIT_TYPES = [
@@ -16,6 +17,7 @@ const VISIT_TYPES = [
 
 interface RecordsSectionProps { baby: any; visits: any[]; vaccinations: any[]; medications: any[]; onDataChanged?: () => void; }
 export default function RecordsSection({ baby, visits, vaccinations, medications, onDataChanged }: RecordsSectionProps) {
+    const { t } = useTranslation('health');
     const [activeTab, setActiveTab] = useState('visits');
 
     return (
@@ -69,6 +71,7 @@ export default function RecordsSection({ baby, visits, vaccinations, medications
 // ============================================================================
 
 function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]; onDataChanged?: () => void }) {
+    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -100,7 +103,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
             };
 
             await api.createDoctorVisit(data);
-            toast.success('Visit recorded');
+            toast.success(t('records.visitRecorded'));
             setFormData({
                 visit_date: new Date().toISOString().split('T')[0],
                 visit_type: 'checkup',
@@ -123,7 +126,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
     const handleDelete = async (id: number) => {
         try {
             await api.deleteDoctorVisit(id);
-            toast.success('Visit deleted');
+            toast.success(t('records.visitDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -166,7 +169,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                     ))}
                 </div>
             ) : (
-                <p className="records-empty">No doctor visits recorded</p>
+                <p className="records-empty">{t('records.noVisits')}</p>
             )}
 
             {isAdding ? (
@@ -239,7 +242,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                     />
                     <div className="record-form-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Visit'}
+                            {saving ? '...' : t('records.visitForm.saveVisit')}
                         </button>
                         <button
                             type="button"
@@ -265,6 +268,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
 // ============================================================================
 
 function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; vaccinations: any[]; onDataChanged?: () => void }) {
+    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -299,7 +303,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
             };
 
             await api.createVaccination(data);
-            toast.success('Vaccination recorded');
+            toast.success(t('records.vaccinationRecorded'));
             setFormData({
                 vaccine_name: '',
                 dose_number: '1',
@@ -320,7 +324,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
     const handleDelete = async (id: number) => {
         try {
             await api.deleteVaccination(id);
-            toast.success('Vaccination deleted');
+            toast.success(t('records.vaccinationDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -347,7 +351,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
             {/* Upcoming reminders */}
             {upcomingDue?.length > 0 && (
                 <div className="vaccination-reminders">
-                    <h4 className="reminders-title">Upcoming</h4>
+                    <h4 className="reminders-title">{t('records.upcoming')}</h4>
                     {upcomingDue.slice(0, 3).map(v => (
                         <div key={v.id} className="reminder-item">
                             <span className="reminder-vaccine">{v.vaccine_name} (Dose {(v.dose_number || 0) + 1})</span>
@@ -386,7 +390,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                     ))}
                 </div>
             ) : (
-                <p className="records-empty">No vaccinations recorded</p>
+                <p className="records-empty">{t('records.noVaccinations')}</p>
             )}
 
             {isAdding ? (
@@ -445,7 +449,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                     />
                     <div className="record-form-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Vaccination'}
+                            {saving ? '...' : t('records.vaccineForm.saveVaccination')}
                         </button>
                         <button
                             type="button"
@@ -471,6 +475,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
 // ============================================================================
 
 function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; medications: any[]; onDataChanged?: () => void }) {
+    const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -506,7 +511,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             };
 
             await api.createMedication(data);
-            toast.success('Medication added');
+            toast.success(t('records.medicationAdded'));
             setFormData({
                 medication_name: '',
                 dosage: '',
@@ -527,7 +532,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
     const handleDelete = async (id: number) => {
         try {
             await api.deleteMedication(id);
-            toast.success('Medication deleted');
+            toast.success(t('records.medicationDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to delete: ' + (error as Error).message);
@@ -537,7 +542,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
     const handleToggleActive = async (med: any) => {
         try {
             await api.updateMedication(med.id, { is_active: !med.is_active });
-            toast.success(med.is_active ? 'Medication stopped' : 'Medication reactivated');
+            toast.success(med.is_active ? t('records.medicationStopped') : t('records.medicationReactivated'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
             toast.error('Failed to update: ' + (error as Error).message);
@@ -561,7 +566,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             {/* Active medications */}
             {activeMeds.length > 0 && (
                 <div className="medications-active">
-                    <h4 className="meds-section-title">Active</h4>
+                    <h4 className="meds-section-title">{t('records.active')}</h4>
                     {activeMeds.map((med) => (
                         <div key={med.id} className="medication-item active">
                             <div className="medication-header">
@@ -598,7 +603,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             {/* Past medications */}
             {pastMeds.length > 0 && (
                 <div className="medications-past">
-                    <h4 className="meds-section-title">Past</h4>
+                    <h4 className="meds-section-title">{t('records.past')}</h4>
                     {pastMeds.map((med) => (
                         <div key={med.id} className="medication-item past">
                             <div className="medication-header">
@@ -625,7 +630,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             )}
 
             {medications?.length === 0 && (
-                <p className="records-empty">No medications recorded</p>
+                <p className="records-empty">{t('records.noMedications')}</p>
             )}
 
             {isAdding ? (

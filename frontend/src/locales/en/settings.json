@@ -1,0 +1,88 @@
+{
+  "title": "Settings",
+  "preferences": "Preferences",
+  "darkMode": "Dark Mode",
+  "darkModeDesc": "Easier on eyes at night",
+  "language": "Language",
+  "languageDesc": "Choose your language",
+  "account": "Account",
+  "signedIn": "Signed in",
+  "premiumPlan": "Premium Plan",
+  "premiumActive": "Active",
+  "unlockAiInsights": "Unlock AI insights",
+  "upgrade": "Upgrade",
+  "enterPromoCode": "Enter promo code...",
+  "data": "Data",
+  "exportData": "Export Data",
+  "exporting": "Exporting...",
+  "downloadCsv": "Download as CSV",
+  "support": "Support",
+  "privacyPolicy": "Privacy Policy",
+  "signOut": "Sign Out",
+  "login": {
+    "title": "HeyBub",
+    "subtitle": "The simple way to track your baby's daily activities",
+    "signInWithGoogle": "Sign in with Google",
+    "trackFeedings": "Track feedings",
+    "monitorSleep": "Monitor sleep",
+    "logDiapers": "Log diapers",
+    "viewGrowthCharts": "View growth charts",
+    "freeWithPremium": "Free with premium features"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: January 2026",
+    "back": "Back",
+    "section1Title": "1. Information We Collect",
+    "section1Intro": "HeyBub collects information you provide directly when using our baby tracking app:",
+    "section1Items": {
+      "account": "Account Information:",
+      "accountDesc": "Email address and name via Google Sign-In",
+      "baby": "Baby Information:",
+      "babyDesc": "Baby names, birth dates, and gender",
+      "activity": "Activity Data:",
+      "activityDesc": "Feeding, diaper, sleep, and other tracking data you log",
+      "health": "Health Records:",
+      "healthDesc": "Doctor visits, vaccinations, medications, and growth data"
+    },
+    "section2Title": "2. How We Use Your Information",
+    "section2Intro": "We use your data solely to:",
+    "section2Items": [
+      "Provide the baby tracking service",
+      "Display your logged activities and summaries",
+      "Enable sharing with caregivers you authorize",
+      "Improve app functionality and fix bugs"
+    ],
+    "section2NoSell": "We do not sell your data to third parties.",
+    "section3Title": "3. Data Storage & Security",
+    "section3Intro": "Your data is stored securely using:",
+    "section3Items": [
+      "AWS cloud infrastructure with encryption at rest",
+      "Secure authentication via AWS Cognito",
+      "HTTPS encryption for all data transmission"
+    ],
+    "section4Title": "4. Data Sharing",
+    "section4Intro": "We only share your data when:",
+    "section4Items": [
+      "You explicitly share a baby profile with another caregiver",
+      "Required by law or legal process"
+    ],
+    "section5Title": "5. Your Rights",
+    "section5Intro": "You can:",
+    "section5Items": [
+      "Access all your stored data through the app",
+      "Delete your baby profiles and associated data",
+      "Revoke sharing access at any time",
+      "Request account deletion by contacting us"
+    ],
+    "section6Title": "6. Children's Privacy",
+    "section6Text": "This app is designed for parents/caregivers to track infant care. We do not knowingly collect information from children under 13.",
+    "section7Title": "7. Changes to This Policy",
+    "section7Text": "We may update this policy periodically. We will notify users of significant changes through the app.",
+    "section8Title": "8. Contact Us",
+    "section8Text": "For privacy questions or concerns, contact us at:",
+    "section8Email": "privacy@heybub.app"
+  },
+  "premiumActiveStripe": "Active — Manage subscription",
+  "premiumActivePromo": "Active — Promo code"
+}

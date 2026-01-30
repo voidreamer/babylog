@@ -1,0 +1,88 @@
+{
+  "title": "Ajustes",
+  "preferences": "Preferencias",
+  "darkMode": "Modo oscuro",
+  "darkModeDesc": "Más suave para la vista de noche",
+  "language": "Idioma",
+  "languageDesc": "Elige tu idioma",
+  "account": "Cuenta",
+  "signedIn": "Sesión iniciada",
+  "premiumPlan": "Plan Premium",
+  "premiumActive": "Activo",
+  "unlockAiInsights": "Desbloquea estadísticas con IA",
+  "upgrade": "Mejorar plan",
+  "enterPromoCode": "Ingresa código promocional...",
+  "data": "Datos",
+  "exportData": "Exportar datos",
+  "exporting": "Exportando...",
+  "downloadCsv": "Descargar como CSV",
+  "support": "Soporte",
+  "privacyPolicy": "Política de privacidad",
+  "signOut": "Cerrar sesión",
+  "login": {
+    "title": "HeyBub",
+    "subtitle": "La forma sencilla de registrar las actividades diarias de tu bebé",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "trackFeedings": "Registra alimentaciones",
+    "monitorSleep": "Monitorea el sueño",
+    "logDiapers": "Registra pañales",
+    "viewGrowthCharts": "Ve gráficas de crecimiento",
+    "freeWithPremium": "Gratis con funciones premium"
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "lastUpdated": "Última actualización: enero 2026",
+    "back": "Atrás",
+    "section1Title": "1. Información que recopilamos",
+    "section1Intro": "HeyBub recopila la información que proporcionas directamente al usar nuestra app de seguimiento del bebé:",
+    "section1Items": {
+      "account": "Información de la cuenta:",
+      "accountDesc": "Correo electrónico y nombre a través de Google Sign-In",
+      "baby": "Información del bebé:",
+      "babyDesc": "Nombres, fechas de nacimiento y sexo del bebé",
+      "activity": "Datos de actividad:",
+      "activityDesc": "Datos de alimentación, pañales, sueño y otros registros",
+      "health": "Registros de salud:",
+      "healthDesc": "Citas médicas, vacunas, medicamentos y datos de crecimiento"
+    },
+    "section2Title": "2. Cómo usamos tu información",
+    "section2Intro": "Usamos tus datos únicamente para:",
+    "section2Items": [
+      "Brindar el servicio de seguimiento del bebé",
+      "Mostrar tus actividades registradas y resúmenes",
+      "Permitir compartir con cuidadores que autorices",
+      "Mejorar la funcionalidad de la app y corregir errores"
+    ],
+    "section2NoSell": "No vendemos tus datos a terceros.",
+    "section3Title": "3. Almacenamiento y seguridad de datos",
+    "section3Intro": "Tus datos se almacenan de forma segura usando:",
+    "section3Items": [
+      "Infraestructura en la nube de AWS con cifrado en reposo",
+      "Autenticación segura a través de AWS Cognito",
+      "Cifrado HTTPS para toda la transmisión de datos"
+    ],
+    "section4Title": "4. Compartir datos",
+    "section4Intro": "Solo compartimos tus datos cuando:",
+    "section4Items": [
+      "Compartes explícitamente un perfil de bebé con otro cuidador",
+      "Lo requiere la ley o un proceso legal"
+    ],
+    "section5Title": "5. Tus derechos",
+    "section5Intro": "Puedes:",
+    "section5Items": [
+      "Acceder a todos tus datos almacenados a través de la app",
+      "Eliminar los perfiles de tus bebés y los datos asociados",
+      "Revocar el acceso compartido en cualquier momento",
+      "Solicitar la eliminación de tu cuenta contactándonos"
+    ],
+    "section6Title": "6. Privacidad de los niños",
+    "section6Text": "Esta app está diseñada para que padres/cuidadores registren el cuidado del bebé. No recopilamos información de menores de 13 años de forma intencional.",
+    "section7Title": "7. Cambios en esta política",
+    "section7Text": "Podemos actualizar esta política periódicamente. Notificaremos a los usuarios sobre cambios significativos a través de la app.",
+    "section8Title": "8. Contáctanos",
+    "section8Text": "Para preguntas o inquietudes sobre privacidad, contáctanos en:",
+    "section8Email": "privacy@heybub.app"
+  },
+  "premiumActiveStripe": "Activo — Administrar suscripción",
+  "premiumActivePromo": "Activo — Código promocional"
+}

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * iOS-style time and date picker with large time display and +/- buttons
@@ -7,6 +8,7 @@ import { useState } from 'react';
 interface TimePickerProps { value: Date | string; onChange: (date: Date) => void; }
 export default function TimePicker({ value, onChange }: TimePickerProps) {
     // Parse the value (expects ISO string or Date)
+    const { t } = useTranslation('common');
     const dateValue = value instanceof Date ? value : new Date(value);
 
     const formatDate = (date: Date): string => {
