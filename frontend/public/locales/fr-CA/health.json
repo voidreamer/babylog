@@ -142,7 +142,8 @@
     "given": "Compte tenu de ce qui précède :",
     "nextDueField": "Prochaine échéance :",
     "startField": "Début :",
-    "endField": "Fin :"
+    "endField": "Fin :",
+    "schedule": "Calendrier"
   },
   "modals": {
     "editDoctorVisit": "Modifier la visite chez le médecin",
@@ -234,5 +235,25 @@
   "toast_sickDayRemoved": "Congé de maladie supprimé",
   "arialabel_deleteSickDay": "Supprimer un jour de maladie",
   "placeholder_tempC": "Temp °C",
-  "toast_toothRecordRemoved": "Dossier dentaire enlevé"
+  "toast_toothRecordRemoved": "Dossier dentaire enlevé",
+  "schedule": {
+    "progress": "Progrès de la vaccination",
+    "complete": "complet",
+    "done": "Terminé",
+    "overdue": "En retard",
+    "upcoming": "Bientôt disponible",
+    "future": "À venir",
+    "markDone": "Mark Done",
+    "confirm": "Confirmer",
+    "scheduledAt": "Prévu à",
+    "ages": {
+      "birth": "Naissance",
+      "2months": "2 mois",
+      "4months": "4 mois",
+      "6months": "6 mois",
+      "12months": "12 mois",
+      "15months": "15 mois",
+      "18months": "18 mois"
+    }
+  }
 }

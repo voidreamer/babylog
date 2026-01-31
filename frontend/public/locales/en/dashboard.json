@@ -382,5 +382,48 @@
     "time": "Time",
     "notesOptional": "Notes (optional)",
     "notes": "Notes"
+  },
+  "sleepRing": {
+    "goal": "goal"
+  },
+  "tipOfTheDay": {
+    "title": "Tip of the Day",
+    "tips": {
+      "tip_sleep_1": "A consistent bedtime routine helps your baby learn when it's time to sleep. Try bath, book, and lullaby.",
+      "tip_sleep_2": "Newborns sleep 14-17 hours a day — but in short bursts. This is completely normal!",
+      "tip_sleep_3": "White noise can help your baby sleep longer by masking household sounds.",
+      "tip_sleep_4": "Toddlers still need 11-14 hours of sleep including naps. A predictable schedule helps.",
+      "tip_sleep_5": "Swaddling can help newborns feel secure and sleep better. Stop swaddling once baby shows signs of rolling.",
+      "tip_sleep_6": "A dark, cool room (68-72°F / 20-22°C) creates the ideal sleep environment.",
+      "tip_sleep_7": "Watch for sleep cues: yawning, rubbing eyes, fussiness. Put baby down drowsy but awake.",
+      "tip_feeding_1": "Stay hydrated! Breastfeeding parents need extra water — keep a bottle nearby during feeds.",
+      "tip_feeding_2": "Cluster feeding in the evenings is normal for newborns and helps establish milk supply.",
+      "tip_feeding_3": "Around 4-6 months, your baby may show signs of readiness for solids: sitting up, showing interest in food.",
+      "tip_feeding_4": "Offer a variety of textures and colors. It can take 10-15 tries before a baby accepts a new food.",
+      "tip_feeding_5": "Feed on demand — newborns typically eat every 2-3 hours. Watch for hunger cues like rooting and lip smacking.",
+      "tip_feeding_6": "Let your toddler self-feed when possible. Messy meals build fine motor skills and independence!",
+      "tip_feeding_7": "If bottle-feeding, pace the feeding by holding the bottle horizontally and taking breaks.",
+      "tip_dev_1": "Tummy time helps strengthen neck and shoulder muscles. Start with a few minutes, several times a day.",
+      "tip_dev_2": "Talk and sing to your baby throughout the day. Early language exposure builds brain connections.",
+      "tip_dev_3": "Reading together daily — even for just 5 minutes — boosts language development significantly.",
+      "tip_dev_4": "High-contrast images and colorful toys stimulate visual development in young babies.",
+      "tip_dev_5": "Toddlers learn through play! Simple activities like stacking blocks build problem-solving skills.",
+      "tip_dev_6": "Respond to your baby's coos and babbles. Turn-taking in \"conversation\" teaches communication.",
+      "tip_dev_7": "Gentle infant massage can improve bonding, digestion, and sleep quality.",
+      "tip_dev_8": "Encourage outdoor play — nature exploration supports sensory development and curiosity.",
+      "tip_safety_1": "Always place baby on their back to sleep. Keep the crib free of blankets, pillows, and stuffed animals.",
+      "tip_safety_2": "Baby-proof as your child becomes mobile. Get down to their level to spot hazards you might miss.",
+      "tip_safety_3": "Never leave baby unattended on elevated surfaces, even for a second.",
+      "tip_safety_4": "Keep small objects, coins, and batteries out of reach. Babies explore everything with their mouths.",
+      "tip_safety_5": "Check the water temperature before bath time. It should feel warm, not hot (around 100°F / 38°C).",
+      "tip_safety_6": "Secure furniture to walls. Climbing toddlers can tip over dressers and bookshelves.",
+      "tip_selfcare_1": "You can't pour from an empty cup. Taking care of yourself makes you a better parent.",
+      "tip_selfcare_2": "It's okay to ask for help. Parenting wasn't meant to be done alone.",
+      "tip_selfcare_3": "Take a few deep breaths when you feel overwhelmed. Even 60 seconds of calm helps reset.",
+      "tip_selfcare_4": "Sleep when the baby sleeps — the dishes can wait. Your rest matters.",
+      "tip_selfcare_5": "Connect with other parents. Sharing experiences helps you feel less alone in this journey.",
+      "tip_selfcare_6": "Celebrate small wins! Every day you're doing your best, and that's enough.",
+      "tip_selfcare_7": "Step outside for fresh air when you can. A short walk does wonders for mental health."
+    }
   }
 }

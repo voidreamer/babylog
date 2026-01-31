@@ -125,7 +125,7 @@
     "nextVisit": "Próxima visita: {{date}}",
     "dr": "Dr. {{name}}",
     "headMeasurement": "Cabeza: {{value}} cm",
-    "started": "Iniciado: {{date}}",
+    "started": "Comenzó: {{date}}",
     "active": "Activo",
     "past": "Anterior",
     "stop": "Stop",
@@ -142,7 +142,8 @@
     "given": "Dada:",
     "nextDueField": "Siguiente plazo:",
     "startField": "Comienza:",
-    "endField": "Fin:"
+    "endField": "Fin:",
+    "schedule": "Horario"
   },
   "modals": {
     "editDoctorVisit": "Editar visita médica",
@@ -234,5 +235,25 @@
   "toast_sickDayRemoved": "Baja por enfermedad",
   "arialabel_deleteSickDay": "Borrar baja por enfermedad",
   "placeholder_tempC": "Temp °C",
-  "toast_toothRecordRemoved": "Registro dental eliminado"
+  "toast_toothRecordRemoved": "Registro dental eliminado",
+  "schedule": {
+    "progress": "Avance de la vacunación",
+    "complete": "completa",
+    "done": "Hecho",
+    "overdue": "Atrasado",
+    "upcoming": "Próximamente",
+    "future": "Próximamente",
+    "markDone": "Marca Hecho",
+    "confirm": "Confirme",
+    "scheduledAt": "Programado en",
+    "ages": {
+      "birth": "Nacimiento",
+      "2months": "2 meses",
+      "4months": "4 meses",
+      "6months": "6 meses",
+      "12months": "12 meses",
+      "15months": "15 meses",
+      "18months": "18 meses"
+    }
+  }
 }

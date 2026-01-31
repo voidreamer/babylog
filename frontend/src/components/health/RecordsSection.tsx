@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp, CalendarCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isFuture } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
+import VaccinationSchedule from './VaccinationSchedule';
 
 const VISIT_TYPE_KEYS = ['checkup', 'sick', 'vaccination', 'specialist', 'emergency'] as const;
 
@@ -34,6 +35,13 @@ export default function RecordsSection({ baby, visits, vaccinations, medications
                     {vaccinations?.length > 0 && <span className="tab-count">{vaccinations.length}</span>}
                 </button>
                 <button
+                    className={`records-tab ${activeTab === 'schedule' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('schedule')}
+                >
+                    <CalendarCheck size={16} />
+                    {t('records.schedule')}
+                </button>
+                <button
                     className={`records-tab ${activeTab === 'medications' ? 'active' : ''}`}
                     onClick={() => setActiveTab('medications')}
                 >
@@ -51,6 +59,9 @@ export default function RecordsSection({ baby, visits, vaccinations, medications
                 )}
                 {activeTab === 'vaccinations' && (
                     <VaccinationsPanel baby={baby} vaccinations={vaccinations} onDataChanged={onDataChanged} />
+                )}
+                {activeTab === 'schedule' && (
+                    <VaccinationSchedule baby={baby} vaccinations={vaccinations} onDataChanged={onDataChanged} />
                 )}
                 {activeTab === 'medications' && (
                     <MedicationsPanel baby={baby} medications={medications} onDataChanged={onDataChanged} />
