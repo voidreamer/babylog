@@ -4,6 +4,7 @@ import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../../hooks/useUnits';
 
 // Lazy load the GrowthChart component - only loads when user clicks "Full Chart"
 const GrowthChart = lazy(() => import('./GrowthChart'));
@@ -38,6 +39,7 @@ function getPercentileLabel(position: number | null): string {
 interface GrowthCardProps { baby: any; growthRecords: any[]; onRecordAdded?: () => void; whoData?: any; }
 export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData }: GrowthCardProps) {
     const { t } = useTranslation('health');
+    const { formatWeight, formatLength, weightPlaceholder, lengthPlaceholder, parseWeight, parseLength, weightUnit, lengthUnit } = useUnits();
     const [showChart, setShowChart] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -93,9 +95,9 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             const data = {
                 baby_id: baby.id,
                 recorded_date: new Date().toISOString(),
-                weight_kg: formData.weight ? parseFloat(formData.weight) : null,
-                height_cm: formData.height ? parseFloat(formData.height) : null,
-                head_cm: formData.head ? parseFloat(formData.head) : null,
+                weight_kg: formData.weight ? parseWeight(parseFloat(formData.weight)) : null,
+                height_cm: formData.height ? parseLength(parseFloat(formData.height)) : null,
+                head_cm: formData.head ? parseLength(parseFloat(formData.head)) : null,
             };
 
             await api.createGrowthRecord(data);
@@ -131,7 +133,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 <div className="growth-metric-box">
                     <div className="growth-metric-label">{t('growth.weight')}</div>
                     <div className="growth-metric-value">
-                        {latestRecord?.weight_kg ? `${parseFloat(latestRecord.weight_kg).toFixed(1)} kg` : '--'}
+                        {latestRecord?.weight_kg ? formatWeight(latestRecord.weight_kg) : '--'}
                     </div>
                     <div className="growth-metric-percentile">
                         {getPercentileLabel(weightPosition)} {t('growth.percentile')}
@@ -147,7 +149,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 <div className="growth-metric-box">
                     <div className="growth-metric-label">{t('growth.height')}</div>
                     <div className="growth-metric-value">
-                        {latestRecord?.height_cm ? `${parseFloat(latestRecord.height_cm).toFixed(1)} cm` : '--'}
+                        {latestRecord?.height_cm ? formatLength(latestRecord.height_cm) : '--'}
                     </div>
                     <div className="growth-metric-percentile">
                         {getPercentileLabel(heightPosition)} {t('growth.percentile')}
@@ -163,7 +165,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 <div className="growth-metric-box">
                     <div className="growth-metric-label">{t('growth.head')}</div>
                     <div className="growth-metric-value">
-                        {latestRecord?.head_cm ? `${parseFloat(latestRecord.head_cm).toFixed(1)} cm` : '--'}
+                        {latestRecord?.head_cm ? formatLength(latestRecord.head_cm) : '--'}
                     </div>
                     <div className="growth-metric-percentile">--</div>
                     <div className="percentile-bar">
@@ -178,7 +180,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <input
                         type="number"
                         step="0.01"
-                        placeholder={t('placeholder_kg')}
+                        placeholder={weightPlaceholder}
                         value={formData.weight}
                         onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                         className="growth-input"
@@ -186,7 +188,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <input
                         type="number"
                         step="0.1"
-                        placeholder={t('placeholder_cm')}
+                        placeholder={lengthPlaceholder}
                         value={formData.height}
                         onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                         className="growth-input"
@@ -194,7 +196,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <input
                         type="number"
                         step="0.1"
-                        placeholder={t('placeholder_head')}
+                        placeholder={`${t('growth.head')} (${lengthUnit})`}
                         value={formData.head}
                         onChange={(e) => setFormData({ ...formData, head: e.target.value })}
                         className="growth-input"

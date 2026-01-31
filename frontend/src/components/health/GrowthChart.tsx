@@ -13,6 +13,7 @@ import {
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../../data/whoGrowthData';
 import { differenceInMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../../hooks/useUnits';
 
 // Calculate age in months from birth date to measurement date
 function getAgeMonths(birthDate: string, measurementDate: string): number {
@@ -24,6 +25,7 @@ function getAgeMonths(birthDate: string, measurementDate: string): number {
 interface HealthGrowthChartProps { baby: any; growthRecords: any[]; }
 export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartProps) {
     const { t } = useTranslation('health');
+    const { convertWeight, convertLength, weightUnit, lengthUnit, isImperial } = useUnits();
     const [metric, setMetric] = useState('weight'); // 'weight' or 'height'
 
     const birthDate = baby?.birth_date;
@@ -52,39 +54,42 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
             .sort((a, b) => a.ageMonths - b.ageMonths);
     }, [growthRecords, birthDate, metric]);
 
+    const conv = metric === 'weight' ? convertWeight : convertLength;
+
     // Combine WHO data with baby's data for charting
     const chartData = useMemo(() => {
-        // Start with WHO data
+        // Start with WHO data (convert to display units)
         const data: any[] = whoData.map(row => ({
             ageMonths: row.months,
-            p3: row.p3,
-            p15: row.p15,
-            p50: row.p50,
-            p85: row.p85,
-            p97: row.p97,
+            p3: row.p3 != null ? conv(row.p3) : null,
+            p15: row.p15 != null ? conv(row.p15) : null,
+            p50: row.p50 != null ? conv(row.p50) : null,
+            p85: row.p85 != null ? conv(row.p85) : null,
+            p97: row.p97 != null ? conv(row.p97) : null,
             babyValue: null,
         }));
 
-        // Add baby's data points
+        // Add baby's data points (convert to display units)
         babyData.forEach(point => {
+            const displayValue = conv(point.value);
             const existing = data.find(d => d.ageMonths === point.ageMonths);
             if (existing) {
-                existing.babyValue = point.value;
+                existing.babyValue = displayValue;
             } else {
                 // Insert at right position
                 const insertIdx = data.findIndex(d => d.ageMonths > point.ageMonths);
                 if (insertIdx === -1) {
-                    data.push({ ageMonths: point.ageMonths, babyValue: point.value });
+                    data.push({ ageMonths: point.ageMonths, babyValue: displayValue });
                 } else {
-                    data.splice(insertIdx, 0, { ageMonths: point.ageMonths, babyValue: point.value });
+                    data.splice(insertIdx, 0, { ageMonths: point.ageMonths, babyValue: displayValue });
                 }
             }
         });
 
         return data;
-    }, [whoData, babyData]);
+    }, [whoData, babyData, conv]);
 
-    const unit = metric === 'weight' ? 'kg' : 'cm';
+    const unit = metric === 'weight' ? weightUnit : lengthUnit;
     const label = metric === 'weight' ? t('growth.weight') : t('growth.height');
 
     // Custom tooltip

@@ -6,12 +6,14 @@ import { Baby, Pencil, Timer, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../hooks/useUnits';
 
 // Helper to parse UTC time
 
 interface FeedingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function FeedingModal({ babyId, editEvent, onClose, onSave }: FeedingModalProps) {
     const { t } = useTranslation('dashboard');
+    const { convertVolume, parseVolume, volumeUnit, isImperial } = useUnits();
     const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
 
@@ -62,7 +64,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             }
 
             if (details.duration_minutes) setDuration(String(details.duration_minutes));
-            if (details.amount_ml) setAmount(String(details.amount_ml));
+            if (details.amount_ml) setAmount(String(Math.round(convertVolume(details.amount_ml))));
             if (details.notes) setNotes(details.notes);
         }
     }, [editEvent]);
@@ -115,7 +117,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
         if (timerSeconds < 1) return;
 
         // Validate amount if provided
-        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
+        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
             toast.error(t('toast_amountMustBeBetween0And500Ml'));
             return;
         }
@@ -133,7 +135,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                 time: startTime!.toISOString(),
                 type: getSaveType(),
                 duration_minutes: Math.ceil(timerSeconds / 60),
-                amount_ml: amount ? parseInt(amount) : null,
+                amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
                 notes: notes || null,
             });
             onSave();
@@ -154,7 +156,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
         }
 
         // Validate amount if provided
-        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > 500)) {
+        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
             toast.error(t('toast_amountMustBeBetween0And500Ml'));
             return;
         }
@@ -172,7 +174,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             time: time.toISOString(),
             type: getSaveType(),
             duration_minutes: duration ? parseInt(duration) : null,
-            amount_ml: amount ? parseInt(amount) : null,
+            amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
             notes: notes || null,
         };
 

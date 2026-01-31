@@ -1,9 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Lightbulb, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBaby } from '../hooks/useBaby';
 
-const TIP_COUNT = 40;
+const TIP_KEYS = [
+    'tip_sleep_1', 'tip_sleep_2', 'tip_sleep_3', 'tip_sleep_4', 'tip_sleep_5', 'tip_sleep_6', 'tip_sleep_7',
+    'tip_feeding_1', 'tip_feeding_2', 'tip_feeding_3', 'tip_feeding_4', 'tip_feeding_5', 'tip_feeding_6', 'tip_feeding_7',
+    'tip_dev_1', 'tip_dev_2', 'tip_dev_3', 'tip_dev_4', 'tip_dev_5', 'tip_dev_6', 'tip_dev_7', 'tip_dev_8',
+    'tip_safety_1', 'tip_safety_2', 'tip_safety_3', 'tip_safety_4', 'tip_safety_5', 'tip_safety_6',
+    'tip_selfcare_1', 'tip_selfcare_2', 'tip_selfcare_3', 'tip_selfcare_4', 'tip_selfcare_5', 'tip_selfcare_6', 'tip_selfcare_7',
+];
+
+const CATEGORIES: Record<string, string> = {
+    sleep: 'catSleep',
+    feeding: 'catFeeding',
+    dev: 'catDevelopment',
+    safety: 'catSafety',
+    selfcare: 'catSelfCare',
+};
 
 function getAgeMonths(birthDate: string | null): number {
     if (!birthDate) return 0;
@@ -12,7 +26,6 @@ function getAgeMonths(birthDate: string | null): number {
     return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
 }
 
-/** Get the day-of-year number for tip rotation */
 function getDayOfYear(): number {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
@@ -27,28 +40,18 @@ export default function TipOfTheDay() {
     const todayKey = `tip_dismissed_${getDayOfYear()}`;
     const [dismissed, setDismissed] = useState(() => localStorage.getItem(todayKey) === '1');
 
-    // Pick age-appropriate tip index, rotating daily
-    const tipIndex = useMemo(() => {
-        // Filter tips by age suitability using index ranges
-        // 0-9: newborn/general, 10-19: sleep, 20-29: feeding, 30-34: development, 35-39: parent self-care
-        const day = getDayOfYear();
-        return day % TIP_COUNT;
-    }, []);
-
-    const tipKey = `tips.tip${tipIndex}`;
-    const tipText = t(tipKey);
-
-    // Determine category label
-    const categoryKey = tipIndex < 10 ? 'tips.catGeneral' :
-        tipIndex < 20 ? 'tips.catSleep' :
-        tipIndex < 30 ? 'tips.catFeeding' :
-        tipIndex < 35 ? 'tips.catDevelopment' :
-        'tips.catSelfCare';
-
     if (dismissed) return null;
 
-    // Add age context if available
-    const ageLabel = ageMonths > 0 ? t('tips.ageContext', { months: ageMonths }) : '';
+    const tipIndex = getDayOfYear() % TIP_KEYS.length;
+    const tipKey = TIP_KEYS[tipIndex];
+    const tipText = t(`tipOfTheDay.tips.${tipKey}`);
+
+    // Extract category from key (e.g. "tip_sleep_1" -> "sleep")
+    const parts = tipKey.split('_');
+    const catKey = parts[1];
+    const categoryLabel = t(`tipOfTheDay.${CATEGORIES[catKey] || 'catGeneral'}`);
+
+    const ageLabel = ageMonths > 0 ? t('tipOfTheDay.ageContext', { months: ageMonths }) : '';
 
     return (
         <div className="tip-of-the-day" style={{
@@ -76,7 +79,7 @@ export default function TipOfTheDay() {
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        {t('tips.title')} · {t(categoryKey)}
+                        {t('tipOfTheDay.title')} · {categoryLabel}
                     </span>
                 </div>
                 <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.5, color: 'var(--text, #333)' }}>

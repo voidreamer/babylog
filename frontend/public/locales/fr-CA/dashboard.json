@@ -85,14 +85,15 @@
     "logSleep": "Log Sleep",
     "nap": "Sieste",
     "nightSleep": "Sommeil de nuit",
-    "duration": "Durée de l'accord",
+    "duration": "La durée",
     "notes": "Notes",
     "wakeUp": "Réveillez-vous",
     "waking": "Réveil...",
     "starting": "Commencer...",
     "startTime": "Heure de début",
     "endTime": "L'heure de la fin",
-    "saveChanges": "Enregistrer les modifications"
+    "saveChanges": "Enregistrer les modifications",
+    "goalLabel": "/ {{hours}}"
   },
   "pumping": {
     "title": "Pompage",
@@ -101,7 +102,7 @@
     "stopPumping": "Arrêter le pompage",
     "logPumping": "Pompage des grumes",
     "amount": "Montant",
-    "duration": "Durée de l'accord",
+    "duration": "La durée",
     "notes": "Notes",
     "savePumping": "Économiser le pompage",
     "start": "Démarrage",
@@ -134,7 +135,7 @@
     "startTummyTime": "Commencer l'heure du ventre",
     "stopTummyTime": "Arrêter le temps du ventre",
     "logTummyTime": "L'heure du ventre de la bûche",
-    "duration": "La durée",
+    "duration": "Durée de l'accord",
     "notes": "Notes",
     "tummy": "Ventre",
     "start": "Démarrage",
@@ -396,7 +397,7 @@
       "tip_sleep_5": "L'emmaillotage peut aider les nouveau-nés à se sentir en sécurité et à mieux dormir. Cessez d'emmailloter votre bébé dès qu'il montre des signes de roulis.",
       "tip_sleep_6": "Une chambre sombre et fraîche (20-22°C) crée un environnement idéal pour le sommeil.",
       "tip_sleep_7": "Soyez attentif aux signes du sommeil : bâillements, frottements des yeux, agitation. Couchez le bébé somnolent mais éveillé.",
-      "tip_feeding_1": "Restez hydratés ! Les parents qui allaitent ont besoin de plus d'eau - gardez un biberon à portée de main pendant les tétées.",
+      "tip_feeding_1": "Restez hydratés ! Les parents qui allaitent ont besoin de plus d'eau - gardez une bouteille à portée de main pendant les tétées.",
       "tip_feeding_2": "Il est normal pour les nouveau-nés d'avoir des tétées groupées le soir, ce qui permet d'établir la production de lait.",
       "tip_feeding_3": "Vers 4-6 mois, votre bébé peut montrer des signes de préparation aux aliments solides : il s'assoit, montre de l'intérêt pour la nourriture.",
       "tip_feeding_4": "Proposez des textures et des couleurs variées. Il faut parfois 10 à 15 essais avant qu'un bébé n'accepte un nouvel aliment.",
@@ -424,6 +425,12 @@
       "tip_selfcare_5": "Entrez en contact avec d'autres parents. Partager ses expériences permet de se sentir moins seul dans cette aventure.",
       "tip_selfcare_6": "Célébrez les petites victoires ! Chaque jour, vous faites de votre mieux, et c'est suffisant.",
       "tip_selfcare_7": "Sortez prendre l'air dès que vous le pouvez. Une petite promenade fait des merveilles pour la santé mentale."
-    }
+    },
+    "catSleep": "Sommeil",
+    "catFeeding": "Alimentation",
+    "catDevelopment": "Développement",
+    "catSafety": "Sécurité",
+    "catSelfCare": "Prendre soin de soi",
+    "ageContext": "Votre bébé a {{months}} mois"
   }
 }

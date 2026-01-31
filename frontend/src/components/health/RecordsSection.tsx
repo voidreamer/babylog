@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { format, parseISO, isFuture } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../../hooks/useUnits';
 import VaccinationSchedule from './VaccinationSchedule';
 
 const VISIT_TYPE_KEYS = ['checkup', 'sick', 'vaccination', 'specialist', 'emergency'] as const;
@@ -77,6 +78,7 @@ export default function RecordsSection({ baby, visits, vaccinations, medications
 
 function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]; onDataChanged?: () => void }) {
     const { t } = useTranslation('health');
+    const { formatWeight, formatLength, parseWeight, parseLength, weightUnit, lengthUnit } = useUnits();
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -100,9 +102,9 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                 visit_date: new Date(formData.visit_date).toISOString(),
                 visit_type: formData.visit_type,
                 doctor_name: formData.doctor_name || null,
-                weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
-                height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
-                head_cm: formData.head_cm ? parseFloat(formData.head_cm) : null,
+                weight_kg: formData.weight_kg ? parseWeight(parseFloat(formData.weight_kg)) : null,
+                height_cm: formData.height_cm ? parseLength(parseFloat(formData.height_cm)) : null,
+                head_cm: formData.head_cm ? parseLength(parseFloat(formData.head_cm)) : null,
                 next_visit_date: formData.next_visit_date ? new Date(formData.next_visit_date).toISOString() : null,
                 notes: formData.notes || null,
             };
@@ -161,9 +163,9 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                             )}
                             {(visit.weight_kg || visit.height_cm || visit.head_cm) && (
                                 <div className="record-measurements">
-                                    {visit.weight_kg && <span>{parseFloat(visit.weight_kg).toFixed(1)} kg</span>}
-                                    {visit.height_cm && <span>{parseFloat(visit.height_cm).toFixed(1)} cm</span>}
-                                    {visit.head_cm && <span>{t('records.headMeasurement', { value: parseFloat(visit.head_cm).toFixed(1) })}</span>}
+                                    {visit.weight_kg && <span>{formatWeight(visit.weight_kg)}</span>}
+                                    {visit.height_cm && <span>{formatLength(visit.height_cm)}</span>}
+                                    {visit.head_cm && <span>{t('records.headMeasurement', { value: formatLength(visit.head_cm) })}</span>}
                                 </div>
                             )}
                             {visit.next_visit_date && (
@@ -207,7 +209,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         <input
                             type="number"
                             step="0.01"
-                            placeholder={t('growth.weightKg')}
+                            placeholder={`${t('growth.weight')} (${weightUnit})`}
                             value={formData.weight_kg}
                             onChange={(e) => setFormData({ ...formData, weight_kg: e.target.value })}
                             className="record-number-input"
@@ -215,7 +217,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         <input
                             type="number"
                             step="0.1"
-                            placeholder={t('growth.heightCm')}
+                            placeholder={`${t('growth.height')} (${lengthUnit})`}
                             value={formData.height_cm}
                             onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
                             className="record-number-input"
@@ -223,7 +225,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                         <input
                             type="number"
                             step="0.1"
-                            placeholder={t('placeholder_headCm')}
+                            placeholder={`${t('growth.head')} (${lengthUnit})`}
                             value={formData.head_cm}
                             onChange={(e) => setFormData({ ...formData, head_cm: e.target.value })}
                             className="record-number-input"

@@ -92,7 +92,8 @@
     "starting": "Starting...",
     "startTime": "Start Time",
     "endTime": "End Time",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "goalLabel": "/ {{hours}}"
   },
   "pumping": {
     "title": "Pumping",
@@ -424,6 +425,12 @@
       "tip_selfcare_5": "Connect with other parents. Sharing experiences helps you feel less alone in this journey.",
       "tip_selfcare_6": "Celebrate small wins! Every day you're doing your best, and that's enough.",
       "tip_selfcare_7": "Step outside for fresh air when you can. A short walk does wonders for mental health."
-    }
+    },
+    "catSleep": "Sleep",
+    "catFeeding": "Feeding",
+    "catDevelopment": "Development",
+    "catSafety": "Safety",
+    "catSelfCare": "Self-Care",
+    "ageContext": "Your baby is {{months}} months old"
   }
 }
