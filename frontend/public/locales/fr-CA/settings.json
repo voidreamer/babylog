@@ -1,11 +1,24 @@
 {
   "title": "Paramètres",
+  "babyProfile": {
+    "title": "Profil du bébé",
+    "born": "Né {{date}}",
+    "growthData": "Données sur la croissance",
+    "growthDataDesc": "Mise à jour du poids et de la taille",
+    "addAnother": "Ajouter un autre bébé",
+    "addAnotherDesc": "Suivre plusieurs enfants"
+  },
   "preferences": {
     "title": "Préférences",
+    "notifications": "Notifications",
+    "notificationsDesc": "Alimentation, rappels de sieste",
     "darkMode": "Mode sombre",
     "darkModeDesc": "Plus facile pour les yeux la nuit",
     "language": "Langue",
-    "languageDesc": "Choisissez votre langue"
+    "languageDesc": "Choisissez votre langue",
+    "units": "Unités",
+    "unitsMetric": "Métrique (kg, cm, ml)",
+    "unitsImperial": "Impérial (lbs, in, oz)"
   },
   "account": {
     "title": "Compte",
@@ -17,22 +30,35 @@
       "activeManage": "Actif - Gérer l'abonnement",
       "activePromo": "Actif - Code promo",
       "unlock": "Débloquer des informations sur l'IA et plus encore"
-    }
+    },
+    "caregivers": "Soignants",
+    "caregiversDesc": "Partager avec la famille",
+    "comingSoon": "Prochainement"
   },
   "data": {
     "title": "Données",
     "export": "Exportation de données",
     "exportDesc": "Télécharger en CSV",
     "exporting": "Exporter...",
-    "upgradeToExport": "Passer à l'exportation",
+    "upgradeToExport": "Mise à niveau pour l'exportation",
     "exportSuccess": "Exportation terminée ! Vérifiez votre dossier de téléchargements.",
     "exportFailed": "Échec de l'exportation",
     "noDataToExport": "Pas de données sur les bébés à exporter"
   },
   "support": {
     "title": "Soutien",
+    "contactUs": "Nous contacter",
     "privacyPolicy": "Politique de confidentialité",
+    "termsOfService": "Conditions d'utilisation",
     "signOut": "S'inscrire"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "livres",
+    "cm": "cm",
+    "in": "en",
+    "ml": "ml",
+    "oz": "oz"
   },
   "upgrade": {
     "title": "Passer à la version Premium",
