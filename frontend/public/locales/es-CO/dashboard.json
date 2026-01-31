@@ -253,7 +253,7 @@
     "oneTapButtons": "Botones de un toque en los widgets"
   },
   "insights": {
-    "selectBaby": "Selecciona un bebé para ver sus características",
+    "selectBaby": "Selecciona un bebé para ver sus perspectivas",
     "analyzingPatterns": "Analizar patrones...",
     "unableToLoad": "No se puede cargar la información",
     "collectingData": "Recopilación de datos",
@@ -340,7 +340,7 @@
   "toast_bathLogged": "Baño registrado",
   "toast_failedToLogBath": "Fallo al iniciar sesión de baño",
   "title_logWithNotes": "Registro con notas",
-  "toast_failedToSaveDiaperChange": "No guardó el cambio de pañal",
+  "toast_failedToSaveDiaperChange": "No guardó el cambio de pañales",
   "placeholder_optionalNotes": "Notas opcionales...",
   "toast_failedToLogDiaper": "No se ha registrado el pañal",
   "title_logWithDetails": "Registro con detalles",
@@ -393,7 +393,7 @@
       "tip_sleep_2": "Los recién nacidos duermen entre 14 y 17 horas al día, pero a ratos. Es completamente normal.",
       "tip_sleep_3": "El ruido blanco puede ayudar a tu bebé a dormir más tiempo al enmascarar los sonidos domésticos.",
       "tip_sleep_4": "Los niños pequeños siguen necesitando entre 11 y 14 horas de sueño, incluidas las siestas. Un horario predecible ayuda.",
-      "tip_sleep_5": "Envolver al recién nacido puede ayudarle a sentirse seguro y a dormir mejor. Deje de envolver al bebé cuando muestre signos de que se está revolcando.",
+      "tip_sleep_5": "Envolver al recién nacido puede ayudarle a sentirse seguro y a dormir mejor. Deje de envolver al bebé cuando muestre signos de estar rodando.",
       "tip_sleep_6": "Una habitación oscura y fresca (20-22 °C) crea el entorno ideal para dormir.",
       "tip_sleep_7": "Presta atención a las señales de sueño: bostezos, frotarse los ojos, inquietud. Acuesta al bebé somnoliento pero despierto.",
       "tip_feeding_1": "Mantente hidratado Los padres que amamantan a sus hijos necesitan un aporte extra de agua.",
