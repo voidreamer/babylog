@@ -402,6 +402,8 @@ h4 {
 .settings-icon-box.sky { background: var(--sleep-bg); color: var(--sleep); }
 .settings-icon-box.mint { background: var(--diaper-bg); color: var(--diaper); }
 .settings-icon-box.danger { background: rgba(248, 168, 168, 0.3); color: var(--danger); }
+.settings-icon-box.blush { background: rgba(255, 182, 193, 0.3); color: #e75480; }
+.settings-icon-box.cloud { background: rgba(200, 210, 230, 0.3); color: #6b7fa0; }
 
 .settings-row-label {
   font-weight: 600;
@@ -429,6 +431,8 @@ h4 {
 
 .settings-badge.mint { background: var(--diaper-bg); color: var(--diaper); }
 .settings-badge.lavender { background: var(--potty-bg); color: var(--potty); }
+.settings-badge.sky { background: var(--sleep-bg); color: var(--sleep); }
+.settings-version { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin: var(--space-lg) 0 var(--space-xl); }
 
 .settings-promo-row {
   display: flex;
