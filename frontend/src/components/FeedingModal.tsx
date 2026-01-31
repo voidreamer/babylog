@@ -315,7 +315,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                             {/* Amount for bottle */}
                             {feedMethod === 'bottle' && (
                                 <div className="form-group">
-                                    <label className="form-label">{t('feeding.amountMl')}</label>
+                                    <label className="form-label">{t('feeding.amount') + ' (' + volumeUnit + ')'}</label>
                                     <input
                                         type="number"
                                         className="form-input"
@@ -364,7 +364,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
                                 {feedMethod === 'bottle' && (
                                     <div className="form-group">
-                                        <label className="form-label">{t('feeding.amountMl')}</label>
+                                        <label className="form-label">{t('feeding.amount') + ' (' + volumeUnit + ')'}</label>
                                         <input
                                             type="number"
                                             className="form-input"

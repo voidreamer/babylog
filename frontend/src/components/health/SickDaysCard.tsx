@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../../hooks/useUnits';
 
 const COMMON_SYMPTOMS = [
     'fever',
@@ -26,6 +27,7 @@ const COMMON_SYMPTOMS = [
 interface SickDaysCardProps { baby: any; sickDays: any[]; onSickDayAdded?: () => void; onSickDayDeleted?: () => void; }
 export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDayDeleted }: SickDaysCardProps) {
     const { t } = useTranslation('health');
+    const { formatTemp, parseTemp, tempUnit, isImperial } = useUnits();
     const symptomLabels: Record<string, string> = {
         fever: t('sickDays.symptomLabels.fever'),
         cough: t('sickDays.symptomLabels.cough'),
@@ -75,7 +77,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                 baby_id: baby.id,
                 date: new Date(formData.date).toISOString(),
                 symptoms: formData.symptoms,
-                temperature: formData.temperature ? parseFloat(formData.temperature) : null,
+                temperature: formData.temperature ? parseTemp(parseFloat(formData.temperature)) : null,
                 notes: formData.notes || null,
             };
 
@@ -147,7 +149,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 <span className="sick-day-date">{formatSickDate(day.date)}</span>
                                 {day.temperature && (
                                     <span className={`sick-day-temp ${getTemperatureStatus(day.temperature)}`}>
-                                        {parseFloat(day.temperature).toFixed(1)}°C
+                                        {formatTemp(day.temperature)}
                                     </span>
                                 )}
                                 <button
@@ -193,7 +195,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 step="0.1"
                                 min="35"
                                 max="42"
-                                placeholder={t('placeholder_tempC')}
+                                placeholder={tempUnit}
                                 value={formData.temperature}
                                 onChange={(e) => setFormData({ ...formData, temperature: e.target.value })}
                                 className="sick-day-temp-input"

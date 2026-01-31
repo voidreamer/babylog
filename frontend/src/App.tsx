@@ -26,17 +26,86 @@ import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
+    const [notifications, setNotifications] = useState(() => localStorage.getItem('heybub-notifications') !== 'false');
+    const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
+
+    const currentBaby = babies?.[0];
+
+    const toggleNotifications = () => {
+        const next = !notifications;
+        setNotifications(next);
+        localStorage.setItem('heybub-notifications', String(next));
+    };
+
+    const toggleUnits = () => {
+        const next = unitsSystem === 'metric' ? 'imperial' : 'metric';
+        setUnitsSystem(next);
+        localStorage.setItem('heybub-units', next);
+    };
+
+    const formatDob = (dateStr: string) => {
+        try {
+            return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        } catch { return dateStr; }
+    };
 
     return (
         <div className="settings-page">
             <h2 style={{ marginBottom: 'var(--space-lg)' }}>{t('settings:title')}</h2>
 
+            {/* Baby Profile */}
+            {currentBaby && (
+                <div className="settings-group">
+                    <div className="settings-group-title">{t('settings:babyProfile.title')}</div>
+                    <div className="settings-row">
+                        <div className="settings-row-left">
+                            <div className="settings-icon-box blush">👶</div>
+                            <div>
+                                <div className="settings-row-label">{currentBaby.name}</div>
+                                <div className="settings-row-desc">{currentBaby.birth_date ? t('settings:babyProfile.born', { date: formatDob(currentBaby.birth_date) }) : ''}</div>
+                            </div>
+                        </div>
+                        <ChevronRight size={18} className="settings-arrow" />
+                    </div>
+                    <div className="settings-row" onClick={() => setActiveTab('health')}>
+                        <div className="settings-row-left">
+                            <div className="settings-icon-box butter">📈</div>
+                            <div>
+                                <div className="settings-row-label">{t('settings:babyProfile.growthData')}</div>
+                                <div className="settings-row-desc">{t('settings:babyProfile.growthDataDesc')}</div>
+                            </div>
+                        </div>
+                        <ChevronRight size={18} className="settings-arrow" />
+                    </div>
+                    <div className="settings-row">
+                        <div className="settings-row-left">
+                            <div className="settings-icon-box lavender">👶</div>
+                            <div>
+                                <div className="settings-row-label">{t('settings:babyProfile.addAnother')}</div>
+                                <div className="settings-row-desc">{t('settings:babyProfile.addAnotherDesc')}</div>
+                            </div>
+                        </div>
+                        <ChevronRight size={18} className="settings-arrow" />
+                    </div>
+                </div>
+            )}
+
             {/* Preferences */}
             <div className="settings-group">
                 <div className="settings-group-title">{t('settings:preferences.title')}</div>
+                <div className="settings-row" onClick={toggleNotifications}>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box sky">🔔</div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:preferences.notifications')}</div>
+                            <div className="settings-row-desc">{t('settings:preferences.notificationsDesc')}</div>
+                        </div>
+                    </div>
+                    <div className={`toggle-switch ${notifications ? 'active' : ''}`} />
+                </div>
                 <div className="settings-row" onClick={toggleTheme}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box peach">
@@ -50,6 +119,16 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     <div className={`toggle-switch ${isDark ? 'active' : ''}`} />
                 </div>
                 <LanguageSwitcher />
+                <div className="settings-row" onClick={toggleUnits}>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box mint">🌐</div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:preferences.units')}</div>
+                            <div className="settings-row-desc">{unitsSystem === 'metric' ? t('settings:preferences.unitsMetric') : t('settings:preferences.unitsImperial')}</div>
+                        </div>
+                    </div>
+                    <span className="settings-badge sky">{unitsSystem === 'metric' ? 'kg, cm, ml' : 'lbs, in, oz'}</span>
+                </div>
             </div>
 
             {/* Account */}
@@ -90,11 +169,16 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         <ChevronRight size={18} className="settings-arrow" />
                     )}
                 </div>
-            </div>
-
-            {/* Data */}
-            <div className="settings-group">
-                <div className="settings-group-title">{t('settings:data.title')}</div>
+                <div className="settings-row">
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box butter">👥</div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:account.caregivers')}</div>
+                            <div className="settings-row-desc">{t('settings:account.caregiversDesc')}</div>
+                        </div>
+                    </div>
+                    <span className="settings-badge lavender">{t('settings:account.comingSoon')}</span>
+                </div>
                 <div
                     className="settings-row"
                     onClick={isPremium ? handleExportCsv : onUpgrade}
@@ -118,6 +202,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             {/* Support */}
             <div className="settings-group">
                 <div className="settings-group-title">{t('settings:support.title')}</div>
+                <a className="settings-row" href="mailto:support@heybub.app" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box peach">📧</div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:support.contactUs')}</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
+                </a>
                 <button
                     className="settings-row"
                     onClick={() => setShowPrivacyPolicy(true)}
@@ -132,6 +225,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </button>
+                <div className="settings-row">
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box cloud">📋</div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:support.termsOfService')}</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
+                </div>
                 <button
                     className="settings-row settings-row-danger"
                     onClick={logout}
@@ -147,6 +249,8 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     <ChevronRight size={18} className="settings-arrow" />
                 </button>
             </div>
+
+            <p className="settings-version">HeyBub v1.0.0</p>
         </div>
     );
 }
@@ -369,6 +473,7 @@ function MainApp() {
                         logout={logout}
                         onUpgrade={() => setShowUpgradeDialog(true)}
                         onManage={handleManageSubscription}
+                        setActiveTab={setActiveTab}
                     />
                 )}
             </main>

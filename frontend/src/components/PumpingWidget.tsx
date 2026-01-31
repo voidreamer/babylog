@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../hooks/useUnits';
 
 
 function formatTimer(seconds: number): string {
@@ -19,6 +20,7 @@ const ACTIVE_PUMPING_KEY = 'activePumping';
 interface PumpingWidgetProps { lastPumping: any; onPumpingChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
 export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModal, quickActionsEnabled = true }: PumpingWidgetProps) {
     const { t } = useTranslation('dashboard');
+    const { formatVolume } = useUnits();
     const { selectedBaby } = useBaby();
     const [saving, setSaving] = useState(false);
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -144,7 +146,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                             <>
                                 <div className="widget-time-ago">{timeAgo}</div>
                                 <div className="widget-detail">
-                                    {lastPumping.amount_ml ? `${lastPumping.amount_ml}ml` : null}
+                                    {lastPumping.amount_ml ? formatVolume(lastPumping.amount_ml) : null}
                                 </div>
                             </>
                         ) : null}
@@ -159,7 +161,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                             <>
                                 <div className="widget-time-ago">{timeAgo}</div>
                                 <div className="widget-detail">
-                                    {lastPumping.amount_ml ? `${lastPumping.amount_ml}ml` : null}
+                                    {lastPumping.amount_ml ? formatVolume(lastPumping.amount_ml) : null}
                                 </div>
                             </>
                         ) : (

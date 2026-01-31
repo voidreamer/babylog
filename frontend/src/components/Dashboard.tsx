@@ -205,7 +205,6 @@ export default function Dashboard() {
                         lastSleep={dashboard?.last_sleep}
                         onSleepChange={loadData}
                         onOpenModal={() => setSleepModal(true)}
-                        totalSleepMinutes={dashboard?.daily_summary?.total_sleep_minutes || 0}
                     />
                 )}
 

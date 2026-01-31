@@ -90,7 +90,15 @@ export default function TipOfTheDay() {
                 )}
             </div>
             <button
-                onClick={() => {
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    localStorage.setItem(todayKey, '1');
+                    setDismissed(true);
+                }}
+                onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     localStorage.setItem(todayKey, '1');
                     setDismissed(true);
                 }}
@@ -98,9 +106,14 @@ export default function TipOfTheDay() {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    padding: '4px',
+                    padding: '8px',
                     opacity: 0.4,
                     flexShrink: 0,
+                    minWidth: '32px',
+                    minHeight: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                 }}
                 aria-label="Dismiss"
             >
