@@ -24,7 +24,7 @@
     "export": "Exportation de données",
     "exportDesc": "Télécharger en CSV",
     "exporting": "Exporter...",
-    "upgradeToExport": "Mise à niveau pour l'exportation",
+    "upgradeToExport": "Passer à l'exportation",
     "exportSuccess": "Exportation terminée ! Vérifiez votre dossier de téléchargements.",
     "exportFailed": "Échec de l'exportation",
     "noDataToExport": "Pas de données sur les bébés à exporter"
