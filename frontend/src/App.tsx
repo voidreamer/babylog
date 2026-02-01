@@ -26,8 +26,8 @@ import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
     const [notifications, setNotifications] = useState(() => localStorage.getItem('heybub-notifications') !== 'false');
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
@@ -197,6 +197,23 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="settings-group">
+                <div className="settings-group-title">Navigation</div>
+                <a className="settings-row" href={hubUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box sky">
+                            <ArrowLeft size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">Back to HeyBub Hub</div>
+                            <div className="settings-row-desc">Return to the main site</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
+                </a>
             </div>
 
             {/* Support */}
@@ -426,20 +443,7 @@ function MainApp() {
 
     return (
         <div className="app-container">
-            <header className="app-header">
-                <div className="header-left">
-                    <a href={buildHubUrl(session, theme)} className="hub-back-link">
-                        <ArrowLeft size={16} />
-                        <span>{t('hub')}</span>
-                    </a>
-                    <span className="header-title">{t('babyTracker')}</span>
-                </div>
-                <div className="header-actions">
-                    <button className="btn-icon theme-toggle" onClick={toggleTheme}>
-                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                    </button>
-                </div>
-            </header>
+            {/* Header removed — greeting is in BabyGreeting, dark mode in Settings, hub link in Settings */}
             <OfflineIndicator
                 online={online}
                 syncing={syncing}
@@ -474,6 +478,7 @@ function MainApp() {
                         onUpgrade={() => setShowUpgradeDialog(true)}
                         onManage={handleManageSubscription}
                         setActiveTab={setActiveTab}
+                        hubUrl={buildHubUrl(session, theme)}
                     />
                 )}
             </main>

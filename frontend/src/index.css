@@ -242,55 +242,7 @@ h4 {
    ============================================================================ */
 
 /* App Header */
-.app-header {
-  position: sticky;
-  top: 0;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  background: var(--background);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 50;
-  transition: background-color 0.3s ease;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.hub-back-link {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.hub-back-link:hover {
-  color: var(--text);
-  background: var(--surface);
-}
-
-.header-title {
-  font-family: var(--font-family-heading);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
+/* Header removed — hub link + dark mode now in Settings */
 
 .btn-icon {
   display: flex;
