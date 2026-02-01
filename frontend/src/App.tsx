@@ -21,13 +21,13 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Star, Sparkles, Download, Shield, ArrowLeft, Crown } from 'lucide-react';
 import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; hubUrl: string; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, hubUrl }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
 
     return (
@@ -113,6 +113,27 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="settings-group">
+                <div className="settings-group-title">{t('settings:navigation', 'Navigation')}</div>
+                <a
+                    className="settings-row"
+                    href={hubUrl}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box sky">
+                            <ArrowLeft size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:navigation.hubLink', 'Back to HeyBub Hub')}</div>
+                            <div className="settings-row-desc">{t('settings:navigation.hubLinkDesc', 'Return to the main hub')}</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
+                </a>
             </div>
 
             {/* Support */}
@@ -322,20 +343,7 @@ function MainApp() {
 
     return (
         <div className="app-container">
-            <header className="app-header">
-                <div className="header-left">
-                    <a href={buildHubUrl(session, theme)} className="hub-back-link">
-                        <ArrowLeft size={16} />
-                        <span>{t('hub')}</span>
-                    </a>
-                    <span className="header-title">{t('babyTracker')}</span>
-                </div>
-                <div className="header-actions">
-                    <button className="btn-icon theme-toggle" onClick={toggleTheme}>
-                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                    </button>
-                </div>
-            </header>
+            {/* Header removed — dark mode toggle and hub link are in Settings */}
             <OfflineIndicator
                 online={online}
                 syncing={syncing}
@@ -369,6 +377,7 @@ function MainApp() {
                         logout={logout}
                         onUpgrade={() => setShowUpgradeDialog(true)}
                         onManage={handleManageSubscription}
+                        hubUrl={buildHubUrl(session, theme)}
                     />
                 )}
             </main>
