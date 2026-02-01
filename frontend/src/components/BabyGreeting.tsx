@@ -7,6 +7,7 @@ import ShareModal from './ShareModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../hooks/useUnits';
 
 // Get time-based greeting
 function getGreeting() {
@@ -68,6 +69,7 @@ function getAvatarColor(name: string | null): string {
 interface BabyGreetingProps { summary: any; latestGrowth: any; }
 export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProps) {
     const { t } = useTranslation('dashboard');
+    const { formatWeight, formatLength } = useUnits();
     const { babies, selectedBaby, selectBaby, removeBaby, refresh } = useBaby();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -301,20 +303,17 @@ export default function BabyGreeting({ summary, latestGrowth }: BabyGreetingProp
                     <div className="baby-greeting-stats">
                         {latestGrowth.weight_kg && (
                             <div className="baby-stat-pill">
-                                <span className="baby-stat-value">{latestGrowth.weight_kg}</span>
-                                <span className="baby-stat-unit">kg</span>
+                                <span className="baby-stat-value">{formatWeight(latestGrowth.weight_kg)}</span>
                             </div>
                         )}
                         {latestGrowth.height_cm && (
                             <div className="baby-stat-pill">
-                                <span className="baby-stat-value">{latestGrowth.height_cm}</span>
-                                <span className="baby-stat-unit">cm</span>
+                                <span className="baby-stat-value">{formatLength(latestGrowth.height_cm)}</span>
                             </div>
                         )}
                         {latestGrowth.head_cm && (
                             <div className="baby-stat-pill">
-                                <span className="baby-stat-value">{latestGrowth.head_cm}</span>
-                                <span className="baby-stat-unit">{t('health:growth.head').toLowerCase()}</span>
+                                <span className="baby-stat-value">{formatLength(latestGrowth.head_cm)}</span>
                             </div>
                         )}
                     </div>

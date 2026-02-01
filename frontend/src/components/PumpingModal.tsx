@@ -6,12 +6,14 @@ import { Milk, Pencil, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { useUnits } from '../hooks/useUnits';
 
 // Helper to parse UTC time
 
 interface PumpingModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function PumpingModal({ babyId, editEvent, onClose, onSave }: PumpingModalProps) {
     const { t } = useTranslation('dashboard');
+    const { convertVolume, parseVolume, volumeUnit, isImperial } = useUnits();
     const isEditing = !!editEvent;
     const [mode, setMode] = useState('quick'); // 'quick' or 'timer'
     const [time, setTime] = useState(new Date());
@@ -32,7 +34,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             const details = editEvent.details;
             setTime(parseUTCTime(editEvent.time));
             if (details.duration_minutes) setDuration(String(details.duration_minutes));
-            if (details.amount_ml) setAmount(String(details.amount_ml));
+            if (details.amount_ml) setAmount(String(Math.round(convertVolume(details.amount_ml))));
             if (details.notes) setNotes(details.notes);
         }
     }, [editEvent]);
@@ -82,7 +84,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                 baby_id: babyId,
                 time: startTime!.toISOString(),
                 duration_minutes: Math.ceil(timerSeconds / 60),
-                amount_ml: amount ? parseInt(amount) : null,
+                amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
                 notes: notes || null,
             });
             onSave();
@@ -101,7 +103,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             baby_id: babyId,
             time: time.toISOString(),
             duration_minutes: duration ? parseInt(duration) : null,
-            amount_ml: amount ? parseInt(amount) : null,
+            amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
             notes: notes || null,
         };
 
@@ -204,7 +206,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                             {(timerRunning || timerSeconds > 0) && (
                                 <>
                                     <div className="form-group">
-                                        <label className="form-label">{t('feeding.amountMl')}</label>
+                                        <label className="form-label">{t('feeding.amount') + ' (' + volumeUnit + ')'}</label>
                                         <input
                                             type="number"
                                             className="form-input"
@@ -269,7 +271,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">{t('feeding.amountMl')}</label>
+                                    <label className="form-label">{t('feeding.amount') + ' (' + volumeUnit + ')'}</label>
                                     <input
                                         type="number"
                                         className="form-input"

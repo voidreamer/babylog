@@ -92,7 +92,8 @@
     "starting": "Commencer...",
     "startTime": "Heure de début",
     "endTime": "L'heure de la fin",
-    "saveChanges": "Enregistrer les modifications"
+    "saveChanges": "Enregistrer les modifications",
+    "goalLabel": "/ {{hours}}"
   },
   "pumping": {
     "title": "Pompage",
@@ -382,5 +383,54 @@
     "time": "L'heure",
     "notesOptional": "Notes (facultatif)",
     "notes": "Notes"
+  },
+  "sleepRing": {
+    "goal": "objectif"
+  },
+  "tipOfTheDay": {
+    "title": "Conseil du jour",
+    "tips": {
+      "tip_sleep_1": "Une routine cohérente à l'heure du coucher aide votre bébé à apprendre quand il est temps de dormir. Essayez le bain, le livre et la berceuse.",
+      "tip_sleep_2": "Les nouveau-nés dorment de 14 à 17 heures par jour, mais par petites périodes. C'est tout à fait normal !",
+      "tip_sleep_3": "Le bruit blanc peut aider votre bébé à dormir plus longtemps en masquant les bruits de la maison.",
+      "tip_sleep_4": "Les tout-petits ont encore besoin de 11 à 14 heures de sommeil, siestes comprises. Un horaire prévisible est utile.",
+      "tip_sleep_5": "L'emmaillotage peut aider les nouveau-nés à se sentir en sécurité et à mieux dormir. Cessez d'emmailloter votre bébé dès qu'il montre des signes de roulis.",
+      "tip_sleep_6": "Une chambre sombre et fraîche (20-22°C) crée un environnement idéal pour le sommeil.",
+      "tip_sleep_7": "Soyez attentif aux signes du sommeil : bâillements, frottements des yeux, agitation. Couchez le bébé somnolent mais éveillé.",
+      "tip_feeding_1": "Restez hydratés ! Les parents qui allaitent ont besoin de plus d'eau - gardez un biberon à portée de main pendant les tétées.",
+      "tip_feeding_2": "Il est normal pour les nouveau-nés d'avoir des tétées groupées le soir, ce qui permet d'établir la production de lait.",
+      "tip_feeding_3": "Vers 4-6 mois, votre bébé peut montrer des signes de préparation aux aliments solides : il s'assoit, montre de l'intérêt pour la nourriture.",
+      "tip_feeding_4": "Proposez des textures et des couleurs variées. Il faut parfois 10 à 15 essais avant qu'un bébé n'accepte un nouvel aliment.",
+      "tip_feeding_5": "Nourrissez-le à la demande - les nouveau-nés mangent généralement toutes les 2 ou 3 heures. Soyez attentif aux signes de faim tels que le fouissement et le claquement des lèvres.",
+      "tip_feeding_6": "Laissez votre tout-petit se nourrir lui-même lorsque c'est possible. Les repas salissants développent la motricité fine et l'indépendance !",
+      "tip_feeding_7": "Si vous nourrissez l'enfant au biberon, accélérez le rythme en tenant le biberon à l'horizontale et en faisant des pauses.",
+      "tip_dev_1": "Le temps passé sur le ventre permet de renforcer les muscles du cou et des épaules. Commencez par quelques minutes, plusieurs fois par jour.",
+      "tip_dev_2": "Parlez et chantez à votre bébé tout au long de la journée. L'exposition au langage dès le plus jeune âge permet de développer les connexions cérébrales.",
+      "tip_dev_3": "Lire ensemble tous les jours, ne serait-ce que 5 minutes, stimule considérablement le développement du langage.",
+      "tip_dev_4": "Les images très contrastées et les jouets colorés stimulent le développement visuel des jeunes bébés.",
+      "tip_dev_5": "Les tout-petits apprennent en jouant ! Des activités simples, comme l'empilage de blocs, développent leur capacité à résoudre des problèmes.",
+      "tip_dev_6": "Répondez aux gazouillis et aux babillages de votre bébé. Le fait de prendre son tour dans la \"conversation\" enseigne la communication.",
+      "tip_dev_7": "Le massage doux du nourrisson peut améliorer le lien affectif, la digestion et la qualité du sommeil.",
+      "tip_dev_8": "Encouragez les jeux en plein air - l'exploration de la nature favorise le développement sensoriel et la curiosité.",
+      "tip_safety_1": "Placez toujours votre bébé sur le dos pour dormir. Ne placez pas de couvertures, d'oreillers ou d'animaux en peluche dans le berceau.",
+      "tip_safety_2": "Protégez votre enfant lorsqu'il devient mobile. Mettez-vous à leur niveau pour repérer les dangers qui pourraient vous échapper.",
+      "tip_safety_3": "Ne laissez jamais votre bébé sans surveillance sur des surfaces surélevées, ne serait-ce qu'une seconde.",
+      "tip_safety_4": "Gardez les petits objets, les pièces de monnaie et les piles hors de portée. Les bébés explorent tout avec leur bouche.",
+      "tip_safety_5": "Vérifiez la température de l'eau avant le bain. Elle doit être tiède, mais pas chaude (environ 38°C).",
+      "tip_safety_6": "Fixez les meubles aux murs. Les tout-petits qui grimpent peuvent faire basculer les commodes et les bibliothèques.",
+      "tip_selfcare_1": "On ne peut pas verser de l'eau dans une tasse vide. Prendre soin de soi fait de vous un meilleur parent.",
+      "tip_selfcare_2": "Il est normal de demander de l'aide. Le rôle de parent n'est pas fait pour être exercé seul.",
+      "tip_selfcare_3": "Respirez profondément lorsque vous vous sentez dépassé. Même 60 secondes de calme aident à se réinitialiser.",
+      "tip_selfcare_4": "Dormez quand le bébé dort - la vaisselle peut attendre. Votre repos est important.",
+      "tip_selfcare_5": "Entrez en contact avec d'autres parents. Partager ses expériences permet de se sentir moins seul dans cette aventure.",
+      "tip_selfcare_6": "Célébrez les petites victoires ! Chaque jour, vous faites de votre mieux, et c'est suffisant.",
+      "tip_selfcare_7": "Sortez prendre l'air dès que vous le pouvez. Une petite promenade fait des merveilles pour la santé mentale."
+    },
+    "catSleep": "Sommeil",
+    "catFeeding": "Alimentation",
+    "catDevelopment": "Développement",
+    "catSafety": "Sécurité",
+    "catSelfCare": "Prendre soin de soi",
+    "ageContext": "Votre bébé a {{months}} mois"
   }
 }

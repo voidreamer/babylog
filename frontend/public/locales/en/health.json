@@ -142,7 +142,8 @@
     "given": "Given:",
     "nextDueField": "Next due:",
     "startField": "Start:",
-    "endField": "End:"
+    "endField": "End:",
+    "schedule": "Schedule"
   },
   "modals": {
     "editDoctorVisit": "Edit Doctor Visit",
@@ -234,5 +235,25 @@
   "toast_sickDayRemoved": "Sick day removed",
   "arialabel_deleteSickDay": "Delete sick day",
   "placeholder_tempC": "Temp °C",
-  "toast_toothRecordRemoved": "Tooth record removed"
+  "toast_toothRecordRemoved": "Tooth record removed",
+  "schedule": {
+    "progress": "Vaccination Progress",
+    "complete": "complete",
+    "done": "Done",
+    "overdue": "Overdue",
+    "upcoming": "Due Soon",
+    "future": "Upcoming",
+    "markDone": "Mark Done",
+    "confirm": "Confirm",
+    "scheduledAt": "Scheduled at",
+    "ages": {
+      "birth": "Birth",
+      "2months": "2 Months",
+      "4months": "4 Months",
+      "6months": "6 Months",
+      "12months": "12 Months",
+      "15months": "15 Months",
+      "18months": "18 Months"
+    }
+  }
 }

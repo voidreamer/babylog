@@ -92,7 +92,8 @@
     "starting": "Empezando...",
     "startTime": "Hora de inicio",
     "endTime": "Fin de los tiempos",
-    "saveChanges": "Guardar cambios"
+    "saveChanges": "Guardar cambios",
+    "goalLabel": "/ {{hours}}"
   },
   "pumping": {
     "title": "Bombeo",
@@ -197,7 +198,7 @@
   "timeline": {
     "noEventsToday": "Hoy no se ha registrado ningún evento",
     "noEventsRecorded": "Ningún evento registrado",
-    "addFromDashboard": "Añada actividades desde el panel de control para verlas aquí",
+    "addFromDashboard": "Añadir actividades desde el cuadro de mandos para verlas aquí",
     "inProgress": "en curso",
     "sleeping": "Durmiendo...",
     "edit": "Editar",
@@ -382,5 +383,54 @@
     "time": "Tiempo",
     "notesOptional": "Notas (opcional)",
     "notes": "Notas"
+  },
+  "sleepRing": {
+    "goal": "meta"
+  },
+  "tipOfTheDay": {
+    "title": "Consejo del día",
+    "tips": {
+      "tip_sleep_1": "Una rutina constante a la hora de acostarse ayuda a tu bebé a aprender cuándo es la hora de dormir. Prueba con baño, libro y nana.",
+      "tip_sleep_2": "Los recién nacidos duermen entre 14 y 17 horas al día, pero a ratos. Es completamente normal.",
+      "tip_sleep_3": "El ruido blanco puede ayudar a tu bebé a dormir más tiempo al enmascarar los sonidos domésticos.",
+      "tip_sleep_4": "Los niños pequeños siguen necesitando entre 11 y 14 horas de sueño, incluidas las siestas. Un horario predecible ayuda.",
+      "tip_sleep_5": "Envolver al recién nacido puede ayudarle a sentirse seguro y a dormir mejor. Deje de envolver al bebé cuando muestre signos de estar rodando.",
+      "tip_sleep_6": "Una habitación oscura y fresca (20-22 °C) crea el entorno ideal para dormir.",
+      "tip_sleep_7": "Presta atención a las señales de sueño: bostezos, frotarse los ojos, inquietud. Acuesta al bebé somnoliento pero despierto.",
+      "tip_feeding_1": "Mantente hidratado Los padres que amamantan a sus hijos necesitan un aporte extra de agua.",
+      "tip_feeding_2": "La alimentación en racimos por la noche es normal para los recién nacidos y ayuda a establecer el suministro de leche.",
+      "tip_feeding_3": "Alrededor de los 4-6 meses, tu bebé puede mostrar signos de estar preparado para comer sólidos: sentarse, mostrar interés por la comida.",
+      "tip_feeding_4": "Ofrézcale una variedad de texturas y colores. El bebé puede tardar entre 10 y 15 intentos en aceptar un nuevo alimento.",
+      "tip_feeding_5": "Los recién nacidos suelen comer cada 2-3 horas. Preste atención a las señales de hambre, como el hociqueo y el chasquido de labios.",
+      "tip_feeding_6": "Deje que su hijo se alimente solo siempre que sea posible. Las comidas desordenadas fomentan la motricidad fina y la independencia.",
+      "tip_feeding_7": "Si se alimenta al bebé con biberón, hay que mantenerlo en posición horizontal y hacer pausas.",
+      "tip_dev_1": "El tiempo boca abajo ayuda a fortalecer los músculos del cuello y los hombros. Empieza con unos minutos, varias veces al día.",
+      "tip_dev_2": "Háblale y cántale a lo largo del día. La exposición temprana al lenguaje crea conexiones cerebrales.",
+      "tip_dev_3": "Leer juntos a diario, aunque sólo sea 5 minutos, favorece considerablemente el desarrollo del lenguaje.",
+      "tip_dev_4": "Las imágenes de alto contraste y los juguetes de colores estimulan el desarrollo visual de los bebés.",
+      "tip_dev_5": "Los niños pequeños aprenden jugando. Actividades sencillas como apilar bloques les ayudan a resolver problemas.",
+      "tip_dev_6": "Responde a los arrullos y balbuceos de tu bebé. Los turnos de \"conversación\" enseñan a comunicarse.",
+      "tip_dev_7": "Un suave masaje infantil puede mejorar el vínculo afectivo, la digestión y la calidad del sueño.",
+      "tip_dev_8": "Fomentar el juego al aire libre: la exploración de la naturaleza favorece el desarrollo sensorial y la curiosidad.",
+      "tip_safety_1": "Coloca siempre al bebé boca arriba para dormir. Mantén la cuna libre de mantas, almohadas y peluches.",
+      "tip_safety_2": "A prueba de bebés a medida que su hijo se desplaza. Ponte a su altura para detectar los peligros que podrías pasar por alto.",
+      "tip_safety_3": "Nunca dejes al bebé desatendido en superficies elevadas, ni siquiera por un segundo.",
+      "tip_safety_4": "Mantén los objetos pequeños, las monedas y las pilas fuera de su alcance. Los bebés lo exploran todo con la boca.",
+      "tip_safety_5": "Comprueba la temperatura del agua antes del baño. Debe estar templada, no caliente (alrededor de 38 °C).",
+      "tip_safety_6": "Sujeta los muebles a la pared. Los niños que trepan pueden volcar cómodas y estanterías.",
+      "tip_selfcare_1": "No se puede servir de una taza vacía. Cuidar de ti mismo te convierte en mejor padre.",
+      "tip_selfcare_2": "No pasa nada por pedir ayuda. La crianza de los hijos no es para hacerla solo.",
+      "tip_selfcare_3": "Respira hondo cuando te sientas abrumado. Incluso 60 segundos de calma ayudan a restablecer la calma.",
+      "tip_selfcare_4": "Duerme cuando duerma el bebé: los platos pueden esperar. Tu descanso es importante.",
+      "tip_selfcare_5": "Conéctate con otros padres. Compartir experiencias te ayuda a sentirte menos solo en este viaje.",
+      "tip_selfcare_6": "Celebra las pequeñas victorias Cada día lo haces lo mejor que puedes, y eso es suficiente.",
+      "tip_selfcare_7": "Salga a tomar el aire cuando pueda. Un breve paseo hace maravillas por la salud mental."
+    },
+    "catSleep": "Dormir",
+    "catFeeding": "Alimentación",
+    "catDevelopment": "Desarrollo",
+    "catSafety": "Seguridad",
+    "catSelfCare": "Autocuidado",
+    "ageContext": "Tu bebé tiene {{months}} meses"
   }
 }

@@ -1,11 +1,24 @@
 {
   "title": "Settings",
+  "babyProfile": {
+    "title": "Baby Profile",
+    "born": "Born {{date}}",
+    "growthData": "Growth Data",
+    "growthDataDesc": "Update weight, height",
+    "addAnother": "Add Another Baby",
+    "addAnotherDesc": "Track multiple children"
+  },
   "preferences": {
     "title": "Preferences",
+    "notifications": "Notifications",
+    "notificationsDesc": "Feeding, nap reminders",
     "darkMode": "Dark Mode",
     "darkModeDesc": "Easier on eyes at night",
     "language": "Language",
-    "languageDesc": "Choose your language"
+    "languageDesc": "Choose your language",
+    "units": "Units",
+    "unitsMetric": "Metric (kg, cm, ml)",
+    "unitsImperial": "Imperial (lbs, in, oz)"
   },
   "account": {
     "title": "Account",
@@ -17,7 +30,10 @@
       "activeManage": "Active — Manage subscription",
       "activePromo": "Active — Promo code",
       "unlock": "Unlock AI insights & more"
-    }
+    },
+    "caregivers": "Caregivers",
+    "caregiversDesc": "Share with family",
+    "comingSoon": "Coming soon"
   },
   "data": {
     "title": "Data",
@@ -31,8 +47,18 @@
   },
   "support": {
     "title": "Support",
+    "contactUs": "Contact Us",
     "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
     "signOut": "Sign Out"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "in": "in",
+    "ml": "ml",
+    "oz": "oz"
   },
   "upgrade": {
     "title": "Upgrade to Premium",

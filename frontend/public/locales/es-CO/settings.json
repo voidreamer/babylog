@@ -1,11 +1,24 @@
 {
   "title": "Ajustes",
+  "babyProfile": {
+    "title": "Perfil del bebé",
+    "born": "Nacido {{date}}",
+    "growthData": "Datos de crecimiento",
+    "growthDataDesc": "Actualizar peso, altura",
+    "addAnother": "Añadir otro bebé",
+    "addAnotherDesc": "Seguimiento de varios niños"
+  },
   "preferences": {
     "title": "Preferencias",
+    "notifications": "Notificaciones",
+    "notificationsDesc": "Recordatorios de alimentación y siesta",
     "darkMode": "Modo oscuro",
     "darkModeDesc": "Más cómodo para los ojos por la noche",
     "language": "Idioma",
-    "languageDesc": "Elija su idioma"
+    "languageDesc": "Elija su idioma",
+    "units": "Unidades",
+    "unitsMetric": "Sistema métrico (kg, cm, ml)",
+    "unitsImperial": "Imperial (lbs, in, oz)"
   },
   "account": {
     "title": "Cuenta",
@@ -17,7 +30,10 @@
       "activeManage": "Activo - Gestionar la suscripción",
       "activePromo": "Activo - Código promocional",
       "unlock": "Descubra la inteligencia artificial y mucho más"
-    }
+    },
+    "caregivers": "Cuidadores",
+    "caregiversDesc": "Compartir con la familia",
+    "comingSoon": "Próximamente"
   },
   "data": {
     "title": "Datos",
@@ -31,14 +47,24 @@
   },
   "support": {
     "title": "Ayuda",
+    "contactUs": "Póngase en contacto con nosotros",
     "privacyPolicy": "Política de privacidad",
+    "termsOfService": "Condiciones de uso",
     "signOut": "Cerrar sesión"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "in": "en",
+    "ml": "ml",
+    "oz": "oz"
   },
   "upgrade": {
     "title": "Pasar a Premium",
     "subtitle": "Desbloquea todas las funciones",
     "features": {
-      "insights": "Información sobre bebés basada en IA",
+      "insights": "Información sobre bebés basada en inteligencia artificial",
       "export": "Exportar datos como CSV",
       "more": "Y pronto más..."
     },
@@ -63,7 +89,7 @@
     "justPerMonth": "Sólo 1,25 $ al mes",
     "redirecting": "Redirigiendo...",
     "startTrial": "Iniciar prueba gratuita de 7 días",
-    "cancelAnytime": "Cancele en cualquier momento - Sin compromiso",
+    "cancelAnytime": "Cancele cuando quiera - Sin compromiso",
     "restorePurchase": "Restaurar compra",
     "premiumFeature": "Característica Premium",
     "upgradeToUnlock": "Actualizar para desbloquear {{feature}}",

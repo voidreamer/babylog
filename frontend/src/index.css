@@ -242,55 +242,7 @@ h4 {
    ============================================================================ */
 
 /* App Header */
-.app-header {
-  position: sticky;
-  top: 0;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  background: var(--background);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 50;
-  transition: background-color 0.3s ease;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.hub-back-link {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.hub-back-link:hover {
-  color: var(--text);
-  background: var(--surface);
-}
-
-.header-title {
-  font-family: var(--font-family-heading);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
+/* Header removed — hub link + dark mode now in Settings */
 
 .btn-icon {
   display: flex;
@@ -402,6 +354,8 @@ h4 {
 .settings-icon-box.sky { background: var(--sleep-bg); color: var(--sleep); }
 .settings-icon-box.mint { background: var(--diaper-bg); color: var(--diaper); }
 .settings-icon-box.danger { background: rgba(248, 168, 168, 0.3); color: var(--danger); }
+.settings-icon-box.blush { background: rgba(255, 182, 193, 0.3); color: #e75480; }
+.settings-icon-box.cloud { background: rgba(200, 210, 230, 0.3); color: #6b7fa0; }
 
 .settings-row-label {
   font-weight: 600;
@@ -429,6 +383,8 @@ h4 {
 
 .settings-badge.mint { background: var(--diaper-bg); color: var(--diaper); }
 .settings-badge.lavender { background: var(--potty-bg); color: var(--potty); }
+.settings-badge.sky { background: var(--sleep-bg); color: var(--sleep); }
+.settings-version { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin: var(--space-lg) 0 var(--space-xl); }
 
 .settings-promo-row {
   display: flex;
@@ -1142,6 +1098,97 @@ h4 {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--widget-text, var(--sleep));
+}
+
+/* Sleep Progress Ring */
+.sleep-progress-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px auto 4px;
+  width: 64px;
+  height: 64px;
+}
+
+.sleep-progress-ring svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.sleep-progress-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  z-index: 1;
+}
+
+.sleep-progress-value {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--widget-text, var(--text));
+}
+
+.sleep-progress-goal {
+  font-size: 0.5rem;
+  opacity: 0.7;
+  color: var(--widget-text, var(--text-secondary));
+}
+
+/* Tip of the Day */
+.tip-of-the-day {
+  background: var(--card-bg, var(--surface));
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-md, 16px);
+  margin-bottom: var(--space-md, 16px);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  position: relative;
+}
+
+.tip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xs, 8px);
+}
+
+.tip-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 8px);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.tip-title svg {
+  color: #f59e0b;
+}
+
+.tip-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.tip-dismiss:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.tip-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* Feeding Widget - Stateful */
@@ -5523,6 +5570,216 @@ h4 {
   color: var(--text-muted);
   margin-left: auto;
   margin-right: var(--space-sm);
+}
+
+/* Vaccination Schedule */
+.vaccination-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.vax-progress {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.vax-progress-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.vax-progress-count {
+  margin-left: auto;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.vax-progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.vax-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+.vax-progress-percent {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+  text-align: right;
+}
+
+.vax-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  font-size: 0.75rem;
+}
+
+.vax-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.vax-legend-item.vaccine-done { color: #16a34a; background: rgba(22, 163, 74, 0.1); }
+.vax-legend-item.vaccine-overdue { color: #dc2626; background: rgba(220, 38, 38, 0.1); }
+.vax-legend-item.vaccine-upcoming { color: #d97706; background: rgba(217, 119, 6, 0.1); }
+.vax-legend-item.vaccine-future { color: var(--text-muted); background: var(--bg); }
+
+.vax-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.vax-group {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--border);
+  overflow: hidden;
+}
+
+.vax-group-done { border-left-color: #16a34a; }
+.vax-group-overdue { border-left-color: #dc2626; }
+.vax-group-current { border-left-color: #d97706; background: rgba(217, 119, 6, 0.04); }
+
+.vax-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+}
+
+.vax-group-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 70px;
+}
+
+.vax-group-age {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.vax-group-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.vax-group-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.vax-pill {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.vax-pill.vaccine-done { background: rgba(22, 163, 74, 0.15); color: #16a34a; }
+.vax-pill.vaccine-overdue { background: rgba(220, 38, 38, 0.15); color: #dc2626; }
+.vax-pill.vaccine-upcoming { background: rgba(217, 119, 6, 0.15); color: #d97706; }
+.vax-pill.vaccine-future { background: var(--surface); color: var(--text-muted); }
+
+.vax-group-details {
+  padding: 0 var(--space-md) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.vax-detail-item {
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.vax-detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.vax-detail-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.vax-status-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.vax-status-badge.vaccine-done { background: rgba(22, 163, 74, 0.12); color: #16a34a; }
+.vax-status-badge.vaccine-overdue { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
+.vax-status-badge.vaccine-upcoming { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+.vax-status-badge.vaccine-future { background: var(--bg); color: var(--text-muted); }
+
+.vax-detail-item.vaccine-done .vax-detail-header { color: #16a34a; }
+.vax-detail-item.vaccine-overdue .vax-detail-header { color: #dc2626; }
+.vax-detail-item.vaccine-upcoming .vax-detail-header { color: #d97706; }
+.vax-detail-item.vaccine-future .vax-detail-header { color: var(--text-muted); }
+
+.vax-mark-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-xs);
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  background: rgba(212, 132, 156, 0.12);
+  border: 1px solid rgba(212, 132, 156, 0.3);
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.vax-mark-btn:hover {
+  background: rgba(212, 132, 156, 0.25);
+}
+
+.vax-mark-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.vax-mark-form .record-date-input {
+  font-size: 0.8rem;
+  padding: 4px 8px;
 }
 
 /* Medications */
