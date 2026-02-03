@@ -51,7 +51,7 @@
     "supplement": "Supplément"
   },
   "time": {
-    "justNow": "A l'instant",
+    "justNow": "A l'heure actuelle",
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "today": "Aujourd'hui",

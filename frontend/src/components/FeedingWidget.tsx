@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatTimeAgo } from '../utils/formatTime';
 import { useState, useEffect, useRef } from 'react';
-import { Baby, Play, Square, Plus } from 'lucide-react';
+import { Baby, Play, Square, Plus, Milk } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -110,6 +110,32 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
         }
     };
 
+    // Quick action handlers for one-tap logging
+    const [quickSaving, setQuickSaving] = useState<string | null>(null);
+
+    const handleQuickLog = async (type: 'breast' | 'formula' | 'bottle', amountMl: number | null, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setQuickSaving(type);
+        try {
+            await api.createFeeding({
+                baby_id: babyId,
+                time: new Date().toISOString(),
+                type,
+                duration_minutes: null,
+                amount_ml: amountMl,
+                notes: null,
+            });
+            const label = type === 'breast' ? t('feeding.breast') : type === 'formula' ? t('feeding.formula') : t('feeding.breastBottle');
+            toast.success(t('feeding.quickLogged', { type: label }));
+            onFeedingChange();
+        } catch (error) {
+            console.error('Failed to log feeding:', error);
+            toast.error(t('toast_failedToSaveFeeding'));
+        } finally {
+            setQuickSaving(null);
+        }
+    };
+
     const isFeeding = !!activeFeeding;
 
     // Calculate end time from time + duration for "time ago" display
@@ -178,15 +204,45 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                         </button>
                     </div>
                 ) : (
-                    /* Simple display without quick actions */
+                    /* Display with quick actions */
                     <div className="feeding-widget-idle">
                         {lastFeeding ? (
                             <>
                                 <div className="widget-time-ago">{timeAgo}</div>
                                 <div className="widget-detail">{getLastFeedingDetail()}</div>
                             </>
-                        ) : (
+                        ) : !quickActionsEnabled ? (
                             <div className="widget-time-ago">{t('feeding.noFeedingsYet')}</div>
+                        ) : null}
+
+                        {/* Quick action buttons */}
+                        {quickActionsEnabled && (
+                            <div className="feeding-quick-btns">
+                                <button
+                                    className="feeding-quick-btn breast"
+                                    onClick={(e) => handleQuickLog('breast', null, e)}
+                                    disabled={quickSaving !== null}
+                                >
+                                    <Baby size={14} />
+                                    {quickSaving === 'breast' ? '...' : t('feeding.breast')}
+                                </button>
+                                <button
+                                    className="feeding-quick-btn formula"
+                                    onClick={(e) => handleQuickLog('formula', 60, e)}
+                                    disabled={quickSaving !== null}
+                                >
+                                    <Milk size={14} />
+                                    {quickSaving === 'formula' ? '...' : t('feeding.formula')}
+                                </button>
+                                <button
+                                    className="feeding-quick-btn bottle"
+                                    onClick={(e) => handleQuickLog('bottle', 60, e)}
+                                    disabled={quickSaving !== null}
+                                >
+                                    <Milk size={14} />
+                                    {quickSaving === 'bottle' ? '...' : t('feeding.breastBottle')}
+                                </button>
+                            </div>
                         )}
                     </div>
                 )}

@@ -35,7 +35,9 @@
     "startedAt": "Started at {{time}}",
     "stop": "Stop",
     "noFeedingsYet": "No feedings yet",
-    "feedingLogged": "Feeding logged ({{duration}} min)"
+    "feedingLogged": "Feeding logged ({{duration}} min)",
+    "breastBottle": "Breast Bottle",
+    "quickLogged": "{{type}} logged"
   },
   "diaper": {
     "title": "Diaper",

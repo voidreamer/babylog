@@ -35,7 +35,9 @@
     "startedAt": "Iniciado en {{time}}",
     "stop": "Stop",
     "noFeedingsYet": "Aún no se ha alimentado",
-    "feedingLogged": "Alimentación registrada ({{duration}} min)"
+    "feedingLogged": "Alimentación registrada ({{duration}} min)",
+    "breastBottle": "Biberón",
+    "quickLogged": "{{type}} registrado"
   },
   "diaper": {
     "title": "Pañales",
@@ -123,7 +125,7 @@
     "both": "Ambos",
     "successLabel": "✓ Éxito",
     "attemptLabel": "~ Attempt",
-    "accidentLabel": "✗ Accidente",
+    "accidentLabel": "Accidente",
     "noPottyYet": "Aún no hay registros de orinales",
     "pottyLogged": "Orinal {{result}} registrado",
     "yes": "Sí",
@@ -254,12 +256,12 @@
     "oneTapButtons": "Botones de un toque en los widgets"
   },
   "insights": {
-    "selectBaby": "Selecciona un bebé para ver sus perspectivas",
+    "selectBaby": "Selecciona un bebé para ver sus características",
     "analyzingPatterns": "Analizar patrones...",
     "unableToLoad": "No se puede cargar la información",
     "collectingData": "Recopilación de datos",
     "collectingDataDesc": "Siga haciendo el seguimiento unos días más. Necesitamos al menos 3-5 días de datos para identificar patrones y hacer predicciones.",
-    "dataPoints": "Puntos de datos: {{feedings}} comidas, {{sleeps}} sueños",
+    "dataPoints": "Puntos de datos: {{feedings}} comidas, {{sleeps}} sueño",
     "predictions": "Predicciones",
     "nextFeeding": "Próxima alimentación",
     "nextNap": "Siguiente siesta",
@@ -400,8 +402,8 @@
       "tip_feeding_1": "Mantente hidratado Los padres que amamantan a sus hijos necesitan un aporte extra de agua.",
       "tip_feeding_2": "La alimentación en racimos por la noche es normal para los recién nacidos y ayuda a establecer el suministro de leche.",
       "tip_feeding_3": "Alrededor de los 4-6 meses, tu bebé puede mostrar signos de estar preparado para comer sólidos: sentarse, mostrar interés por la comida.",
-      "tip_feeding_4": "Ofrézcale una variedad de texturas y colores. El bebé puede tardar entre 10 y 15 intentos en aceptar un nuevo alimento.",
-      "tip_feeding_5": "Los recién nacidos suelen comer cada 2-3 horas. Preste atención a las señales de hambre, como el hociqueo y el chasquido de labios.",
+      "tip_feeding_4": "Ofrezca una variedad de texturas y colores. El bebé puede tardar entre 10 y 15 intentos en aceptar un nuevo alimento.",
+      "tip_feeding_5": "Los recién nacidos suelen comer cada 2-3 horas. Esté atento a las señales de hambre, como el hociqueo y el chasquido de labios.",
       "tip_feeding_6": "Deje que su hijo se alimente solo siempre que sea posible. Las comidas desordenadas fomentan la motricidad fina y la independencia.",
       "tip_feeding_7": "Si se alimenta al bebé con biberón, hay que mantenerlo en posición horizontal y hacer pausas.",
       "tip_dev_1": "El tiempo boca abajo ayuda a fortalecer los músculos del cuello y los hombros. Empieza con unos minutos, varias veces al día.",
@@ -424,7 +426,7 @@
       "tip_selfcare_4": "Duerme cuando duerma el bebé: los platos pueden esperar. Tu descanso es importante.",
       "tip_selfcare_5": "Conéctate con otros padres. Compartir experiencias te ayuda a sentirte menos solo en este viaje.",
       "tip_selfcare_6": "Celebra las pequeñas victorias Cada día lo haces lo mejor que puedes, y eso es suficiente.",
-      "tip_selfcare_7": "Salga a tomar el aire cuando pueda. Un breve paseo hace maravillas por la salud mental."
+      "tip_selfcare_7": "Salga a tomar el aire cuando pueda. Un corto paseo hace maravillas por la salud mental."
     },
     "catSleep": "Dormir",
     "catFeeding": "Alimentación",
