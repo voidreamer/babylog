@@ -237,7 +237,7 @@
   "placeholder_tempC": "Temp °C",
   "toast_toothRecordRemoved": "Registro dental eliminado",
   "schedule": {
-    "progress": "Avance de la vacunación",
+    "progress": "Progresos en la vacunación",
     "complete": "completa",
     "done": "Hecho",
     "overdue": "Atrasado",

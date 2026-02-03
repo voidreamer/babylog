@@ -36,7 +36,7 @@
     "stop": "Arrêter",
     "noFeedingsYet": "Pas encore de tétée",
     "feedingLogged": "Alimentation enregistrée ({{duration}} min)",
-    "breastBottle": "Biberon Maternel",
+    "breastBottle": "Biberon",
     "quickLogged": "{{type}} enregistré"
   },
   "diaper": {
@@ -400,7 +400,7 @@
       "tip_sleep_6": "Une chambre sombre et fraîche (20-22°C) crée un environnement idéal pour le sommeil.",
       "tip_sleep_7": "Soyez attentif aux signes du sommeil : bâillements, frottements des yeux, agitation. Couchez le bébé somnolent mais éveillé.",
       "tip_feeding_1": "Restez hydratés ! Les parents qui allaitent ont besoin de plus d'eau - gardez un biberon à portée de main pendant les tétées.",
-      "tip_feeding_2": "Il est normal pour les nouveau-nés d'avoir des tétées groupées le soir, ce qui permet d'établir la production de lait.",
+      "tip_feeding_2": "Les tétées groupées le soir sont normales pour les nouveau-nés et aident à établir la production de lait.",
       "tip_feeding_3": "Vers 4-6 mois, votre bébé peut montrer des signes de préparation aux aliments solides : il s'assoit, montre de l'intérêt pour la nourriture.",
       "tip_feeding_4": "Proposez des textures et des couleurs variées. Il faut parfois 10 à 15 essais avant qu'un bébé n'accepte un nouvel aliment.",
       "tip_feeding_5": "Nourrissez-le à la demande - les nouveau-nés mangent généralement toutes les 2 ou 3 heures. Soyez attentif aux signes de faim tels que le fouissement et le claquement des lèvres.",
