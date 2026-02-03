@@ -1688,7 +1688,7 @@ h4 {
   border: 2px solid var(--border);
   border-radius: var(--radius-md);
   font-family: var(--font-family);
-  font-size: 0.95rem;
+  font-size: 16px; /* Prevents iOS Safari zoom on focus */
   background: var(--surface);
   color: var(--text);
   transition: var(--transition);
