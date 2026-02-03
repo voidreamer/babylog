@@ -35,7 +35,9 @@
     "startedAt": "Iniciado en {{time}}",
     "stop": "Stop",
     "noFeedingsYet": "Aún no se ha alimentado",
-    "feedingLogged": "Alimentación registrada ({{duration}} min)"
+    "feedingLogged": "Alimentación registrada ({{duration}} min)",
+    "breastBottle": "Biberón Materno",
+    "quickLogged": "{{type}} registrado"
   },
   "diaper": {
     "title": "Pañales",

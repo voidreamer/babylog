@@ -35,7 +35,9 @@
     "startedAt": "Commencé à {{time}}",
     "stop": "Arrêter",
     "noFeedingsYet": "Pas encore de tétée",
-    "feedingLogged": "Alimentation enregistrée ({{duration}} min)"
+    "feedingLogged": "Alimentation enregistrée ({{duration}} min)",
+    "breastBottle": "Biberon Maternel",
+    "quickLogged": "{{type}} enregistré"
   },
   "diaper": {
     "title": "Couche",
