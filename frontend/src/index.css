@@ -1353,6 +1353,45 @@ h4 {
   background: #f59e0b;
 }
 
+/* Supplement quick action buttons */
+.supplement-quick-btns {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: auto;
+}
+
+.supplement-quick-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  background: var(--widget-stroke, var(--supplement));
+  color: white;
+}
+
+.supplement-quick-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.supplement-quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.supplement-quick-btn.vitamin-d {
+  background: #f97316;
+}
+
 /* ============================================================================
    Coming Up
    ============================================================================ */

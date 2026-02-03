@@ -72,8 +72,22 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                             <div className="widget-time-ago">{timeAgo}</div>
                             <div className="widget-detail">{supplementLabel}</div>
                         </>
-                    ) : (
+                    ) : !quickActionsEnabled ? (
                         <div className="widget-time-ago">{t('supplement.noSupplementsYet')}</div>
+                    ) : null}
+
+                    {/* Quick action button */}
+                    {quickActionsEnabled && (
+                        <div className="supplement-quick-btns">
+                            <button
+                                className="supplement-quick-btn vitamin-d"
+                                onClick={handleQuickLog}
+                                disabled={saving}
+                            >
+                                <Check size={14} />
+                                {saving ? '...' : t('supplement.vitaminD')}
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
