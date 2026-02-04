@@ -11,15 +11,17 @@ import {
     Tooltip,
 } from 'recharts';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../../data/whoGrowthData';
-import { differenceInMonths } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
-// Calculate age in months from birth date to measurement date
+// Calculate age in fractional months from birth date to measurement date
+// Uses days to avoid truncation (6 weeks = ~1.4 months, not 1)
 function getAgeMonths(birthDate: string, measurementDate: string): number {
-    const birth = new Date(birthDate);
-    const measurement = new Date(measurementDate);
-    return differenceInMonths(measurement, birth);
+    const birth = new Date(birthDate + 'T00:00:00');
+    const measurement = new Date(measurementDate + 'T00:00:00');
+    const days = differenceInDays(measurement, birth);
+    return Math.round((days / 30.4375) * 10) / 10; // 1 decimal place
 }
 
 interface HealthGrowthChartProps { baby: any; growthRecords: any[]; }
@@ -100,7 +102,11 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
 
         return (
             <div className="growth-chart-tooltip">
-                <div className="growth-chart-tooltip-title">{data.ageMonths} months</div>
+                <div className="growth-chart-tooltip-title">
+                    {Number.isInteger(data.ageMonths)
+                        ? `${data.ageMonths} months`
+                        : `${(data.ageMonths * 30.4375 / 7).toFixed(0)} weeks`}
+                </div>
                 {data.babyValue && (
                     <div className="growth-chart-tooltip-baby">
                         {t('growth.baby', { value: data.babyValue, unit })}
@@ -161,7 +167,8 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                                 dataKey="ageMonths"
                                 stroke="var(--text-muted)"
                                 tick={{ fontSize: 12 }}
-                                tickFormatter={(v) => `${v}m`}
+                                tickFormatter={(v) => Number.isInteger(v) ? `${v}m` : ''}
+                                ticks={whoData.map(d => d.months)}
                             />
 
                             <YAxis
@@ -215,7 +222,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                                 stroke="var(--primary)"
                                 strokeWidth={2}
                                 dot={{ fill: 'var(--primary)', strokeWidth: 2, r: 5 }}
-                                connectNulls={false}
+                                connectNulls={true}
                             />
                         </ComposedChart>
                     </ResponsiveContainer>

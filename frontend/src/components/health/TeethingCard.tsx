@@ -86,7 +86,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
             await api.createTooth({
                 baby_id: baby.id,
                 position: selectedTooth.position,
-                emerged_date: new Date(emergedDate).toISOString(),
+                emerged_date: emergedDate,
             });
             toast.success(`${selectedTooth.name} marked as emerged!`);
             setSelectedTooth(null);

@@ -75,7 +75,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
         try {
             const data = {
                 baby_id: baby.id,
-                date: new Date(formData.date).toISOString(),
+                date: formData.date,
                 symptoms: formData.symptoms,
                 temperature: formData.temperature ? parseTemp(parseFloat(formData.temperature)) : null,
                 notes: formData.notes || null,

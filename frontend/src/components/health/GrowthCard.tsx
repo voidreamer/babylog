@@ -94,7 +94,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
         try {
             const data = {
                 baby_id: baby.id,
-                recorded_date: new Date().toISOString(),
+                recorded_date: new Date().toISOString().split('T')[0],
                 weight_kg: formData.weight ? parseWeight(parseFloat(formData.weight)) : null,
                 height_cm: formData.height ? parseLength(parseFloat(formData.height)) : null,
                 head_cm: formData.head ? parseLength(parseFloat(formData.head)) : null,

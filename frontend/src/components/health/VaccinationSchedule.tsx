@@ -113,7 +113,7 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
         baby_id: baby.id,
         vaccine_name: vaccineName,
         dose_number: doseNumber,
-        given_date: new Date(markDate).toISOString(),
+        given_date: markDate,
         next_due_date: null,
         administered_by: null,
         notes: `${t('schedule.scheduledAt')} ${t(`schedule.ages.${ageGroup.ageKey}`)}`,
