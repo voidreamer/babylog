@@ -11,7 +11,7 @@ import {
     Tooltip,
 } from 'recharts';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../../data/whoGrowthData';
-import { differenceInDays } from 'date-fns';
+import { differenceInMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
@@ -21,13 +21,9 @@ function toLocalDate(dateStr: string): Date {
     return new Date(datePart + 'T12:00:00');
 }
 
-// Calculate age in fractional months from birth date to measurement date
-// Uses days to avoid truncation (6 weeks = ~1.4 months, not 1)
+// Calculate age in whole months from birth date to measurement date
 function getAgeMonths(birthDate: string, measurementDate: string): number {
-    const birth = toLocalDate(birthDate);
-    const measurement = toLocalDate(measurementDate);
-    const days = differenceInDays(measurement, birth);
-    return Math.round((days / 30.4375) * 10) / 10; // 1 decimal place
+    return differenceInMonths(toLocalDate(measurementDate), toLocalDate(birthDate));
 }
 
 interface HealthGrowthChartProps { baby: any; growthRecords: any[]; }
@@ -51,7 +47,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     const babyData = useMemo(() => {
         if (!growthRecords || !birthDate) return [];
 
-        return growthRecords
+        const points = growthRecords
             .filter(r => metric === 'weight' ? r.weight_kg : r.height_cm)
             .map(r => ({
                 ageMonths: getAgeMonths(birthDate, r.recorded_date),
@@ -60,6 +56,13 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
             }))
             .filter(r => r.ageMonths >= 0 && r.ageMonths <= 24)
             .sort((a, b) => a.ageMonths - b.ageMonths);
+
+        // Keep only the latest entry per month
+        const byMonth = new Map<number, typeof points[0]>();
+        for (const p of points) {
+            byMonth.set(p.ageMonths, p);
+        }
+        return Array.from(byMonth.values()).sort((a, b) => a.ageMonths - b.ageMonths);
     }, [growthRecords, birthDate, metric]);
 
     const conv = metric === 'weight' ? convertWeight : convertLength;
@@ -108,11 +111,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
 
         return (
             <div className="growth-chart-tooltip">
-                <div className="growth-chart-tooltip-title">
-                    {Number.isInteger(data.ageMonths)
-                        ? `${data.ageMonths} months`
-                        : `${(data.ageMonths * 30.4375 / 7).toFixed(0)} weeks`}
-                </div>
+                <div className="growth-chart-tooltip-title">{data.ageMonths} months</div>
                 {data.babyValue && (
                     <div className="growth-chart-tooltip-baby">
                         {t('growth.baby', { value: data.babyValue, unit })}
@@ -173,8 +172,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                                 dataKey="ageMonths"
                                 stroke="var(--text-muted)"
                                 tick={{ fontSize: 12 }}
-                                tickFormatter={(v) => Number.isInteger(v) ? `${v}m` : ''}
-                                ticks={whoData.map(d => d.months)}
+                                tickFormatter={(v) => `${v}m`}
                             />
 
                             <YAxis
