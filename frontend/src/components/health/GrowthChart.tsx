@@ -15,11 +15,17 @@ import { differenceInDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
+// Parse a date string safely, handling both "YYYY-MM-DD" and full ISO timestamps
+function toLocalDate(dateStr: string): Date {
+    const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    return new Date(datePart + 'T12:00:00');
+}
+
 // Calculate age in fractional months from birth date to measurement date
 // Uses days to avoid truncation (6 weeks = ~1.4 months, not 1)
 function getAgeMonths(birthDate: string, measurementDate: string): number {
-    const birth = new Date(birthDate + 'T00:00:00');
-    const measurement = new Date(measurementDate + 'T00:00:00');
+    const birth = toLocalDate(birthDate);
+    const measurement = toLocalDate(measurementDate);
     const days = differenceInDays(measurement, birth);
     return Math.round((days / 30.4375) * 10) / 10; // 1 decimal place
 }
