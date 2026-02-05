@@ -28,7 +28,9 @@
     "fiftiethPercentile": "50e percentile",
     "thirdToNinetySeventh": "3e-97e gamme",
     "baby": "Bébé : {{value}} {{unit}}",
-    "refPercentile": "50ème percentile : {{value}} {{unit}}"
+    "refPercentile": "50ème percentile : {{value}} {{unit}}",
+    "month": "Mois",
+    "current": "actuel"
   },
   "milestones": {
     "title": "Jalons",
@@ -141,7 +143,7 @@
     },
     "given": "Compte tenu de ce qui précède :",
     "nextDueField": "Prochaine échéance :",
-    "startField": "Démarrage :",
+    "startField": "Début :",
     "endField": "Fin :",
     "schedule": "Calendrier"
   },
@@ -180,7 +182,7 @@
   "arialabel_deleteAllergy": "Supprimer l'allergie",
   "placeholder_allergenEgPeanuts": "Allergènes (par exemple, arachides)",
   "placeholder_reactionEgHivesSwelling": "Réaction (par exemple, urticaire, gonflement)",
-  "placeholder_additionalNotes": "Notes supplémentaires...",
+  "placeholder_additionalNotes": "Notes complémentaires...",
   "toast_pleaseEnterAtLeastOneMeasurement": "Veuillez indiquer au moins une mesure",
   "toast_growthRecorded": "Croissance enregistrée !",
   "placeholder_kg": "kg",

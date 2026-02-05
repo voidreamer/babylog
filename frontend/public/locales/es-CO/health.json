@@ -28,7 +28,9 @@
     "fiftiethPercentile": "percentil 50",
     "thirdToNinetySeventh": "3ª-97ª gama",
     "baby": "Bebé: {{value}} {{unit}}",
-    "refPercentile": "Percentil 50: {{value}} {{unit}}"
+    "refPercentile": "Percentil 50: {{value}} {{unit}}",
+    "month": "Mes",
+    "current": "actual"
   },
   "milestones": {
     "title": "Hitos",
