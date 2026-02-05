@@ -28,7 +28,9 @@
     "fiftiethPercentile": "50th percentile",
     "thirdToNinetySeventh": "3rd-97th range",
     "baby": "Baby: {{value}} {{unit}}",
-    "refPercentile": "50th percentile: {{value}} {{unit}}"
+    "refPercentile": "50th percentile: {{value}} {{unit}}",
+    "month": "Month",
+    "current": "current"
   },
   "milestones": {
     "title": "Milestones",
