@@ -111,7 +111,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
 
         return (
             <div className="growth-chart-tooltip">
-                <div className="growth-chart-tooltip-title">{data.ageMonths} months</div>
+                <div className="growth-chart-tooltip-title">{data.ageMonths} {t('growth.months')}</div>
                 {data.babyValue && (
                     <div className="growth-chart-tooltip-baby">
                         {t('growth.baby', { value: data.babyValue, unit })}

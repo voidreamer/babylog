@@ -30,6 +30,7 @@
     "baby": "Bebé: {{value}} {{unit}}",
     "refPercentile": "Percentil 50: {{value}} {{unit}}",
     "month": "Mes",
+    "months": "meses",
     "current": "actual"
   },
   "milestones": {

@@ -32,8 +32,8 @@ describe('Timeline', () => {
 
   it('renders timeline events', () => {
     render(<Timeline events={mockTimelineEvents} />);
-    expect(screen.getByText(/Feeding - breast/)).toBeInTheDocument();
-    expect(screen.getByText(/Diaper - pee/)).toBeInTheDocument();
+    expect(screen.getByText(/Feeding - Breast/)).toBeInTheDocument();
+    expect(screen.getByText(/Diaper - Pee/)).toBeInTheDocument();
   });
 
   it('shows sleep duration', () => {

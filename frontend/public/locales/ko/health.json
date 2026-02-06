@@ -30,6 +30,7 @@
     "baby": "Baby: {{value}} {{unit}}",
     "refPercentile": "50th percentile: {{value}} {{unit}}",
     "month": "Month",
+    "months": "개월",
     "current": "current"
   },
   "milestones": {
