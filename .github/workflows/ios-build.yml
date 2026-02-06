@@ -79,7 +79,7 @@ jobs:
           ls -lh "$APP_PATH"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios-simulator-build-${{ github.sha }}
           path: frontend/ios/App/build/**/App.app
