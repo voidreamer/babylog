@@ -25,7 +25,8 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                 poo_amount: null,
                 notes: null,
             });
-            toast.success(t('diaper.diaperLogged', { type: type.charAt(0).toUpperCase() + type.slice(1) }));
+            const diaperTypeLabel = ({ pee: t('diaper.pee'), poo: t('diaper.poo'), mixed: t('diaper.both') } as Record<string, string>)[type] || type;
+            toast.success(t('diaper.diaperLogged', { type: diaperTypeLabel }));
             onDiaperChange();
         } catch (error) {
             console.error('Failed to log diaper:', error);

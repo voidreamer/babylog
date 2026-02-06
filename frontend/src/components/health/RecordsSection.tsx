@@ -99,13 +99,13 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
         try {
             const data = {
                 baby_id: baby.id,
-                visit_date: new Date(formData.visit_date).toISOString(),
+                visit_date: formData.visit_date,
                 visit_type: formData.visit_type,
                 doctor_name: formData.doctor_name || null,
                 weight_kg: formData.weight_kg ? parseWeight(parseFloat(formData.weight_kg)) : null,
                 height_cm: formData.height_cm ? parseLength(parseFloat(formData.height_cm)) : null,
                 head_cm: formData.head_cm ? parseLength(parseFloat(formData.head_cm)) : null,
-                next_visit_date: formData.next_visit_date ? new Date(formData.next_visit_date).toISOString() : null,
+                next_visit_date: formData.next_visit_date || null,
                 notes: formData.notes || null,
             };
 
@@ -301,9 +301,9 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                 baby_id: baby.id,
                 vaccine_name: formData.vaccine_name.trim(),
                 dose_number: parseInt(formData.dose_number) || 1,
-                given_date: new Date(formData.given_date).toISOString(),
+                given_date: formData.given_date,
                 next_due_date: formData.next_due_date
-                    ? new Date(formData.next_due_date).toISOString()
+                    ? formData.next_due_date
                     : null,
                 administered_by: formData.administered_by || null,
                 notes: formData.notes || null,
@@ -509,9 +509,9 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                 medication_name: formData.medication_name.trim(),
                 dosage: formData.dosage || null,
                 frequency: formData.frequency || null,
-                start_date: new Date(formData.start_date).toISOString(),
+                start_date: formData.start_date,
                 end_date: formData.end_date
-                    ? new Date(formData.end_date).toISOString()
+                    ? formData.end_date
                     : null,
                 is_active: true,
                 notes: formData.notes || null,

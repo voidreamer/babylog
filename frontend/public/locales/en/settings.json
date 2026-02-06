@@ -45,6 +45,11 @@
     "exportFailed": "Export failed",
     "noDataToExport": "No baby data to export"
   },
+  "navigation": {
+    "title": "Navigation",
+    "backToHub": "Back to HeyBub Hub",
+    "backToHubDesc": "Return to the main site"
+  },
   "support": {
     "title": "Support",
     "contactUs": "Contact Us",

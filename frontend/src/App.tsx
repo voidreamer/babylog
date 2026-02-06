@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
 import { useOfflineSync } from './hooks/useOfflineSync';
+import { useAnalytics } from './hooks/useAnalytics';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
 import TimelineCalendar from './components/TimelineCalendar';
@@ -34,8 +35,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
     const currentBaby = babies?.[0];
 
-    const toggleNotifications = () => {
+    const toggleNotifications = async () => {
+        const { subscribeToPush, unsubscribeFromPush } = await import('./utils/pushNotifications');
         const next = !notifications;
+        if (next) {
+            const ok = await subscribeToPush();
+            if (!ok) return; // Permission denied or not supported
+        } else {
+            await unsubscribeFromPush();
+        }
         setNotifications(next);
         localStorage.setItem('heybub-notifications', String(next));
     };
@@ -68,7 +76,6 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                                 <div className="settings-row-desc">{currentBaby.birth_date ? t('settings:babyProfile.born', { date: formatDob(currentBaby.birth_date) }) : ''}</div>
                             </div>
                         </div>
-                        <ChevronRight size={18} className="settings-arrow" />
                     </div>
                     <div className="settings-row" onClick={() => setActiveTab('health')}>
                         <div className="settings-row-left">
@@ -80,7 +87,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         </div>
                         <ChevronRight size={18} className="settings-arrow" />
                     </div>
-                    <div className="settings-row">
+                    <div className="settings-row" onClick={() => setActiveTab('home')}>
                         <div className="settings-row-left">
                             <div className="settings-icon-box lavender">👶</div>
                             <div>
@@ -201,15 +208,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
             {/* Navigation */}
             <div className="settings-group">
-                <div className="settings-group-title">Navigation</div>
+                <div className="settings-group-title">{t('settings:navigation.title')}</div>
                 <a className="settings-row" href={hubUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
                             <ArrowLeft size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Back to HeyBub Hub</div>
-                            <div className="settings-row-desc">Return to the main site</div>
+                            <div className="settings-row-label">{t('settings:navigation.backToHub')}</div>
+                            <div className="settings-row-desc">{t('settings:navigation.backToHubDesc')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -242,7 +249,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </button>
-                <div className="settings-row">
+                <a className="settings-row" href="https://heybub.app/terms" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box cloud">📋</div>
                         <div>
@@ -250,7 +257,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
-                </div>
+                </a>
                 <button
                     className="settings-row settings-row-danger"
                     onClick={logout}
@@ -307,6 +314,7 @@ function MainApp() {
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
+    const { track, trackPageView } = useAnalytics();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
@@ -360,6 +368,10 @@ function MainApp() {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
     }, [theme]);
+
+    useEffect(() => {
+        trackPageView(activeTab);
+    }, [activeTab, trackPageView]);
 
     useEffect(() => {
         const checkPremiumStatus = async () => {

@@ -50,7 +50,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                 severity: formData.severity,
                 reaction: formData.reaction || null,
                 discovered_date: formData.discovered_date
-                    ? new Date(formData.discovered_date).toISOString()
+                    ? formData.discovered_date
                     : null,
                 notes: formData.notes || null,
             };

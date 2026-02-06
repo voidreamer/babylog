@@ -15,11 +15,15 @@ import { differenceInMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
-// Calculate age in months from birth date to measurement date
+// Parse a date string safely, handling both "YYYY-MM-DD" and full ISO timestamps
+function toLocalDate(dateStr: string): Date {
+    const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    return new Date(datePart + 'T12:00:00');
+}
+
+// Calculate age in whole months from birth date to measurement date
 function getAgeMonths(birthDate: string, measurementDate: string): number {
-    const birth = new Date(birthDate);
-    const measurement = new Date(measurementDate);
-    return differenceInMonths(measurement, birth);
+    return differenceInMonths(toLocalDate(measurementDate), toLocalDate(birthDate));
 }
 
 interface HealthGrowthChartProps { baby: any; growthRecords: any[]; }
@@ -43,7 +47,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     const babyData = useMemo(() => {
         if (!growthRecords || !birthDate) return [];
 
-        return growthRecords
+        const points = growthRecords
             .filter(r => metric === 'weight' ? r.weight_kg : r.height_cm)
             .map(r => ({
                 ageMonths: getAgeMonths(birthDate, r.recorded_date),
@@ -52,6 +56,13 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
             }))
             .filter(r => r.ageMonths >= 0 && r.ageMonths <= 24)
             .sort((a, b) => a.ageMonths - b.ageMonths);
+
+        // Keep only the latest entry per month
+        const byMonth = new Map<number, typeof points[0]>();
+        for (const p of points) {
+            byMonth.set(p.ageMonths, p);
+        }
+        return Array.from(byMonth.values()).sort((a, b) => a.ageMonths - b.ageMonths);
     }, [growthRecords, birthDate, metric]);
 
     const conv = metric === 'weight' ? convertWeight : convertLength;
@@ -100,7 +111,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
 
         return (
             <div className="growth-chart-tooltip">
-                <div className="growth-chart-tooltip-title">{data.ageMonths} months</div>
+                <div className="growth-chart-tooltip-title">{data.ageMonths} {t('growth.months')}</div>
                 {data.babyValue && (
                     <div className="growth-chart-tooltip-baby">
                         {t('growth.baby', { value: data.babyValue, unit })}
@@ -215,7 +226,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                                 stroke="var(--primary)"
                                 strokeWidth={2}
                                 dot={{ fill: 'var(--primary)', strokeWidth: 2, r: 5 }}
-                                connectNulls={false}
+                                connectNulls={true}
                             />
                         </ComposedChart>
                     </ResponsiveContainer>

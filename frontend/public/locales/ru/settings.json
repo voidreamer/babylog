@@ -1,0 +1,107 @@
+{
+  "title": "Настройки",
+  "babyProfile": {
+    "title": "Профиль малыша",
+    "born": "Родился(ась) {{date}}",
+    "growthData": "Данные о росте",
+    "growthDataDesc": "Обновить вес, рост",
+    "addAnother": "Добавить ещё малыша",
+    "addAnotherDesc": "Отслеживать нескольких детей"
+  },
+  "preferences": {
+    "title": "Настройки",
+    "notifications": "Уведомления",
+    "notificationsDesc": "Напоминания о кормлении, сне",
+    "darkMode": "Тёмная тема",
+    "darkModeDesc": "Удобно для глаз ночью",
+    "language": "Язык",
+    "languageDesc": "Выберите язык",
+    "units": "Единицы измерения",
+    "unitsMetric": "Метрические (kg, cm, ml)",
+    "unitsImperial": "Имперские (lbs, in, oz)"
+  },
+  "account": {
+    "title": "Аккаунт",
+    "signedIn": "Вы вошли",
+    "premiumMember": "Премиум-пользователь ⭐",
+    "premium": {
+      "title": "Премиум-план",
+      "active": "Активен",
+      "activeManage": "Активен — Управление подпиской",
+      "activePromo": "Активен — Промокод",
+      "unlock": "Откройте ИИ-аналитику и многое другое"
+    },
+    "caregivers": "Опекуны",
+    "caregiversDesc": "Поделиться с семьёй",
+    "comingSoon": "Скоро"
+  },
+  "data": {
+    "title": "Данные",
+    "export": "Экспорт данных",
+    "exportDesc": "Скачать в формате CSV",
+    "exporting": "Экспорт...",
+    "upgradeToExport": "Обновите для экспорта",
+    "exportSuccess": "Экспорт завершён! Проверьте папку загрузок.",
+    "exportFailed": "Ошибка экспорта",
+    "noDataToExport": "Нет данных для экспорта"
+  },
+  "navigation": {
+    "title": "Навигация",
+    "backToHub": "Вернуться в HeyBub Hub",
+    "backToHubDesc": "Перейти на главный сайт"
+  },
+  "support": {
+    "title": "Поддержка",
+    "contactUs": "Связаться с нами",
+    "privacyPolicy": "Политика конфиденциальности",
+    "termsOfService": "Условия использования",
+    "signOut": "Выйти"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "in": "in",
+    "ml": "ml",
+    "oz": "oz"
+  },
+  "upgrade": {
+    "title": "Перейти на Премиум",
+    "subtitle": "Откройте все функции",
+    "features": {
+      "insights": "ИИ-аналитика для малыша",
+      "export": "Экспорт данных в CSV",
+      "more": "И многое другое скоро..."
+    },
+    "promoCode": "Промокод",
+    "promoPlaceholder": "Введите промокод",
+    "applyPromo": "Применить",
+    "subscribe": "Подписаться",
+    "manageSub": "Не удалось открыть управление подпиской.",
+    "heyBubPremium": "HeyBub Премиум",
+    "premiumFeatures": {
+      "insights": "ИИ-аналитика и прогнозы для малыша",
+      "growth": "Графики роста с перцентилями ВОЗ",
+      "export": "Экспорт всех данных (CSV)",
+      "share": "Доступ для неограниченного числа опекунов",
+      "multiple": "Отслеживание нескольких детей",
+      "support": "Приоритетная поддержка"
+    },
+    "limitedTime": "ОГРАНИЧЕННОЕ ВРЕМЯ · СКИДКА 50%",
+    "bestValue": "ЛУЧШАЯ ЦЕНА",
+    "perMonth": "в месяц",
+    "perYear": "в год",
+    "justPerMonth": "Всего $1.25/мес",
+    "redirecting": "Перенаправление…",
+    "startTrial": "Начать 7-дневный бесплатный период",
+    "cancelAnytime": "Отмена в любое время · Без обязательств",
+    "restorePurchase": "Восстановить покупку",
+    "premiumFeature": "Премиум-функция",
+    "upgradeToUnlock": "Обновите подписку, чтобы открыть {{feature}}",
+    "upgradeBtn": "Обновить"
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "Не удалось начать оформление. Пожалуйста, попробуйте снова.",
+  "toast_premiumRestoredReloading": "Премиум восстановлен! Перезагрузка…",
+  "toast_noActiveSubscriptionFoundForThisAc": "Активная подписка для этого аккаунта не найдена.",
+  "toast_couldNotCheckSubscription": "Не удалось проверить подписку."
+}

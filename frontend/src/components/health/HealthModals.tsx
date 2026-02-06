@@ -38,13 +38,13 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
         try {
             const data = {
                 baby_id: babyId,
-                visit_date: new Date(visitDate).toISOString(),
+                visit_date: visitDate,
                 visit_type: visitType,
                 doctor_name: doctorName || null,
                 weight_kg: weight ? parseFloat(weight) : null,
                 height_cm: height ? parseFloat(height) : null,
                 head_cm: head ? parseFloat(head) : null,
-                next_visit_date: nextVisitDate ? new Date(nextVisitDate).toISOString() : null,
+                next_visit_date: nextVisitDate ? nextVisitDate : null,
                 notes: notes || null,
             };
 
@@ -145,9 +145,9 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
                 baby_id: babyId,
                 vaccine_name: vaccineName,
                 dose_number: doseNumber,
-                given_date: new Date(givenDate).toISOString(),
+                given_date: givenDate,
                 administered_by: administeredBy || null,
-                next_due_date: nextDueDate ? new Date(nextDueDate).toISOString() : null,
+                next_due_date: nextDueDate ? nextDueDate : null,
                 notes: notes || null,
             };
 
@@ -232,7 +232,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
                 medication_name: medicationName,
                 dosage: dosage || null,
                 frequency: frequency || null,
-                start_date: new Date(startDate).toISOString(),
+                start_date: startDate,
                 is_active: editData ? editData.is_active : true,
                 notes: notes || null,
             };
@@ -314,7 +314,7 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
             const data = {
                 baby_id: babyId,
                 milestone_type: milestoneType === 'Other' ? customType : milestoneType,
-                achieved_date: new Date(achievedDate).toISOString(),
+                achieved_date: achievedDate,
                 notes: notes || null,
             };
 
@@ -393,7 +393,7 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
         try {
             const data = {
                 baby_id: babyId,
-                recorded_date: new Date(recordedDate).toISOString(),
+                recorded_date: recordedDate,
                 weight_kg: weight ? parseFloat(weight) : null,
                 height_cm: height ? parseFloat(height) : null,
                 head_cm: head ? parseFloat(head) : null,

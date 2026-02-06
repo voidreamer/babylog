@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
-
-const LANGUAGE_CODES = ['en', 'es-CO', 'fr-CA'] as const;
+import { LANGUAGES } from '../i18n/languages';
 
 export default function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
@@ -32,11 +31,12 @@ export default function LanguageSwitcher() {
           color: 'var(--text)',
           fontSize: 13,
           cursor: 'pointer',
+          maxWidth: 160,
         }}
       >
-        {LANGUAGE_CODES.map((code) => (
+        {LANGUAGES.map(({ code, nativeName }) => (
           <option key={code} value={code}>
-            {t(`common:language.${code}`)}
+            {nativeName}
           </option>
         ))}
       </select>

@@ -33,7 +33,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             const data = {
                 baby_id: baby.id,
                 milestone_type: formData.milestone.trim(),
-                achieved_date: new Date(formData.date).toISOString(),
+                achieved_date: formData.date,
             };
 
             await api.createMilestone(data);

@@ -151,9 +151,14 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
     // Get display text for last feeding
     const getLastFeedingDetail = () => {
         if (!lastFeeding) return null;
-        const type = lastFeeding.type === 'bottle' || lastFeeding.type === 'breastmilk_bottle'
-            ? t('feeding.bottle')
-            : lastFeeding.type.charAt(0).toUpperCase() + lastFeeding.type.slice(1);
+        const typeMap: Record<string, string> = {
+            breast: t('feeding.breast'),
+            bottle: t('feeding.bottle'),
+            breastmilk_bottle: t('feeding.breastBottle'),
+            formula: t('feeding.formula'),
+            solid: t('feeding.solid'),
+        };
+        const type = typeMap[lastFeeding.type] || lastFeeding.type;
         return lastFeeding.duration_minutes ? `${type} • ${lastFeeding.duration_minutes}min` : type;
     };
 

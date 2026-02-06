@@ -1,17 +1,17 @@
 # iOS Simulator Build
 # Builds the Capacitor iOS app for simulator testing (no signing required)
-# Runs on push to staging/main and PRs
+# Runs on push to main and PRs
 
 name: iOS Build
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main]
     paths:
       - 'frontend/**'
       - '.github/workflows/ios-build.yml'
   pull_request:
-    branches: [main, staging]
+    branches: [main]
     paths:
       - 'frontend/**'
       - '.github/workflows/ios-build.yml'

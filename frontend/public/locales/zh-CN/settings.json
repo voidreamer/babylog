@@ -1,0 +1,107 @@
+{
+  "title": "设置",
+  "babyProfile": {
+    "title": "宝宝资料",
+    "born": "出生于 {{date}}",
+    "growthData": "生长数据",
+    "growthDataDesc": "更新体重、身高",
+    "addAnother": "添加另一个宝宝",
+    "addAnotherDesc": "追踪多个孩子"
+  },
+  "preferences": {
+    "title": "偏好设置",
+    "notifications": "通知",
+    "notificationsDesc": "喂养、小睡提醒",
+    "darkMode": "深色模式",
+    "darkModeDesc": "夜间护眼",
+    "language": "语言",
+    "languageDesc": "选择您的语言",
+    "units": "单位",
+    "unitsMetric": "公制 (kg, cm, ml)",
+    "unitsImperial": "英制 (lbs, in, oz)"
+  },
+  "account": {
+    "title": "账户",
+    "signedIn": "已登录",
+    "premiumMember": "高级会员 ⭐",
+    "premium": {
+      "title": "高级计划",
+      "active": "已激活",
+      "activeManage": "已激活 — 管理订阅",
+      "activePromo": "已激活 — 促销码",
+      "unlock": "解锁 AI 洞察及更多功能"
+    },
+    "caregivers": "看护人",
+    "caregiversDesc": "与家人共享",
+    "comingSoon": "即将推出"
+  },
+  "data": {
+    "title": "数据",
+    "export": "导出数据",
+    "exportDesc": "下载为 CSV",
+    "exporting": "导出中...",
+    "upgradeToExport": "升级以导出",
+    "exportSuccess": "导出完成！请查看下载文件夹。",
+    "exportFailed": "导出失败",
+    "noDataToExport": "没有宝宝数据可导出"
+  },
+  "navigation": {
+    "title": "导航",
+    "backToHub": "返回 HeyBub Hub",
+    "backToHubDesc": "返回主站"
+  },
+  "support": {
+    "title": "支持",
+    "contactUs": "联系我们",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款",
+    "signOut": "退出登录"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "in": "in",
+    "ml": "ml",
+    "oz": "oz"
+  },
+  "upgrade": {
+    "title": "升级到高级版",
+    "subtitle": "解锁所有功能",
+    "features": {
+      "insights": "AI 智能宝宝洞察",
+      "export": "导出数据为 CSV",
+      "more": "更多功能即将推出..."
+    },
+    "promoCode": "促销码",
+    "promoPlaceholder": "输入促销码",
+    "applyPromo": "使用",
+    "subscribe": "订阅",
+    "manageSub": "无法打开订阅管理。",
+    "heyBubPremium": "HeyBub 高级版",
+    "premiumFeatures": {
+      "insights": "AI 智能宝宝洞察与预测",
+      "growth": "含 WHO 百分位的生长曲线",
+      "export": "导出所有数据 (CSV)",
+      "share": "与无限看护人共享",
+      "multiple": "追踪多个宝宝",
+      "support": "优先客服支持"
+    },
+    "limitedTime": "限时优惠 · 5折",
+    "bestValue": "超值推荐",
+    "perMonth": "每月",
+    "perYear": "每年",
+    "justPerMonth": "仅 $1.25/月",
+    "redirecting": "跳转中…",
+    "startTrial": "开始7天免费试用",
+    "cancelAnytime": "随时取消 · 无需承诺",
+    "restorePurchase": "恢复购买",
+    "premiumFeature": "高级功能",
+    "upgradeToUnlock": "升级以解锁 {{feature}}",
+    "upgradeBtn": "升级"
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "无法开始结账，请重试。",
+  "toast_premiumRestoredReloading": "高级版已恢复！正在重新加载…",
+  "toast_noActiveSubscriptionFoundForThisAc": "未找到此账户的有效订阅。",
+  "toast_couldNotCheckSubscription": "无法检查订阅状态。"
+}

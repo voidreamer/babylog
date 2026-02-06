@@ -1,0 +1,74 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import Icon from '../components/Icon';
+
+describe('Icon', () => {
+  it('renders image for valid icon name', () => {
+    render(<Icon name="feeding" />);
+    const img = screen.getByRole('img', { name: 'feeding' });
+    expect(img).toBeInTheDocument();
+  });
+
+  it('returns null for unknown icon name', () => {
+    const { container } = render(<Icon name="nonexistent" />);
+    expect(container.innerHTML).toBe('');
+  });
+
+  it('uses correct src path', () => {
+    render(<Icon name="diaper" />);
+    const img = screen.getByRole('img', { name: 'diaper' });
+    expect(img).toHaveAttribute('src', '/icons/diaper.png');
+  });
+
+  it('uses correct src path for each known icon', () => {
+    const { rerender } = render(<Icon name="feeding" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/feeding.png');
+
+    rerender(<Icon name="sleep" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/sleep.png');
+
+    rerender(<Icon name="pumping" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/pumping.png');
+
+    rerender(<Icon name="logo" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/logo.png');
+  });
+
+  it('applies default size of 32', () => {
+    render(<Icon name="feeding" />);
+    const img = screen.getByRole('img');
+    expect(img).toHaveAttribute('width', '32');
+    expect(img).toHaveAttribute('height', '32');
+  });
+
+  it('applies custom size', () => {
+    render(<Icon name="feeding" size={64} />);
+    const img = screen.getByRole('img');
+    expect(img).toHaveAttribute('width', '64');
+    expect(img).toHaveAttribute('height', '64');
+  });
+
+  it('applies custom className', () => {
+    render(<Icon name="feeding" className="my-custom-class" />);
+    const img = screen.getByRole('img');
+    expect(img).toHaveClass('my-custom-class');
+  });
+
+  it('sets border radius to 8px when size is 40 or less', () => {
+    render(<Icon name="feeding" size={32} />);
+    const img = screen.getByRole('img');
+    expect(img.style.borderRadius).toBe('8px');
+  });
+
+  it('sets border radius to 8px when size is exactly 40', () => {
+    render(<Icon name="feeding" size={40} />);
+    const img = screen.getByRole('img');
+    expect(img.style.borderRadius).toBe('8px');
+  });
+
+  it('sets border radius to 12px when size is greater than 40', () => {
+    render(<Icon name="feeding" size={48} />);
+    const img = screen.getByRole('img');
+    expect(img.style.borderRadius).toBe('12px');
+  });
+});

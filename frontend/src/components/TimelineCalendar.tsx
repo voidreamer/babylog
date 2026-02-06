@@ -280,14 +280,14 @@ export default function TimelineCalendar() {
             case 'feeding':
                 let feedType = details.type || '';
                 // Format the type for display
-                if (feedType === 'breastmilk_bottle') {
-                    feedType = t('timeline.breastmilkBottle');
-                } else if (feedType === 'bottle') {
-                    // Legacy data - treat as breastmilk bottle
-                    feedType = t('timeline.breastmilkBottle');
-                } else {
-                    feedType = feedType.charAt(0).toUpperCase() + feedType.slice(1);
-                }
+                const feedTypeMap: Record<string, string> = {
+                    breast: t('feeding.breast'),
+                    bottle: t('timeline.breastmilkBottle'),
+                    breastmilk_bottle: t('timeline.breastmilkBottle'),
+                    formula: t('feeding.formula'),
+                    solid: t('feeding.solid'),
+                };
+                feedType = feedTypeMap[feedType] || feedType;
                 const duration = details.duration_minutes ? ` • ${details.duration_minutes}min` : '';
                 return feedType + duration;
             case 'diaper':
@@ -305,14 +305,14 @@ export default function TimelineCalendar() {
                 const pumpParts = [];
                 if (details.duration_minutes) pumpParts.push(`${details.duration_minutes}min`);
                 if (details.amount_ml) pumpParts.push(`${details.amount_ml}ml`);
-                return pumpParts.join(' • ') || 'Pumping';
+                return pumpParts.join(' • ') || t('pumping.title');
             case 'potty':
                 const resultLabel = ({ success: t('potty.success'), attempt: t('timeline.attempt') } as Record<string, string>)[details.result] || details.result || '';
                 return resultLabel;
             case 'tummy':
-                return details.duration_minutes ? `Tummy Time • ${details.duration_minutes}min` : 'Tummy Time';
+                return details.duration_minutes ? `${t('tummyTime.title')} • ${details.duration_minutes}min` : t('tummyTime.title');
             case 'bath':
-                return details.notes ? `Bath • ${details.notes}` : 'Bath';
+                return details.notes ? `${t('bath.title')} • ${details.notes}` : t('bath.title');
             case 'supplement':
                 const supName = details.name ? details.name.replace('_', ' ') : t('supplement.title');
                 const supNameFormatted = supName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');

@@ -45,6 +45,11 @@
     "exportFailed": "Error de exportación",
     "noDataToExport": "No hay datos de bebés para exportar"
   },
+  "navigation": {
+    "title": "Navegación",
+    "backToHub": "Volver a HeyBub Hub",
+    "backToHubDesc": "Regresar al sitio principal"
+  },
   "support": {
     "title": "Ayuda",
     "contactUs": "Póngase en contacto con nosotros",
@@ -64,7 +69,7 @@
     "title": "Pasar a Premium",
     "subtitle": "Desbloquea todas las funciones",
     "features": {
-      "insights": "Información sobre bebés basada en inteligencia artificial",
+      "insights": "Información sobre bebés basada en IA",
       "export": "Exportar datos como CSV",
       "more": "Y pronto más..."
     },
@@ -89,7 +94,7 @@
     "justPerMonth": "Sólo 1,25 $ al mes",
     "redirecting": "Redirigiendo...",
     "startTrial": "Iniciar prueba gratuita de 7 días",
-    "cancelAnytime": "Cancele cuando quiera - Sin compromiso",
+    "cancelAnytime": "Cancele en cualquier momento - Sin compromiso",
     "restorePurchase": "Restaurar compra",
     "premiumFeature": "Característica Premium",
     "upgradeToUnlock": "Actualizar para desbloquear {{feature}}",

@@ -8,7 +8,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .config import get_settings
 from .database import engine, Base
-from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export, billing
+from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export, billing, tracking, notifications, photos
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -62,6 +62,33 @@ app.include_router(subscription.router)
 app.include_router(admin.router)
 app.include_router(export.router)
 app.include_router(billing.router)
+app.include_router(tracking.router)
+app.include_router(notifications.router)
+app.include_router(photos.router)
+
+
+# Cache-Control middleware for performance
+@app.middleware("http")
+async def add_cache_control(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+
+    # Skip cache headers for non-GET or auth endpoints
+    if request.method != "GET":
+        return response
+
+    if "/events/dashboard" in path:
+        response.headers["Cache-Control"] = "private, max-age=60"
+    elif "/analytics" in path:
+        response.headers["Cache-Control"] = "private, max-age=300"
+    elif "/babies" in path:
+        response.headers["Cache-Control"] = "private, max-age=60"
+    elif "/events/timeline" in path:
+        response.headers["Cache-Control"] = "no-cache"
+    elif "/health" == path:
+        response.headers["Cache-Control"] = "no-cache"
+
+    return response
 
 
 @app.get("/health")

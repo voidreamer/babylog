@@ -1,0 +1,107 @@
+{
+  "title": "सेटिंग्स",
+  "babyProfile": {
+    "title": "शिशु प्रोफ़ाइल",
+    "born": "जन्म {{date}}",
+    "growthData": "ग्रोथ डेटा",
+    "growthDataDesc": "वज़न, लंबाई अपडेट करें",
+    "addAnother": "एक और शिशु जोड़ें",
+    "addAnotherDesc": "कई बच्चों को ट्रैक करें"
+  },
+  "preferences": {
+    "title": "प्राथमिकताएं",
+    "notifications": "सूचनाएं",
+    "notificationsDesc": "आहार, झपकी रिमाइंडर",
+    "darkMode": "डार्क मोड",
+    "darkModeDesc": "रात में आँखों पर आसान",
+    "language": "भाषा",
+    "languageDesc": "अपनी भाषा चुनें",
+    "units": "इकाइयाँ",
+    "unitsMetric": "मीट्रिक (kg, cm, ml)",
+    "unitsImperial": "इम्पीरियल (lbs, in, oz)"
+  },
+  "account": {
+    "title": "खाता",
+    "signedIn": "साइन इन है",
+    "premiumMember": "प्रीमियम सदस्य ⭐",
+    "premium": {
+      "title": "प्रीमियम प्लान",
+      "active": "सक्रिय",
+      "activeManage": "सक्रिय — सदस्यता प्रबंधित करें",
+      "activePromo": "सक्रिय — प्रोमो कोड",
+      "unlock": "AI जानकारियाँ और अधिक अनलॉक करें"
+    },
+    "caregivers": "देखभालकर्ता",
+    "caregiversDesc": "परिवार के साथ शेयर करें",
+    "comingSoon": "जल्द आ रहा है"
+  },
+  "data": {
+    "title": "डेटा",
+    "export": "डेटा एक्सपोर्ट करें",
+    "exportDesc": "CSV के रूप में डाउनलोड करें",
+    "exporting": "एक्सपोर्ट हो रहा है...",
+    "upgradeToExport": "एक्सपोर्ट के लिए अपग्रेड करें",
+    "exportSuccess": "एक्सपोर्ट पूरा! अपना डाउनलोड फ़ोल्डर देखें।",
+    "exportFailed": "एक्सपोर्ट विफल",
+    "noDataToExport": "एक्सपोर्ट करने के लिए कोई शिशु डेटा नहीं"
+  },
+  "navigation": {
+    "title": "नेविगेशन",
+    "backToHub": "HeyBub Hub पर वापस जाएं",
+    "backToHubDesc": "मुख्य साइट पर लौटें"
+  },
+  "support": {
+    "title": "सहायता",
+    "contactUs": "हमसे संपर्क करें",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsOfService": "सेवा की शर्तें",
+    "signOut": "साइन आउट करें"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "in": "in",
+    "ml": "ml",
+    "oz": "oz"
+  },
+  "upgrade": {
+    "title": "प्रीमियम में अपग्रेड करें",
+    "subtitle": "सभी सुविधाएं अनलॉक करें",
+    "features": {
+      "insights": "AI-संचालित शिशु जानकारियाँ",
+      "export": "डेटा CSV के रूप में एक्सपोर्ट करें",
+      "more": "और भी बहुत कुछ जल्द आ रहा है..."
+    },
+    "promoCode": "प्रोमो कोड",
+    "promoPlaceholder": "प्रोमो कोड दर्ज करें",
+    "applyPromo": "लागू करें",
+    "subscribe": "सदस्यता लें",
+    "manageSub": "सदस्यता प्रबंधन नहीं खुल सका।",
+    "heyBubPremium": "HeyBub Premium",
+    "premiumFeatures": {
+      "insights": "AI-संचालित शिशु जानकारियाँ और पूर्वानुमान",
+      "growth": "WHO पर्सेंटाइल के साथ ग्रोथ चार्ट",
+      "export": "अपना सारा डेटा एक्सपोर्ट करें (CSV)",
+      "share": "असीमित देखभालकर्ताओं के साथ शेयर करें",
+      "multiple": "कई शिशुओं को ट्रैक करें",
+      "support": "प्राथमिकता सहायता"
+    },
+    "limitedTime": "सीमित समय · 50% छूट",
+    "bestValue": "सर्वोत्तम मूल्य",
+    "perMonth": "प्रति माह",
+    "perYear": "प्रति वर्ष",
+    "justPerMonth": "केवल $1.25/माह",
+    "redirecting": "रीडायरेक्ट हो रहा है…",
+    "startTrial": "7-दिन का निःशुल्क ट्रायल शुरू करें",
+    "cancelAnytime": "कभी भी रद्द करें · कोई बाध्यता नहीं",
+    "restorePurchase": "खरीदारी पुनर्स्थापित करें",
+    "premiumFeature": "प्रीमियम सुविधा",
+    "upgradeToUnlock": "{{feature}} अनलॉक करने के लिए अपग्रेड करें",
+    "upgradeBtn": "अपग्रेड करें"
+  },
+  "toast_couldNotStartCheckoutPleaseTryAgai": "चेकआउट शुरू नहीं हो सका। कृपया पुनः प्रयास करें।",
+  "toast_premiumRestoredReloading": "प्रीमियम पुनर्स्थापित! रीलोड हो रहा है…",
+  "toast_noActiveSubscriptionFoundForThisAc": "इस खाते के लिए कोई सक्रिय सदस्यता नहीं मिली।",
+  "toast_couldNotCheckSubscription": "सदस्यता जाँच नहीं हो सकी।"
+}

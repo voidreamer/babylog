@@ -2,10 +2,12 @@
 
 /**
  * DeepL Auto-Translation Script
- * 
+ *
  * Reads EN source files from frontend/public/locales/en/
- * Translates to ES-CO and FR-CA using DeepL API
- * 
+ * Translates to all supported languages using DeepL API
+ *
+ * Note: Hindi (hi) is not supported by DeepL and is skipped.
+ *
  * Usage: DEEPL_API_KEY=... node scripts/translate.js
  */
 
@@ -27,6 +29,10 @@ const SOURCE_LANG = 'EN';
 const TARGET_LANGS = [
   { code: 'ES', folder: 'es-CO' },
   { code: 'FR', folder: 'fr-CA' },
+  { code: 'JA', folder: 'ja' },
+  { code: 'ZH-HANS', folder: 'zh-CN' },
+  { code: 'RU', folder: 'ru' },
+  // Hindi (hi) is NOT supported by DeepL — skip
 ];
 const NAMESPACES = ['common', 'dashboard', 'health', 'settings', 'auth'];
 
@@ -131,30 +137,30 @@ function restoreTokens(text, tokens) {
 }
 
 async function main() {
-  console.log('🌍 Starting DeepL translation...\n');
+  console.log('Starting DeepL translation...\n');
 
   for (const target of TARGET_LANGS) {
-    console.log(`\n📝 Translating to ${target.folder} (${target.code})...`);
+    console.log(`\nTranslating to ${target.folder} (${target.code})...`);
     const targetDir = path.join(LOCALES_DIR, target.folder);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
     for (const ns of NAMESPACES) {
       const sourceFile = path.join(LOCALES_DIR, 'en', `${ns}.json`);
       if (!fs.existsSync(sourceFile)) {
-        console.log(`  ⚠️  Skipping ${ns}.json (not found)`);
+        console.log(`  Skipping ${ns}.json (not found)`);
         continue;
       }
 
       const sourceData = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
       const entries = flattenObject(sourceData);
-      
+
       // Preserve interpolation tokens before sending to DeepL
       const tokenData = entries.map(e => preserveTokens(e.value));
       const textsToTranslate = tokenData.map(t => t.preserved);
 
       try {
         const translated = await translateBatch(textsToTranslate, target.code);
-        
+
         const result = {};
         entries.forEach((entry, i) => {
           const restoredText = restoreTokens(translated[i], tokenData[i].tokens);
@@ -163,14 +169,15 @@ async function main() {
 
         const targetFile = path.join(targetDir, `${ns}.json`);
         fs.writeFileSync(targetFile, JSON.stringify(result, null, 2) + '\n', 'utf-8');
-        console.log(`  ✅ ${ns}.json (${entries.length} strings)`);
+        console.log(`  ${ns}.json (${entries.length} strings)`);
       } catch (err) {
-        console.error(`  ❌ ${ns}.json failed: ${err.message}`);
+        console.error(`  ${ns}.json failed: ${err.message}`);
       }
     }
   }
 
-  console.log('\n🎉 Translation complete!');
+  console.log('\nTranslation complete!');
+  console.log('Note: Hindi (hi) is not supported by DeepL and must be translated separately.');
 }
 
 main().catch(err => {

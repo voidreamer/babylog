@@ -45,12 +45,17 @@
     "exportFailed": "Échec de l'exportation",
     "noDataToExport": "Pas de données sur les bébés à exporter"
   },
+  "navigation": {
+    "title": "Navigation",
+    "backToHub": "Retour à HeyBub Hub",
+    "backToHubDesc": "Retourner au site principal"
+  },
   "support": {
     "title": "Soutien",
     "contactUs": "Nous contacter",
     "privacyPolicy": "Politique de confidentialité",
     "termsOfService": "Conditions d'utilisation",
-    "signOut": "S'inscrire"
+    "signOut": "Se déconnecter"
   },
   "units": {
     "kg": "kg",

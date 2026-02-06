@@ -28,16 +28,26 @@ export default function Timeline({ events, onRefresh }: TimelineProps) {
         const config = EVENT_CONFIG[event.event_type] || { label: event.event_type };
 
         switch (event.event_type) {
-            case 'feeding':
-                return `${config.label} - ${event.details.type}`;
-            case 'diaper':
-                let diaperLabel = `${config.label} - ${event.details.type}`;
+            case 'feeding': {
+                const feedTypeMap: Record<string, string> = {
+                    breast: t('feeding.breast'),
+                    bottle: t('feeding.bottle'),
+                    breastmilk_bottle: t('feeding.breastBottle'),
+                    formula: t('feeding.formula'),
+                    solid: t('feeding.solid'),
+                };
+                return `${config.label} - ${feedTypeMap[event.details.type] || event.details.type}`;
+            }
+            case 'diaper': {
+                const diaperTypeMap: Record<string, string> = { pee: t('diaper.pee'), poo: t('diaper.poo'), mixed: t('diaper.both') };
+                let diaperLabel = `${config.label} - ${diaperTypeMap[event.details.type] || event.details.type}`;
                 if (event.details.poo_amount) diaperLabel += ` (${event.details.poo_amount})`;
                 return diaperLabel;
+            }
             case 'sleep':
                 return event.details.end_time
                     ? `${config.label} - ${event.details.duration_minutes || 0}min`
-                    : `${config.label} - in progress`;
+                    : `${config.label} - ${t('timeline.inProgress')}`;
             case 'pumping':
                 return event.details.amount_ml
                     ? `${config.label} - ${event.details.amount_ml}ml`

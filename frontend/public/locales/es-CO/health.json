@@ -15,7 +15,7 @@
     "percentile": "percentil",
     "hideChart": "Ocultar gráfico",
     "fullChart": "Gráfico completo",
-    "logMeasurement": "Medición de registros",
+    "logMeasurement": "Registrar medición",
     "weightForAge": "Peso para la edad",
     "heightForAge": "Altura para la edad",
     "whoStandards": "Normas de la OMS ({{gender}})",
@@ -28,7 +28,10 @@
     "fiftiethPercentile": "percentil 50",
     "thirdToNinetySeventh": "3ª-97ª gama",
     "baby": "Bebé: {{value}} {{unit}}",
-    "refPercentile": "Percentil 50: {{value}} {{unit}}"
+    "refPercentile": "Percentil 50: {{value}} {{unit}}",
+    "month": "Mes",
+    "months": "meses",
+    "current": "actual"
   },
   "milestones": {
     "title": "Hitos",
@@ -51,11 +54,11 @@
     "teethCount": "{{count}}/20 dientes",
     "upper": "Superior",
     "lower": "Baja",
-    "emerged": "Emerged",
+    "emerged": "Brotado",
     "expected": "Previsto",
     "future": "Futuro",
-    "markEmerged": "Marcar {{name}} como Emergido",
-    "markEmergedBtn": "Mark Emerged",
+    "markEmerged": "Marcar {{name}} como brotado",
+    "markEmergedBtn": "Marcar brotado",
     "emergedDate": "Emergido: {{date}}",
     "removeRecord": "Eliminar registro",
     "toothMarked": "¡{{name}} marcado como surgido!"
@@ -79,7 +82,7 @@
       "diarrhea": "Diarrea",
       "rash": "Erupción",
       "ear_pain": "Dolor de oído",
-      "fussy": "Fussy",
+      "fussy": "Irritable",
       "poor_appetite": "Falta de apetito",
       "lethargy": "Letargo",
       "sore_throat": "Dolor de garganta"
@@ -155,7 +158,7 @@
     "editMilestone": "Editar hito",
     "logMilestone": "Hito de registro",
     "editGrowth": "Editar Crecimiento",
-    "logGrowth": "Crecimiento logarítmico",
+    "logGrowth": "Registrar crecimiento",
     "date": "Fecha",
     "type": "Tipo",
     "doctorName": "Nombre del médico",
@@ -237,7 +240,7 @@
   "placeholder_tempC": "Temp °C",
   "toast_toothRecordRemoved": "Registro dental eliminado",
   "schedule": {
-    "progress": "Progresos en la vacunación",
+    "progress": "Avance de la vacunación",
     "complete": "completa",
     "done": "Hecho",
     "overdue": "Atrasado",

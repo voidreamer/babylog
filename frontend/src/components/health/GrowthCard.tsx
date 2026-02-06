@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useMemo } from 'react';
 import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { addMonths, format } from 'date-fns';
 import { api } from '../../api/client';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
@@ -43,6 +44,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
     const [showChart, setShowChart] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         weight: '',
         height: '',
@@ -56,6 +58,16 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
     const babyAgeMonths = baby?.birth_date
         ? Math.floor((new Date().getTime() - new Date(baby.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 30.44))
         : null;
+
+    // Available months for selection (0 to current age, max 24)
+    const availableMonths = useMemo(() => {
+        if (babyAgeMonths === null) return [];
+        const maxMonth = Math.min(babyAgeMonths, 24);
+        return Array.from({ length: maxMonth + 1 }, (_, i) => i);
+    }, [babyAgeMonths]);
+
+    // Default to current month when form opens
+    const effectiveMonth = selectedMonth ?? babyAgeMonths ?? 0;
 
     // Get WHO percentile data for current age
     const getWhoDataForAge = (dataSet: any[], ageMonths: number | null) => {
@@ -92,9 +104,13 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
 
         setSaving(true);
         try {
+            // Calculate date from birth_date + selected month
+            const birthDate = new Date(baby.birth_date + 'T12:00:00');
+            const recordDate = addMonths(birthDate, effectiveMonth);
+
             const data = {
                 baby_id: baby.id,
-                recorded_date: new Date().toISOString(),
+                recorded_date: format(recordDate, 'yyyy-MM-dd'),
                 weight_kg: formData.weight ? parseWeight(parseFloat(formData.weight)) : null,
                 height_cm: formData.height ? parseLength(parseFloat(formData.height)) : null,
                 head_cm: formData.head ? parseLength(parseFloat(formData.head)) : null,
@@ -103,6 +119,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             await api.createGrowthRecord(data);
             toast.success(t('toast_growthRecorded'));
             setFormData({ weight: '', height: '', head: '' });
+            setSelectedMonth(null);
             setIsAdding(false);
             if (onRecordAdded) onRecordAdded();
         } catch (error) {
@@ -177,6 +194,17 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             {/* Inline Quick Entry */}
             {isAdding ? (
                 <form onSubmit={handleSubmit} className="growth-quick-entry">
+                    <select
+                        value={effectiveMonth}
+                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                        className="growth-input growth-month-select"
+                    >
+                        {availableMonths.map((m) => (
+                            <option key={m} value={m}>
+                                {t('growth.month')} {m}{m === babyAgeMonths ? ` (${t('growth.current')})` : ''}
+                            </option>
+                        ))}
+                    </select>
                     <input
                         type="number"
                         step="0.01"
@@ -207,7 +235,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                     <button
                         type="button"
                         className="btn btn-ghost btn-sm"
-                        onClick={() => setIsAdding(false)}
+                        onClick={() => { setIsAdding(false); setSelectedMonth(null); }}
                     >
                         {t('common:cancel')}
                     </button>

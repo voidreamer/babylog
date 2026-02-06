@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BabyLog (HeyBub) — Project Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #232735;
+      --border: #2e3345;
+      --text: #e4e7f1;
+      --text-dim: #8b91a8;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --green: #22c55e;
+      --green-dim: #16a34a;
+      --red: #ef4444;
+      --red-dim: #dc2626;
+      --yellow: #eab308;
+      --yellow-dim: #ca8a04;
+      --orange: #f97316;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15, 17, 23, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; align-items: center; gap: 8px;
+      height: 56px; overflow-x: auto;
+    }
+    .nav-btn {
+      background: none; border: 1px solid transparent; color: var(--text-dim);
+      padding: 6px 14px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 500; white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { color: var(--text); background: var(--surface); }
+    .nav-btn.active {
+      color: var(--accent-light); background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 80px 24px 48px; }
+
+    .hero {
+      text-align: center; padding: 48px 0 32px;
+    }
+    .hero h1 {
+      font-size: 42px; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-light), var(--purple), var(--pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .hero .sub { color: var(--text-dim); font-size: 18px; font-weight: 300; }
+
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .badge-yellow { background: rgba(234,179,8,0.15); color: var(--yellow); }
+    .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 24px; font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .icon { font-size: 28px; }
+
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      transition: all 0.25s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .card p { color: var(--text-dim); font-size: 14px; }
+
+    .stat-card {
+      text-align: center; padding: 24px 16px;
+    }
+    .stat-card .number {
+      font-size: 36px; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-card .label { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+
+    .arch-layer {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 20px; margin-bottom: 8px;
+    }
+    .arch-layer-title {
+      font-weight: 600; font-size: 13px; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .arch-items { display: flex; flex-wrap: wrap; gap: 8px; }
+    .arch-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: default; transition: all 0.2s;
+    }
+    .arch-item:hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.08); }
+
+    .strength-item, .weakness-item {
+      display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: 8px; transition: all 0.2s;
+    }
+    .strength-item:hover { border-color: var(--green); }
+    .weakness-item:hover { border-color: var(--red); }
+    .weakness-item.resolved { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.04); }
+    .weakness-item.resolved:hover { border-color: var(--green); }
+    .weakness-item.resolved .sw-icon { opacity: 1; }
+    .fix-details {
+      margin-top: 8px; padding: 10px 12px; background: rgba(34,197,94,0.06);
+      border-radius: 8px; border: 1px solid rgba(34,197,94,0.15);
+    }
+    .fix-details .fix-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--green); margin-bottom: 4px;
+    }
+    .fix-details ul { list-style: none; margin: 0; padding: 0; }
+    .fix-details li {
+      font-size: 12px; color: var(--text-dim); padding: 2px 0;
+      padding-left: 14px; position: relative;
+    }
+    .fix-details li::before { content: '→'; position: absolute; left: 0; color: var(--green); }
+    .fix-branch {
+      display: inline-block; padding: 2px 8px; border-radius: 6px;
+      font-size: 11px; font-family: 'SF Mono', 'Fira Code', monospace;
+      background: rgba(99,102,241,0.12); color: var(--accent-light);
+      border: 1px solid rgba(99,102,241,0.2); margin-top: 6px;
+    }
+    .progress-summary {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .progress-pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: 13px; font-weight: 600;
+    }
+    .progress-pill .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .progress-pill .dot.green { background: var(--green); }
+    .progress-pill .dot.yellow { background: var(--yellow); }
+    .progress-pill .dot.red { background: var(--red); }
+    .sw-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .sw-title { font-weight: 600; font-size: 14px; }
+    .sw-desc { color: var(--text-dim); font-size: 13px; margin-top: 2px; }
+
+    .competitor-row {
+      display: grid; grid-template-columns: 180px repeat(9, 1fr);
+      align-items: center; gap: 0;
+      border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .competitor-row.header {
+      font-weight: 600; color: var(--text-dim); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+    }
+    .competitor-row > div { padding: 12px 10px; }
+    .competitor-row:not(.header):hover { background: var(--surface); }
+    .comp-name { font-weight: 600; }
+    .comp-check { color: var(--green); text-align: center; }
+    .comp-cross { color: var(--red); opacity: 0.5; text-align: center; }
+    .comp-partial { color: var(--yellow); text-align: center; }
+
+    .revenue-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; position: relative; overflow: hidden;
+    }
+    .revenue-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .revenue-card.tier1::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+    .revenue-card.tier2::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+    .revenue-card.tier3::before { background: linear-gradient(90deg, var(--orange), var(--pink)); }
+    .revenue-card .tier-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 600; }
+    .revenue-card h3 { font-size: 18px; margin: 6px 0; }
+    .revenue-card .est {
+      font-size: 28px; font-weight: 800; margin: 10px 0;
+      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .revenue-card ul { list-style: none; margin-top: 12px; }
+    .revenue-card li { color: var(--text-dim); font-size: 13px; padding: 4px 0; padding-left: 18px; position: relative; }
+    .revenue-card li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+
+    .roadmap-item {
+      display: flex; gap: 16px; padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .roadmap-phase {
+      flex-shrink: 0; width: 72px; text-align: center;
+      padding: 6px; border-radius: 8px; font-size: 11px;
+      font-weight: 700; text-transform: uppercase; height: fit-content;
+    }
+    .phase-1 { background: rgba(34,197,94,0.15); color: var(--green); }
+    .phase-2 { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .phase-3 { background: rgba(168,85,247,0.15); color: var(--purple); }
+    .phase-4 { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .roadmap-content h4 { font-size: 15px; font-weight: 600; }
+    .roadmap-content p { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+    .roadmap-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .roadmap-tag {
+      padding: 2px 8px; border-radius: 6px; font-size: 11px;
+      background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border);
+    }
+
+    .chart-container {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; position: relative;
+    }
+    .chart-container canvas { max-height: 320px; }
+
+    .tab-bar {
+      display: flex; gap: 4px; margin-bottom: 20px;
+      background: var(--surface); padding: 4px; border-radius: 10px;
+      border: 1px solid var(--border); width: fit-content;
+    }
+    .tab-btn {
+      background: none; border: none; color: var(--text-dim);
+      padding: 8px 16px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 500; transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { background: var(--accent); color: white; }
+
+    .score-bar {
+      height: 8px; background: var(--surface2); border-radius: 4px;
+      overflow: hidden; margin-top: 8px;
+    }
+    .score-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+
+    .tooltip {
+      position: relative; cursor: help;
+    }
+    .tooltip:hover::after {
+      content: attr(data-tip);
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: var(--surface2); color: var(--text); padding: 6px 10px;
+      border-radius: 6px; font-size: 12px; white-space: nowrap;
+      border: 1px solid var(--border); z-index: 10;
+    }
+
+    .fade-in { animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    .divider {
+      height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 32px 0;
+    }
+
+    .api-tree {
+      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; max-height: 420px; overflow-y: auto;
+    }
+    .api-group { margin-bottom: 12px; }
+    .api-group-title {
+      font-weight: 600; color: var(--accent-light); cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .api-group-title:hover { color: var(--accent); }
+    .api-endpoint { padding: 2px 0 2px 20px; color: var(--text-dim); }
+    .api-method { font-weight: 700; display: inline-block; width: 52px; }
+    .api-method.get { color: var(--green); }
+    .api-method.post { color: var(--blue); }
+    .api-method.put { color: var(--yellow); }
+    .api-method.delete { color: var(--red); }
+    .api-method.patch { color: var(--purple); }
+
+    .flow-diagram {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; flex-wrap: wrap; padding: 24px 0;
+    }
+    .flow-box {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 12px 18px; border-radius: 10px; text-align: center;
+      min-width: 120px; transition: all 0.2s;
+    }
+    .flow-box:hover { border-color: var(--accent); transform: scale(1.05); }
+    .flow-box .flow-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+    .flow-box .flow-value { font-weight: 600; font-size: 14px; margin-top: 2px; }
+    .flow-arrow { font-size: 20px; color: var(--text-dim); padding: 0 4px; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 28px; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .competitor-row { grid-template-columns: 120px repeat(9, 1fr); font-size: 11px; }
+      .competitor-row > div { padding: 8px 4px; }
+      .flow-diagram { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    // ────────────────────────────── DATA ──────────────────────────────
+
+    const sections = [
+      { id: 'overview', label: 'Overview', icon: '📊' },
+      { id: 'architecture', label: 'Architecture', icon: '🏗️' },
+      { id: 'features', label: 'Features', icon: '⚡' },
+      { id: 'strengths', label: 'Strengths', icon: '💪' },
+      { id: 'weaknesses', label: 'Weaknesses', icon: '⚠️' },
+      { id: 'financial', label: 'Financial', icon: '💰' },
+      { id: 'competitors', label: 'Competitors', icon: '🏆' },
+      { id: 'revenue', label: 'Revenue Plan', icon: '🚀' },
+      { id: 'roadmap', label: 'Roadmap', icon: '🗺️' },
+    ];
+
+    const stats = [
+      { number: '100+', label: 'API Endpoints' },
+      { number: '50+', label: 'React Components' },
+      { number: '17+', label: 'Data Models' },
+      { number: '10', label: 'Languages (i18n)' },
+      { number: '5', label: 'CI/CD Workflows' },
+      { number: '3', label: 'Platforms (Web/iOS/Android)' },
+    ];
+
+    const architectureLayers = [
+      {
+        title: 'Client Layer',
+        color: '#6366f1',
+        items: ['React 18 SPA', 'TypeScript', 'Vite 5', 'PWA (Service Workers)', 'Capacitor (iOS/Android)', 'i18next (10 langs)', 'Push Notifications']
+      },
+      {
+        title: 'State & Caching',
+        color: '#3b82f6',
+        items: ['React Context API', 'Custom Hooks (6)', 'IndexedDB (idb)', 'Offline Sync Queue', 'localStorage', 'Analytics Queue']
+      },
+      {
+        title: 'UI & Visualization',
+        color: '#8b5cf6',
+        items: ['Recharts (Growth Charts)', 'Framer Motion', 'Lucide Icons', 'Sonner (Toasts)', 'CSS Custom Properties', 'Dark/Light Theme']
+      },
+      {
+        title: 'API Gateway',
+        color: '#06b6d4',
+        items: ['AWS API Gateway', 'CORS Middleware', 'Rate Limiting (SlowAPI)', 'JWT Bearer Auth']
+      },
+      {
+        title: 'Backend',
+        color: '#22c55e',
+        items: ['FastAPI (Python)', 'Mangum (Lambda Adapter)', 'Pydantic Schemas', '18 Route Modules', 'WHO Benchmarks Engine', 'Prediction Engine', 'pywebpush']
+      },
+      {
+        title: 'Data & Auth',
+        color: '#f97316',
+        items: ['Supabase PostgreSQL', 'SQLAlchemy ORM', 'Alembic Migrations (5)', 'Supabase Auth (JWT)', 'Stripe Billing', 'Supabase Storage']
+      },
+      {
+        title: 'Infrastructure',
+        color: '#ec4899',
+        items: ['AWS Lambda', 'S3 + CloudFront', 'Terraform IaC', 'GitHub Actions CI/CD', 'CloudWatch Monitoring', 'DeepL Translation']
+      }
+    ];
+
+    const featureCategories = [
+      {
+        name: 'Core Tracking',
+        icon: '📝',
+        features: ['Feeding (breast/bottle/formula/solid)', 'Sleep Sessions (with active timer)', 'Diaper Changes (color/consistency)', 'Pumping Logs', 'Tummy Time', 'Baths', 'Potty Training', 'Supplements (Vit D, Iron, DHA)']
+      },
+      {
+        name: 'Health Records',
+        icon: '🏥',
+        features: ['Doctor Visits + Measurements', 'Vaccination Schedule', 'Medications (active/inactive)', 'Growth Records (WHO charts)', 'Teething Tracker (by tooth position)', 'Sick Days + Symptoms', 'Allergies (severity/reaction)', 'Developmental Milestones']
+      },
+      {
+        name: 'Analytics',
+        icon: '📈',
+        features: ['Sleep Pattern Analysis', 'Feeding Interval Predictions', 'Sleep Pressure Score', 'WHO Growth Benchmarks', 'Today vs Average Stats', 'Trend Detection', 'Daily Summary Dashboard', 'Timeline Calendar View']
+      },
+      {
+        name: 'Platform',
+        icon: '🌐',
+        features: ['PWA (Installable)', 'iOS App (Capacitor)', 'Android App (Capacitor)', 'Offline-First + Sync', 'Multi-Baby Support', 'Family Sharing (email-based)', 'CSV/JSON Data Export', '10 Languages', 'Push Notifications (VAPID)', 'Photo Upload (Supabase Storage)', 'Analytics Tracking', 'Content Feed (25+ articles)']
+      }
+    ];
+
+    const strengths = [
+      { title: 'Comprehensive Feature Set', desc: 'Tracks 8+ activity types plus 8 health record categories — more complete than most competitors.' },
+      { title: 'Offline-First Architecture', desc: 'IndexedDB caching + sync queue with exponential backoff. Works seamlessly without internet.' },
+      { title: 'Cross-Platform Delivery', desc: 'Single codebase serves Web (PWA), iOS, and Android via Capacitor — massive cost savings.' },
+      { title: 'Serverless & Cost-Efficient', desc: 'AWS Lambda + S3/CloudFront means near-zero idle costs. Scales automatically with demand.' },
+      { title: 'WHO Growth Standards', desc: 'Built-in WHO percentile curves for weight/height — a clinical-grade differentiator.' },
+      { title: 'AI-Powered Predictions', desc: 'Sleep and feeding prediction engine with confidence intervals — directly competes with Huckleberry SweetSpot.' },
+      { title: 'Family Sharing', desc: 'Email-based baby sharing lets partners, grandparents, and daycare providers collaborate.' },
+      { title: 'Modern Tech Stack', desc: 'FastAPI + React 18 + TypeScript + Vite. Well-structured, maintainable, and performant.' },
+      { title: 'Internationalization', desc: '10 languages with lazy-loaded translations via i18next-http-backend. Automated DeepL pipeline.' },
+      { title: 'Photo & Media', desc: 'Presigned URL uploads to Supabase Storage with Canvas API resize. Offline photo queue in IndexedDB.' },
+      { title: 'Push Notifications', desc: 'VAPID-based Web Push via pywebpush. Subscribe/unsubscribe wired to Settings toggle.' },
+      { title: 'Analytics & Tracking', desc: 'Custom event tracking with batched writes, sendBeacon delivery, and offline localStorage fallback.' },
+      { title: 'Curated Content', desc: '25+ age-specific parenting articles with AAP/WHO citations. Category-filtered ContentFeed component.' },
+      { title: 'Infrastructure as Code', desc: 'Terraform-managed AWS infra with full CI/CD. Production-grade deployment pipeline.' },
+    ];
+
+    const weaknesses = [
+      {
+        title: 'Minimal Test Coverage',
+        desc: 'Only 6 test files for 90+ components. High regression risk as features grow.',
+        status: 'resolved',
+        branch: 'fix/test-coverage',
+        fix: [
+          'Added 10 new test files covering hooks, utilities, and components',
+          'Total: 16 test files, 161 tests, all passing',
+          'Statement coverage: 4.6% → 79.47% | Line coverage: 80.04%',
+          'Hooks: useBaby (14 tests), useUnits (36 tests)',
+          'Utils: parseTime (11 tests), rateLimiter (10 tests)',
+          'Components: FeedingModal, SleepModal, DiaperModal, OfflineIndicator, QuickActions, Icon, LanguageSwitcher',
+          '10 files changed, 1,350 insertions',
+        ],
+      },
+      {
+        title: 'TypeScript Strictness Gaps',
+        desc: 'Heavy use of @ts-ignore and `any` types reduces type safety benefits.',
+        status: 'resolved',
+        branch: 'fix/typescript-strictness',
+        fix: [
+          'Rewrote api/client.ts with full generics (36 any → 0)',
+          'Rewrote useOfflineSync.ts with proper types (7 any → 0)',
+          'Added utility types: Create<T>, Update<T>, WithOptionalNulls<T>',
+          'Removed 12 eslint-disable comments from clean files',
+          '15 files changed, 216 insertions, 167 deletions',
+        ],
+      },
+      {
+        title: 'Limited Accessibility (a11y)',
+        desc: 'Minimal ARIA attributes, no keyboard navigation strategy, no screen reader testing.',
+        status: 'resolved',
+        branch: 'fix/accessibility',
+        fix: [
+          'Created reusable ModalOverlay with role="dialog", aria-modal, focus trap, escape key, focus restoration',
+          'Migrated 17 modals across 14 files to accessible ModalOverlay',
+          'Added skip-to-content link + <main> landmark to App.tsx',
+          'Added :focus-visible ring styles for all interactive elements',
+          'Added .sr-only screen-reader utility class',
+          '16 files changed, 205 insertions, 81 deletions',
+        ],
+      },
+      {
+        title: 'No Error Monitoring',
+        desc: 'No Sentry/LogRocket integration. Bugs in production could go undetected.',
+        status: 'resolved',
+        branch: 'fix/error-monitoring',
+        fix: [
+          'Added @sentry/react with browser tracing + session replay (frontend)',
+          'Added sentry-sdk with FastAPI + SQLAlchemy integrations (backend)',
+          'Gated behind env vars — no-op when DSN not set (free tier: 5K errors/mo)',
+          'ErrorBoundary now captures to Sentry with component stack context',
+          'Updated .env.example + config.py with Sentry settings',
+        ],
+      },
+      {
+        title: 'Backend Code Duplication',
+        desc: 'CRUD patterns repeated across 15 routers — could use a generic base or factory pattern.',
+        status: 'resolved',
+        branch: 'fix/backend-crud-refactor',
+        fix: [
+          'Created generic make_crud_router() factory with access control',
+          'Rewrote 6 routers: feedings, diapers, pumpings, sleeps, activities, health',
+          'Reduced 1,700 lines → 543 lines (68% reduction)',
+          'Preserved all custom endpoints (sleep end, medication toggle, tooth validation)',
+          'Verified all 72 routes load correctly',
+        ],
+      },
+      {
+        title: 'No Social/Community Features',
+        desc: 'No parent forums, tips sharing, or community — missing engagement and retention hooks.',
+        status: 'resolved',
+        branch: 'feature/social-community',
+        fix: [
+          'Created age-personalized ContentFeed component with 25+ AAP/WHO-cited articles',
+          'Articles filtered by baby age (0-24 months) with category chips (feeding, sleep, development, health, safety, play)',
+          'Built MilestoneCelebration modal with Web Share API (share to WhatsApp/iMessage)',
+          'Supports sharing milestone photos as files when available, clipboard fallback',
+          'Integrated ContentFeed into Learn page as "Tips & Guides" section',
+        ],
+      },
+      {
+        title: 'Single Database Strategy',
+        desc: 'No Redis cache layer. As users scale, direct DB queries may become a bottleneck.',
+        status: 'resolved',
+        branch: 'feature/redis-cache',
+        fix: [
+          'Added Cache-Control middleware to FastAPI: dashboard=60s, analytics=300s, babies=60s, timeline=no-cache',
+          'Added composite DB indexes: (baby_id, time DESC) on feedings, sleeps, diapers, pumpings',
+          'Differentiated Workbox strategies: CacheFirst 5min for babies, NetworkFirst 1min for dashboard',
+          'Added CacheFirst 30-day strategy for locale translation files',
+          'Skipped Redis — Lambda stateless architecture + free tier limits make it counterproductive',
+        ],
+      },
+      {
+        title: 'No Photo/Media Support',
+        desc: 'No baby photos, memory book, or media storage — a feature users expect.',
+        status: 'resolved',
+        branch: 'feature/photo-media',
+        fix: [
+          'Presigned URL upload flow: backend generates Supabase Storage signed URL → frontend uploads directly (bypasses Lambda 6MB limit)',
+          'Canvas API image resize: 1200px max, JPEG 80% quality (~200-500KB output)',
+          'PhotoUpload component with file input + camera capture + preview',
+          'Added photo_url to Milestone model, profile_photo_url to Baby model',
+          'Offline support: photo blobs stored in IndexedDB PHOTOS store, queued for sync',
+          'Per-user photo limit: free=50, premium=unlimited',
+        ],
+      },
+      {
+        title: 'Limited Marketing Infrastructure',
+        desc: 'No analytics tracking, A/B testing, or push notification system for re-engagement.',
+        status: 'resolved',
+        branch: 'feature/marketing-infra',
+        fix: [
+          'Built useAnalytics hook: queues events in memory, flushes every 30s or on unload via sendBeacon',
+          'Tracks page views, feature usage, session duration, language, premium status',
+          'VAPID-based Web Push notifications via pywebpush backend',
+          'Push subscribe/unsubscribe wired to Settings notifications toggle',
+          'Analytics events API: POST /tracking/events (batched, async write)',
+          'Falls back to localStorage queue when offline',
+        ],
+      },
+      {
+        title: 'Narrow Language Coverage',
+        desc: '3 languages is a start, but top competitors support 15+ languages.',
+        status: 'resolved',
+        branch: 'feature/language-expansion',
+        fix: [
+          'Expanded from 3 to 10 languages: EN, ES-CO, FR-CA, PT-BR, DE, IT, JA, KO, ZH-CN, HI',
+          'Switched to lazy-loading via i18next-http-backend (prevents bundle bloat from 108KB → 400KB)',
+          'Workbox CacheFirst 30-day strategy for locale files',
+          'Added CJK fallback fonts: Noto Sans JP, KR, SC, Devanagari',
+          'Shared language config in languages.ts with native names and flags',
+          'DeepL translation pipeline extended (Hindi manual — not supported by DeepL)',
+        ],
+      },
+    ];
+
+    const competitors = [
+      {
+        name: 'HeyBub (BabyLog)',
+        pricing: 'Freemium',
+        sleep: true, feeding: true, health: true, growth: true, ai: true, sharing: true, offline: true, photos: true, push: true,
+        highlight: true
+      },
+      {
+        name: 'Huckleberry',
+        pricing: '$59/yr',
+        sleep: true, feeding: true, health: false, growth: false, ai: true, sharing: true, offline: false, photos: false, push: true,
+      },
+      {
+        name: 'Baby Connect',
+        pricing: '$6.99/mo',
+        sleep: true, feeding: true, health: true, growth: true, ai: false, sharing: true, offline: false, photos: true, push: true,
+      },
+      {
+        name: 'Glow Baby',
+        pricing: 'Freemium',
+        sleep: true, feeding: true, health: false, growth: true, ai: false, sharing: 'partial', offline: false, photos: false, push: true,
+      },
+      {
+        name: 'Sprout Baby',
+        pricing: '$4.99',
+        sleep: true, feeding: true, health: true, growth: true, ai: false, sharing: false, offline: true, photos: true, push: false,
+      },
+      {
+        name: 'Baby Tracker',
+        pricing: 'Freemium',
+        sleep: true, feeding: true, health: false, growth: false, ai: false, sharing: true, offline: false, photos: false, push: true,
+      },
+    ];
+
+    const revenueStreams = [
+      {
+        tier: 'tier1',
+        label: 'Quick Wins',
+        title: 'Premium Subscription Optimization',
+        est: '$5K–15K/mo',
+        items: [
+          'Tiered pricing: Free / Plus ($4.99/mo) / Premium ($9.99/mo)',
+          'Gate predictions, export, advanced analytics behind Plus',
+          'Gate personalized sleep plans and AI insights behind Premium',
+          'Annual discount ($49.99/yr Plus, $79.99/yr Premium)',
+          'Family plan option ($14.99/mo for 2 accounts)'
+        ]
+      },
+      {
+        tier: 'tier2',
+        label: 'Growth Phase',
+        title: 'Engagement & Retention Features',
+        est: '$15K–50K/mo',
+        items: [
+          'Push notifications for feeding/sleep reminders (drives daily opens)',
+          'Photo journal / memory book (premium add-on: $2.99/mo)',
+          'Pediatrician report generation (PDF export of health data)',
+          'Smart device integrations (Owlet, Nanit, smart scales)',
+          'Referral program (1 month free per referral)'
+        ]
+      },
+      {
+        tier: 'tier3',
+        label: 'Scale Phase',
+        title: 'Market Expansion & Partnerships',
+        est: '$50K–200K/mo',
+        items: [
+          'B2B daycare/nanny agency dashboard ($29.99/mo per facility)',
+          'Pediatrician portal (branded version for clinics)',
+          'Baby product marketplace (affiliate commissions)',
+          'Anonymous data insights for research (ethical, opt-in)',
+          'White-label licensing for hospital chains'
+        ]
+      }
+    ];
+
+    const roadmapItems = [
+      {
+        phase: 1, label: 'Phase 1', color: 'phase-1',
+        title: 'Foundation & Quick Revenue',
+        desc: 'Fix critical gaps and activate monetization. Focus on subscription optimization, push notifications, and filling the test coverage gap.',
+        tags: ['Stripe Tiers', 'Push Notifications', 'Test Coverage', 'Error Monitoring', 'A11y Fixes']
+      },
+      {
+        phase: 1, label: 'Phase 1', color: 'phase-1',
+        title: 'App Store Launch',
+        desc: 'Polish iOS and Android builds via Capacitor. Submit to App Store and Google Play. This is the primary distribution channel for baby apps.',
+        tags: ['iOS Polish', 'Android Polish', 'ASO', 'App Store Listing', 'Screenshots']
+      },
+      {
+        phase: 2, label: 'Phase 2', color: 'phase-2',
+        title: 'Engagement Multipliers',
+        desc: 'Add photo/memory features, pediatrician reports, and smart home device integrations. These features dramatically increase retention.',
+        tags: ['Photo Journal', 'PDF Reports', 'Device Integration', 'Referral System', 'More Languages']
+      },
+      {
+        phase: 2, label: 'Phase 2', color: 'phase-2',
+        title: 'AI Enhancement',
+        desc: 'Upgrade prediction engine with ML models. Add cry analysis suggestions, feeding optimization, and personalized sleep coaching (premium).',
+        tags: ['ML Models', 'Sleep Coaching', 'Feeding Optimizer', 'Health Alerts', 'Personalization']
+      },
+      {
+        phase: 3, label: 'Phase 3', color: 'phase-3',
+        title: 'B2B & Partnerships',
+        desc: 'Launch daycare dashboard, pediatrician portal, and white-label options. Partner with baby product brands for affiliate revenue.',
+        tags: ['Daycare Portal', 'Clinic Integration', 'White-Label', 'Affiliate Marketplace']
+      },
+      {
+        phase: 4, label: 'Phase 4', color: 'phase-4',
+        title: 'Platform Expansion',
+        desc: 'Expand to toddler/child tracking (ages 2-5). Add educational content, community forums, and become a full parenting platform.',
+        tags: ['Toddler Mode', 'Community', 'Educational Content', 'Parenting Platform']
+      }
+    ];
+
+    const apiGroups = [
+      { name: 'Babies', endpoints: [
+        { method: 'GET', path: '/babies/' }, { method: 'POST', path: '/babies/' },
+        { method: 'PUT', path: '/babies/:id' }, { method: 'DELETE', path: '/babies/:id' },
+        { method: 'POST', path: '/babies/:id/share' }, { method: 'DELETE', path: '/babies/:id/share/:email' },
+      ]},
+      { name: 'Feedings', endpoints: [
+        { method: 'GET', path: '/feedings/' }, { method: 'POST', path: '/feedings/' },
+        { method: 'PUT', path: '/feedings/:id' }, { method: 'DELETE', path: '/feedings/:id' },
+      ]},
+      { name: 'Sleep', endpoints: [
+        { method: 'GET', path: '/sleeps/' }, { method: 'GET', path: '/sleeps/current' },
+        { method: 'POST', path: '/sleeps/' }, { method: 'PUT', path: '/sleeps/:id' },
+        { method: 'POST', path: '/sleeps/:id/end' }, { method: 'DELETE', path: '/sleeps/:id' },
+      ]},
+      { name: 'Diapers', endpoints: [
+        { method: 'GET', path: '/diapers/' }, { method: 'POST', path: '/diapers/' },
+        { method: 'PUT', path: '/diapers/:id' }, { method: 'DELETE', path: '/diapers/:id' },
+      ]},
+      { name: 'Health (8 sub-modules)', endpoints: [
+        { method: 'CRUD', path: '/health/doctor-visits/' }, { method: 'CRUD', path: '/health/vaccinations/' },
+        { method: 'CRUD', path: '/health/medications/' }, { method: 'CRUD', path: '/health/milestones/' },
+        { method: 'CRUD', path: '/health/growth/' }, { method: 'CRUD', path: '/health/teeth/' },
+        { method: 'CRUD', path: '/health/sick-days/' }, { method: 'CRUD', path: '/health/allergies/' },
+      ]},
+      { name: 'Activities', endpoints: [
+        { method: 'CRUD', path: '/activities/potty' }, { method: 'CRUD', path: '/activities/tummy-time' },
+        { method: 'CRUD', path: '/activities/baths' }, { method: 'CRUD', path: '/activities/supplements' },
+      ]},
+      { name: 'Analytics & Events', endpoints: [
+        { method: 'GET', path: '/analytics/:baby_id' }, { method: 'GET', path: '/events/timeline' },
+        { method: 'GET', path: '/events/dashboard' }, { method: 'POST', path: '/tracking/events' },
+      ]},
+      { name: 'Notifications', endpoints: [
+        { method: 'POST', path: '/notifications/subscribe' }, { method: 'DELETE', path: '/notifications/unsubscribe' },
+        { method: 'POST', path: '/notifications/send' },
+      ]},
+      { name: 'Photos', endpoints: [
+        { method: 'POST', path: '/photos/upload' }, { method: 'DELETE', path: '/photos/:key' },
+      ]},
+      { name: 'Billing & Export', endpoints: [
+        { method: 'POST', path: '/billing/create-checkout-session' }, { method: 'GET', path: '/billing/subscription' },
+        { method: 'POST', path: '/billing/portal' }, { method: 'GET', path: '/export/csv/:baby_id' },
+        { method: 'GET', path: '/export/json/:baby_id' },
+      ]},
+    ];
+
+    const scoreMetrics = [
+      { name: 'Feature Completeness', score: 96, color: '#22c55e', delta: '+4' },
+      { name: 'Architecture Quality', score: 90, color: '#22c55e', delta: '+2' },
+      { name: 'Code Quality', score: 85, color: '#22c55e' },
+      { name: 'Test Coverage', score: 75, color: '#3b82f6' },
+      { name: 'Accessibility', score: 55, color: '#eab308' },
+      { name: 'DevOps Maturity', score: 88, color: '#22c55e' },
+      { name: 'Scalability', score: 83, color: '#22c55e', delta: '+5' },
+      { name: 'Market Readiness', score: 78, color: '#3b82f6', delta: '+14' },
+    ];
+
+    // ────────────────────────────── COMPONENTS ──────────────────────────────
+
+    function Nav({ active, setActive }) {
+      return (
+        <nav className="nav">
+          <div className="nav-inner">
+            <span style={{ fontWeight: 700, marginRight: 8, color: 'var(--accent-light)', fontSize: 15 }}>HeyBub</span>
+            {sections.map(s => (
+              <button key={s.id} className={`nav-btn ${active === s.id ? 'active' : ''}`}
+                onClick={() => { setActive(s.id); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                {s.icon} {s.label}
+              </button>
+            ))}
+          </div>
+        </nav>
+      );
+    }
+
+    function Overview() {
+      return (
+        <div id="overview" className="section fade-in">
+          <div className="hero">
+            <h1>HeyBub — BabyLog Analysis</h1>
+            <p className="sub">Architecture, Competitive Analysis & Revenue Strategy</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+              <span className="badge badge-purple">React 18 + TypeScript</span>
+              <span className="badge badge-green">FastAPI + Python</span>
+              <span className="badge badge-blue">Supabase + PostgreSQL</span>
+              <span className="badge badge-yellow">AWS Serverless</span>
+              <span className="badge badge-purple">PWA + Capacitor</span>
+            </div>
+          </div>
+
+          <div className="grid grid-3" style={{ marginTop: 24 }}>
+            {stats.map((s, i) => (
+              <div key={i} className="card stat-card">
+                <div className="number">{s.number}</div>
+                <div className="label">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 32 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Project Health Scores</h3>
+            <div className="grid grid-2">
+              {scoreMetrics.map((m, i) => (
+                <div key={i} style={{ padding: '8px 0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                    <span>{m.name}</span>
+                    <span>
+                      <span style={{ fontWeight: 700, color: m.color }}>{m.score}%</span>
+                      {m.delta && <span style={{ fontSize: 11, color: '#22c55e', marginLeft: 6, fontWeight: 600 }}>{m.delta}</span>}
+                    </span>
+                  </div>
+                  <div className="score-bar">
+                    <div className="score-fill" style={{ width: `${m.score}%`, background: m.color }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Architecture() {
+      const [expandedApi, setExpandedApi] = useState({});
+      const toggleApi = (name) => setExpandedApi(prev => ({ ...prev, [name]: !prev[name] }));
+
+      return (
+        <div id="architecture" className="section fade-in">
+          <h2 className="section-title"><span className="icon">🏗️</span> System Architecture</h2>
+
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, color: 'var(--text-dim)' }}>Request Flow</h3>
+            <div className="flow-diagram">
+              <div className="flow-box"><div className="flow-label">Client</div><div className="flow-value">React PWA</div></div>
+              <span className="flow-arrow">→</span>
+              <div className="flow-box"><div className="flow-label">CDN</div><div className="flow-value">CloudFront</div></div>
+              <span className="flow-arrow">→</span>
+              <div className="flow-box"><div className="flow-label">Gateway</div><div className="flow-value">API Gateway</div></div>
+              <span className="flow-arrow">→</span>
+              <div className="flow-box"><div className="flow-label">Compute</div><div className="flow-value">Lambda</div></div>
+              <span className="flow-arrow">→</span>
+              <div className="flow-box"><div className="flow-label">App</div><div className="flow-value">FastAPI</div></div>
+              <span className="flow-arrow">→</span>
+              <div className="flow-box"><div className="flow-label">Database</div><div className="flow-value">Supabase PG</div></div>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, color: 'var(--text-dim)' }}>Stack Layers</h3>
+            {architectureLayers.map((layer, i) => (
+              <div key={i} className="arch-layer">
+                <div className="arch-layer-title">
+                  <span style={{ width: 10, height: 10, borderRadius: 3, background: layer.color, display: 'inline-block' }}></span>
+                  {layer.title}
+                </div>
+                <div className="arch-items">
+                  {layer.items.map((item, j) => <span key={j} className="arch-item">{item}</span>)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, color: 'var(--text-dim)' }}>API Surface (100+ endpoints)</h3>
+            <div className="api-tree">
+              {apiGroups.map((group, i) => (
+                <div key={i} className="api-group">
+                  <div className="api-group-title" onClick={() => toggleApi(group.name)}>
+                    <span>{expandedApi[group.name] ? '▼' : '▶'}</span> /api/{group.name.toLowerCase().replace(/[^a-z]/g, '')}
+                    <span style={{ fontSize: 11, color: 'var(--text-dim)', fontWeight: 400 }}>({group.endpoints.length} endpoints)</span>
+                  </div>
+                  {expandedApi[group.name] && group.endpoints.map((ep, j) => (
+                    <div key={j} className="api-endpoint">
+                      <span className={`api-method ${ep.method.toLowerCase()}`}>{ep.method}</span>
+                      <span>/api{ep.path}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Features() {
+      return (
+        <div id="features" className="section fade-in">
+          <h2 className="section-title"><span className="icon">⚡</span> Feature Map</h2>
+          <div className="grid grid-2">
+            {featureCategories.map((cat, i) => (
+              <div key={i} className="card">
+                <h3>{cat.icon} {cat.name}</h3>
+                <ul style={{ listStyle: 'none', marginTop: 8 }}>
+                  {cat.features.map((f, j) => (
+                    <li key={j} style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0', paddingLeft: 16, position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: 0, color: 'var(--green)' }}>✓</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function Strengths() {
+      return (
+        <div id="strengths" className="section fade-in">
+          <h2 className="section-title"><span className="icon">💪</span> Strengths</h2>
+          {strengths.map((s, i) => (
+            <div key={i} className="strength-item">
+              <span className="sw-icon">✅</span>
+              <div><div className="sw-title">{s.title}</div><div className="sw-desc">{s.desc}</div></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function Weaknesses() {
+      const resolved = weaknesses.filter(w => w.status === 'resolved');
+      const pending = weaknesses.filter(w => w.status !== 'resolved');
+
+      return (
+        <div id="weaknesses" className="section fade-in">
+          <h2 className="section-title"><span className="icon">⚠️</span> Weaknesses & Risks</h2>
+
+          <div className="progress-summary">
+            <div className="progress-pill">
+              <div className="dot green"></div>
+              <span>{resolved.length} Resolved</span>
+            </div>
+            <div className="progress-pill">
+              <div className="dot yellow"></div>
+              <span>{pending.length} Remaining</span>
+            </div>
+            <div className="progress-pill">
+              <div className="dot" style={{ background: 'var(--accent)' }}></div>
+              <span>{Math.round(resolved.length / weaknesses.length * 100)}% Complete</span>
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, color: 'var(--green)' }}>Resolved</h3>
+          {resolved.map((w, i) => (
+            <div key={i} className="weakness-item resolved">
+              <span className="sw-icon">✅</span>
+              <div style={{ flex: 1 }}>
+                <div className="sw-title" style={{ textDecoration: 'line-through', opacity: 0.7 }}>{w.title}</div>
+                <div className="sw-desc">{w.desc}</div>
+                {w.fix && (
+                  <div className="fix-details">
+                    <div className="fix-label">What was done</div>
+                    <ul>
+                      {w.fix.map((f, j) => <li key={j}>{f}</li>)}
+                    </ul>
+                    {w.branch && <div className="fix-branch">branch: {w.branch}</div>}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, marginTop: 24, color: 'var(--yellow)' }}>Remaining</h3>
+          {pending.map((w, i) => (
+            <div key={i} className="weakness-item">
+              <span className="sw-icon">🔴</span>
+              <div>
+                <div className="sw-title">{w.title}</div>
+                <div className="sw-desc">{w.desc}</div>
+                {w.branch && <div className="fix-branch" style={{ marginTop: 6 }}>branch: {w.branch}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function Financial() {
+      const marketChartRef = useRef(null);
+      const costChartRef = useRef(null);
+      const chartInstances = useRef([]);
+
+      useEffect(() => {
+        // Cleanup previous charts
+        chartInstances.current.forEach(c => c.destroy());
+        chartInstances.current = [];
+
+        if (marketChartRef.current) {
+          const ctx = marketChartRef.current.getContext('2d');
+          const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['Parenting Apps\n(Total)', 'Pregnancy +\nPostpartum', 'Baby Monitor\n(App-Enabled)', 'Smart Monitor\n(Hardware)'],
+              datasets: [
+                {
+                  label: '2025 ($B)',
+                  data: [1.06, 0.8, 0.5, 1.5],
+                  backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                  borderColor: '#6366f1',
+                  borderWidth: 1,
+                  borderRadius: 6,
+                },
+                {
+                  label: 'Projected ($B)',
+                  data: [5.5, 1.5, 1.2, 3.7],
+                  backgroundColor: 'rgba(168, 85, 247, 0.5)',
+                  borderColor: '#a855f7',
+                  borderWidth: 1,
+                  borderRadius: 6,
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { labels: { color: '#8b91a8', font: { size: 11 } } },
+                title: { display: true, text: 'Market Size: Current vs Projected', color: '#e4e7f1', font: { size: 14 } }
+              },
+              scales: {
+                y: { ticks: { color: '#8b91a8', callback: v => '$' + v + 'B' }, grid: { color: '#2e3345' } },
+                x: { ticks: { color: '#8b91a8', font: { size: 10 } }, grid: { display: false } }
+              }
+            }
+          });
+          chartInstances.current.push(chart);
+        }
+
+        if (costChartRef.current) {
+          const ctx = costChartRef.current.getContext('2d');
+          const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Supabase (DB/Auth)', 'AWS Lambda', 'CloudFront/S3', 'Stripe Fees', 'DeepL API', 'Domain/SSL'],
+              datasets: [{
+                data: [25, 5, 8, 2.9, 5, 12],
+                backgroundColor: ['#6366f1', '#22c55e', '#3b82f6', '#f97316', '#a855f7', '#06b6d4'],
+                borderColor: '#1a1d27',
+                borderWidth: 3,
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: 'right', labels: { color: '#8b91a8', font: { size: 11 }, padding: 12 } },
+                title: { display: true, text: 'Est. Monthly Infrastructure Cost (~$58/mo)', color: '#e4e7f1', font: { size: 14 } }
+              }
+            }
+          });
+          chartInstances.current.push(chart);
+        }
+
+        return () => chartInstances.current.forEach(c => c.destroy());
+      }, []);
+
+      return (
+        <div id="financial" className="section fade-in">
+          <h2 className="section-title"><span className="icon">💰</span> Financial Analysis</h2>
+
+          <div className="grid grid-2" style={{ marginBottom: 24 }}>
+            <div className="chart-container">
+              <canvas ref={marketChartRef}></canvas>
+            </div>
+            <div className="chart-container">
+              <canvas ref={costChartRef}></canvas>
+            </div>
+          </div>
+
+          <div className="grid grid-3">
+            <div className="card">
+              <h3 style={{ color: 'var(--green)' }}>TAM (Total Addressable)</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, margin: '8px 0', color: 'var(--green)' }}>$5.5B</div>
+              <p>Global parenting apps market by 2034, growing at 20.37% CAGR. Baby tracking is a core segment.</p>
+            </div>
+            <div className="card">
+              <h3 style={{ color: 'var(--blue)' }}>SAM (Serviceable)</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, margin: '8px 0', color: 'var(--blue)' }}>$800M</div>
+              <p>Baby tracking apps segment (EN/ES/FR markets). Overlaps with pregnancy tracking and postpartum care.</p>
+            </div>
+            <div className="card">
+              <h3 style={{ color: 'var(--purple)' }}>SOM (Obtainable)</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, margin: '8px 0', color: 'var(--purple)' }}>$2-5M/yr</div>
+              <p>Realistic year-3 target with 10K-25K paying subscribers at $9.99/mo average. Huckleberry does ~$600K/mo.</p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Key Market Insights</h3>
+            <div className="grid grid-2">
+              <div className="card">
+                <h3>🎯 65% of working parents use parenting apps</h3>
+                <p>Rising health consciousness and demand for data-driven parenting decisions drive adoption. Market is far from saturated.</p>
+              </div>
+              <div className="card">
+                <h3>🤖 AI features increase engagement 50%</h3>
+                <p>Apps with AI predictions, pattern recognition, and personalized recommendations see dramatically higher retention.</p>
+              </div>
+              <div className="card">
+                <h3>🔒 40% hesitate due to privacy concerns</h3>
+                <p>Data privacy is a major market barrier. Transparent privacy policies and data control features are a competitive advantage.</p>
+              </div>
+              <div className="card">
+                <h3>📱 North America = 45% of market</h3>
+                <p>NA leads adoption due to smartphone penetration and willingness to pay for premium apps. EN + ES covers the core market.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Competitors() {
+      const compChartRef = useRef(null);
+      const chartInstance = useRef(null);
+
+      useEffect(() => {
+        if (chartInstance.current) chartInstance.current.destroy();
+        if (compChartRef.current) {
+          const ctx = compChartRef.current.getContext('2d');
+          chartInstance.current = new Chart(ctx, {
+            type: 'radar',
+            data: {
+              labels: ['Sleep Tracking', 'Health Records', 'AI/Predictions', 'Offline Support', 'Growth Charts', 'Multi-Platform', 'Sharing', 'Photos/Media', 'i18n'],
+              datasets: [
+                {
+                  label: 'HeyBub',
+                  data: [9, 10, 7, 10, 9, 9, 8, 6, 9],
+                  borderColor: '#6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                  pointBackgroundColor: '#6366f1',
+                  borderWidth: 2,
+                },
+                {
+                  label: 'Huckleberry',
+                  data: [10, 3, 9, 3, 4, 7, 7, 3, 7],
+                  borderColor: '#22c55e',
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                  pointBackgroundColor: '#22c55e',
+                  borderWidth: 2,
+                },
+                {
+                  label: 'Baby Connect',
+                  data: [8, 8, 3, 4, 7, 6, 8, 9, 5],
+                  borderColor: '#f97316',
+                  backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                  pointBackgroundColor: '#f97316',
+                  borderWidth: 2,
+                },
+                {
+                  label: 'Glow Baby',
+                  data: [7, 4, 4, 2, 6, 6, 5, 4, 6],
+                  borderColor: '#ec4899',
+                  backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                  pointBackgroundColor: '#ec4899',
+                  borderWidth: 2,
+                },
+              ]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { labels: { color: '#8b91a8', font: { size: 12 } } },
+                title: { display: true, text: 'Feature Comparison (1-10 scale)', color: '#e4e7f1', font: { size: 14 } }
+              },
+              scales: {
+                r: {
+                  angleLines: { color: '#2e3345' },
+                  grid: { color: '#2e3345' },
+                  pointLabels: { color: '#8b91a8', font: { size: 11 } },
+                  ticks: { display: false },
+                  suggestedMin: 0, suggestedMax: 10,
+                }
+              }
+            }
+          });
+        }
+        return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+      }, []);
+
+      const renderCell = (val) => {
+        if (val === true) return <div className="comp-check">✓</div>;
+        if (val === false) return <div className="comp-cross">✗</div>;
+        if (val === 'partial') return <div className="comp-partial">~</div>;
+        return <div>{val}</div>;
+      };
+
+      return (
+        <div id="competitors" className="section fade-in">
+          <h2 className="section-title"><span className="icon">🏆</span> Competitive Landscape</h2>
+
+          <div className="chart-container" style={{ marginBottom: 24 }}>
+            <canvas ref={compChartRef}></canvas>
+          </div>
+
+          <div style={{ overflowX: 'auto', background: 'var(--surface)', borderRadius: 12, border: '1px solid var(--border)', padding: '4px 0' }}>
+            <div className="competitor-row header">
+              <div>App</div><div>Pricing</div><div style={{textAlign:'center'}}>Sleep</div><div style={{textAlign:'center'}}>Feeding</div>
+              <div style={{textAlign:'center'}}>Health</div><div style={{textAlign:'center'}}>Growth</div><div style={{textAlign:'center'}}>AI</div>
+              <div style={{textAlign:'center'}}>Sharing</div><div style={{textAlign:'center'}}>Photos</div><div style={{textAlign:'center'}}>Push</div>
+            </div>
+            {competitors.map((c, i) => (
+              <div key={i} className="competitor-row" style={c.highlight ? { background: 'rgba(99,102,241,0.06)' } : {}}>
+                <div className="comp-name" style={c.highlight ? { color: 'var(--accent-light)' } : {}}>{c.name}</div>
+                <div style={{ color: 'var(--text-dim)', fontSize: 12 }}>{c.pricing}</div>
+                {renderCell(c.sleep)}{renderCell(c.feeding)}{renderCell(c.health)}
+                {renderCell(c.growth)}{renderCell(c.ai)}{renderCell(c.sharing)}
+                {renderCell(c.photos)}{renderCell(c.push)}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-2" style={{ marginTop: 24 }}>
+            <div className="card">
+              <h3 style={{ color: 'var(--green)' }}>HeyBub's Advantages</h3>
+              <ul style={{ listStyle: 'none', marginTop: 8 }}>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ Most comprehensive health tracking (8 categories vs 0-2 for competitors)</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ Only app with full offline support + sync</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ WHO growth percentile charts (clinical-grade)</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ True cross-platform (PWA + iOS + Android from one codebase)</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ Serverless = near-zero marginal cost per user</li>
+              </ul>
+            </div>
+            <div className="card">
+              <h3 style={{ color: 'var(--red)' }}>Where Competitors Lead</h3>
+              <ul style={{ listStyle: 'none', marginTop: 8 }}>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ Huckleberry: Superior AI sleep predictions + expert sleep consultants</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ Baby Connect: Full scrapbooking + memory book (vs our basic photo upload)</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ Glow Baby: Community forums + social features + 5M+ users</li>
+                <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '4px 0' }}>→ All competitors: Established app store presence + reviews</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Revenue() {
+      const projChartRef = useRef(null);
+      const chartInstance = useRef(null);
+
+      useEffect(() => {
+        if (chartInstance.current) chartInstance.current.destroy();
+        if (projChartRef.current) {
+          const ctx = projChartRef.current.getContext('2d');
+          chartInstance.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: ['M1', 'M3', 'M6', 'M9', 'M12', 'M15', 'M18', 'M24', 'M30', 'M36'],
+              datasets: [
+                {
+                  label: 'Conservative',
+                  data: [200, 800, 2500, 5000, 8000, 12000, 18000, 32000, 48000, 65000],
+                  borderColor: '#22c55e',
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                  fill: true, tension: 0.3, borderWidth: 2,
+                },
+                {
+                  label: 'Moderate',
+                  data: [500, 2000, 6000, 12000, 20000, 32000, 50000, 85000, 130000, 180000],
+                  borderColor: '#3b82f6',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  fill: true, tension: 0.3, borderWidth: 2,
+                },
+                {
+                  label: 'Aggressive',
+                  data: [1000, 5000, 15000, 30000, 50000, 80000, 120000, 200000, 320000, 500000],
+                  borderColor: '#a855f7',
+                  backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                  fill: true, tension: 0.3, borderWidth: 2,
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { labels: { color: '#8b91a8', font: { size: 12 } } },
+                title: { display: true, text: 'Monthly Revenue Projection (36 months)', color: '#e4e7f1', font: { size: 14 } }
+              },
+              scales: {
+                y: { ticks: { color: '#8b91a8', callback: v => '$' + (v >= 1000 ? (v/1000) + 'K' : v) }, grid: { color: '#2e3345' } },
+                x: { ticks: { color: '#8b91a8' }, grid: { color: '#2e3345' } }
+              }
+            }
+          });
+        }
+        return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+      }, []);
+
+      return (
+        <div id="revenue" className="section fade-in">
+          <h2 className="section-title"><span className="icon">🚀</span> Revenue Strategy</h2>
+
+          <div className="chart-container" style={{ marginBottom: 24 }}>
+            <canvas ref={projChartRef}></canvas>
+          </div>
+
+          <div className="grid grid-3">
+            {revenueStreams.map((r, i) => (
+              <div key={i} className={`revenue-card ${r.tier}`}>
+                <div className="tier-label">{r.label}</div>
+                <h3>{r.title}</h3>
+                <div className="est">{r.est}</div>
+                <ul>
+                  {r.items.map((item, j) => <li key={j}>{item}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Pricing Strategy Recommendation</h3>
+            <div className="grid grid-3">
+              <div className="card" style={{ borderTop: '3px solid var(--text-dim)' }}>
+                <h3>Free Tier</h3>
+                <div style={{ fontSize: 24, fontWeight: 800, margin: '8px 0' }}>$0</div>
+                <ul style={{ listStyle: 'none' }}>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Core tracking (feed/sleep/diaper)</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ 1 baby profile</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Basic timeline view</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ 7-day history</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✗ No sharing</li>
+                </ul>
+              </div>
+              <div className="card" style={{ borderTop: '3px solid var(--blue)' }}>
+                <h3>Plus <span className="badge badge-blue">Popular</span></h3>
+                <div style={{ fontSize: 24, fontWeight: 800, margin: '8px 0', color: 'var(--blue)' }}>$4.99/mo</div>
+                <ul style={{ listStyle: 'none' }}>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Everything in Free</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Unlimited babies + history</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Health records + growth charts</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Family sharing (up to 5)</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ CSV/JSON export</li>
+                </ul>
+              </div>
+              <div className="card" style={{ borderTop: '3px solid var(--purple)' }}>
+                <h3>Premium <span className="badge badge-purple">Best Value</span></h3>
+                <div style={{ fontSize: 24, fontWeight: 800, margin: '8px 0', color: 'var(--purple)' }}>$9.99/mo</div>
+                <ul style={{ listStyle: 'none' }}>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Everything in Plus</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ AI predictions + sleep coaching</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Advanced analytics + trends</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Pediatrician PDF reports</li>
+                  <li style={{ fontSize: 13, color: 'var(--text-dim)', padding: '3px 0' }}>✓ Priority support</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Revenue Math</h3>
+            <div className="card" style={{ fontFamily: 'monospace', fontSize: 13, lineHeight: 2 }}>
+              <div>Huckleberry benchmark: ~$600K/mo revenue, 100K downloads/mo, 5M+ total users</div>
+              <div style={{ borderTop: '1px solid var(--border)', margin: '8px 0', paddingTop: 8 }}>
+                <strong>Conservative Year 1 Target:</strong><br/>
+                &nbsp;&nbsp;1,000 free users × 10% conversion = 100 paid users<br/>
+                &nbsp;&nbsp;70 Plus ($4.99) + 30 Premium ($9.99) = $649/mo<br/>
+                &nbsp;&nbsp;+ Growth: 500 paid users by M12 = ~$4,000/mo = <strong style={{ color: 'var(--green)' }}>$48K ARR</strong>
+              </div>
+              <div style={{ borderTop: '1px solid var(--border)', margin: '8px 0', paddingTop: 8 }}>
+                <strong>Moderate Year 2 Target:</strong><br/>
+                &nbsp;&nbsp;50K free users × 8% conversion = 4,000 paid users<br/>
+                &nbsp;&nbsp;2,800 Plus ($4.99) + 1,200 Premium ($9.99) = ~$26K/mo = <strong style={{ color: 'var(--blue)' }}>$312K ARR</strong>
+              </div>
+              <div style={{ borderTop: '1px solid var(--border)', margin: '8px 0', paddingTop: 8 }}>
+                <strong>Aggressive Year 3 Target (with B2B):</strong><br/>
+                &nbsp;&nbsp;200K free users × 8% = 16K paid + 200 B2B accounts<br/>
+                &nbsp;&nbsp;Subscriptions: ~$100K/mo + B2B: ~$6K/mo + Affiliate: ~$5K/mo<br/>
+                &nbsp;&nbsp;= <strong style={{ color: 'var(--purple)' }}>$1.3M ARR</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Roadmap() {
+      return (
+        <div id="roadmap" className="section fade-in">
+          <h2 className="section-title"><span className="icon">🗺️</span> Go-to-Market Roadmap</h2>
+          {roadmapItems.map((item, i) => (
+            <div key={i} className="roadmap-item">
+              <div className={`roadmap-phase ${item.color}`}>{item.label}</div>
+              <div className="roadmap-content">
+                <h4>{item.title}</h4>
+                <p>{item.desc}</p>
+                <div className="roadmap-tags">
+                  {item.tags.map((tag, j) => <span key={j} className="roadmap-tag">{tag}</span>)}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div className="divider"></div>
+
+          <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1))', border: '1px solid rgba(99,102,241,0.3)' }}>
+            <h3 style={{ marginBottom: 8 }}>Bottom Line</h3>
+            <p style={{ fontSize: 14, lineHeight: 1.8 }}>
+              HeyBub/BabyLog has a <strong>strong technical foundation</strong> with the most comprehensive feature set in the baby tracking space.
+              The serverless architecture keeps costs minimal (~$58/mo) while the app's feature depth rivals or exceeds apps generating $600K+/mo.
+              <br/><br/>
+              <strong>The gap is not in features — it's in distribution and polish.</strong> The immediate priorities are:
+              (1) App Store launch for iOS/Android,
+              (2) push notifications for retention,
+              (3) photo/memory features for emotional engagement,
+              and (4) optimized tiered pricing.
+              <br/><br/>
+              With the parenting apps market growing at <strong>20.37% CAGR</strong> and projected to reach <strong>$5.5B by 2034</strong>,
+              there is significant runway. The app's unique combination of offline support, WHO growth charts, and comprehensive health tracking
+              positions it well against competitors who focus narrowly on sleep or feeding.
+              Reaching <strong>$1M+ ARR within 3 years</strong> is achievable with focused execution on distribution and monetization.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // ────────────────────────────── APP ──────────────────────────────
+
+    function App() {
+      const [active, setActive] = useState('overview');
+
+      useEffect(() => {
+        const handleScroll = () => {
+          const scrollPos = window.scrollY + 100;
+          for (let i = sections.length - 1; i >= 0; i--) {
+            const el = document.getElementById(sections[i].id);
+            if (el && el.offsetTop <= scrollPos) {
+              setActive(sections[i].id);
+              break;
+            }
+          }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      return (
+        <>
+          <Nav active={active} setActive={setActive} />
+          <div className="container">
+            <Overview />
+            <div className="divider"></div>
+            <Architecture />
+            <div className="divider"></div>
+            <Features />
+            <div className="divider"></div>
+            <Strengths />
+            <div className="divider"></div>
+            <Weaknesses />
+            <div className="divider"></div>
+            <Financial />
+            <div className="divider"></div>
+            <Competitors />
+            <div className="divider"></div>
+            <Revenue />
+            <div className="divider"></div>
+            <Roadmap />
+            <div style={{ textAlign: 'center', padding: '40px 0 20px', color: 'var(--text-dim)', fontSize: 12 }}>
+              Generated {new Date().toLocaleDateString()} — HeyBub/BabyLog Project Analysis
+              <br/>Sources: Straits Research, Business Research Insights, Polaris Market Research, Sensor Tower, Crunchbase
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

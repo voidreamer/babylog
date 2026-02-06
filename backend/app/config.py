@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""
     stripe_price_monthly: str = ""
     stripe_price_yearly: str = ""
+    # VAPID keys for Web Push notifications
+    vapid_private_key: str = ""
+    vapid_public_key: str = ""
+    vapid_contact_email: str = "support@heybub.app"
+    # Supabase Storage (for photo uploads)
+    supabase_url: str = ""
+    supabase_service_key: str = ""
+    photo_bucket: str = "photos"
 
     class Config:
         env_file = ".env"

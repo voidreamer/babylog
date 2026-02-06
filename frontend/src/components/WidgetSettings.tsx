@@ -8,14 +8,14 @@ import {
 } from 'lucide-react';
 
 const ALL_WIDGETS = [
-    { id: 'feeding', label: 'Feeding', icon: Baby, color: 'var(--feeding)' },
-    { id: 'diaper', label: 'Diaper', icon: Droplets, color: 'var(--diaper)' },
-    { id: 'sleep', label: 'Sleep', icon: Moon, color: 'var(--sleep)' },
-    { id: 'pumping', label: 'Pumping', icon: Heart, color: 'var(--pumping)' },
-    { id: 'potty', label: 'Potty', icon: Toilet, color: 'var(--potty)' },
-    { id: 'tummy', label: 'Tummy Time', icon: Timer, color: 'var(--tummy)' },
-    { id: 'bath', label: 'Bath', icon: BathIcon, color: 'var(--bath)' },
-    { id: 'supplement', label: 'Supplement', icon: Pill, color: '#16a34a' },
+    { id: 'feeding', labelKey: 'feeding.title', icon: Baby, color: 'var(--feeding)' },
+    { id: 'diaper', labelKey: 'diaper.title', icon: Droplets, color: 'var(--diaper)' },
+    { id: 'sleep', labelKey: 'sleep.title', icon: Moon, color: 'var(--sleep)' },
+    { id: 'pumping', labelKey: 'pumping.title', icon: Heart, color: 'var(--pumping)' },
+    { id: 'potty', labelKey: 'potty.title', icon: Toilet, color: 'var(--potty)' },
+    { id: 'tummy', labelKey: 'tummyTime.title', icon: Timer, color: 'var(--tummy)' },
+    { id: 'bath', labelKey: 'bath.title', icon: BathIcon, color: 'var(--bath)' },
+    { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: '#16a34a' },
 ];
 
 interface WidgetSettingsProps { visibleWidgets: string[]; onToggle: (id: string) => void; quickActionsEnabled: boolean; onToggleQuickActions: () => void; }
@@ -97,7 +97,7 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                                             >
                                                 <Icon size={20} />
                                             </div>
-                                            <span className="widget-settings-label">{widget.label}</span>
+                                            <span className="widget-settings-label">{t(widget.labelKey)}</span>
                                             <div className={`widget-settings-check ${isEnabled ? 'visible' : ''}`}>
                                                 <Check size={14} />
                                             </div>
