@@ -31,7 +31,7 @@
   "errorBoundaryTitle": "Algo salió mal",
   "errorBoundaryMessage": "Lo sentimos, pero ha ocurrido algo inesperado. Inténtelo de nuevo.",
   "refresh": "Actualizar",
-  "tryAgain": "Inténtalo de nuevo",
+  "tryAgain": "Inténtelo de nuevo",
   "now": "Ahora",
   "nav": {
     "home": "Inicio",
@@ -60,7 +60,14 @@
   "language": {
     "en": "Inglés",
     "es-CO": "English (Colombia)",
-    "fr-CA": "Français (Canadá)"
+    "fr-CA": "Français (Canadá)",
+    "pt-BR": "Português (Brasil)",
+    "de": "Deutsch",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी"
   },
   "placeholder_enterName": "Introduzca el nombre",
   "placeholder_35": "3.5",
