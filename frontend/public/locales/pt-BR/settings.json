@@ -98,5 +98,10 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "Could not start checkout. Please try again.",
   "toast_premiumRestoredReloading": "Premium restored! Reloading…",
   "toast_noActiveSubscriptionFoundForThisAc": "No active subscription found for this account.",
-  "toast_couldNotCheckSubscription": "Could not check subscription."
+  "toast_couldNotCheckSubscription": "Could not check subscription.",
+  "navigation": {
+    "title": "Navegação",
+    "backToHub": "Voltar para HeyBub Hub",
+    "backToHubDesc": "Retornar ao site principal"
+  }
 }

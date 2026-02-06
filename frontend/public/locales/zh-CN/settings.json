@@ -98,5 +98,10 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "Could not start checkout. Please try again.",
   "toast_premiumRestoredReloading": "Premium restored! Reloading…",
   "toast_noActiveSubscriptionFoundForThisAc": "No active subscription found for this account.",
-  "toast_couldNotCheckSubscription": "Could not check subscription."
+  "toast_couldNotCheckSubscription": "Could not check subscription.",
+  "navigation": {
+    "title": "导航",
+    "backToHub": "返回HeyBub Hub",
+    "backToHubDesc": "返回主站"
+  }
 }

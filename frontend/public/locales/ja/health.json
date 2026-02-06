@@ -53,11 +53,11 @@
     "teethCount": "{{count}}/20 teeth",
     "upper": "Upper",
     "lower": "Lower",
-    "emerged": "Emerged",
+    "emerged": "生えた",
     "expected": "Expected",
     "future": "Future",
     "markEmerged": "Mark {{name}} as Emerged",
-    "markEmergedBtn": "Mark Emerged",
+    "markEmergedBtn": "生えたと記録",
     "emergedDate": "Emerged: {{date}}",
     "removeRecord": "Remove Record",
     "toothMarked": "{{name}} marked as emerged!"
@@ -81,7 +81,7 @@
       "diarrhea": "Diarrhea",
       "rash": "Rash",
       "ear_pain": "Ear Pain",
-      "fussy": "Fussy",
+      "fussy": "不機嫌",
       "poor_appetite": "Poor Appetite",
       "lethargy": "Lethargy",
       "sore_throat": "Sore Throat"

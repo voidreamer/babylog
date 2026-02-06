@@ -45,6 +45,11 @@
     "exportFailed": "Error de exportación",
     "noDataToExport": "No hay datos de bebés para exportar"
   },
+  "navigation": {
+    "title": "Navegación",
+    "backToHub": "Volver a HeyBub Hub",
+    "backToHubDesc": "Regresar al sitio principal"
+  },
   "support": {
     "title": "Ayuda",
     "contactUs": "Póngase en contacto con nosotros",

@@ -76,7 +76,6 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                                 <div className="settings-row-desc">{currentBaby.birth_date ? t('settings:babyProfile.born', { date: formatDob(currentBaby.birth_date) }) : ''}</div>
                             </div>
                         </div>
-                        <ChevronRight size={18} className="settings-arrow" />
                     </div>
                     <div className="settings-row" onClick={() => setActiveTab('health')}>
                         <div className="settings-row-left">
@@ -88,7 +87,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         </div>
                         <ChevronRight size={18} className="settings-arrow" />
                     </div>
-                    <div className="settings-row">
+                    <div className="settings-row" onClick={() => setActiveTab('home')}>
                         <div className="settings-row-left">
                             <div className="settings-icon-box lavender">👶</div>
                             <div>
@@ -209,15 +208,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
             {/* Navigation */}
             <div className="settings-group">
-                <div className="settings-group-title">Navigation</div>
+                <div className="settings-group-title">{t('settings:navigation.title')}</div>
                 <a className="settings-row" href={hubUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
                             <ArrowLeft size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">Back to HeyBub Hub</div>
-                            <div className="settings-row-desc">Return to the main site</div>
+                            <div className="settings-row-label">{t('settings:navigation.backToHub')}</div>
+                            <div className="settings-row-desc">{t('settings:navigation.backToHubDesc')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -250,7 +249,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </button>
-                <div className="settings-row">
+                <a className="settings-row" href="https://heybub.app/terms" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box cloud">📋</div>
                         <div>
@@ -258,7 +257,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
-                </div>
+                </a>
                 <button
                     className="settings-row settings-row-danger"
                     onClick={logout}
