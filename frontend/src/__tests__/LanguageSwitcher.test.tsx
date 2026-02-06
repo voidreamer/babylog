@@ -31,8 +31,8 @@ describe('LanguageSwitcher', () => {
         expect(screen.getByText('English')).toBeInTheDocument();
         expect(screen.getByText('Español (Colombia)')).toBeInTheDocument();
         expect(screen.getByText('Français (Canada)')).toBeInTheDocument();
-        expect(screen.getByText('Deutsch')).toBeInTheDocument();
         expect(screen.getByText('日本語')).toBeInTheDocument();
+        expect(screen.getByText('Русский')).toBeInTheDocument();
     });
 
     it('shows current language as selected', () => {

@@ -29,12 +29,9 @@ const SOURCE_LANG = 'EN';
 const TARGET_LANGS = [
   { code: 'ES', folder: 'es-CO' },
   { code: 'FR', folder: 'fr-CA' },
-  { code: 'PT-BR', folder: 'pt-BR' },
-  { code: 'DE', folder: 'de' },
-  { code: 'IT', folder: 'it' },
   { code: 'JA', folder: 'ja' },
-  { code: 'KO', folder: 'ko' },
   { code: 'ZH-HANS', folder: 'zh-CN' },
+  { code: 'RU', folder: 'ru' },
   // Hindi (hi) is NOT supported by DeepL — skip
 ];
 const NAMESPACES = ['common', 'dashboard', 'health', 'settings', 'auth'];
@@ -180,7 +177,7 @@ async function main() {
   }
 
   console.log('\nTranslation complete!');
-  console.log('Note: Hindi (hi) locale must be translated manually or via Google Cloud Translation.');
+  console.log('Note: Hindi (hi) is not supported by DeepL and must be translated separately.');
 }
 
 main().catch(err => {

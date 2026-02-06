@@ -1,56 +1,61 @@
 {
-  "title": "Settings",
+  "title": "設定",
   "babyProfile": {
-    "title": "Baby Profile",
-    "born": "Born {{date}}",
-    "growthData": "Growth Data",
-    "growthDataDesc": "Update weight, height",
-    "addAnother": "Add Another Baby",
-    "addAnotherDesc": "Track multiple children"
+    "title": "赤ちゃんのプロフィール",
+    "born": "{{date}}生まれ",
+    "growthData": "成長データ",
+    "growthDataDesc": "体重・身長を更新",
+    "addAnother": "もう一人登録",
+    "addAnotherDesc": "複数のお子様を管理"
   },
   "preferences": {
-    "title": "Preferences",
-    "notifications": "Notifications",
-    "notificationsDesc": "Feeding, nap reminders",
-    "darkMode": "Dark Mode",
-    "darkModeDesc": "Easier on eyes at night",
-    "language": "Language",
-    "languageDesc": "Choose your language",
-    "units": "Units",
-    "unitsMetric": "Metric (kg, cm, ml)",
-    "unitsImperial": "Imperial (lbs, in, oz)"
+    "title": "環境設定",
+    "notifications": "通知",
+    "notificationsDesc": "授乳・お昼寝のリマインダー",
+    "darkMode": "ダークモード",
+    "darkModeDesc": "夜間に目にやさしい",
+    "language": "言語",
+    "languageDesc": "言語を選択",
+    "units": "単位",
+    "unitsMetric": "メートル法 (kg, cm, ml)",
+    "unitsImperial": "ヤード・ポンド法 (lbs, in, oz)"
   },
   "account": {
-    "title": "Account",
-    "signedIn": "Signed in",
-    "premiumMember": "Premium member ⭐",
+    "title": "アカウント",
+    "signedIn": "サインイン中",
+    "premiumMember": "プレミアム会員 ⭐",
     "premium": {
-      "title": "Premium Plan",
-      "active": "Active",
-      "activeManage": "Active — Manage subscription",
-      "activePromo": "Active — Promo code",
-      "unlock": "Unlock AI insights & more"
+      "title": "プレミアムプラン",
+      "active": "有効",
+      "activeManage": "有効 — サブスクリプションを管理",
+      "activePromo": "有効 — プロモコード",
+      "unlock": "AI分析などの機能を解放"
     },
-    "caregivers": "Caregivers",
-    "caregiversDesc": "Share with family",
-    "comingSoon": "Coming soon"
+    "caregivers": "保育者",
+    "caregiversDesc": "家族と共有",
+    "comingSoon": "近日公開"
   },
   "data": {
-    "title": "Data",
-    "export": "Export Data",
-    "exportDesc": "Download as CSV",
-    "exporting": "Exporting...",
-    "upgradeToExport": "Upgrade to export",
-    "exportSuccess": "Export complete! Check your downloads folder.",
-    "exportFailed": "Export failed",
-    "noDataToExport": "No baby data to export"
+    "title": "データ",
+    "export": "データをエクスポート",
+    "exportDesc": "CSVでダウンロード",
+    "exporting": "エクスポート中...",
+    "upgradeToExport": "アップグレードしてエクスポート",
+    "exportSuccess": "エクスポート完了！ダウンロードフォルダをご確認ください。",
+    "exportFailed": "エクスポートに失敗しました",
+    "noDataToExport": "エクスポートするデータがありません"
+  },
+  "navigation": {
+    "title": "ナビゲーション",
+    "backToHub": "HeyBub Hubに戻る",
+    "backToHubDesc": "メインサイトに戻る"
   },
   "support": {
-    "title": "Support",
-    "contactUs": "Contact Us",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "signOut": "Sign Out"
+    "title": "サポート",
+    "contactUs": "お問い合わせ",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "signOut": "サインアウト"
   },
   "units": {
     "kg": "kg",
@@ -61,47 +66,42 @@
     "oz": "oz"
   },
   "upgrade": {
-    "title": "Upgrade to Premium",
-    "subtitle": "Unlock all features",
+    "title": "プレミアムにアップグレード",
+    "subtitle": "すべての機能を解放",
     "features": {
-      "insights": "AI-powered baby insights",
-      "export": "Export data as CSV",
-      "more": "And more coming soon..."
+      "insights": "AIによる赤ちゃんの分析",
+      "export": "データをCSVでエクスポート",
+      "more": "さらに多くの機能が近日公開..."
     },
-    "promoCode": "Promo Code",
-    "promoPlaceholder": "Enter promo code",
-    "applyPromo": "Apply",
-    "subscribe": "Subscribe",
-    "manageSub": "Could not open subscription management.",
+    "promoCode": "プロモコード",
+    "promoPlaceholder": "プロモコードを入力",
+    "applyPromo": "適用",
+    "subscribe": "登録する",
+    "manageSub": "サブスクリプション管理を開けませんでした。",
     "heyBubPremium": "HeyBub Premium",
     "premiumFeatures": {
-      "insights": "AI-powered baby insights & predictions",
-      "growth": "Growth charts with WHO percentiles",
-      "export": "Export all your data (CSV)",
-      "share": "Share with unlimited caregivers",
-      "multiple": "Track multiple babies",
-      "support": "Priority support"
+      "insights": "AIによる赤ちゃんの分析と予測",
+      "growth": "WHO基準の成長チャート",
+      "export": "すべてのデータをエクスポート (CSV)",
+      "share": "保育者と無制限に共有",
+      "multiple": "複数の赤ちゃんを管理",
+      "support": "優先サポート"
     },
-    "limitedTime": "LIMITED TIME · 50% OFF",
-    "bestValue": "BEST VALUE",
-    "perMonth": "per month",
-    "perYear": "per year",
-    "justPerMonth": "Just $1.25/mo",
-    "redirecting": "Redirecting…",
-    "startTrial": "Start 7-Day Free Trial",
-    "cancelAnytime": "Cancel anytime · No commitment",
-    "restorePurchase": "Restore Purchase",
-    "premiumFeature": "Premium Feature",
-    "upgradeToUnlock": "Upgrade to unlock {{feature}}",
-    "upgradeBtn": "Upgrade"
+    "limitedTime": "期間限定 · 50% OFF",
+    "bestValue": "最もお得",
+    "perMonth": "月額",
+    "perYear": "年額",
+    "justPerMonth": "月々わずか$1.25",
+    "redirecting": "リダイレクト中…",
+    "startTrial": "7日間の無料トライアルを開始",
+    "cancelAnytime": "いつでもキャンセル可能 · 縛りなし",
+    "restorePurchase": "購入を復元",
+    "premiumFeature": "プレミアム機能",
+    "upgradeToUnlock": "アップグレードして{{feature}}を解放",
+    "upgradeBtn": "アップグレード"
   },
-  "toast_couldNotStartCheckoutPleaseTryAgai": "Could not start checkout. Please try again.",
-  "toast_premiumRestoredReloading": "Premium restored! Reloading…",
-  "toast_noActiveSubscriptionFoundForThisAc": "No active subscription found for this account.",
-  "toast_couldNotCheckSubscription": "Could not check subscription.",
-  "navigation": {
-    "title": "ナビゲーション",
-    "backToHub": "HeyBub Hubに戻る",
-    "backToHubDesc": "メインサイトに戻る"
-  }
+  "toast_couldNotStartCheckoutPleaseTryAgai": "決済を開始できませんでした。もう一度お試しください。",
+  "toast_premiumRestoredReloading": "プレミアムが復元されました！再読み込み中…",
+  "toast_noActiveSubscriptionFoundForThisAc": "このアカウントに有効なサブスクリプションが見つかりません。",
+  "toast_couldNotCheckSubscription": "サブスクリプションを確認できませんでした。"
 }

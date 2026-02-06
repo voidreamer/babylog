@@ -1,10 +1,10 @@
 {
   "appName": "HeyBub",
   "babyTracker": "Rastreador de bebés",
-  "hub": "Cubo",
+  "hub": "Hub",
   "loading": "Cargando...",
   "save": "Guardar",
-  "saving": "Ahorrar...",
+  "saving": "Guardando...",
   "cancel": "Cancelar",
   "delete": "Borrar",
   "edit": "Editar",
@@ -46,7 +46,7 @@
     "sleep": "Dormir",
     "pumping": "Bombeo",
     "potty": "Orinal",
-    "tummyTime": "Hora del vientre",
+    "tummyTime": "Boca abajo",
     "bath": "Baño",
     "supplement": "Suplemento"
   },
@@ -59,15 +59,12 @@
   },
   "language": {
     "en": "Inglés",
-    "es-CO": "English (Colombia)",
+    "es-CO": "Español (Colombia)",
     "fr-CA": "Français (Canadá)",
-    "pt-BR": "Português (Brasil)",
-    "de": "Deutsch",
-    "it": "Italiano",
-    "ja": "日本語",
-    "ko": "한국어",
     "zh-CN": "简体中文",
-    "hi": "हिन्दी"
+    "ja": "日本語",
+    "hi": "हिन्दी",
+    "ru": "Русский"
   },
   "placeholder_enterName": "Introduzca el nombre",
   "placeholder_35": "3.5",

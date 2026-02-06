@@ -8,13 +8,10 @@ export const LANGUAGES: LanguageConfig[] = [
   { code: 'en', nativeName: 'English', flag: '🇺🇸' },
   { code: 'es-CO', nativeName: 'Español (Colombia)', flag: '🇨🇴' },
   { code: 'fr-CA', nativeName: 'Français (Canada)', flag: '🇨🇦' },
-  { code: 'pt-BR', nativeName: 'Português (Brasil)', flag: '🇧🇷' },
-  { code: 'de', nativeName: 'Deutsch', flag: '🇩🇪' },
-  { code: 'it', nativeName: 'Italiano', flag: '🇮🇹' },
-  { code: 'ja', nativeName: '日本語', flag: '🇯🇵' },
-  { code: 'ko', nativeName: '한국어', flag: '🇰🇷' },
   { code: 'zh-CN', nativeName: '简体中文', flag: '🇨🇳' },
+  { code: 'ja', nativeName: '日本語', flag: '🇯🇵' },
   { code: 'hi', nativeName: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'ru', nativeName: 'Русский', flag: '🇷🇺' },
 ];
 
 export const LANGUAGE_CODES = LANGUAGES.map(l => l.code);
