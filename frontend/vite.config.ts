@@ -65,7 +65,53 @@ export default defineConfig({
                         }
                     },
                     {
-                        // Cache API responses with network-first strategy
+                        // Cache locale JSON files (translations) — CacheFirst, long TTL
+                        urlPattern: /\/locales\/.+\.json$/i,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'locales-cache',
+                            expiration: {
+                                maxEntries: 60,
+                                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200]
+                            }
+                        }
+                    },
+                    {
+                        // Cache baby/profile data — CacheFirst with 5 min TTL
+                        urlPattern: /\/api\/babies\/.*/i,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'api-babies-cache',
+                            expiration: {
+                                maxEntries: 20,
+                                maxAgeSeconds: 60 * 5 // 5 minutes
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200]
+                            }
+                        }
+                    },
+                    {
+                        // Dashboard data — NetworkFirst with 1 min timeout
+                        urlPattern: /\/api\/events\/dashboard.*/i,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'api-dashboard-cache',
+                            expiration: {
+                                maxEntries: 10,
+                                maxAgeSeconds: 60 // 1 minute
+                            },
+                            networkTimeoutSeconds: 5,
+                            cacheableResponse: {
+                                statuses: [0, 200]
+                            }
+                        }
+                    },
+                    {
+                        // All other API responses — NetworkFirst
                         urlPattern: /\/api\/.*/i,
                         handler: 'NetworkFirst',
                         options: {

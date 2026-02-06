@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
 import { useOfflineSync } from './hooks/useOfflineSync';
+import { useAnalytics } from './hooks/useAnalytics';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
 import TimelineCalendar from './components/TimelineCalendar';
@@ -34,8 +35,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
     const currentBaby = babies?.[0];
 
-    const toggleNotifications = () => {
+    const toggleNotifications = async () => {
+        const { subscribeToPush, unsubscribeFromPush } = await import('./utils/pushNotifications');
         const next = !notifications;
+        if (next) {
+            const ok = await subscribeToPush();
+            if (!ok) return; // Permission denied or not supported
+        } else {
+            await unsubscribeFromPush();
+        }
         setNotifications(next);
         localStorage.setItem('heybub-notifications', String(next));
     };
@@ -307,6 +315,7 @@ function MainApp() {
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
+    const { track, trackPageView } = useAnalytics();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
@@ -360,6 +369,10 @@ function MainApp() {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
     }, [theme]);
+
+    useEffect(() => {
+        trackPageView(activeTab);
+    }, [activeTab, trackPageView]);
 
     useEffect(() => {
         const checkPremiumStatus = async () => {

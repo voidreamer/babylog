@@ -403,6 +403,27 @@ class ApiClient {
     // Upcoming
     async getUpcoming(babyId: number): Promise<any> { return this.request(`/health/upcoming/?baby_id=${babyId}`); }
 
+    // Photos
+    async getPhotoUploadUrl(babyId: number, filename: string, contentType: string = 'image/jpeg'): Promise<{ upload_url: string; storage_key: string; public_url: string }> {
+        return this.request('/photos/upload', {
+            method: 'POST',
+            body: JSON.stringify({ baby_id: babyId, filename, content_type: contentType }),
+        });
+    }
+
+    async deletePhoto(storageKey: string): Promise<void> {
+        return this.request(`/photos/${storageKey}`, { method: 'DELETE' });
+    }
+
+    async uploadPhotoToStorage(uploadUrl: string, file: Blob, contentType: string = 'image/jpeg'): Promise<void> {
+        const response = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': contentType },
+            body: file,
+        });
+        if (!response.ok) throw new Error('Photo upload failed');
+    }
+
     // Billing
     async createCheckoutSession(priceId: string, successUrl: string, cancelUrl: string): Promise<any> {
         return this.request('/billing/create-checkout-session', {

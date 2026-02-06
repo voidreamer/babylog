@@ -44,9 +44,10 @@ class Baby(Base):
     name = Column(String, nullable=False)
     birth_date = Column(DateTime, nullable=True)
     gender = Column(String, nullable=True)  # 'boy', 'girl', or null
+    profile_photo_url = Column(String, nullable=True)
     shared_with_emails = Column(ARRAY(String), default=list)
     created_at = Column(DateTime, default=utc_now)
-    
+
     # Relationships
     feedings = relationship("Feeding", back_populates="baby", cascade="all, delete-orphan")
     diapers = relationship("Diaper", back_populates="baby", cascade="all, delete-orphan")
@@ -190,14 +191,15 @@ class Medication(Base):
 
 class Milestone(Base):
     __tablename__ = "milestones"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     milestone_type = Column(String(100), nullable=False)
     achieved_date = Column(DateTime, nullable=False)
+    photo_url = Column(String, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="milestones")
 
 
@@ -307,7 +309,7 @@ class Bath(Base):
 class Supplement(Base):
     """Track daily supplements like Vitamin D, Iron, etc."""
     __tablename__ = "supplements"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
@@ -315,5 +317,33 @@ class Supplement(Base):
     dosage = Column(String, nullable=True)  # e.g., "400 IU", "1ml"
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="supplements")
+
+
+# ============================================================================
+# Analytics & Marketing Models
+# ============================================================================
+
+class AnalyticsEvent(Base):
+    """Lightweight event tracking for product analytics."""
+    __tablename__ = "analytics_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, index=True, nullable=False)
+    event_name = Column(String(100), nullable=False, index=True)
+    event_data = Column(String, nullable=True)  # JSON string
+    session_id = Column(String(64), nullable=True, index=True)
+    created_at = Column(DateTime, default=utc_now, index=True)
+
+
+class PushSubscription(Base):
+    """Web Push subscription info for notifications."""
+    __tablename__ = "push_subscriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, index=True, nullable=False)
+    endpoint = Column(String, nullable=False, unique=True)
+    p256dh_key = Column(String, nullable=False)
+    auth_key = Column(String, nullable=False)
+    created_at = Column(DateTime, default=utc_now)

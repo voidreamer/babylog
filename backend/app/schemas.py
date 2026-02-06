@@ -23,6 +23,7 @@ class BabyBase(BaseModel):
     name: str = Field(..., max_length=200)
     birth_date: Optional[datetime] = None
     gender: Optional[GenderEnum] = None
+    profile_photo_url: Optional[str] = None
 
 
 class BabyCreate(BabyBase):
@@ -33,6 +34,7 @@ class BabyUpdate(BaseModel):
     name: Optional[str] = None
     birth_date: Optional[datetime] = None
     gender: Optional[GenderEnum] = None
+    profile_photo_url: Optional[str] = None
 
 
 class BabyResponse(BabyBase):
@@ -369,6 +371,7 @@ class MedicationUpdate(BaseModel):
 class MilestoneBase(BaseModel):
     milestone_type: str = Field(..., max_length=200)
     achieved_date: datetime
+    photo_url: Optional[str] = None
     notes: Optional[str] = Field(None, max_length=2000)
 
 
@@ -390,6 +393,7 @@ class MilestoneResponse(MilestoneBase):
 class MilestoneUpdate(BaseModel):
     milestone_type: Optional[str] = None
     achieved_date: Optional[datetime] = None
+    photo_url: Optional[str] = None
     notes: Optional[str] = Field(None, max_length=2000)
 
 
@@ -605,3 +609,75 @@ class AllergyResponse(AllergyBase):
         from_attributes=True,
         json_encoders={datetime: serialize_datetime}
     )
+
+
+# ============================================================================
+# Analytics Schemas
+# ============================================================================
+
+class AnalyticsEventCreate(BaseModel):
+    event_name: str = Field(..., max_length=100)
+    event_data: Optional[str] = None  # JSON string
+    session_id: Optional[str] = Field(None, max_length=64)
+
+
+class AnalyticsEventBatch(BaseModel):
+    events: List[AnalyticsEventCreate]
+
+
+class AnalyticsEventResponse(BaseModel):
+    id: int
+    user_id: str
+    event_name: str
+    event_data: Optional[str] = None
+    session_id: Optional[str] = None
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+# ============================================================================
+# Push Notification Schemas
+# ============================================================================
+
+class PushSubscriptionCreate(BaseModel):
+    endpoint: str
+    p256dh_key: str
+    auth_key: str
+
+
+class PushSubscriptionResponse(BaseModel):
+    id: int
+    user_id: str
+    endpoint: str
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
+
+class PushNotificationSend(BaseModel):
+    title: str = Field(..., max_length=200)
+    body: str = Field(..., max_length=1000)
+    user_ids: Optional[List[str]] = None  # None = broadcast to all
+
+
+# ============================================================================
+# Photo Upload Schemas
+# ============================================================================
+
+class PhotoUploadRequest(BaseModel):
+    filename: str
+    content_type: str = "image/jpeg"
+    baby_id: int
+
+
+class PhotoUploadResponse(BaseModel):
+    upload_url: str
+    storage_key: str
+    public_url: str

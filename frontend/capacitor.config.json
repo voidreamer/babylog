@@ -27,6 +27,12 @@
   "plugins": {
     "Browser": {
       "presentationStyle": "popover"
+    },
+    "Camera": {
+      "presentationStyle": "fullscreen"
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
     }
   }
 }

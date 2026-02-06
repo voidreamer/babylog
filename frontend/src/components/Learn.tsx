@@ -2,6 +2,7 @@
 import { useMemo } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import BabyInsights from './BabyInsights';
+import ContentFeed from './ContentFeed';
 
 function calculateAgeInMonths(birthDate: string): number {
     const birth = new Date(birthDate);
@@ -43,6 +44,13 @@ export default function Learn({ isPremium = false }: LearnProps) {
                 </div>
 
                 <BabyInsights isPremium={isPremium} />
+
+                <div style={{ marginTop: 'var(--space-xl)' }}>
+                    <h2 style={{ fontSize: 18, marginBottom: 'var(--space-md)', fontFamily: 'var(--font-family-heading)' }}>
+                        Tips & Guides
+                    </h2>
+                    <ContentFeed />
+                </div>
             </motion.div>
         </div>
     );

@@ -1,7 +1,7 @@
 import { openDB, IDBPDatabase } from 'idb';
 
 const DB_NAME = 'heybub-offline';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 const CACHE_CONFIG = {
     MAX_ENTRIES_PER_BABY: 500,
@@ -22,7 +22,8 @@ const STORES = {
     VACCINATIONS: 'vaccinations',
     MEDICATIONS: 'medications',
     MILESTONES: 'milestones',
-    GROWTH_RECORDS: 'growth_records'
+    GROWTH_RECORDS: 'growth_records',
+    PHOTOS: 'photos'
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,6 +95,10 @@ async function getDB() {
                 const store = db.createObjectStore(STORES.GROWTH_RECORDS, { keyPath: 'id' });
                 store.createIndex('baby_id', 'baby_id');
                 store.createIndex('recorded_date', 'recorded_date');
+            }
+            if (!db.objectStoreNames.contains(STORES.PHOTOS)) {
+                const store = db.createObjectStore(STORES.PHOTOS, { keyPath: 'id', autoIncrement: true });
+                store.createIndex('baby_id', 'baby_id');
             }
         }
     });
@@ -424,7 +429,7 @@ export async function clearAllOfflineData(): Promise<void> {
         [STORES.BABIES, STORES.FEEDINGS, STORES.SLEEPS, STORES.DIAPERS,
          STORES.PUMPINGS, STORES.ACTIVITIES, STORES.PENDING_SYNC, STORES.METADATA,
          STORES.DOCTOR_VISITS, STORES.VACCINATIONS, STORES.MEDICATIONS,
-         STORES.MILESTONES, STORES.GROWTH_RECORDS],
+         STORES.MILESTONES, STORES.GROWTH_RECORDS, STORES.PHOTOS],
         'readwrite'
     );
 
@@ -442,6 +447,7 @@ export async function clearAllOfflineData(): Promise<void> {
         tx.objectStore(STORES.MEDICATIONS).clear(),
         tx.objectStore(STORES.MILESTONES).clear(),
         tx.objectStore(STORES.GROWTH_RECORDS).clear(),
+        tx.objectStore(STORES.PHOTOS).clear(),
     ]);
 
     await tx.done;
@@ -492,6 +498,7 @@ export async function getCacheStats(): Promise<Record<string, number>> {
         medications: await db.count(STORES.MEDICATIONS),
         milestones: await db.count(STORES.MILESTONES),
         growthRecords: await db.count(STORES.GROWTH_RECORDS),
+        photos: await db.count(STORES.PHOTOS),
     };
 }
 

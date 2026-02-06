@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react';
 import i18n from 'i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { LANGUAGES } from '../i18n/languages';
 
 describe('LanguageSwitcher', () => {
     beforeEach(async () => {
@@ -15,21 +16,23 @@ describe('LanguageSwitcher', () => {
         expect(screen.getByText('Choose your language')).toBeInTheDocument();
     });
 
-    it('renders a select element with three language options', () => {
+    it('renders a select element with all language options', () => {
         render(<LanguageSwitcher />);
         const select = screen.getByRole('combobox');
         expect(select).toBeInTheDocument();
 
         const options = screen.getAllByRole('option');
-        expect(options).toHaveLength(3);
+        expect(options).toHaveLength(LANGUAGES.length);
     });
 
     it('shows the correct language option labels', () => {
         render(<LanguageSwitcher />);
+        // Native names from languages.ts config
         expect(screen.getByText('English')).toBeInTheDocument();
-        // These come from common:language.es-CO and common:language.fr-CA
         expect(screen.getByText('Español (Colombia)')).toBeInTheDocument();
         expect(screen.getByText('Français (Canada)')).toBeInTheDocument();
+        expect(screen.getByText('Deutsch')).toBeInTheDocument();
+        expect(screen.getByText('日本語')).toBeInTheDocument();
     });
 
     it('shows current language as selected', () => {
@@ -82,6 +85,6 @@ describe('LanguageSwitcher', () => {
         const options = screen.getAllByRole('option') as HTMLOptionElement[];
 
         const values = options.map((opt) => opt.value);
-        expect(values).toEqual(['en', 'es-CO', 'fr-CA']);
+        expect(values).toEqual(LANGUAGES.map(l => l.code));
     });
 });
