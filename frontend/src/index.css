@@ -785,6 +785,7 @@ h4 {
   cursor: pointer;
   height: auto;
   min-height: 140px;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border-light, var(--border));
   box-shadow: var(--shadow-sm);
@@ -1349,10 +1350,12 @@ h4 {
   display: flex;
   gap: var(--space-xs);
   margin-top: auto;
+  overflow: hidden;
 }
 
 .feeding-quick-btn {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1438,10 +1441,12 @@ h4 {
   display: flex;
   gap: var(--space-xs);
   margin-top: auto;
+  overflow: hidden;
 }
 
 .tummy-quick-btn {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1457,6 +1462,8 @@ h4 {
   background: var(--widget-stroke, var(--tummy));
   color: var(--text-on-color);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tummy-quick-btn:hover:not(:disabled) {
@@ -1478,10 +1485,12 @@ h4 {
   display: flex;
   gap: var(--space-xs);
   margin-top: auto;
+  overflow: hidden;
 }
 
 .pumping-quick-btn {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1497,6 +1506,8 @@ h4 {
   background: var(--widget-stroke, var(--pumping));
   color: var(--text-on-color);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pumping-quick-btn:hover:not(:disabled) {

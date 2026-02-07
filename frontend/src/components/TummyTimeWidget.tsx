@@ -179,21 +179,21 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                                     onClick={(e) => handleQuickLog(5, e)}
                                     disabled={quickSaving !== null || saving}
                                 >
-                                    {quickSaving === 5 ? '...' : t('tummyTime.durationOptions.5min')}
+                                    {quickSaving === 5 ? '...' : '5m'}
                                 </button>
                                 <button
                                     className="tummy-quick-btn"
                                     onClick={(e) => handleQuickLog(10, e)}
                                     disabled={quickSaving !== null || saving}
                                 >
-                                    {quickSaving === 10 ? '...' : t('tummyTime.durationOptions.10min')}
+                                    {quickSaving === 10 ? '...' : '10m'}
                                 </button>
                                 <button
                                     className="tummy-quick-btn"
                                     onClick={(e) => handleQuickLog(15, e)}
                                     disabled={quickSaving !== null || saving}
                                 >
-                                    {quickSaving === 15 ? '...' : t('tummyTime.durationOptions.15min')}
+                                    {quickSaving === 15 ? '...' : '15m'}
                                 </button>
                                 <button
                                     className="tummy-quick-btn timer"
