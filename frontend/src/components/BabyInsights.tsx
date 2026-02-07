@@ -12,12 +12,14 @@ import {
     BenchmarksSection,
     TodayVsAverageSection
 } from './insights/InsightsSections';
+import RestPlannerSection from './insights/RestPlannerSection';
 
 interface BabyInsightsProps { isPremium?: boolean; }
 export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [analytics, setAnalytics] = useState<any>(null);
+    const [restPlan, setRestPlan] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -31,8 +33,12 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await api.getAnalytics(selectedBaby.id, 7);
+                const [data, plan] = await Promise.all([
+                    api.getAnalytics(selectedBaby.id, 7),
+                    api.getRestPlan(selectedBaby.id, 7).catch(() => null),
+                ]);
                 setAnalytics(data);
+                setRestPlan(plan);
             } catch (err) {
                 // Only log in development
                 if (import.meta.env.DEV) {
@@ -100,6 +106,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     return (
         <div className="insights-container">
             <PredictionsSection predictions={predictions} isPremium={isPremium} />
+            <RestPlannerSection restPlan={restPlan} isPremium={isPremium} />
             <PatternsSection patterns={patterns} isPremium={isPremium} />
             <TrendsSection trends={trends} isPremium={isPremium} />
             <BenchmarksSection benchmarks={benchmarks} today_vs_average={today_vs_average} />
