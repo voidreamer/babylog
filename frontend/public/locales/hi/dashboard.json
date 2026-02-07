@@ -309,6 +309,8 @@
     "diapers": "डायपर",
     "vs": "बनाम",
     "perDay": "{{value}}/दिन",
+    "forYou": "आपके लिए",
+    "forYouDesc": "आपके शिशु के पैटर्न पर आधारित आराम के सुझाव",
     "restPlanner": "\u0906\u0930\u093e\u092e \u092f\u094b\u091c\u0928\u093e",
     "upgradeToSeeRestPlanner": "\u0906\u0930\u093e\u092e \u092f\u094b\u091c\u0928\u093e \u0926\u0947\u0916\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0905\u092a\u0917\u094d\u0930\u0947\u0921 \u0915\u0930\u0947\u0902",
     "restNow": "\u0905\u092d\u0940 \u0906\u0930\u093e\u092e \u0915\u0930\u0947\u0902! \u0936\u093f\u0936\u0941 \u0938\u094b \u0930\u0939\u093e \u0939\u0948",
@@ -326,7 +328,15 @@
     "quality_fair": "\u0920\u0940\u0915",
     "noFeedingOverlap": "\u0907\u0938 \u0938\u092e\u092f \u0926\u0942\u0927 \u092a\u093f\u0932\u093e\u0928\u0947 \u0915\u0940 \u0909\u092e\u094d\u092e\u0940\u0926 \u0928\u0939\u0940\u0902",
     "feedingMayOverlap": "\u090f\u0915 \u0926\u0942\u0927 \u092a\u093f\u0932\u093e\u0928\u093e \u0907\u0938 \u0928\u0940\u0902\u0926 \u0938\u0947 \u0913\u0935\u0930\u0932\u0948\u092a \u0939\u094b \u0938\u0915\u0924\u093e \u0939\u0948",
-    "currentNap": "\u0935\u0930\u094d\u0924\u092e\u093e\u0928 \u0928\u0940\u0902\u0926"
+    "currentNap": "\u0935\u0930\u094d\u0924\u092e\u093e\u0928 \u0928\u0940\u0902\u0926",
+    "confidenceScore": "{{score}}% विश्वसनीय",
+    "windowRange": "~{{earliest}} – {{latest}}",
+    "sleepPressureLabel": "नींद का दबाव",
+    "signal_pattern": "ऐतिहासिक पैटर्न",
+    "signal_pressure": "नींद का दबाव",
+    "signal_circadian": "जैविक लय",
+    "signal_feeding": "आहार सहसंबंध",
+    "poweredByScience": "नींद विज्ञान पर आधारित"
   },
   "learn": {
     "insights": "जानकारियाँ",

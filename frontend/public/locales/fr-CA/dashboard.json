@@ -309,6 +309,8 @@
     "diapers": "Couches",
     "vs": "vs",
     "perDay": "{{value}}/jour",
+    "forYou": "Pour Vous",
+    "forYouDesc": "Suggestions de repos basées sur les habitudes de votre bébé",
     "restPlanner": "Planificateur de repos",
     "upgradeToSeeRestPlanner": "Passez à la version premium pour voir le planificateur",
     "restNow": "Reposez-vous maintenant! Bébé fait la sieste",
@@ -326,7 +328,15 @@
     "quality_fair": "Passable",
     "noFeedingOverlap": "Aucun boire prévu pendant cette fenêtre",
     "feedingMayOverlap": "Un boire pourrait chevaucher cette sieste",
-    "currentNap": "Sieste en cours"
+    "currentNap": "Sieste en cours",
+    "confidenceScore": "{{score}}% de confiance",
+    "windowRange": "~{{earliest}} – {{latest}}",
+    "sleepPressureLabel": "Pression de sommeil",
+    "signal_pattern": "Historique",
+    "signal_pressure": "Pression de sommeil",
+    "signal_circadian": "Rythme biologique",
+    "signal_feeding": "Corrélation alimentation",
+    "poweredByScience": "Basé sur la science du sommeil"
   },
   "learn": {
     "insights": "Perspectives",

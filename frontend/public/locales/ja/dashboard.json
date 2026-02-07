@@ -309,6 +309,8 @@
     "diapers": "おむつ",
     "vs": "対",
     "perDay": "{{value}}/日",
+    "forYou": "あなたへ",
+    "forYouDesc": "赤ちゃんのパターンに基づく休憩の提案",
     "restPlanner": "\u4f11\u61a9\u30d7\u30e9\u30f3\u30ca\u30fc",
     "upgradeToSeeRestPlanner": "\u4f11\u61a9\u30d7\u30e9\u30f3\u30ca\u30fc\u3092\u898b\u308b\u306b\u306f\u30a2\u30c3\u30d7\u30b0\u30ec\u30fc\u30c9",
     "restNow": "\u4eca\u304c\u4f11\u61a9\u30c1\u30e3\u30f3\u30b9\uff01\u8d64\u3061\u3083\u3093\u306f\u304a\u663c\u5bdd\u4e2d",
@@ -326,7 +328,15 @@
     "quality_fair": "\u666e\u901a",
     "noFeedingOverlap": "\u3053\u306e\u6642\u9593\u5e2f\u306b\u6388\u4e73\u306e\u4e88\u5b9a\u306f\u3042\u308a\u307e\u305b\u3093",
     "feedingMayOverlap": "\u6388\u4e73\u304c\u3053\u306e\u304a\u663c\u5bdd\u3068\u91cd\u306a\u308b\u53ef\u80fd\u6027\u304c\u3042\u308a\u307e\u3059",
-    "currentNap": "\u73fe\u5728\u306e\u304a\u663c\u5bdd"
+    "currentNap": "\u73fe\u5728\u306e\u304a\u663c\u5bbd",
+    "confidenceScore": "{{score}}%\u306e\u4fe1\u983c\u5ea6",
+    "windowRange": "~{{earliest}} \u2013 {{latest}}",
+    "sleepPressureLabel": "\u7761\u7720\u5309",
+    "signal_pattern": "\u904e\u53bb\u306e\u30d1\u30bf\u30fc\u30f3",
+    "signal_pressure": "\u7761\u7720\u5309",
+    "signal_circadian": "\u751f\u4f53\u30ea\u30ba\u30e0",
+    "signal_feeding": "\u4f50\u4e73\u3068\u306e\u76f8\u95a2",
+    "poweredByScience": "\u7761\u7720\u79d1\u5b66\u306b\u57fa\u3065\u304f"
   },
   "learn": {
     "insights": "分析",

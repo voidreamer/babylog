@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Baby, AlertCircle, Sparkles } from 'lucide-react';
+import { Baby, AlertCircle, Sparkles, Heart } from 'lucide-react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
@@ -106,11 +106,23 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     return (
         <div className="insights-container">
             <PredictionsSection predictions={predictions} isPremium={isPremium} />
-            <RestPlannerSection restPlan={restPlan} isPremium={isPremium} />
             <PatternsSection patterns={patterns} isPremium={isPremium} />
             <TrendsSection trends={trends} isPremium={isPremium} />
             <BenchmarksSection benchmarks={benchmarks} today_vs_average={today_vs_average} />
             <TodayVsAverageSection today_vs_average={today_vs_average} />
+
+            {restPlan && restPlan.patterns_used?.has_enough_data && (
+                <div className="insights-parent-section">
+                    <div className="insights-parent-header">
+                        <Heart size={20} />
+                        <div>
+                            <h2>{t('insights.forYou')}</h2>
+                            <p>{t('insights.forYouDesc')}</p>
+                        </div>
+                    </div>
+                    <RestPlannerSection restPlan={restPlan} isPremium={isPremium} />
+                </div>
+            )}
         </div>
     );
 }

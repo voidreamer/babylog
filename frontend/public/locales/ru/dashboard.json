@@ -309,6 +309,8 @@
     "diapers": "Подгузники",
     "vs": "vs",
     "perDay": "{{value}}/день",
+    "forYou": "Для Вас",
+    "forYouDesc": "Рекомендации по отдыху на основе режима вашего малыша",
     "restPlanner": "Планировщик отдыха",
     "upgradeToSeeRestPlanner": "Обновите подписку для планировщика отдыха",
     "restNow": "Отдыхайте сейчас! Малыш спит",
@@ -326,7 +328,15 @@
     "quality_fair": "Нормально",
     "noFeedingOverlap": "Кормление не ожидается в этом окне",
     "feedingMayOverlap": "Кормление может совпасть с этим сном",
-    "currentNap": "Текущий сон"
+    "currentNap": "Текущий сон",
+    "confidenceScore": "{{score}}% уверенности",
+    "windowRange": "~{{earliest}} – {{latest}}",
+    "sleepPressureLabel": "Давление сна",
+    "signal_pattern": "Исторический паттерн",
+    "signal_pressure": "Давление сна",
+    "signal_circadian": "Биологический ритм",
+    "signal_feeding": "Корреляция кормления",
+    "poweredByScience": "На основе науки о сне"
   },
   "learn": {
     "insights": "Аналитика",

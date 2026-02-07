@@ -309,6 +309,8 @@
     "diapers": "Diapers",
     "vs": "vs",
     "perDay": "{{value}}/day",
+    "forYou": "For You",
+    "forYouDesc": "Rest suggestions based on your baby's patterns",
     "restPlanner": "Rest Planner",
     "upgradeToSeeRestPlanner": "Upgrade to see rest planner",
     "restNow": "Rest now! Baby is napping",
@@ -326,7 +328,15 @@
     "quality_fair": "Fair",
     "noFeedingOverlap": "No feeding expected during this window",
     "feedingMayOverlap": "A feeding may overlap with this nap",
-    "currentNap": "Current nap"
+    "currentNap": "Current nap",
+    "confidenceScore": "{{score}}% confident",
+    "windowRange": "~{{earliest}} – {{latest}}",
+    "sleepPressureLabel": "Sleep pressure",
+    "signal_pattern": "Historical pattern",
+    "signal_pressure": "Sleep pressure",
+    "signal_circadian": "Biological rhythm",
+    "signal_feeding": "Feeding correlation",
+    "poweredByScience": "Powered by sleep science"
   },
   "learn": {
     "insights": "Insights",
