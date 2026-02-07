@@ -10,7 +10,7 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="settings-row" style={{ position: 'relative' }}>
+    <div className="settings-row">
       <div className="settings-row-left">
         <div className="settings-icon-box sky">
           <Globe size={16} />
@@ -23,16 +23,7 @@ export default function LanguageSwitcher() {
       <select
         value={i18n.language}
         onChange={handleChange}
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 8,
-          padding: '4px 8px',
-          color: 'var(--text)',
-          fontSize: 13,
-          cursor: 'pointer',
-          maxWidth: 160,
-        }}
+        className="language-select"
       >
         {LANGUAGES.map(({ code, nativeName }) => (
           <option key={code} value={code}>

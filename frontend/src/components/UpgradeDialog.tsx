@@ -55,124 +55,76 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
     }
   };
 
-  const promoBadgeStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: -10,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-    color: '#fff',
-    fontSize: '0.58rem',
-    fontWeight: 800,
-    padding: '2px 7px',
-    borderRadius: 8,
-    whiteSpace: 'nowrap',
-    letterSpacing: '0.03em',
-    boxShadow: '0 2px 6px rgba(239,68,68,0.35)',
-  };
-
-  const cardBase: React.CSSProperties = {
-    flex: 1,
-    borderRadius: 'var(--radius-lg)',
-    padding: 'var(--space-md)',
-    background: 'var(--surface)',
-    cursor: loading ? 'wait' : 'pointer',
-    textAlign: 'center',
-    position: 'relative',
-  };
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-content"
+        className="modal-content upgrade-modal-content"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: 420, padding: 'var(--space-xl)' }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Crown size={24} style={{ color: '#f59e0b' }} />
-            <h2 style={{ margin: 0 }}>{t('upgrade.heyBubPremium')}</h2>
+        <div className="upgrade-header">
+          <div className="upgrade-header-left">
+            <Crown size={24} className="icon-gold" />
+            <h2>{t('upgrade.heyBubPremium')}</h2>
           </div>
           <button className="btn-icon" onClick={onClose} aria-label={t('common:close')}><X size={20} /></button>
         </div>
 
         {/* Features */}
-        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--space-lg)' }}>
+        <ul className="upgrade-features">
           {FEATURE_KEYS.map((key) => (
-            <li key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: '0.9rem' }}>
-              <Check size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
+            <li key={key} className="upgrade-feature-item">
+              <Check size={16} className="icon-green" />
               {t(`upgrade.premiumFeatures.${key}`)}
             </li>
           ))}
         </ul>
 
         {/* Pricing cards */}
-        <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
+        <div className="pricing-cards">
           {/* Monthly */}
           <button
+            className="pricing-card pricing-card-monthly"
             onClick={() => handleCheckout(MONTHLY_PRICE_ID)}
             disabled={!!loading}
-            style={{ ...cardBase, border: '2px solid var(--border)' }}
           >
-            <span style={promoBadgeStyle}>{t('upgrade.limitedTime')}</span>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginTop: 4 }}>
-              $4.99/mo
-            </div>
-            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$2.49</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('upgrade.perMonth')}</div>
+            <span className="promo-badge">{t('upgrade.limitedTime')}</span>
+            <div className="price-original">$4.99/mo</div>
+            <div className="price-main">$2.49</div>
+            <div className="price-period">{t('upgrade.perMonth')}</div>
           </button>
 
           {/* Yearly */}
           <button
+            className="pricing-card pricing-card-yearly"
             onClick={() => handleCheckout(YEARLY_PRICE_ID)}
             disabled={!!loading}
-            style={{ ...cardBase, border: '2px solid #f59e0b' }}
           >
-            <span style={promoBadgeStyle}>{t('upgrade.limitedTime')}</span>
-            <span
-              style={{
-                position: 'absolute',
-                top: -10,
-                right: -6,
-                background: '#f59e0b',
-                color: '#fff',
-                fontSize: '0.58rem',
-                fontWeight: 800,
-                padding: '2px 7px',
-                borderRadius: 8,
-              }}
-            >
-              {t('upgrade.bestValue')}
-            </span>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginTop: 4 }}>
-              $29.99/yr
-            </div>
-            <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>$14.99</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('upgrade.perYear')}</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>
-              Just $1.25/mo
-            </div>
+            <span className="promo-badge">{t('upgrade.limitedTime')}</span>
+            <span className="best-value-badge">{t('upgrade.bestValue')}</span>
+            <div className="price-original">$29.99/yr</div>
+            <div className="price-main">$14.99</div>
+            <div className="price-period">{t('upgrade.perYear')}</div>
+            <div className="price-equivalent">Just $1.25/mo</div>
           </button>
         </div>
 
         {/* CTA */}
         <button
-          className="btn btn-primary"
+          className="btn btn-primary btn-cta"
           onClick={() => handleCheckout(YEARLY_PRICE_ID)}
           disabled={!!loading}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
           <Sparkles size={16} />
           {loading ? t('upgrade.redirecting') : t('upgrade.startTrial')}
         </button>
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: 'var(--space-md)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+        <div className="upgrade-footer">
           {t('upgrade.cancelAnytime')} ·{' '}
           <button
             onClick={handleRestore}
-            style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.78rem', textDecoration: 'underline', padding: 0 }}
+            className="btn-text-link"
           >
             {t('upgrade.restorePurchase')}
           </button>

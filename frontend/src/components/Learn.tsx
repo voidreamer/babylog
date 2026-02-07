@@ -51,21 +51,18 @@ export default function Learn({ isPremium = false }: LearnProps) {
                 <BabyInsights isPremium={isPremium} />
 
                 {teaserArticles.length > 0 && (
-                    <div className="card" style={{ marginTop: 'var(--space-xl)', padding: 'var(--space-lg)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
-                            <BookOpen size={18} style={{ color: 'var(--primary)' }} />
-                            <h2 style={{ fontSize: 16, margin: 0, fontFamily: 'var(--font-family-heading)' }}>
+                    <div className="card learn-articles-card">
+                        <div className="learn-articles-header">
+                            <BookOpen size={18} className="icon-primary" />
+                            <h2>
                                 {t('dashboard:learn.tipsAndGuides', { defaultValue: 'Tips & Guides' })}
                             </h2>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                        <div className="learn-articles-list">
                             {teaserArticles.map(article => (
-                                <div key={article.id} style={{
-                                    padding: 'var(--space-sm) 0',
-                                    borderBottom: '1px solid var(--border)',
-                                }}>
-                                    <div style={{ fontWeight: 500, fontSize: 14 }}>{article.title}</div>
-                                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{article.summary}</div>
+                                <div key={article.id} className="learn-article-item">
+                                    <div className="learn-article-title">{article.title}</div>
+                                    <div className="learn-article-summary">{article.summary}</div>
                                 </div>
                             ))}
                         </div>
@@ -73,20 +70,7 @@ export default function Learn({ isPremium = false }: LearnProps) {
                             href="https://heybub.app"
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 'var(--space-xs)',
-                                marginTop: 'var(--space-md)',
-                                padding: 'var(--space-sm) var(--space-md)',
-                                background: 'var(--primary)',
-                                color: '#fff',
-                                borderRadius: 'var(--radius-md)',
-                                textDecoration: 'none',
-                                fontWeight: 600,
-                                fontSize: 14,
-                            }}
+                            className="learn-read-more"
                         >
                             {t('dashboard:learn.readMoreOnHeyBub', { defaultValue: 'Read more on HeyBub' })}
                             <ExternalLink size={14} />

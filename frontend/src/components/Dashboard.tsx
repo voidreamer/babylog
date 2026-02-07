@@ -166,8 +166,11 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div className="loading">
-                <div className="spinner"></div>
+            <div>
+                <div className="skeleton skeleton-greeting" />
+                <div className="widgets-grid">
+                    {[1,2,3,4].map(i => <div key={i} className="skeleton skeleton-widget" />)}
+                </div>
             </div>
         );
     }

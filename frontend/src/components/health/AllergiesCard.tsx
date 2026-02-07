@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from '../ConfirmModal';
 
 const COMMON_ALLERGENS = [
     'Dairy',
@@ -26,6 +27,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
     const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         allergen: '',
         severity: 'mild',
@@ -124,7 +126,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                                 </span>
                                 <button
                                     className="allergy-delete"
-                                    onClick={() => handleDelete(allergy.id)}
+                                    onClick={() => setConfirmDeleteId(allergy.id)}
                                     aria-label={t('arialabel_deleteAllergy')}
                                 >
                                     <Trash2 size={14} />
@@ -229,6 +231,12 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
                     {t('allergies.addAllergy')}
                 </button>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }
