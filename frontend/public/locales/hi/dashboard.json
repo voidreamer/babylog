@@ -110,7 +110,8 @@
     "start": "शुरू करें",
     "noPumpingsYet": "अभी कोई पंपिंग नहीं",
     "pumpingLogged": "पंपिंग दर्ज हुई ({{duration}} मि.)",
-    "startedAt": "{{time}} पर शुरू"
+    "startedAt": "{{time}} पर शुरू",
+    "quickLogged": "पम्पिंग दर्ज ({{amount}})"
   },
   "potty": {
     "title": "पॉटी",

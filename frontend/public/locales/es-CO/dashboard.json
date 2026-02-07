@@ -110,7 +110,8 @@
     "start": "Inicio",
     "noPumpingsYet": "Aún no hay bombeos",
     "pumpingLogged": "Bombeo registrado ({{duration}} min)",
-    "startedAt": "Iniciado a las {{time}}"
+    "startedAt": "Iniciado a las {{time}}",
+    "quickLogged": "Bombeo registrado ({{amount}})"
   },
   "potty": {
     "title": "Orinal",

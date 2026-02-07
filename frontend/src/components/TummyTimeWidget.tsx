@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatTimeAgo } from '../utils/formatTime';
 import { useState, useEffect, useRef } from 'react';
-import { Sun, Play, Square, Plus } from 'lucide-react';
+import { Sun, Square, Plus, Clock } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { hapticImpact, hapticNotification } from '../utils/haptics';
 import { motion } from 'framer-motion';
 
 
@@ -54,12 +55,38 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
         }
     }, [activeTummy]);
 
+    const [quickSaving, setQuickSaving] = useState<number | null>(null);
+
+    const handleQuickLog = async (durationMinutes: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!selectedBaby) return;
+
+        setQuickSaving(durationMinutes);
+        try {
+            await api.createTummyTime({
+                baby_id: selectedBaby.id,
+                start_time: new Date(Date.now() - durationMinutes * 60000).toISOString(),
+                duration_minutes: durationMinutes,
+                notes: null,
+            });
+            hapticNotification();
+            toast.success(t('tummyTime.tummyTimeLogged', { duration: durationMinutes }));
+            onTummyChange();
+        } catch (error) {
+            console.error('Failed to log tummy time:', error);
+            toast.error(t('toast_failedToSaveTummyTime'));
+        } finally {
+            setQuickSaving(null);
+        }
+    };
+
     const handleStartTummy = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!selectedBaby) return;
         const newActive = { babyId: selectedBaby.id, startTime: Date.now() };
         setActiveTummy(newActive);
         localStorage.setItem(ACTIVE_TUMMY_KEY, JSON.stringify(newActive));
+        hapticImpact();
         toast.success(t('toast_tummyTimeStarted'));
     };
 
@@ -134,30 +161,51 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                             {saving ? t('common:saving') : t('common:done')}
                         </button>
                     </div>
-                ) : quickActionsEnabled ? (
-                    <div className="feeding-widget-idle">
-                        {lastTummy ? (
-                            <>
-                                <div className="widget-time-ago">{timeAgo}</div>
-                                <div className="widget-detail">{lastTummy.duration_minutes}min</div>
-                            </>
-                        ) : null}
-                        <button className="feeding-start-btn" onClick={handleStartTummy} disabled={saving}>
-                            <Play size={14} fill="currentColor" />
-                            {t('tummyTime.start')}
-                        </button>
-                    </div>
                 ) : (
-                    <div className="feeding-widget-idle">
+                    <>
                         {lastTummy ? (
                             <>
                                 <div className="widget-time-ago">{timeAgo}</div>
                                 <div className="widget-detail">{lastTummy.duration_minutes}min</div>
                             </>
-                        ) : (
+                        ) : !quickActionsEnabled ? (
                             <div className="widget-time-ago">{t('tummyTime.noTummyTimeYet')}</div>
+                        ) : null}
+
+                        {quickActionsEnabled && (
+                            <div className="tummy-quick-btns">
+                                <button
+                                    className="tummy-quick-btn"
+                                    onClick={(e) => handleQuickLog(5, e)}
+                                    disabled={quickSaving !== null || saving}
+                                >
+                                    {quickSaving === 5 ? '...' : t('tummyTime.durationOptions.5min')}
+                                </button>
+                                <button
+                                    className="tummy-quick-btn"
+                                    onClick={(e) => handleQuickLog(10, e)}
+                                    disabled={quickSaving !== null || saving}
+                                >
+                                    {quickSaving === 10 ? '...' : t('tummyTime.durationOptions.10min')}
+                                </button>
+                                <button
+                                    className="tummy-quick-btn"
+                                    onClick={(e) => handleQuickLog(15, e)}
+                                    disabled={quickSaving !== null || saving}
+                                >
+                                    {quickSaving === 15 ? '...' : t('tummyTime.durationOptions.15min')}
+                                </button>
+                                <button
+                                    className="tummy-quick-btn timer"
+                                    onClick={handleStartTummy}
+                                    disabled={saving}
+                                    title={t('tummyTime.start')}
+                                >
+                                    <Clock size={14} />
+                                </button>
+                            </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
         </motion.div>
