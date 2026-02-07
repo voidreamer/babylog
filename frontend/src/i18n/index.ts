@@ -1,21 +1,23 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import HttpBackend from 'i18next-http-backend';
+import resourcesToBackend from 'i18next-resources-to-backend';
 import { DEFAULT_LANGUAGE, NAMESPACES } from './languages';
 
 const savedLanguage = localStorage.getItem('language') || DEFAULT_LANGUAGE;
 
 i18n
-  .use(HttpBackend)
+  .use(
+    resourcesToBackend(
+      (language: string, namespace: string) =>
+        import(`../../public/locales/${language}/${namespace}.json`)
+    )
+  )
   .use(initReactI18next)
   .init({
     lng: savedLanguage,
     fallbackLng: DEFAULT_LANGUAGE,
     ns: [...NAMESPACES],
     defaultNS: 'common',
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-    },
     interpolation: {
       escapeValue: false,
     },
