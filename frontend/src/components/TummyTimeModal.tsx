@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -60,6 +61,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
             } else {
                 await api.createTummyTime(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log tummy time:', error);

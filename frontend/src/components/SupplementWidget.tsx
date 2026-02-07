@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 
 interface SupplementWidgetProps { lastSupplement: any; onSupplementChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
@@ -48,9 +49,12 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
     const supplementLabel = lastSupplement?.name?.replace('_', ' ') || t('supplement.vitaminD');
 
     return (
-        <div
+        <motion.div
             className="widget supplement"
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             <div className="widget-bg-icon">
                 <Pill size={80} strokeWidth={1} />
@@ -91,6 +95,6 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -7,6 +7,7 @@ import TimePicker from './TimePicker';
 import { ShowerHead } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Parse UTC time string to local Date
 
@@ -50,6 +51,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
             } else {
                 await api.createBath(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log bath:', error);

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import UpgradeDialog from './UpgradeDialog';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from './ConfirmModal';
+import { hapticSelection } from '../utils/haptics';
 
 export default function BabySelector(): React.ReactElement | null {
     const { t } = useTranslation('common');
@@ -133,6 +134,7 @@ export default function BabySelector(): React.ReactElement | null {
                                 background: baby.id === selectedBaby?.id ? 'var(--surface-hover)' : 'transparent',
                             }}
                             onClick={() => {
+                                hapticSelection();
                                 selectBaby(baby);
                                 setShowDropdown(false);
                             }}

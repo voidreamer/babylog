@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 
 interface SleepModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
@@ -52,6 +53,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
             } else {
                 await api.createSleep(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);

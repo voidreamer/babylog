@@ -7,6 +7,7 @@ import TimePicker from './TimePicker';
 import { Pill } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Parse UTC time string to local Date
 
@@ -75,6 +76,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
             } else {
                 await api.createSupplement(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log supplement:', error);

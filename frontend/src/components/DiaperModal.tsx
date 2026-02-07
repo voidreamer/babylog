@@ -5,6 +5,7 @@ import TimePicker from './TimePicker';
 import { Droplets, CircleDot, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr: any): Date => {
@@ -66,6 +67,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
             } else {
                 await api.createDiaper(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);

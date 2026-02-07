@@ -2,6 +2,7 @@
 import { Baby, Droplets, Moon, Heart, Plus, CircleDot, Sun, ShowerHead, Pill } from 'lucide-react';
 import { formatTimeAgo } from '../utils/formatTime';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 // Map widget types to PNG icons (null means use Lucide fallback)
 const pngIcons: Record<string, string | null> = {
@@ -55,13 +56,16 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
     const isEmpty = !lastTime && value === 'Never';
 
     return (
-        <div
+        <motion.div
             className={`widget ${type} ${isSleeping ? 'sleeping' : ''}`}
             onClick={onClick}
             role="button"
             tabIndex={0}
             aria-label={label}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
 
             {/* Background glow for sleeping */}
@@ -97,7 +101,7 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
                     </>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }
 
