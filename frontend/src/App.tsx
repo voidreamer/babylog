@@ -274,7 +274,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 </button>
             </div>
 
-            <p className="settings-version">HeyBub v1.0.0</p>
+            <p className="settings-version">{t('app.version', { version: '1.0.0' })}</p>
         </div>
     );
 }

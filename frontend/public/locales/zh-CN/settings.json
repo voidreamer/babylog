@@ -103,5 +103,8 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "无法开始结账，请重试。",
   "toast_premiumRestoredReloading": "高级版已恢复！正在重新加载…",
   "toast_noActiveSubscriptionFoundForThisAc": "未找到此账户的有效订阅。",
-  "toast_couldNotCheckSubscription": "无法检查订阅状态。"
+  "toast_couldNotCheckSubscription": "无法检查订阅状态。",
+  "app": {
+    "version": "HeyBub v{{version}}"
+  }
 }

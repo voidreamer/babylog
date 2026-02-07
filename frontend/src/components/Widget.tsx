@@ -58,6 +58,10 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
         <div
             className={`widget ${type} ${isSleeping ? 'sleeping' : ''}`}
             onClick={onClick}
+            role="button"
+            tabIndex={0}
+            aria-label={label}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
         >
 
             {/* Background glow for sleeping */}

@@ -14,13 +14,8 @@ const parseUTCTime = (timeStr: any): Date => {
     return new Date(utcTime);
 };
 
-const durationOptions = [
-    { value: 1, label: '1 min' },
-    { value: 3, label: '3 min' },
-    { value: 5, label: '5 min' },
-    { value: 10, label: '10 min' },
-    { value: 15, label: '15 min' },
-];
+const durationValues = [1, 3, 5, 10, 15] as const;
+const durationKeys = ['1min', '3min', '5min', '10min', '15min'] as const;
 
 interface TummyTimeModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
 export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTimeModalProps) {
@@ -45,6 +40,11 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedBaby) return;
+
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
 
         setSaving(true);
         try {
@@ -71,10 +71,10 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('tummyTime.title')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -83,14 +83,14 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
                         <div className="form-group">
                             <label className="form-label">{t('tummyTime.duration')}</label>
                             <div className="type-selector">
-                                {durationOptions.map((opt) => (
+                                {durationValues.map((val, i) => (
                                     <button
-                                        key={opt.value}
+                                        key={val}
                                         type="button"
-                                        className={`type-btn ${duration === opt.value ? 'active' : ''}`}
-                                        onClick={() => setDuration(opt.value)}
+                                        className={`type-btn ${duration === val ? 'active' : ''}`}
+                                        onClick={() => setDuration(val)}
                                     >
-                                        {opt.label}
+                                        {t(`tummyTime.durationOptions.${durationKeys[i]}`)}
                                     </button>
                                 ))}
                             </div>

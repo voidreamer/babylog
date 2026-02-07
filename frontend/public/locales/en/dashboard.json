@@ -109,7 +109,8 @@
     "savePumping": "Save Pumping",
     "start": "Start",
     "noPumpingsYet": "No pumpings yet",
-    "pumpingLogged": "Pumping logged ({{duration}} min)"
+    "pumpingLogged": "Pumping logged ({{duration}} min)",
+    "startedAt": "Started at {{time}}"
   },
   "potty": {
     "title": "Potty",
@@ -142,7 +143,14 @@
     "tummy": "Tummy",
     "start": "Start",
     "noTummyTimeYet": "No tummy time yet",
-    "tummyTimeLogged": "Tummy time logged ({{duration}} min)"
+    "tummyTimeLogged": "Tummy time logged ({{duration}} min)",
+    "durationOptions": {
+      "1min": "1 min",
+      "3min": "3 min",
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min"
+    }
   },
   "bath": {
     "title": "Bath",

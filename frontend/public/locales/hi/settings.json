@@ -103,5 +103,8 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "चेकआउट शुरू नहीं हो सका। कृपया पुनः प्रयास करें।",
   "toast_premiumRestoredReloading": "प्रीमियम पुनर्स्थापित! रीलोड हो रहा है…",
   "toast_noActiveSubscriptionFoundForThisAc": "इस खाते के लिए कोई सक्रिय सदस्यता नहीं मिली।",
-  "toast_couldNotCheckSubscription": "सदस्यता जाँच नहीं हो सकी।"
+  "toast_couldNotCheckSubscription": "सदस्यता जाँच नहीं हो सकी।",
+  "app": {
+    "version": "HeyBub v{{version}}"
+  }
 }

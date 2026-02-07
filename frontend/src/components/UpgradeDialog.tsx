@@ -94,7 +94,7 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
             <Crown size={24} style={{ color: '#f59e0b' }} />
             <h2 style={{ margin: 0 }}>{t('upgrade.heyBubPremium')}</h2>
           </div>
-          <button className="btn-icon" onClick={onClose}><X size={20} /></button>
+          <button className="btn-icon" onClick={onClose} aria-label={t('common:close')}><X size={20} /></button>
         </div>
 
         {/* Features */}

@@ -88,6 +88,25 @@
   --shadow-md: 0 4px 16px rgba(74, 64, 68, 0.08);
   --shadow-lg: 0 8px 24px rgba(74, 64, 68, 0.1);
 
+  --card-bg: var(--surface);
+  --text-on-color: #ffffff;
+
+  /* Z-index scale */
+  --z-widget: 1;
+  --z-sticky: 10;
+  --z-nav: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  /* Widget action colors */
+  --feeding-breast: #ec4899;
+  --feeding-formula: #8b5cf6;
+  --feeding-bottle: #f59e0b;
+  --diaper-pee: #0891b2;
+  --diaper-poo: #92400e;
+  --supplement-action: #f97316;
+
   --font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans Devanagari', sans-serif;
   --font-family-heading: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans Devanagari', sans-serif;
 }
@@ -155,6 +174,17 @@
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  --card-bg: var(--surface);
+  --text-on-color: #ffffff;
+
+  /* Widget action colors (dark variants) */
+  --feeding-breast: #f472b6;
+  --feeding-formula: #a78bfa;
+  --feeding-bottle: #fbbf24;
+  --diaper-pee: #22d3ee;
+  --diaper-poo: #d97706;
+  --supplement-action: #fb923c;
 
   --font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans Devanagari', sans-serif;
   --font-family-heading: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans Devanagari', sans-serif;
@@ -421,7 +451,7 @@ h4 {
   position: absolute;
   width: 22px;
   height: 22px;
-  background: white;
+  background: var(--background);
   border-radius: 50%;
   top: 3px;
   left: 3px;
@@ -695,7 +725,7 @@ h4 {
 .baby-dropdown-shared {
   font-size: 0.7rem;
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: uppercase;
@@ -851,7 +881,7 @@ h4 {
 
 .widget-content {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-widget);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -1066,7 +1096,7 @@ h4 {
 
 .sleep-start-btn {
   background: var(--widget-stroke, var(--sleep));
-  color: white;
+  color: var(--text-on-color);
 }
 
 .sleep-start-btn:hover:not(:disabled) {
@@ -1076,7 +1106,7 @@ h4 {
 
 .sleep-wake-btn {
   background: var(--warning);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .sleep-wake-btn:hover:not(:disabled) {
@@ -1122,7 +1152,7 @@ h4 {
   flex-direction: column;
   align-items: center;
   line-height: 1.1;
-  z-index: 1;
+  z-index: var(--z-widget);
 }
 
 .sleep-progress-value {
@@ -1218,7 +1248,7 @@ h4 {
 
 .feeding-start-btn {
   background: var(--widget-stroke, var(--feeding));
-  color: white;
+  color: var(--text-on-color);
 }
 
 .feeding-start-btn:hover:not(:disabled) {
@@ -1228,7 +1258,7 @@ h4 {
 
 .feeding-stop-btn {
   background: var(--success);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .feeding-stop-btn:hover:not(:disabled) {
@@ -1281,7 +1311,7 @@ h4 {
   transition: var(--transition);
   font-family: inherit;
   background: var(--widget-stroke, var(--diaper));
-  color: white;
+  color: var(--text-on-color);
 }
 
 .diaper-quick-btn:hover:not(:disabled) {
@@ -1295,11 +1325,11 @@ h4 {
 }
 
 .diaper-quick-btn.pee {
-  background: #0891b2;
+  background: var(--diaper-pee);
 }
 
 .diaper-quick-btn.poo {
-  background: #92400e;
+  background: var(--diaper-poo);
 }
 
 .diaper-quick-btn.mixed {
@@ -1328,7 +1358,7 @@ h4 {
   transition: var(--transition);
   font-family: inherit;
   background: var(--widget-stroke, var(--feeding));
-  color: white;
+  color: var(--text-on-color);
 }
 
 .feeding-quick-btn:hover:not(:disabled) {
@@ -1342,15 +1372,15 @@ h4 {
 }
 
 .feeding-quick-btn.breast {
-  background: #ec4899;
+  background: var(--feeding-breast);
 }
 
 .feeding-quick-btn.formula {
-  background: #8b5cf6;
+  background: var(--feeding-formula);
 }
 
 .feeding-quick-btn.bottle {
-  background: #f59e0b;
+  background: var(--feeding-bottle);
 }
 
 /* Supplement quick action buttons */
@@ -1375,7 +1405,7 @@ h4 {
   transition: var(--transition);
   font-family: inherit;
   background: var(--widget-stroke, var(--supplement));
-  color: white;
+  color: var(--text-on-color);
 }
 
 .supplement-quick-btn:hover:not(:disabled) {
@@ -1389,7 +1419,7 @@ h4 {
 }
 
 .supplement-quick-btn.vitamin-d {
-  background: #f97316;
+  background: var(--supplement-action);
 }
 
 /* ============================================================================
@@ -1630,7 +1660,7 @@ h4 {
   display: flex;
   justify-content: center;
   gap: var(--space-md);
-  z-index: 100;
+  z-index: var(--z-nav);
   padding-bottom: max(var(--space-md), env(safe-area-inset-bottom));
 }
 
@@ -1660,7 +1690,7 @@ h4 {
 
 .action-btn.feeding:hover {
   background: var(--feeding);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .action-btn.diaper {
@@ -1670,7 +1700,7 @@ h4 {
 
 .action-btn.diaper:hover {
   background: var(--diaper);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .action-btn.sleep {
@@ -1680,7 +1710,7 @@ h4 {
 
 .action-btn.sleep:hover {
   background: var(--sleep);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .action-btn.pumping {
@@ -1690,7 +1720,7 @@ h4 {
 
 .action-btn.pumping:hover {
   background: var(--pumping);
-  color: white;
+  color: var(--text-on-color);
 }
 
 /* ============================================================================
@@ -1714,7 +1744,7 @@ h4 {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: #fff;
+  color: var(--text-on-color);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1877,7 +1907,7 @@ h4 {
 
 .time-picker-btn:hover {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .time-picker-btn:active {
@@ -1918,7 +1948,7 @@ h4 {
   padding: var(--space-sm) var(--space-lg);
   border: none;
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
   border-radius: var(--radius-full);
   font-size: 0.875rem;
   font-weight: 600;
@@ -1945,7 +1975,7 @@ h4 {
   justify-content: space-around;
   padding: 0.5rem 1rem;
   padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
-  z-index: 100;
+  z-index: var(--z-nav);
   box-shadow: 0 -4px 20px rgba(74, 64, 68, 0.06);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
@@ -2023,7 +2053,7 @@ h4 {
 
 .timeline-nav-btn:hover {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .timeline-date {
@@ -2103,7 +2133,7 @@ h4 {
 
 .timeline-event-block.selected {
   box-shadow: 0 0 0 2px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 10;
+  z-index: var(--z-sticky);
 }
 
 .timeline-event-content {
@@ -2158,7 +2188,7 @@ h4 {
 
 .timeline-action-btn.edit {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .timeline-action-btn.edit:hover {
@@ -2167,7 +2197,7 @@ h4 {
 
 .timeline-action-btn.delete {
   background: var(--danger);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .timeline-action-btn.delete:hover {
@@ -2181,7 +2211,7 @@ h4 {
   right: 8px;
   height: 2px;
   background: var(--danger);
-  z-index: 5;
+  z-index: var(--z-sticky);
   pointer-events: none;
 }
 
@@ -2304,7 +2334,7 @@ h4 {
 
 .confirm-modal-actions .btn-danger {
   background: var(--danger);
-  color: white;
+  color: var(--text-on-color);
   border: none;
 }
 
@@ -2430,7 +2460,7 @@ h4 {
 
 .health-tab.active {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .health-tab-badge {
@@ -2576,7 +2606,7 @@ h4 {
 
 .growth-chart-tab.active {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .growth-chart {
@@ -2697,7 +2727,7 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--text-on-color);
   font-weight: 600;
   font-size: 0.875rem;
 }
@@ -2718,7 +2748,7 @@ h4 {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  z-index: 200;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease;
   padding: 1rem;
 }
@@ -3509,7 +3539,7 @@ h4 {
   height: 48px;
   border-radius: var(--radius-md);
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-color);
 }
 
 .widget-settings-btn-text {
@@ -3538,7 +3568,7 @@ h4 {
   transform: translate(-50%, -50%);
   max-width: 400px;
   width: calc(100% - var(--space-xl));
-  z-index: 1001;
+  z-index: var(--z-modal);
   padding: var(--space-lg);
   max-height: 80vh;
   overflow-y: auto;
@@ -3607,7 +3637,7 @@ h4 {
   height: 20px;
   border-radius: var(--radius-full);
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3659,7 +3689,7 @@ h4 {
 
 .widget-settings-toggle.enabled .widget-settings-toggle-icon {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
 }
 
 .widget-settings-toggle-text {
@@ -3700,7 +3730,7 @@ h4 {
   left: 2px;
   width: 20px;
   height: 20px;
-  background: white;
+  background: var(--background);
   border-radius: 50%;
   transition: var(--transition);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -3808,7 +3838,7 @@ h4 {
   height: 64px;
   border-radius: var(--radius-full);
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
   margin-bottom: var(--space-md);
 }
 
@@ -3922,7 +3952,7 @@ h4 {
 
 .age-badge {
   background: var(--primary);
-  color: white;
+  color: var(--text-on-color);
   font-size: 0.75rem;
   padding: 2px 8px;
   border-radius: var(--radius-full);
@@ -4320,7 +4350,7 @@ h4 {
   color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 500;
-  z-index: 10;
+  z-index: var(--z-sticky);
 }
 
 /* Empty/Loading/Error States */
@@ -5021,7 +5051,7 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
   padding: var(--space-md);
 }
 

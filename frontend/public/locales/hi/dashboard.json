@@ -109,7 +109,8 @@
     "savePumping": "पंपिंग सहेजें",
     "start": "शुरू करें",
     "noPumpingsYet": "अभी कोई पंपिंग नहीं",
-    "pumpingLogged": "पंपिंग दर्ज हुई ({{duration}} मि.)"
+    "pumpingLogged": "पंपिंग दर्ज हुई ({{duration}} मि.)",
+    "startedAt": "{{time}} पर शुरू"
   },
   "potty": {
     "title": "पॉटी",
@@ -142,7 +143,14 @@
     "tummy": "पेट के बल",
     "start": "शुरू करें",
     "noTummyTimeYet": "अभी कोई पेट के बल समय नहीं",
-    "tummyTimeLogged": "पेट के बल समय दर्ज हुआ ({{duration}} मि.)"
+    "tummyTimeLogged": "पेट के बल समय दर्ज हुआ ({{duration}} मि.)",
+    "durationOptions": {
+      "1min": "1 मिनट",
+      "3min": "3 मिनट",
+      "5min": "5 मिनट",
+      "10min": "10 मिनट",
+      "15min": "15 मिनट"
+    }
   },
   "bath": {
     "title": "नहलाना",

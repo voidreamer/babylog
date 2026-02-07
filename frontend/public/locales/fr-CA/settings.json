@@ -103,5 +103,8 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "Impossible de lancer le paiement. Veuillez réessayer.",
   "toast_premiumRestoredReloading": "Premium restauré ! Rechargement...",
   "toast_noActiveSubscriptionFoundForThisAc": "Aucun abonnement actif n'a été trouvé pour ce compte.",
-  "toast_couldNotCheckSubscription": "Impossible de vérifier l'abonnement."
+  "toast_couldNotCheckSubscription": "Impossible de vérifier l'abonnement.",
+  "app": {
+    "version": "HeyBub v{{version}}"
+  }
 }

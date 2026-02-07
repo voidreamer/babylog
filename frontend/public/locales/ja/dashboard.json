@@ -109,7 +109,8 @@
     "savePumping": "搾乳を保存",
     "start": "開始",
     "noPumpingsYet": "搾乳記録はまだありません",
-    "pumpingLogged": "搾乳を記録しました（{{duration}}分）"
+    "pumpingLogged": "搾乳を記録しました（{{duration}}分）",
+    "startedAt": "{{time}}に開始"
   },
   "potty": {
     "title": "トイレトレーニング",
@@ -142,7 +143,14 @@
     "tummy": "うつ伏せ",
     "start": "開始",
     "noTummyTimeYet": "うつ伏せの記録はまだありません",
-    "tummyTimeLogged": "うつ伏せを記録しました（{{duration}}分）"
+    "tummyTimeLogged": "うつ伏せを記録しました（{{duration}}分）",
+    "durationOptions": {
+      "1min": "1分",
+      "3min": "3分",
+      "5min": "5分",
+      "10min": "10分",
+      "15min": "15分"
+    }
   },
   "bath": {
     "title": "お風呂",

@@ -109,7 +109,8 @@
     "savePumping": "Sauvegarder pompage",
     "start": "Démarrage",
     "noPumpingsYet": "Pas encore de pompage",
-    "pumpingLogged": "Pompage enregistré ({{duration}} min)"
+    "pumpingLogged": "Pompage enregistré ({{duration}} min)",
+    "startedAt": "Débuté à {{time}}"
   },
   "potty": {
     "title": "Pot",
@@ -142,7 +143,14 @@
     "tummy": "Ventre",
     "start": "Démarrage",
     "noTummyTimeYet": "Pas encore de temps passé sur le ventre",
-    "tummyTimeLogged": "Enregistrement de l'heure du ventre ({{duration}} min)"
+    "tummyTimeLogged": "Enregistrement de l'heure du ventre ({{duration}} min)",
+    "durationOptions": {
+      "1min": "1 min",
+      "3min": "3 min",
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min"
+    }
   },
   "bath": {
     "title": "Bain",
