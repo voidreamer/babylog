@@ -72,21 +72,19 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
 
                 {/* Quick action buttons */}
                 {quickActionsEnabled && (
-                    <div className="diaper-quick-btns">
+                    <div className="potty-quick-btns">
                         <button
-                            className="diaper-quick-btn pee"
+                            className="potty-quick-btn success"
                             onClick={(e) => handleQuickLog('success', e)}
                             disabled={saving !== null}
-                            style={{ background: '#16a34a' }}
                         >
                             <Check size={14} />
                             {saving === 'success' ? '...' : t('potty.yes')}
                         </button>
                         <button
-                            className="diaper-quick-btn poo"
+                            className="potty-quick-btn attempt"
                             onClick={(e) => handleQuickLog('attempt', e)}
                             disabled={saving !== null}
-                            style={{ background: '#6b7280' }}
                         >
                             <X size={14} />
                             {saving === 'attempt' ? '...' : t('potty.try')}

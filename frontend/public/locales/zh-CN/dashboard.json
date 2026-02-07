@@ -110,7 +110,8 @@
     "start": "开始",
     "noPumpingsYet": "暂无吸奶记录",
     "pumpingLogged": "已记录吸奶（{{duration}} 分钟）",
-    "startedAt": "开始于 {{time}}"
+    "startedAt": "开始于 {{time}}",
+    "quickLogged": "已记录泵奶 ({{amount}})"
   },
   "potty": {
     "title": "如厕训练",

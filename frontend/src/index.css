@@ -1319,6 +1319,7 @@ h4 {
   font-family: inherit;
   background: var(--widget-stroke, var(--diaper));
   color: var(--text-on-color);
+  white-space: nowrap;
 }
 
 .diaper-quick-btn:hover:not(:disabled) {
@@ -1359,13 +1360,16 @@ h4 {
   padding: var(--space-xs) var(--space-sm);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 0.70rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   font-family: inherit;
   background: var(--widget-stroke, var(--feeding));
   color: var(--text-on-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .feeding-quick-btn:hover:not(:disabled) {
@@ -1427,6 +1431,133 @@ h4 {
 
 .supplement-quick-btn.vitamin-d {
   background: var(--supplement-action);
+}
+
+/* Tummy Time quick action buttons */
+.tummy-quick-btns {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: auto;
+}
+
+.tummy-quick-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  background: var(--widget-stroke, var(--tummy));
+  color: var(--text-on-color);
+  white-space: nowrap;
+}
+
+.tummy-quick-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.tummy-quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tummy-quick-btn.timer {
+  background: var(--tummy-text);
+}
+
+/* Pumping quick action buttons */
+.pumping-quick-btns {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: auto;
+}
+
+.pumping-quick-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  background: var(--widget-stroke, var(--pumping));
+  color: var(--text-on-color);
+  white-space: nowrap;
+}
+
+.pumping-quick-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.pumping-quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pumping-quick-btn.timer {
+  background: var(--pumping-text);
+}
+
+.pumping-quick-btn.amount {
+  background: var(--pumping);
+}
+
+/* Potty quick action buttons */
+.potty-quick-btns {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: auto;
+}
+
+.potty-quick-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  color: var(--text-on-color);
+  white-space: nowrap;
+}
+
+.potty-quick-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.potty-quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.potty-quick-btn.success {
+  background: var(--success);
+}
+
+.potty-quick-btn.attempt {
+  background: var(--text-tertiary);
 }
 
 /* ============================================================================

@@ -110,7 +110,8 @@
     "start": "Démarrage",
     "noPumpingsYet": "Pas encore de pompage",
     "pumpingLogged": "Pompage enregistré ({{duration}} min)",
-    "startedAt": "Débuté à {{time}}"
+    "startedAt": "Débuté à {{time}}",
+    "quickLogged": "Tirage enregistré ({{amount}})"
   },
   "potty": {
     "title": "Pot",

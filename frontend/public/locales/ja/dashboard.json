@@ -110,7 +110,8 @@
     "start": "開始",
     "noPumpingsYet": "搾乳記録はまだありません",
     "pumpingLogged": "搾乳を記録しました（{{duration}}分）",
-    "startedAt": "{{time}}に開始"
+    "startedAt": "{{time}}に開始",
+    "quickLogged": "搾乳を記録しました ({{amount}})"
   },
   "potty": {
     "title": "トイレトレーニング",

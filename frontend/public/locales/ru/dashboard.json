@@ -110,7 +110,8 @@
     "start": "Начать",
     "noPumpingsYet": "Сцеживаний пока нет",
     "pumpingLogged": "Сцеживание записано ({{duration}} мин)",
-    "startedAt": "Начато в {{time}}"
+    "startedAt": "Начато в {{time}}",
+    "quickLogged": "Сцеживание записано ({{amount}})"
   },
   "potty": {
     "title": "Горшок",

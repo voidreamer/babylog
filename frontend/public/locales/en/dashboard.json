@@ -110,7 +110,8 @@
     "start": "Start",
     "noPumpingsYet": "No pumpings yet",
     "pumpingLogged": "Pumping logged ({{duration}} min)",
-    "startedAt": "Started at {{time}}"
+    "startedAt": "Started at {{time}}",
+    "quickLogged": "Pumping logged ({{amount}})"
   },
   "potty": {
     "title": "Potty",
