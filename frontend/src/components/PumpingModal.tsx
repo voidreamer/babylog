@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
+import { hapticNotification } from '../utils/haptics';
 
 // Helper to parse UTC time
 
@@ -96,6 +97,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                 amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
                 notes: notes || null,
             });
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save pumping (timer):', error);
@@ -133,6 +135,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             } else {
                 await api.createPumping(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save pumping:', error);

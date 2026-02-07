@@ -8,6 +8,7 @@ import { useOfflineSync } from './hooks/useOfflineSync';
 import { useAnalytics } from './hooks/useAnalytics';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
+import { hapticSelection } from './utils/haptics';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -514,35 +515,35 @@ function MainApp() {
             <nav className="bottom-nav">
                 <button
                     className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('home')}
+                    onClick={() => { hapticSelection(); setActiveTab('home'); }}
                 >
                     <Home size={22} />
                     <span>{t('nav.home')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('timeline')}
+                    onClick={() => { hapticSelection(); setActiveTab('timeline'); }}
                 >
                     <Clock size={22} />
                     <span>{t('nav.timeline')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('health')}
+                    onClick={() => { hapticSelection(); setActiveTab('health'); }}
                 >
                     <Activity size={22} />
                     <span>{t('nav.health')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('learn')}
+                    onClick={() => { hapticSelection(); setActiveTab('learn'); }}
                 >
                     <PieChart size={22} />
                     <span>{t('nav.insights')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('settings')}
+                    onClick={() => { hapticSelection(); setActiveTab('settings'); }}
                 >
                     <SettingsIcon size={22} />
                     <span>{t('nav.settings')}</span>

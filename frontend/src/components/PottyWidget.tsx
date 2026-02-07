@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 
 interface PottyWidgetProps { lastPotty: any; onPottyChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
@@ -39,9 +40,12 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
     const timeAgo = lastPotty ? formatTimeAgo(lastPotty.time) : null;
 
     return (
-        <div
+        <motion.div
             className="widget potty"
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             <div className="widget-bg-icon">
                 <CircleDot size={80} strokeWidth={1} />
@@ -90,6 +94,6 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

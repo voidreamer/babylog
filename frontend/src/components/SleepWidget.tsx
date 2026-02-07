@@ -5,6 +5,8 @@ import { Moon, Sun, Plus, Clock } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { hapticImpact, hapticNotification } from '../utils/haptics';
+import { motion } from 'framer-motion';
 
 // Format elapsed time as "Xh Ym" or "Ym"
 function formatElapsedTime(startTimeStr: string | null): string {
@@ -52,6 +54,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                 end_time: null,
                 notes: null,
             });
+            hapticImpact();
             toast.success(t('toast_sleepStarted'));
             onSleepChange();
         } catch (error) {
@@ -68,6 +71,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
         setSaving(true);
         try {
             await api.endSleep(currentSleep.id);
+            hapticNotification();
             toast.success(t('toast_babyIsAwake'));
             onSleepChange();
         } catch (error) {
@@ -82,9 +86,12 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
     const timeAgo = lastSleep ? formatTimeAgo(lastSleep.end_time || lastSleep.start_time) : null;
 
     return (
-        <div
+        <motion.div
             className={`widget sleep ${isSleeping ? 'sleeping' : ''}`}
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             {isSleeping && <div className="widget-glow" />}
 
@@ -117,7 +124,9 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                     <div className="sleep-widget-sleeping">
                         <div className="sleep-elapsed">
                             <Clock size={14} />
-                            <span>{elapsed}</span>
+                            <motion.span key={elapsed} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }}>
+                                {elapsed}
+                            </motion.span>
                         </div>
                         <button
                             className="sleep-wake-btn"
@@ -145,6 +154,6 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

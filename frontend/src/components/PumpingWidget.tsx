@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
+import { motion } from 'framer-motion';
 
 
 function formatTimer(seconds: number): string {
@@ -112,9 +113,12 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
     const timeAgo = lastPumping ? formatTimeAgo(getEndTime()) : null;
 
     return (
-        <div
+        <motion.div
             className={`widget pumping ${isPumping ? 'active-timer' : ''}`}
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             {isPumping && <div className="widget-glow" />}
 
@@ -170,6 +174,6 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 
 interface BathWidgetProps { lastBath: any; onBathChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
@@ -38,9 +39,12 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
     const timeAgo = lastBath ? formatTimeAgo(lastBath.time) : null;
 
     return (
-        <div
+        <motion.div
             className="widget bath"
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             <div className="widget-bg-icon">
                 <ShowerHead size={80} strokeWidth={1} />
@@ -70,6 +74,6 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { CircleDot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -66,6 +67,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
             } else {
                 await api.createPottyLog(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log potty:', error);

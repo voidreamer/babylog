@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
+import { hapticNotification } from '../utils/haptics';
 
 // Helper to parse UTC time
 
@@ -138,6 +139,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                 amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
                 notes: notes || null,
             });
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save feeding (timer):', error);
@@ -185,6 +187,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             } else {
                 await api.createFeeding(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save feeding (quick):', error);

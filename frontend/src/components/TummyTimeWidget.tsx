@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 
 function formatTimer(seconds: number): string {
@@ -102,9 +103,12 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
     const timeAgo = lastTummy ? formatTimeAgo(getEndTime()) : null;
 
     return (
-        <div
+        <motion.div
             className={`widget tummy ${isActive ? 'active-timer' : ''}`}
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             {isActive && <div className="widget-glow" />}
 
@@ -156,6 +160,6 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }
