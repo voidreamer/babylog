@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
+import ConfirmModal from '../ConfirmModal';
 
 const COMMON_SYMPTOMS = [
     'fever',
@@ -44,6 +45,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
     };
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
     const [formData, setFormData] = useState<{ date: string; symptoms: string[]; temperature: string; notes: string; }>({
         date: new Date().toISOString().split('T')[0],
         symptoms: [],
@@ -154,7 +156,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                                 )}
                                 <button
                                     className="sick-day-delete"
-                                    onClick={() => handleDelete(day.id)}
+                                    onClick={() => setConfirmDeleteId(day.id)}
                                     aria-label={t('arialabel_deleteSickDay')}
                                 >
                                     <Trash2 size={14} />
@@ -246,6 +248,12 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
                     {t('sickDays.logSickDay')}
                 </button>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }

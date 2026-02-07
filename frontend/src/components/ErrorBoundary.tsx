@@ -2,11 +2,51 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
+type ErrorLevel = 'app' | 'page' | 'widget';
+
 /**
  * Error Fallback UI shown when an error is caught
  */
-interface ErrorFallbackProps { error: Error | null; onRetry: () => void; }
-function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
+interface ErrorFallbackProps { error: Error | null; level: ErrorLevel; onRetry: () => void; }
+function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps) {
+    if (level === 'widget') {
+        return (
+            <div className="error-fallback-widget">
+                <h3 className="error-fallback-title">Widget unavailable</h3>
+                <button className="btn btn-ghost btn-sm" onClick={onRetry}>
+                    <RefreshCw size={14} />
+                    <span>Retry</span>
+                </button>
+            </div>
+        );
+    }
+
+    if (level === 'page') {
+        return (
+            <div className="error-fallback-compact">
+                <div className="error-fallback-icon">
+                    <AlertTriangle size={32} />
+                </div>
+                <h2 className="error-fallback-title">This page ran into a problem</h2>
+                <p className="error-fallback-message">
+                    Try again or switch to a different tab.
+                </p>
+                {error?.message && import.meta.env.DEV && (
+                    <pre className="error-fallback-details">
+                        {error.message}
+                    </pre>
+                )}
+                <button
+                    className="btn btn-primary btn-sm"
+                    onClick={onRetry}
+                >
+                    <RefreshCw size={16} />
+                    <span>Try Again</span>
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="error-fallback">
             <div className="error-fallback-content">
@@ -17,7 +57,7 @@ function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
                 <p className="error-fallback-message">
                     We're sorry, but something unexpected happened. Please try again.
                 </p>
-                {error?.message && process.env.NODE_ENV === 'development' && (
+                {error?.message && import.meta.env.DEV && (
                     <pre className="error-fallback-details">
                         {error.message}
                     </pre>
@@ -37,7 +77,7 @@ function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
 /**
  * Error Boundary class component to catch JavaScript errors anywhere in the child component tree
  */
-interface ErrorBoundaryProps { children: React.ReactNode; }
+interface ErrorBoundaryProps { children: React.ReactNode; level?: ErrorLevel; }
 interface ErrorBoundaryState { hasError: boolean; error: Error | null; }
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
     constructor(props: ErrorBoundaryProps) {
@@ -46,24 +86,22 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     }
 
     static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-        // Update state so the next render shows the fallback UI
         return { hasError: true, error };
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        // Log error to console in development
         if (import.meta.env.DEV) {
             console.error('ErrorBoundary caught an error:', error, errorInfo);
         }
-
-        // TODO: In production, send to error monitoring service (e.g., Sentry, LogRocket)
-        // Example: Sentry.captureException(error, { extra: { componentStack: errorInfo?.componentStack } });
     }
 
     handleRetry = () => {
+        const level = this.props.level || 'app';
         this.setState({ hasError: false, error: null });
-        // Optionally reload the page if the error is unrecoverable
-        window.location.reload();
+        // Only reload for app-level errors; page/widget just clear the error state
+        if (level === 'app') {
+            window.location.reload();
+        }
     };
 
     render() {
@@ -71,6 +109,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             return (
                 <ErrorFallback
                     error={this.state.error}
+                    level={this.props.level || 'app'}
                     onRetry={this.handleRetry}
                 />
             );

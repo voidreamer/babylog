@@ -90,8 +90,11 @@ export default function Health() {
 
     if (loading) {
         return (
-            <div className="loading">
-                <div className="spinner"></div>
+            <div className="health-dashboard">
+                <div className="skeleton skeleton-card" />
+                <div className="health-cards-grid">
+                    {[1,2,3].map(i => <div key={i} className="skeleton skeleton-card" />)}
+                </div>
             </div>
         );
     }

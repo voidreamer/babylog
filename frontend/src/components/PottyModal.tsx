@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { CircleDot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -46,6 +47,11 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
         e.preventDefault();
         if (!selectedBaby) return;
 
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
+
         setSaving(true);
         try {
             const data = {
@@ -61,6 +67,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
             } else {
                 await api.createPottyLog(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log potty:', error);
@@ -72,10 +79,10 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('potty.title')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

@@ -5,6 +5,8 @@ import { Baby, Play, Square, Plus, Milk } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { hapticImpact, hapticNotification } from '../utils/haptics';
+import { motion } from 'framer-motion';
 
 
 // Format timer display
@@ -75,6 +77,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
         setActiveFeeding(newActiveFeeding);
         localStorage.setItem(ACTIVE_FEEDING_KEY, JSON.stringify(newActiveFeeding));
+        hapticImpact();
         toast.success(t('toast_feedingStarted'));
     };
 
@@ -100,6 +103,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
 
             localStorage.removeItem(ACTIVE_FEEDING_KEY);
             setActiveFeeding(null);
+            hapticNotification();
             toast.success(t('feeding.feedingLogged', { duration: durationMinutes }));
             onFeedingChange();
         } catch (error) {
@@ -126,6 +130,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                 notes: null,
             });
             const label = type === 'breast' ? t('feeding.breast') : type === 'formula' ? t('feeding.formula') : t('feeding.breastBottle');
+            hapticNotification();
             toast.success(t('feeding.quickLogged', { type: label }));
             onFeedingChange();
         } catch (error) {
@@ -163,9 +168,12 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
     };
 
     return (
-        <div
+        <motion.div
             className={`widget feeding ${isFeeding ? 'active-timer' : ''}`}
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             {isFeeding && <div className="widget-glow" />}
 
@@ -197,7 +205,9 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                     /* Feeding in progress - always show timer */
                     <div className="feeding-widget-active">
                         <div className="feeding-timer">
-                            {formatTimer(timerSeconds)}
+                            <motion.span key={timerSeconds} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }}>
+                                {formatTimer(timerSeconds)}
+                            </motion.span>
                         </div>
                         <button
                             className="feeding-stop-btn"
@@ -252,6 +262,6 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -8,6 +8,7 @@ import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 import VaccinationSchedule from './VaccinationSchedule';
+import ConfirmModal from '../ConfirmModal';
 
 const VISIT_TYPE_KEYS = ['checkup', 'sick', 'vaccination', 'specialist', 'emergency'] as const;
 
@@ -81,6 +82,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
     const { formatWeight, formatLength, parseWeight, parseLength, weightUnit, lengthUnit } = useUnits();
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         visit_date: new Date().toISOString().split('T')[0],
         visit_type: 'checkup',
@@ -152,7 +154,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                                 <span className="record-type">{t(`records.visitTypes.${visit.visit_type}`)}</span>
                                 <button
                                     className="record-delete"
-                                    onClick={() => handleDelete(visit.id)}
+                                    onClick={() => setConfirmDeleteId(visit.id)}
                                     aria-label={t('arialabel_deleteVisit')}
                                 >
                                     <Trash2 size={14} />
@@ -266,6 +268,12 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                     {t('records.addVisit')}
                 </button>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }
@@ -278,6 +286,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
     const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         vaccine_name: '',
         dose_number: '1',
@@ -378,7 +387,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                                 <span className="vaccine-dose">{t('records.dose', { number: vax.dose_number })}</span>
                                 <button
                                     className="record-delete"
-                                    onClick={() => handleDelete(vax.id)}
+                                    onClick={() => setConfirmDeleteId(vax.id)}
                                     aria-label={t('arialabel_deleteVaccination')}
                                 >
                                     <Trash2 size={14} />
@@ -473,6 +482,12 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
                     {t('records.addVaccination')}
                 </button>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }
@@ -485,6 +500,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
     const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         medication_name: '',
         dosage: '',
@@ -587,7 +603,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                                 </button>
                                 <button
                                     className="record-delete"
-                                    onClick={() => handleDelete(med.id)}
+                                    onClick={() => setConfirmDeleteId(med.id)}
                                     aria-label={t('arialabel_deleteMedication')}
                                 >
                                     <Trash2 size={14} />
@@ -624,7 +640,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                                 </button>
                                 <button
                                     className="record-delete"
-                                    onClick={() => handleDelete(med.id)}
+                                    onClick={() => setConfirmDeleteId(med.id)}
                                     aria-label={t('arialabel_deleteMedication')}
                                 >
                                     <Trash2 size={14} />
@@ -712,6 +728,12 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
                     {t('records.addMedication')}
                 </button>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }

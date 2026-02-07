@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import TimePicker from './TimePicker';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 
 interface SleepModalProps { babyId: number; editEvent?: any; onClose: () => void; onSave: () => void; }
@@ -31,6 +32,12 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
+
         setSaving(true);
 
         const data = {
@@ -46,6 +53,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
             } else {
                 await api.createSleep(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);
@@ -57,10 +65,10 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('sleep.title')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

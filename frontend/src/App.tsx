@@ -8,6 +8,7 @@ import { useOfflineSync } from './hooks/useOfflineSync';
 import { useAnalytics } from './hooks/useAnalytics';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
+import { hapticSelection } from './utils/haptics';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -62,7 +63,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
     return (
         <div className="settings-page">
-            <h2 style={{ marginBottom: 'var(--space-lg)' }}>{t('settings:title')}</h2>
+            <h2 className="settings-page-title">{t('settings:title')}</h2>
 
             {/* Baby Profile */}
             {currentBaby && (
@@ -148,13 +149,13 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                                 <User size={16} />
                             </div>
                             <div>
-                                <div className="settings-row-label">{user.email} {isPremium && <span style={{ fontSize: 11, background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#fff', padding: '1px 6px', borderRadius: 8, marginLeft: 6, fontWeight: 600 }}>PRO</span>}</div>
+                                <div className="settings-row-label">{user.email} {isPremium && <span className="pro-badge">PRO</span>}</div>
                                 <div className="settings-row-desc">{isPremium ? t('settings:account.premiumMember') : t('settings:account.signedIn')}</div>
                             </div>
                         </div>
                     </div>
                 )}
-                <div className="settings-row" onClick={isPremium && !hasStripeSubscription ? undefined : (isPremium ? onManage : onUpgrade)} style={{ cursor: isPremium && !hasStripeSubscription ? 'default' : 'pointer' }}>
+                <div className={`settings-row ${isPremium && !hasStripeSubscription ? 'settings-row--disabled' : ''}`} onClick={isPremium && !hasStripeSubscription ? undefined : (isPremium ? onManage : onUpgrade)}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box butter">
                             <Crown size={16} />
@@ -187,16 +188,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     <span className="settings-badge lavender">{t('settings:account.comingSoon')}</span>
                 </div>
                 <div
-                    className="settings-row"
+                    className={`settings-row ${!isPremium ? 'settings-row--disabled' : ''}`}
                     onClick={isPremium ? handleExportCsv : onUpgrade}
-                    style={{ cursor: exportLoading || (!isPremium && false) || !babies || babies.length === 0 ? 'not-allowed' : 'pointer', opacity: isPremium ? 1 : 0.6 }}
                 >
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
                             <Download size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:data.export')} {!isPremium && <span className="settings-badge mint" style={{ fontSize: 10, marginLeft: 6 }}>PRO</span>}</div>
+                            <div className="settings-row-label">{t('settings:data.export')} {!isPremium && <span className="pro-badge">PRO</span>}</div>
                             <div className="settings-row-desc">
                                 {!isPremium ? t('settings:data.upgradeToExport') : exportLoading ? t('settings:data.exporting') : t('settings:data.exportDesc')}
                             </div>
@@ -209,7 +209,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             {/* Navigation */}
             <div className="settings-group">
                 <div className="settings-group-title">{t('settings:navigation.title')}</div>
-                <a className="settings-row" href={hubUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <a className="settings-row" href={hubUrl}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
                             <ArrowLeft size={16} />
@@ -226,7 +226,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             {/* Support */}
             <div className="settings-group">
                 <div className="settings-group-title">{t('settings:support.title')}</div>
-                <a className="settings-row" href="mailto:support@heybub.app" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <a className="settings-row" href="mailto:support@heybub.app">
                     <div className="settings-row-left">
                         <div className="settings-icon-box peach">📧</div>
                         <div>
@@ -249,7 +249,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </button>
-                <a className="settings-row" href="https://heybub.app/terms" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <a className="settings-row" href="https://heybub.app/terms" target="_blank" rel="noopener noreferrer">
                     <div className="settings-row-left">
                         <div className="settings-icon-box cloud">📋</div>
                         <div>
@@ -274,7 +274,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 </button>
             </div>
 
-            <p className="settings-version">HeyBub v1.0.0</p>
+            <p className="settings-version">{t('app.version', { version: '1.0.0' })}</p>
         </div>
     );
 }
@@ -463,18 +463,32 @@ function MainApp() {
                 onSync={syncPendingChanges}
             />
             <main>
-                {activeTab === 'home' && <Dashboard />}
-                {activeTab === 'timeline' && <TimelineCalendar />}
-                {activeTab === 'health' && (
-                    <Suspense fallback={
-                        <div className="loading">
-                            <div className="spinner"></div>
-                        </div>
-                    }>
-                        <Health />
-                    </Suspense>
+                {activeTab === 'home' && (
+                    <ErrorBoundary level="page">
+                        <Dashboard />
+                    </ErrorBoundary>
                 )}
-                {activeTab === 'learn' && <Learn isPremium={isPremium} />}
+                {activeTab === 'timeline' && (
+                    <ErrorBoundary level="page">
+                        <TimelineCalendar />
+                    </ErrorBoundary>
+                )}
+                {activeTab === 'health' && (
+                    <ErrorBoundary level="page">
+                        <Suspense fallback={
+                            <div className="loading">
+                                <div className="spinner"></div>
+                            </div>
+                        }>
+                            <Health />
+                        </Suspense>
+                    </ErrorBoundary>
+                )}
+                {activeTab === 'learn' && (
+                    <ErrorBoundary level="page">
+                        <Learn isPremium={isPremium} />
+                    </ErrorBoundary>
+                )}
                 {activeTab === 'settings' && (
                     <SettingsPage
                         user={user}
@@ -501,35 +515,35 @@ function MainApp() {
             <nav className="bottom-nav">
                 <button
                     className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('home')}
+                    onClick={() => { hapticSelection(); setActiveTab('home'); }}
                 >
                     <Home size={22} />
                     <span>{t('nav.home')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('timeline')}
+                    onClick={() => { hapticSelection(); setActiveTab('timeline'); }}
                 >
                     <Clock size={22} />
                     <span>{t('nav.timeline')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('health')}
+                    onClick={() => { hapticSelection(); setActiveTab('health'); }}
                 >
                     <Activity size={22} />
                     <span>{t('nav.health')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('learn')}
+                    onClick={() => { hapticSelection(); setActiveTab('learn'); }}
                 >
                     <PieChart size={22} />
                     <span>{t('nav.insights')}</span>
                 </button>
                 <button
                     className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('settings')}
+                    onClick={() => { hapticSelection(); setActiveTab('settings'); }}
                 >
                     <SettingsIcon size={22} />
                     <span>{t('nav.settings')}</span>

@@ -6,12 +6,14 @@ import { api } from '../../api/client';
 import { format, parseISO } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from '../ConfirmModal';
 
 interface MilestonesCardProps { baby: any; milestones: any[]; onMilestoneAdded?: () => void; onMilestoneDeleted?: () => void; }
 export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onMilestoneDeleted }: MilestonesCardProps) {
     const { t } = useTranslation('health');
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         milestone: '',
         date: new Date().toISOString().split('T')[0]
@@ -89,7 +91,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                             </div>
                             <button
                                 className="milestone-delete"
-                                onClick={() => handleDelete(milestone.id)}
+                                onClick={() => setConfirmDeleteId(milestone.id)}
                                 aria-label={t('arialabel_deleteMilestone')}
                             >
                                 <Trash2 size={14} />
@@ -140,6 +142,12 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
                     Add Milestone
                 </button>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }

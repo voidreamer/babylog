@@ -7,6 +7,7 @@ import TimePicker from './TimePicker';
 import { Pill } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Parse UTC time string to local Date
 
@@ -55,6 +56,11 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
         e.preventDefault();
         if (!selectedBaby) return;
 
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
+
         setSaving(true);
         try {
             const data = {
@@ -70,6 +76,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
             } else {
                 await api.createSupplement(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to log supplement:', error);
@@ -86,10 +93,10 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('supplement.title')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

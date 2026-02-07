@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from '../ConfirmModal';
 
 // Baby teeth positions - 20 total
 // Upper: A-E (left to right from baby's perspective)
@@ -52,6 +53,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [emergedDate, setEmergedDate] = useState(new Date().toISOString().split('T')[0]);
     const [saving, setSaving] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
     // Build a map of emerged teeth for quick lookup
     const emergedTeethMap: Record<string, any> = {};
@@ -214,7 +216,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                         <div className="tooth-modal-actions">
                             <button
                                 className="btn btn-ghost btn-danger"
-                                onClick={() => handleDelete(selectedTooth.emerged.id)}
+                                onClick={() => setConfirmDeleteId(selectedTooth.emerged.id)}
                             >
                                 {t('teething.removeRecord')}
                             </button>
@@ -222,6 +224,12 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                open={confirmDeleteId !== null}
+                onConfirm={() => { handleDelete(confirmDeleteId!); setConfirmDeleteId(null); }}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }

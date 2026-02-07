@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 
 interface PottyWidgetProps { lastPotty: any; onPottyChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
@@ -39,9 +40,12 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
     const timeAgo = lastPotty ? formatTimeAgo(lastPotty.time) : null;
 
     return (
-        <div
+        <motion.div
             className="widget potty"
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             <div className="widget-bg-icon">
                 <CircleDot size={80} strokeWidth={1} />
@@ -68,21 +72,19 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
 
                 {/* Quick action buttons */}
                 {quickActionsEnabled && (
-                    <div className="diaper-quick-btns">
+                    <div className="potty-quick-btns">
                         <button
-                            className="diaper-quick-btn pee"
+                            className="potty-quick-btn success"
                             onClick={(e) => handleQuickLog('success', e)}
                             disabled={saving !== null}
-                            style={{ background: '#16a34a' }}
                         >
                             <Check size={14} />
                             {saving === 'success' ? '...' : t('potty.yes')}
                         </button>
                         <button
-                            className="diaper-quick-btn poo"
+                            className="potty-quick-btn attempt"
                             onClick={(e) => handleQuickLog('attempt', e)}
                             disabled={saving !== null}
-                            style={{ background: '#6b7280' }}
                         >
                             <X size={14} />
                             {saving === 'attempt' ? '...' : t('potty.try')}
@@ -90,6 +92,6 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

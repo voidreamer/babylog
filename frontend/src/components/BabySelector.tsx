@@ -7,6 +7,8 @@ import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 import UpgradeDialog from './UpgradeDialog';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from './ConfirmModal';
+import { hapticSelection } from '../utils/haptics';
 
 export default function BabySelector(): React.ReactElement | null {
     const { t } = useTranslation('common');
@@ -15,6 +17,7 @@ export default function BabySelector(): React.ReactElement | null {
     const [showAddForm, setShowAddForm] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [saving, setSaving] = useState(false);
     const isPremium = localStorage.getItem('isPremium') === 'true';
 
@@ -131,6 +134,7 @@ export default function BabySelector(): React.ReactElement | null {
                                 background: baby.id === selectedBaby?.id ? 'var(--surface-hover)' : 'transparent',
                             }}
                             onClick={() => {
+                                hapticSelection();
                                 selectBaby(baby);
                                 setShowDropdown(false);
                             }}
@@ -177,10 +181,8 @@ export default function BabySelector(): React.ReactElement | null {
                                 color: 'var(--danger)',
                             }}
                             onClick={() => {
-                                if (confirm(t('babySelector.deleteConfirm', { name: selectedBaby.name }))) {
-                                    removeBaby(selectedBaby.id);
-                                    setShowDropdown(false);
-                                }
+                                setShowDeleteConfirm(true);
+                                setShowDropdown(false);
                             }}
                         >
                             {t('babySelector.deleteName', { name: selectedBaby?.name })}
@@ -235,6 +237,16 @@ export default function BabySelector(): React.ReactElement | null {
                     onShare={() => refresh()}
                 />
             )}
+            <ConfirmModal
+                open={showDeleteConfirm}
+                title={t('deleteConfirmTitle')}
+                message={t('babySelector.deleteConfirm', { name: selectedBaby?.name })}
+                onConfirm={() => {
+                    if (selectedBaby) removeBaby(selectedBaby.id);
+                    setShowDeleteConfirm(false);
+                }}
+                onCancel={() => setShowDeleteConfirm(false)}
+            />
             {showUpgrade && <UpgradeDialog onClose={() => setShowUpgrade(false)} />}
         </div>
     );

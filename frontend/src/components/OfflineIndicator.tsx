@@ -5,7 +5,7 @@
  * Shows a banner when offline and pending sync count.
  */
 
-import { WifiOff, RefreshCw, Cloud, CloudOff } from 'lucide-react';
+import { WifiOff, RefreshCw, Cloud } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface OfflineIndicatorProps { online: boolean; syncing: boolean; pendingCount: number; onSync: () => void; }
@@ -18,31 +18,14 @@ export function OfflineIndicator({ online, syncing, pendingCount, onSync }: Offl
 
     return (
         <div
-            className="offline-indicator"
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 1000,
-                padding: 'var(--space-xs) var(--space-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-sm)',
-                fontSize: '0.85rem',
-                fontWeight: 500,
-                background: online ? 'var(--success)' : 'var(--text-muted)',
-                color: '#fff',
-                transition: 'all 0.3s ease'
-            }}
+            className={`offline-indicator offline-indicator-bar ${online ? 'online' : 'offline'}`}
         >
             {!online ? (
                 <>
                     <WifiOff size={16} />
                     <span>{t('offlineIndicator.youreOffline')}</span>
                     {pendingCount > 0 && (
-                        <span style={{ opacity: 0.8 }}>
+                        <span className="offline-pending-text">
                             • {t('offlineIndicator.changesPending', { count: pendingCount, s: pendingCount !== 1 ? 's' : '' })}
                         </span>
                     )}
@@ -58,15 +41,7 @@ export function OfflineIndicator({ online, syncing, pendingCount, onSync }: Offl
                     <span>{t('offlineIndicator.changesToSync', { count: pendingCount, s: pendingCount !== 1 ? 's' : '' })}</span>
                     <button
                         onClick={onSync}
-                        style={{
-                            background: 'rgba(255,255,255,0.2)',
-                            border: 'none',
-                            borderRadius: 'var(--radius-sm)',
-                            padding: '2px 8px',
-                            color: '#fff',
-                            cursor: 'pointer',
-                            fontSize: '0.8rem'
-                        }}
+                        className="offline-sync-btn"
                     >
                         {t('offlineIndicator.syncNow')}
                     </button>

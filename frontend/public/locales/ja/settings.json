@@ -103,5 +103,8 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "決済を開始できませんでした。もう一度お試しください。",
   "toast_premiumRestoredReloading": "プレミアムが復元されました！再読み込み中…",
   "toast_noActiveSubscriptionFoundForThisAc": "このアカウントに有効なサブスクリプションが見つかりません。",
-  "toast_couldNotCheckSubscription": "サブスクリプションを確認できませんでした。"
+  "toast_couldNotCheckSubscription": "サブスクリプションを確認できませんでした。",
+  "app": {
+    "version": "HeyBub v{{version}}"
+  }
 }

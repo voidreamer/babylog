@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyBub Hub — Platform Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0b0f;--surface:#13151d;--surface2:#1b1e2b;--surface3:#242839;--border:#2b3048;--border-light:#383e5a;--text:#e8ebf6;--text-dim:#7d839e;--text-muted:#555a74;--accent:#8b5cf6;--accent-light:#a78bfa;--accent-glow:rgba(139,92,246,0.12);--green:#10b981;--green-light:#34d399;--red:#ef4444;--red-light:#f87171;--yellow:#f59e0b;--orange:#f97316;--blue:#3b82f6;--purple:#a855f7;--pink:#ec4899;--cyan:#06b6d4;--teal:#14b8a6;--warm:#d4a574}
+    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,11,15,0.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}.nav-inner{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:4px;height:52px;padding:0 20px;overflow-x:auto}.nav-brand{font-weight:800;font-size:14px;color:var(--accent-light);margin-right:12px;white-space:nowrap}.nav-btn{background:none;border:1px solid transparent;color:var(--text-dim);padding:5px 11px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;transition:all .2s;font-family:inherit}.nav-btn:hover{color:var(--text);background:var(--surface2)}.nav-btn.active{color:var(--accent-light);background:var(--accent-glow);border-color:rgba(139,92,246,0.25)}
+    .container{max-width:1440px;margin:0 auto;padding:72px 24px 60px}
+    .hero{text-align:center;padding:56px 0 24px}.hero-tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--accent-glow);color:var(--accent-light);border:1px solid rgba(139,92,246,0.2);margin-bottom:16px}.hero h1{font-size:44px;font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,var(--accent-light),var(--warm),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.hero .sub{color:var(--text-dim);font-size:17px;font-weight:300;max-width:620px;margin:0 auto}
+    .section{margin-bottom:52px}.section-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}.section-num{width:32px;height:32px;border-radius:8px;background:var(--accent-glow);border:1px solid rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent-light)}.section-title{font-size:22px;font-weight:700;letter-spacing:-.5px}.section-sub{color:var(--text-dim);font-size:14px;margin-top:-12px;margin-bottom:18px;margin-left:44px}
+    .grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .2s}.card:hover{border-color:var(--border-light)}.card h3{font-size:15px;font-weight:600;margin-bottom:6px}.card p,.card li{color:var(--text-dim);font-size:13px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}.badge-green{background:rgba(16,185,129,.12);color:var(--green-light)}.badge-red{background:rgba(239,68,68,.12);color:var(--red-light)}.badge-yellow{background:rgba(245,158,11,.12);color:var(--yellow)}.badge-blue{background:rgba(59,130,246,.12);color:var(--blue)}.badge-purple{background:rgba(168,85,247,.12);color:var(--purple)}.badge-orange{background:rgba(249,115,22,.12);color:var(--orange)}.badge-accent{background:var(--accent-glow);color:var(--accent-light)}
+    .stat-card{text-align:center;padding:22px 14px}.stat-card .val{font-size:32px;font-weight:900;letter-spacing:-1px;margin:4px 0}.stat-card .label{font-size:12px;color:var(--text-dim)}.stat-card .sub-label{font-size:10px;color:var(--text-muted);margin-top:2px}
+    .progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}.progress-fill{height:100%;border-radius:3px;transition:width .8s ease}
+    .status-row{display:grid;grid-template-columns:1fr 90px 90px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}.status-row.header{color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)}.status-row:not(.header):hover{background:var(--surface2)}
+    .pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600}
+    .pill-working{background:rgba(16,185,129,.12);color:var(--green-light)}.pill-partial{background:rgba(245,158,11,.12);color:var(--yellow)}.pill-stub{background:rgba(239,68,68,.12);color:var(--red-light)}.pill-missing{background:rgba(85,90,116,.15);color:var(--text-muted)}
+    .flow-diagram{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;padding:24px 0}.flow-box{background:var(--surface2);border:1px solid var(--border);padding:12px 18px;border-radius:10px;text-align:center;min-width:110px;transition:all .2s}.flow-box:hover{border-color:var(--accent);transform:scale(1.05)}.flow-box .flow-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}.flow-box .flow-value{font-weight:600;font-size:13px;margin-top:2px}.flow-arrow{font-size:18px;color:var(--text-muted);padding:0 4px}
+    .article-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;gap:14px;transition:all .2s}.article-card:hover{border-color:var(--accent)}.article-meta{flex-shrink:0;width:48px;text-align:center}.article-meta .cat{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:600}.article-meta .time{font-size:20px;font-weight:800;color:var(--accent-light)}.article-meta .unit{font-size:9px;color:var(--text-muted)}.article-body h4{font-size:14px;font-weight:600;margin-bottom:2px}.article-body p{font-size:12px;color:var(--text-dim)}.article-body .author{font-size:11px;color:var(--text-muted);margin-top:4px}
+    .synergy-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}.synergy-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}.synergy-card.high::before{background:linear-gradient(90deg,var(--green),var(--teal))}.synergy-card.medium::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}.synergy-card.low::before{background:linear-gradient(90deg,var(--orange),var(--yellow))}.synergy-card .impact-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px}.synergy-card h3{font-size:16px;margin-bottom:6px}.synergy-card ul{list-style:none;margin-top:8px}.synergy-card li{font-size:12px;color:var(--text-dim);padding:3px 0 3px 16px;position:relative}.synergy-card li::before{content:'\2192';position:absolute;left:0;color:var(--accent)}
+    .issue-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:all .2s}.issue-icon{font-size:18px;flex-shrink:0;margin-top:1px}.issue-title{font-weight:600;font-size:14px}.issue-desc{color:var(--text-dim);font-size:12px;margin-top:2px}.issue-fix{color:var(--green-light);font-size:11px;margin-top:4px;font-style:italic}
+    .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}.chart-wrap canvas{max-height:300px}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:40px 0}.fade-in{animation:fadeIn .4s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+    .eco-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;position:relative}.eco-box .eco-icon{font-size:28px;margin-bottom:6px}.eco-box h4{font-size:14px;font-weight:600}.eco-box p{font-size:11px;color:var(--text-dim);margin-top:2px}.eco-box.active{border-color:var(--accent);box-shadow:0 0 20px rgba(139,92,246,.1)}.eco-box.stub{opacity:.5;border-style:dashed}.eco-arrow{display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px}
+    @media(max-width:768px){.hero h1{font-size:30px}.g2,.g3,.g4{grid-template-columns:1fr}.status-row{grid-template-columns:1fr 70px 70px;font-size:12px}.flow-diagram{flex-direction:column}.flow-arrow{transform:rotate(90deg)}}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const sections = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'ecosystem', label: 'Ecosystem' },
+  { id: 'architecture', label: 'Architecture' },
+  { id: 'features', label: 'Features' },
+  { id: 'content', label: 'Content' },
+  { id: 'issues', label: 'Issues' },
+  { id: 'potential', label: 'Potential' },
+  { id: 'synergy', label: 'Synergy' },
+  { id: 'revenue', label: 'Revenue' },
+  { id: 'roadmap', label: 'Roadmap' },
+];
+
+// ──── DATA ────
+
+const stats = [
+  { val: '7', label: 'Pages/Routes', sub: '4 functional, 3 stubbed' },
+  { val: '12', label: 'Components', sub: 'Lean, no component library' },
+  { val: '8', label: 'Published Articles', sub: 'Rich interactive content' },
+  { val: '6', label: 'Content Categories', sub: 'Sleep, Nutrition, Dev, Health...' },
+  { val: '0', label: 'Backend Routes', sub: 'Pure Supabase direct calls' },
+  { val: '1', label: 'Auth Provider', sub: 'Google OAuth via Supabase' },
+];
+
+const healthScores = [
+  { name: 'Article Quality', score: 85, color: '#10b981' },
+  { name: 'Auth Integration', score: 78, color: '#3b82f6' },
+  { name: 'Design System', score: 72, color: '#3b82f6' },
+  { name: 'Feature Completeness', score: 35, color: '#ef4444' },
+  { name: 'SEO Readiness', score: 20, color: '#ef4444' },
+  { name: 'Monetization', score: 10, color: '#ef4444' },
+  { name: 'Tracker Synergy', score: 25, color: '#ef4444' },
+  { name: 'Market Readiness', score: 22, color: '#ef4444' },
+];
+
+const featureStatus = [
+  { feature: 'Landing Page (Hub.tsx)', status: 'working', hub: 'Yes', tracker: '—' },
+  { feature: 'Google OAuth Login', status: 'working', hub: 'Yes', tracker: 'Yes' },
+  { feature: 'Auth Token Relay (cross-app)', status: 'working', hub: 'Yes', tracker: 'Yes' },
+  { feature: 'Articles (8 published)', status: 'working', hub: 'Yes', tracker: '—' },
+  { feature: 'Article Comments + Reactions', status: 'working', hub: 'Yes', tracker: '—' },
+  { feature: 'Category Filtering', status: 'working', hub: 'Yes', tracker: '—' },
+  { feature: 'Dark/Light Theme', status: 'working', hub: 'Yes', tracker: 'Yes' },
+  { feature: 'Responsive Mobile Nav', status: 'working', hub: 'Yes', tracker: '—' },
+  { feature: 'Nanny Finder', status: 'stub', hub: 'Waitlist only', tracker: '—' },
+  { feature: 'Shop / Marketplace', status: 'stub', hub: 'UI only, no checkout', tracker: '—' },
+  { feature: 'Community', status: 'stub', hub: 'External links only', tracker: '—' },
+  { feature: 'SEO (meta, sitemap, schema)', status: 'missing', hub: 'Basic only', tracker: 'Basic only' },
+  { feature: 'Push Notifications', status: 'missing', hub: 'None', tracker: 'None' },
+  { feature: 'Email Capture / Newsletter', status: 'missing', hub: 'None', tracker: 'None' },
+  { feature: 'Analytics / Tracking', status: 'missing', hub: 'None', tracker: 'None' },
+  { feature: 'Blog CMS / Admin', status: 'missing', hub: 'Hardcoded articles', tracker: '—' },
+];
+
+const articles = [
+  { title: 'Sleep Training Guide', cat: 'Sleep', time: 8, age: '0-24mo', author: 'Dr. Rachel Kim', desc: 'Covers Ferber, Chair, Pick Up/Put Down, Gentle methods. Interactive method comparison.' },
+  { title: 'First Foods & Solids', cat: 'Nutrition', time: 6, age: '4-12mo', author: 'Dr. Sarah Chen', desc: 'BLW vs purees, allergen introduction schedule. Checklists included.' },
+  { title: 'Milestones: Year One', cat: 'Development', time: 10, age: '0-12mo', author: 'Dr. Emily Torres', desc: 'Month-by-month developmental breakdown with visual timeline.' },
+  { title: 'Baby-Proofing Guide', cat: 'Health', time: 7, age: '6-18mo', author: 'Dr. Michael Park', desc: 'Room-by-room guide with interactive safety checklist.' },
+  { title: 'Sleep Regressions', cat: 'Sleep', time: 5, age: '4-24mo', author: 'Dr. Rachel Kim', desc: 'Ages 4mo through 2yr regression patterns and coping strategies.' },
+  { title: 'Self-Care for Parents', cat: 'Parenting', time: 4, age: '0-48mo', author: 'Dr. Amanda Foster', desc: 'Maternal mental health focus. Practical self-care strategies.' },
+  { title: 'Sensory Play Ideas', cat: 'Activities', time: 6, age: '0-12mo', author: 'Dr. Lisa Nguyen', desc: '20 activities organized by age range with materials lists.' },
+  { title: 'Tummy Time Guide', cat: 'Development', time: 5, age: '0-6mo', author: 'Dr. Emily Torres', desc: 'Includes embedded video. Techniques and progression tips.' },
+];
+
+const issues = [
+  { icon: '🔴', title: 'Shop Page is a Dead End', desc: 'Shows product cards with prices, badges (New, Bestseller, Sale), but zero checkout functionality. Users see a curated shopping experience that doesn\'t work.', fix: 'Either remove entirely or implement affiliate links to real products (instant revenue with zero inventory).' },
+  { icon: '🔴', title: 'Nanny Finder is Just a Waitlist', desc: 'The entire "Find Nannies" section is a single waitlist signup form. No profiles, no matching, no messaging. Feels like vaporware.', fix: 'Partner with existing nanny platforms (Care.com, Sittercity) via affiliate or embed. Or remove until ready.' },
+  { icon: '🔴', title: 'Community Links to External Platforms', desc: 'Community page just links to Discord and Facebook. No integrated forums, comments (except articles), or user profiles.', fix: 'Leverage the article comment system as a starting point. Add a Q&A section tied to article topics.' },
+  { icon: '🟡', title: 'Articles are Hardcoded', desc: 'All 8 articles are defined in a static TypeScript array. No CMS, no admin panel, no way for non-developers to publish content.', fix: 'Move to Supabase table or integrate a headless CMS (Sanity, Contentful). Enable a content pipeline.' },
+  { icon: '🟡', title: 'Fragile Token Relay Between Apps', desc: 'Auth tokens passed via URL parameters (auth_relay, refresh_token) between Hub and Tracker. Tokens visible in browser history and logs.', fix: 'Use HttpOnly cookies, postMessage, or a shared Supabase session with custom domain cookies.' },
+  { icon: '🟡', title: 'Zero SEO Infrastructure', desc: 'No sitemap.xml, no robots.txt, no JSON-LD structured data, no Open Graph tags, no canonical URLs. Articles are invisible to Google.', fix: 'Critical for content marketing strategy. Add SSR/SSG or pre-rendering for article pages.' },
+  { icon: '🟡', title: 'No Analytics or Tracking', desc: 'No Mixpanel, Amplitude, Google Analytics, or any event tracking. Zero visibility into user behavior.', fix: 'Add Plausible (privacy-friendly) or Mixpanel. Track: page views, article reads, CTA clicks, auth conversions.' },
+  { icon: '🟡', title: 'Theme Color Mismatch', desc: 'Hub uses warm cream (#fefdfb) while Tracker uses indigo (#6366f1). Brand identity feels disconnected between the two apps.', fix: 'Unify design tokens. Both apps should share the same warm pastel palette.' },
+  { icon: '🔵', title: 'No Email Capture', desc: 'No newsletter signup, no lead magnet, no drip sequences. The #1 content marketing conversion tool is missing.', fix: 'Add email capture on every article page. Offer lead magnets: "Printable Milestone Checklist", "Vaccination Schedule PDF".' },
+  { icon: '🔵', title: 'Duplicate Auth Logic', desc: 'Both apps independently implement Supabase auth with separate hooks, stores (Zustand in Hub, Context in Tracker).', fix: 'Extract shared auth into an npm package or use Supabase custom domain cookies for seamless SSO.' },
+];
+
+const potentials = [
+  { title: 'Content Marketing Engine', impact: 'high', desc: 'The article system is genuinely well-built: interactive checklists, video embeds, collapsible sections, comments, reactions. This is the foundation for an SEO-driven acquisition channel.',
+    actions: ['Add SSR/pre-rendering for article pages (SEO indexing)', 'Move articles to CMS for scalable publishing', 'Target 50+ articles covering high-volume parenting keywords', 'Each article → CTA to download HeyBub Tracker (conversion funnel)', 'Estimated organic traffic: 50K-100K/mo at 50 articles'] },
+  { title: 'Affiliate Baby Shop', impact: 'high', desc: 'The shop UI already exists with product cards. Instead of building e-commerce, partner with Amazon Associates, Target, BuyBuyBaby for affiliate commissions.',
+    actions: ['Replace stub products with real affiliate links', 'Curate products by category (sleep, feeding, health, safety)', 'Write "best baby products" articles linking to shop', 'Track conversions with UTM parameters', 'Estimated revenue: $500-2K/mo at 10K monthly visitors'] },
+  { title: 'Nanny/Childcare Directory', impact: 'medium', desc: 'Instead of building a full marketplace, create a local childcare directory with reviews. Partner with existing platforms for referral fees.',
+    actions: ['Integrate with Care.com API or similar for listings', 'Add user reviews and ratings (leverage Supabase)', 'Charge for featured listings ($29-99/mo per provider)', 'Or pure affiliate: earn $10-50 per signup referral', 'Start with 3 major cities, expand based on demand'] },
+  { title: 'Parenting Tools & Calculators', impact: 'high', desc: 'Free interactive tools drive massive SEO traffic. Examples: due date calculator, baby name generator, feeding amount calculator, sleep schedule builder.',
+    actions: ['Build 5-10 free tools (pure frontend, no backend needed)', 'Each tool → email capture + CTA to download tracker', 'Target long-tail keywords: "baby feeding calculator", "wake window calculator"', 'These pages rank fast and have high conversion intent', 'Estimated: 20K-50K organic visits/mo from tool pages alone'] },
+  { title: 'Community Q&A Forum', impact: 'medium', desc: 'The comment system already works. Extend it into a Q&A forum where parents ask questions and get answers from the community + expert contributors.',
+    actions: ['Add a /questions route with topic categories', 'Leverage Supabase real-time for live discussions', 'Gamify with reputation points and badges', 'Expert-verified answers (partner with pediatricians)', 'Builds organic SEO content (every question = indexed page)'] },
+  { title: 'Pediatrician Partner Portal', impact: 'medium', desc: 'Create a section where pediatricians can publish content, answer questions, and recommend HeyBub to patients. Builds clinical credibility.',
+    actions: ['Partner with 10-20 pediatricians for content', 'Offer free Premium accounts for their patients', 'Create co-branded content (articles, guides)', 'Pediatrician endorsement = massive trust signal', 'Long-term: pediatrician dashboard for patient growth data'] },
+];
+
+const synergies = [
+  { title: 'Articles → Tracker Conversion Funnel', impact: 'Critical', color: 'var(--green-light)',
+    desc: 'Every article should end with a contextual CTA to the tracker. "Sleep Training Guide" → "Track your baby\'s sleep patterns with HeyBub." "Growth Milestones" → "See your baby\'s WHO percentile chart."',
+    items: ['Embed mini tracker demos in articles (interactive widget)', 'Show sample growth charts in nutrition articles', 'Link vaccination articles directly to vaccination tracker', 'Auto-detect reader\'s baby age (if logged in) and personalize CTAs'] },
+  { title: 'Shared Auth = Seamless Experience', impact: 'High', color: 'var(--blue)',
+    desc: 'Users who read articles and sign up for the Hub should instantly have access to the Tracker without re-authenticating. The token relay exists but needs to be seamless.',
+    items: ['Unified login: sign up once, access everything', 'After article login → prompt to "Start tracking your baby"', 'Show personalized content based on tracker data (baby age, tracked activities)', 'Single account page across both apps'] },
+  { title: 'Shop Recommendations from Tracker Data', impact: 'High', color: 'var(--blue)',
+    desc: 'If the tracker knows baby is 5 months old and starting solids, the shop can recommend high chairs, bibs, and first foods. Data-driven affiliate recommendations.',
+    items: ['Tracker age data → personalized shop categories', '"Your baby is starting solids — here are our top picks"', 'Milestone-triggered product recommendations via email', 'Feeding tracker data → relevant nutrition product suggestions'] },
+  { title: 'Content Powers SEO for Tracker', impact: 'Critical', color: 'var(--green-light)',
+    desc: 'Hub articles rank for parenting keywords → drive organic traffic → convert to tracker users. This is the primary acquisition strategy discussed in the marketing plan.',
+    items: ['50 SEO articles = estimated 50K-100K organic visits/month', 'Each article targets keywords the tracker needs (baby sleep, feeding, growth)', 'Hub becomes the top-of-funnel; tracker is the product', 'Content + tools + community = organic growth flywheel'] },
+  { title: 'Community Drives Retention', impact: 'Medium', color: 'var(--accent-light)',
+    desc: 'Parents who engage in the community (Q&A, comments, forums) are more likely to keep using the tracker. Social stickiness prevents churn.',
+    items: ['Share tracker achievements in community ("Luna slept through the night!")', 'Ask questions about tracker data in forums', 'Community challenges ("7-day tracking streak")', 'User-generated tips that reference tracker features'] },
+  { title: 'Nanny Feature Uses Tracker Data', impact: 'Low', color: 'var(--orange)',
+    desc: 'When parents hire a nanny, they share the baby\'s tracker profile. The nanny uses HeyBub to log feeds, naps, diapers during the day. Both parents and nanny see the same data.',
+    items: ['Nanny gets shared access to baby profile (already built!)', 'Nanny logging → parents see updates in real-time', 'Daycare centers use web version (PWA advantage)', 'Nanny partnership = B2B acquisition channel for tracker'] },
+];
+
+const revenueStreams = [
+  { name: 'Tracker Subscriptions (via Hub funnel)', est: '$5K-60K/mo', timeline: 'Now → 12mo', desc: 'Hub articles drive organic traffic → convert to tracker signups → premium subscriptions. This is the primary revenue engine.' },
+  { name: 'Affiliate Baby Shop', est: '$500-5K/mo', timeline: '1-3mo to launch', desc: 'Replace stub shop with Amazon/Target affiliate links. Curate products by baby age + activity. 4-8% commission per sale.' },
+  { name: 'Sponsored Content', est: '$500-3K/mo', timeline: '6-12mo (need traffic)', desc: 'Once articles reach 50K+ monthly readers, offer sponsored posts from baby brands. $500-2K per sponsored article.' },
+  { name: 'Email List Monetization', est: '$200-2K/mo', timeline: '3-6mo', desc: 'Build email list via lead magnets on articles. Monetize via sponsored newsletter spots + product recommendations.' },
+  { name: 'Nanny Referral Fees', est: '$200-1K/mo', timeline: '6-12mo', desc: 'Partner with nanny platforms for referral fees ($10-50 per signup). Low effort, passive income.' },
+  { name: 'Featured Provider Listings', est: '$500-3K/mo', timeline: '9-18mo', desc: 'Charge childcare providers, pediatricians, and baby service businesses for featured listings in directory.' },
+];
+
+const roadmap = [
+  { phase: 'Phase 1: Fix Foundations', weeks: 'Weeks 1-4', color: '#ef4444', items: [
+    { task: 'Remove or convert Shop to affiliate links (Amazon Associates)', priority: 'critical' },
+    { task: 'Remove or clarify Nanny Finder (honest "coming soon" or affiliate)', priority: 'critical' },
+    { task: 'Add SEO: sitemap.xml, robots.txt, Open Graph, JSON-LD for articles', priority: 'critical' },
+    { task: 'Add analytics (Plausible or Mixpanel)', priority: 'critical' },
+    { task: 'Add email capture on every article + homepage (lead magnet)', priority: 'high' },
+    { task: 'Fix token relay security (move to cookie-based SSO)', priority: 'high' },
+    { task: 'Add article CTAs linking to tracker features', priority: 'high' },
+    { task: 'Unify design tokens between Hub and Tracker', priority: 'medium' },
+  ]},
+  { phase: 'Phase 2: Content Scale', weeks: 'Weeks 5-12', color: '#f59e0b', items: [
+    { task: 'Move articles to Supabase table or headless CMS', priority: 'high' },
+    { task: 'Publish 20 more SEO-optimized articles (total: 28)', priority: 'critical' },
+    { task: 'Build 5 free tools: due date calc, feeding calc, sleep schedule, name gen, growth percentile', priority: 'high' },
+    { task: 'Launch email newsletter (weekly parenting tips)', priority: 'high' },
+    { task: 'Add pre-rendering/SSG for article pages (SEO indexing)', priority: 'high' },
+    { task: 'Create comparison landing pages (HeyBub vs Huckleberry)', priority: 'medium' },
+    { task: 'Start pediatrician content partnerships (3-5 doctors)', priority: 'medium' },
+    { task: 'Implement community Q&A section', priority: 'medium' },
+  ]},
+  { phase: 'Phase 3: Monetize', weeks: 'Months 4-6', color: '#10b981', items: [
+    { task: 'Launch affiliate shop with 50+ curated products', priority: 'high' },
+    { task: 'Reach 10K monthly organic visitors (SEO milestone)', priority: 'critical' },
+    { task: 'Launch sponsored content program for baby brands', priority: 'medium' },
+    { task: 'Build nanny/childcare directory (partner with Care.com)', priority: 'medium' },
+    { task: 'Launch featured listings for service providers', priority: 'medium' },
+    { task: 'Optimize article → tracker conversion funnel (A/B test CTAs)', priority: 'high' },
+    { task: 'Expand to 50+ articles (target: 50K organic/mo)', priority: 'high' },
+    { task: 'Implement personalized shop recommendations from tracker data', priority: 'medium' },
+  ]},
+  { phase: 'Phase 4: Platform', weeks: 'Months 7-12', color: '#8b5cf6', items: [
+    { task: 'Launch pediatrician partner portal', priority: 'medium' },
+    { task: 'Build parent community with reputation system', priority: 'medium' },
+    { task: 'Reach 50K monthly organic visitors', priority: 'critical' },
+    { task: 'Launch baby product reviews section (SEO + affiliate)', priority: 'high' },
+    { task: 'Add pregnancy tracking content + tools (expand TAM)', priority: 'high' },
+    { task: 'Internationalize Hub content (ES, FR matching tracker)', priority: 'medium' },
+    { task: 'B2B portal for daycare centers and nanny agencies', priority: 'medium' },
+    { task: 'Evaluate standalone Hub premium tier (ad-free, exclusive content)', priority: 'low' },
+  ]},
+];
+
+// ──── COMPONENTS ────
+
+function Nav({ active, setActive }) {
+  return (
+    <nav className="nav"><div className="nav-inner">
+      <span className="nav-brand">HeyBub Hub Analysis</span>
+      {sections.map(s => (
+        <button key={s.id} className={`nav-btn ${active === s.id ? 'active' : ''}`}
+          onClick={() => { setActive(s.id); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+          {s.label}
+        </button>
+      ))}
+    </div></nav>
+  );
+}
+
+function Overview() {
+  return (
+    <div id="overview" className="section fade-in">
+      <div className="hero">
+        <div className="hero-tag">Platform Analysis</div>
+        <h1>HeyBub Hub</h1>
+        <p className="sub">The marketing site, content hub, and ecosystem front door for the HeyBub parenting platform. Currently a prototype — here's what works, what doesn't, and what could be huge.</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+          <span className="badge badge-purple">React 18 + TypeScript</span>
+          <span className="badge badge-blue">Vite 7 + Zustand</span>
+          <span className="badge badge-green">Supabase Auth</span>
+          <span className="badge badge-yellow">S3 + CloudFront</span>
+          <span className="badge badge-orange">Prototype Stage</span>
+        </div>
+      </div>
+      <div className="grid g3" style={{ marginTop: 24 }}>
+        {stats.map((s, i) => (
+          <div key={i} className="card stat-card">
+            <div className="val" style={{ background: 'linear-gradient(135deg,var(--accent-light),var(--warm))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{s.val}</div>
+            <div className="label">{s.label}</div>
+            <div className="sub-label">{s.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 24 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>Platform Health Scores</h3>
+        <div className="grid g2">
+          {healthScores.map((m, i) => (
+            <div key={i} style={{ padding: '6px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <span>{m.name}</span>
+                <span style={{ fontWeight: 700, color: m.color }}>{m.score}%</span>
+              </div>
+              <div className="progress-bar"><div className="progress-fill" style={{ width: `${m.score}%`, background: m.color }}></div></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Ecosystem() {
+  const items = [
+    { icon: '🌐', name: 'HeyBub Hub', desc: 'Marketing site, articles, shop, community', active: true },
+    { icon: '📱', name: 'BabyLog Tracker', desc: 'Core product: tracking, health, analytics', active: true },
+    { icon: '🛒', name: 'Baby Shop', desc: 'Product recommendations + affiliate', active: false },
+    { icon: '👶', name: 'Nanny Finder', desc: 'Childcare directory + matching', active: false },
+    { icon: '💬', name: 'Community', desc: 'Forums, Q&A, parent groups', active: false },
+    { icon: '🧰', name: 'Parent Tools', desc: 'Calculators, planners, checklists', active: false },
+  ];
+  return (
+    <div id="ecosystem" className="section fade-in">
+      <div className="section-header"><div className="section-num">01</div><h2 className="section-title">The HeyBub Ecosystem</h2></div>
+      <p className="section-sub">How Hub and Tracker fit together — and where the gaps are.</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
+        {items.map((item, i) => (
+          <div key={i} className={`eco-box ${item.active ? 'active' : 'stub'}`}>
+            <div className="eco-icon">{item.icon}</div>
+            <h4>{item.name}</h4>
+            <p>{item.desc}</p>
+            <span className={`badge ${item.active ? 'badge-green' : 'badge-red'}`} style={{ marginTop: 6 }}>{item.active ? 'Live' : 'Stubbed'}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 10, color: 'var(--text-dim)' }}>User Flow: Hub → Tracker</h3>
+        <div className="flow-diagram">
+          <div className="flow-box"><div className="flow-label">Discovery</div><div className="flow-value">Google / Social</div></div>
+          <span className="flow-arrow">&rarr;</span>
+          <div className="flow-box"><div className="flow-label">Landing</div><div className="flow-value">Hub Article</div></div>
+          <span className="flow-arrow">&rarr;</span>
+          <div className="flow-box"><div className="flow-label">Engage</div><div className="flow-value">Read + Comment</div></div>
+          <span className="flow-arrow">&rarr;</span>
+          <div className="flow-box"><div className="flow-label">CTA</div><div className="flow-value">"Try HeyBub"</div></div>
+          <span className="flow-arrow">&rarr;</span>
+          <div className="flow-box"><div className="flow-label">Auth</div><div className="flow-value">Google OAuth</div></div>
+          <span className="flow-arrow">&rarr;</span>
+          <div className="flow-box" style={{ borderColor: 'var(--accent)' }}><div className="flow-label">Product</div><div className="flow-value">BabyLog Tracker</div></div>
+          <span className="flow-arrow">&rarr;</span>
+          <div className="flow-box" style={{ borderColor: 'var(--green)' }}><div className="flow-label">Revenue</div><div className="flow-value">Premium Sub</div></div>
+        </div>
+      </div>
+      <div className="card" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)' }}>
+        <h3>The Core Insight</h3>
+        <p style={{ fontSize: 13, lineHeight: 1.8, marginTop: 6 }}>
+          The Hub's primary purpose should be as a <strong>top-of-funnel acquisition engine</strong> for the Tracker.
+          Articles and tools attract organic traffic via SEO → users discover HeyBub → sign up → start tracking → convert to premium.
+          Right now, the funnel is broken: articles exist but aren't indexed by Google (no SEO), there are no CTAs linking to the tracker,
+          and stubbed features (shop, nannies) create dead ends that hurt credibility.
+          <strong> Fix the funnel first, add features second.</strong>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Architecture() {
+  return (
+    <div id="architecture" className="section fade-in">
+      <div className="section-header"><div className="section-num">02</div><h2 className="section-title">Architecture & Tech Stack</h2></div>
+      <div className="grid g2" style={{ marginBottom: 16 }}>
+        <div className="card">
+          <h3 style={{ color: 'var(--accent-light)' }}>Hub (Marketing Site)</h3>
+          <ul style={{ listStyle: 'none', marginTop: 8 }}>
+            {['React 18.3 + TypeScript 5.9', 'Vite 7.2 (build)', 'React Router DOM 7.13', 'Zustand 5.0 (auth state)', 'Supabase JS 2.93 (auth + DB)', 'Custom CSS (no Tailwind, no lib)', 'S3 + CloudFront (hosting)', 'No backend — Supabase direct'].map((t, i) =>
+              <li key={i} style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0 3px 14px', position: 'relative' }}>
+                <span style={{ position: 'absolute', left: 0, color: 'var(--accent)' }}>+</span>{t}
+              </li>
+            )}
+          </ul>
+        </div>
+        <div className="card">
+          <h3 style={{ color: 'var(--warm)' }}>Tracker (Core Product)</h3>
+          <ul style={{ listStyle: 'none', marginTop: 8 }}>
+            {['React 18.2 + TypeScript 5.9', 'Vite 5.0 + PWA plugin', 'React Router DOM 6.20', 'Context API (state)', 'FastAPI + SQLAlchemy (backend)', 'AWS Lambda + API Gateway', 'Supabase (auth + PostgreSQL)', 'Capacitor 8 (iOS/Android)'].map((t, i) =>
+              <li key={i} style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0 3px 14px', position: 'relative' }}>
+                <span style={{ position: 'absolute', left: 0, color: 'var(--warm)' }}>+</span>{t}
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+      <div className="card">
+        <h3>Shared Infrastructure</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+          {['Supabase PostgreSQL', 'Supabase Auth (Google OAuth)', 'AWS S3 + CloudFront', 'Terraform IaC (ca-central-1)', 'GitHub Actions CI/CD', 'Token Relay (cross-app SSO)'].map((t, i) =>
+            <span key={i} style={{ padding: '4px 12px', background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}>{t}</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Features() {
+  const statusPill = (s) => {
+    const map = { working: ['Working', 'pill-working'], partial: ['Partial', 'pill-partial'], stub: ['Stubbed', 'pill-stub'], missing: ['Missing', 'pill-missing'] };
+    const [label, cls] = map[s];
+    return <span className={`pill ${cls}`}>{label}</span>;
+  };
+  const counts = { working: 0, partial: 0, stub: 0, missing: 0 };
+  featureStatus.forEach(f => counts[f.status]++);
+
+  return (
+    <div id="features" className="section fade-in">
+      <div className="section-header"><div className="section-num">03</div><h2 className="section-title">Feature Status Map</h2></div>
+      <div className="grid g4" style={{ marginBottom: 16 }}>
+        {[
+          { label: 'Working', count: counts.working, color: 'var(--green-light)', total: featureStatus.length },
+          { label: 'Stubbed', count: counts.stub, color: 'var(--yellow)', total: featureStatus.length },
+          { label: 'Missing', count: counts.missing, color: 'var(--red-light)', total: featureStatus.length },
+        ].map((s, i) => (
+          <div key={i} className="card stat-card" style={{ padding: 16 }}>
+            <div className="val" style={{ color: s.color, fontSize: 28 }}>{s.count}/{s.total}</div>
+            <div className="label">{s.label}</div>
+            <div className="progress-bar" style={{ marginTop: 8 }}>
+              <div className="progress-fill" style={{ width: `${(s.count / s.total) * 100}%`, background: s.color }}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+        <div className="status-row header">
+          <div>Feature</div><div style={{ textAlign: 'center' }}>Status</div><div style={{ textAlign: 'center' }}>Hub</div>
+        </div>
+        {featureStatus.map((f, i) => (
+          <div key={i} className="status-row">
+            <div>{f.feature}</div>
+            <div style={{ textAlign: 'center' }}>{statusPill(f.status)}</div>
+            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>{f.hub}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Content() {
+  const catColors = { Sleep: 'var(--blue)', Nutrition: 'var(--green)', Development: 'var(--purple)', Health: 'var(--red)', Parenting: 'var(--pink)', Activities: 'var(--yellow)' };
+  return (
+    <div id="content" className="section fade-in">
+      <div className="section-header"><div className="section-num">04</div><h2 className="section-title">Content Library (8 Articles)</h2></div>
+      <p className="section-sub">Well-written, expert-attributed articles with interactive elements. The strongest asset of the Hub.</p>
+      <div className="grid g2">
+        {articles.map((a, i) => (
+          <div key={i} className="article-card">
+            <div className="article-meta">
+              <div className="cat" style={{ color: catColors[a.cat] }}>{a.cat}</div>
+              <div className="time">{a.time}</div>
+              <div className="unit">min</div>
+            </div>
+            <div className="article-body">
+              <h4>{a.title}</h4>
+              <p>{a.desc}</p>
+              <div className="author">By {a.author} | Ages {a.age}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3>Content Assessment</h3>
+        <div className="grid g3" style={{ marginTop: 10 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--green-light)', marginBottom: 4 }}>Strengths</div>
+            <ul style={{ listStyle: 'none' }}>
+              {['Expert attribution (doctors, specialists)', 'Interactive elements (checklists, video embeds)', 'Comments + reactions system working', 'Age-targeted content (0-48 months)', 'Category filtering implemented', '6 categories covering key parenting topics'].map((s, i) =>
+                <li key={i} style={{ fontSize: 11, color: 'var(--text-dim)', padding: '2px 0 2px 12px', position: 'relative' }}><span style={{ position: 'absolute', left: 0, color: 'var(--green)' }}>+</span>{s}</li>
+              )}
+            </ul>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--red-light)', marginBottom: 4 }}>Weaknesses</div>
+            <ul style={{ listStyle: 'none' }}>
+              {['Only 8 articles (need 50+ for SEO traction)', 'Hardcoded in TypeScript (no CMS)', 'Not indexed by Google (no SSR/SSG)', 'No Open Graph tags for social sharing', 'No email capture on articles', 'No CTA linking to tracker app'].map((s, i) =>
+                <li key={i} style={{ fontSize: 11, color: 'var(--text-dim)', padding: '2px 0 2px 12px', position: 'relative' }}><span style={{ position: 'absolute', left: 0, color: 'var(--red)' }}>-</span>{s}</li>
+              )}
+            </ul>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--blue)', marginBottom: 4 }}>Missing Topics</div>
+            <ul style={{ listStyle: 'none' }}>
+              {['Breastfeeding guides (high SEO volume)', 'Baby growth percentiles explained', 'Vaccination schedules by country', 'Postpartum recovery', 'Baby product reviews', 'Co-sleeping safety'].map((s, i) =>
+                <li key={i} style={{ fontSize: 11, color: 'var(--text-dim)', padding: '2px 0 2px 12px', position: 'relative' }}><span style={{ position: 'absolute', left: 0, color: 'var(--blue)' }}>?</span>{s}</li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Issues() {
+  return (
+    <div id="issues" className="section fade-in">
+      <div className="section-header"><div className="section-num">05</div><h2 className="section-title">Issues & What Doesn't Make Sense</h2></div>
+      <p className="section-sub">Honest assessment of problems that need fixing before the Hub can be effective.</p>
+      {issues.map((issue, i) => (
+        <div key={i} className="issue-item">
+          <span className="issue-icon">{issue.icon}</span>
+          <div>
+            <div className="issue-title">{issue.title}</div>
+            <div className="issue-desc">{issue.desc}</div>
+            <div className="issue-fix">Fix: {issue.fix}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Potential() {
+  return (
+    <div id="potential" className="section fade-in">
+      <div className="section-header"><div className="section-num">06</div><h2 className="section-title">High-Potential Opportunities</h2></div>
+      <p className="section-sub">Features and strategies that could transform the Hub from a prototype into a growth engine.</p>
+      <div className="grid g2">
+        {potentials.map((p, i) => (
+          <div key={i} className={`synergy-card ${p.impact}`}>
+            <div className="impact-label" style={{ color: p.impact === 'high' ? 'var(--green-light)' : 'var(--blue)' }}>{p.impact} impact</div>
+            <h3>{p.title}</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 6 }}>{p.desc}</p>
+            <ul>{p.actions.map((a, j) => <li key={j}>{a}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Synergy() {
+  return (
+    <div id="synergy" className="section fade-in">
+      <div className="section-header"><div className="section-num">07</div><h2 className="section-title">Hub + Tracker Synergy Map</h2></div>
+      <p className="section-sub">How the Hub and Tracker can amplify each other to create a platform greater than the sum of its parts.</p>
+      <div className="grid g2">
+        {synergies.map((s, i) => (
+          <div key={i} className="card" style={{ borderLeft: `3px solid ${s.color}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <h3>{s.title}</h3>
+              <span className="badge badge-accent">{s.impact}</span>
+            </div>
+            <p style={{ fontSize: 12, marginBottom: 8 }}>{s.desc}</p>
+            <ul style={{ listStyle: 'none' }}>
+              {s.items.map((item, j) => (
+                <li key={j} style={{ fontSize: 11, color: 'var(--text-dim)', padding: '2px 0 2px 14px', position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 0, color: s.color }}>+</span>{item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Revenue() {
+  const chartRef = useRef(null);
+  const inst = useRef(null);
+  useEffect(() => {
+    if (inst.current) inst.current.destroy();
+    if (!chartRef.current) return;
+    inst.current = new Chart(chartRef.current.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: revenueStreams.map(r => r.name.split('(')[0].trim()),
+        datasets: [
+          { label: 'Low Est. ($/mo)', data: [5000, 500, 500, 200, 200, 500], backgroundColor: 'rgba(139,92,246,0.5)', borderColor: '#8b5cf6', borderWidth: 1, borderRadius: 6 },
+          { label: 'High Est. ($/mo)', data: [60000, 5000, 3000, 2000, 1000, 3000], backgroundColor: 'rgba(212,165,116,0.5)', borderColor: '#d4a574', borderWidth: 1, borderRadius: 6 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#7d839e', font: { size: 11 } } }, title: { display: true, text: 'Revenue Potential by Stream (Monthly)', color: '#e8ebf6', font: { size: 14 } } },
+        scales: { y: { ticks: { color: '#7d839e', callback: v => '$' + (v >= 1000 ? (v/1000) + 'K' : v) }, grid: { color: '#2b3048' } }, x: { ticks: { color: '#7d839e', font: { size: 10 } }, grid: { display: false } } }
+      }
+    });
+    return () => { if (inst.current) inst.current.destroy(); };
+  }, []);
+
+  return (
+    <div id="revenue" className="section fade-in">
+      <div className="section-header"><div className="section-num">08</div><h2 className="section-title">Revenue Opportunities</h2></div>
+      <div className="chart-wrap" style={{ marginBottom: 20 }}><canvas ref={chartRef}></canvas></div>
+      <div className="grid g3">
+        {revenueStreams.map((r, i) => (
+          <div key={i} className="card">
+            <h3>{r.name}</h3>
+            <div style={{ fontSize: 22, fontWeight: 800, margin: '6px 0', background: 'linear-gradient(135deg,var(--accent-light),var(--warm))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{r.est}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6 }}>{r.timeline}</div>
+            <p>{r.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Roadmap() {
+  const pColors = { critical: 'var(--red)', high: 'var(--orange)', medium: 'var(--blue)', low: 'var(--text-muted)' };
+  return (
+    <div id="roadmap" className="section fade-in">
+      <div className="section-header"><div className="section-num">09</div><h2 className="section-title">Hub Development Roadmap</h2></div>
+      {roadmap.map((phase, i) => (
+        <div key={i} style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: `${phase.color}20`, color: phase.color, border: `1px solid ${phase.color}40` }}>{phase.weeks}</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>{phase.phase}</span>
+          </div>
+          {phase.items.map((item, j) => (
+            <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 12px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 4, fontSize: 12 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: pColors[item.priority], flexShrink: 0 }}></span>
+              <span style={{ flex: 1, color: 'var(--text-dim)' }}>{item.task}</span>
+              <span className={`badge badge-${item.priority === 'critical' ? 'red' : item.priority === 'high' ? 'orange' : 'blue'}`}>{item.priority}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+      <div className="divider"></div>
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(212,165,116,0.08))', border: '1px solid rgba(139,92,246,0.25)' }}>
+        <h3 style={{ fontSize: 18, marginBottom: 10 }}>The Verdict</h3>
+        <p style={{ fontSize: 14, lineHeight: 1.9 }}>
+          The BabyHub has a <strong>solid foundation</strong> — the article system is genuinely well-built with interactive elements,
+          expert attribution, comments, and reactions. The shared Supabase auth creates a real bridge to the Tracker.
+          <br/><br/>
+          But right now, it's <strong>hurting more than helping</strong>. The stubbed Shop and Nanny Finder create dead ends that
+          damage credibility. The articles aren't indexed by Google. There's no email capture, no analytics, no conversion funnel to the Tracker.
+          <br/><br/>
+          <strong>The fix is straightforward:</strong> Remove or convert the stubs (affiliate shop, partner nanny links), add SEO infrastructure,
+          put CTAs on every article linking to the Tracker, and scale content to 50+ articles.
+          The Hub then becomes the <strong>organic acquisition engine</strong> that feeds the Tracker's premium subscription revenue.
+          <br/><br/>
+          With 50 well-targeted articles and basic SEO, the Hub could realistically drive <strong>50K-100K organic visitors/month</strong>,
+          converting at 2-3% to tracker signups, feeding <strong>1,000-3,000 new users/month</strong> into the premium funnel — at <strong>zero ad spend</strong>.
+          <br/><br/>
+          <strong style={{ color: 'var(--accent-light)' }}>The Hub isn't a separate product — it's the marketing engine the Tracker needs to win.</strong>
+        </p>
+      </div>
+      <div style={{ textAlign: 'center', padding: '40px 0 20px', color: 'var(--text-muted)', fontSize: 11 }}>
+        Generated {new Date().toLocaleDateString()} — HeyBub Hub Platform Analysis
+      </div>
+    </div>
+  );
+}
+
+// ──── APP ────
+function App() {
+  const [active, setActive] = useState('overview');
+  useEffect(() => {
+    const h = () => { const p = window.scrollY + 100; for (let i = sections.length - 1; i >= 0; i--) { const el = document.getElementById(sections[i].id); if (el && el.offsetTop <= p) { setActive(sections[i].id); break; } } };
+    window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h);
+  }, []);
+  return (
+    <><Nav active={active} setActive={setActive} />
+    <div className="container">
+      <Overview /><div className="divider"/>
+      <Ecosystem /><div className="divider"/>
+      <Architecture /><div className="divider"/>
+      <Features /><div className="divider"/>
+      <Content /><div className="divider"/>
+      <Issues /><div className="divider"/>
+      <Potential /><div className="divider"/>
+      <Synergy /><div className="divider"/>
+      <Revenue /><div className="divider"/>
+      <Roadmap />
+    </div></>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

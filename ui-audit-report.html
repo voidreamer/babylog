@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Babylog UI/UX Audit Report — Updated</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --bg: #0f0f12;
+    --surface: #1a1a22;
+    --surface-hover: #22222e;
+    --border: #2a2a38;
+    --text: #e8e6f0;
+    --text-secondary: #9896a8;
+    --text-muted: #6b6980;
+    --critical: #ff4d6a;
+    --critical-bg: rgba(255,77,106,0.08);
+    --critical-border: rgba(255,77,106,0.2);
+    --high: #ff8c42;
+    --high-bg: rgba(255,140,66,0.08);
+    --high-border: rgba(255,140,66,0.2);
+    --medium: #ffc844;
+    --medium-bg: rgba(255,200,68,0.08);
+    --medium-border: rgba(255,200,68,0.2);
+    --low: #44b8ff;
+    --low-bg: rgba(68,184,255,0.08);
+    --low-border: rgba(68,184,255,0.2);
+    --nice: #a78bfa;
+    --nice-bg: rgba(167,139,250,0.08);
+    --nice-border: rgba(167,139,250,0.2);
+    --success: #34d399;
+    --success-bg: rgba(52,211,153,0.08);
+    --accent: #d4849c;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 3rem; padding: 3rem 2rem; background: linear-gradient(135deg, rgba(212,132,156,0.1) 0%, rgba(106,156,184,0.1) 100%); border-radius: 20px; border: 1px solid var(--border); }
+  .header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #d4849c, #6a9cb8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header p { color: var(--text-secondary); font-size: 1.05rem; }
+  .header-meta { display: flex; gap: 2rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+  .header-stat { text-align: center; }
+  .header-stat-value { font-size: 1.8rem; font-weight: 700; }
+  .header-stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Score Ring */
+  .score-ring { position: relative; width: 100px; height: 100px; margin: 1.5rem auto 0.5rem; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; }
+
+  /* Navigation */
+  .nav-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; position: sticky; top: 0; z-index: 10; background: var(--bg); padding-top: 0.5rem; }
+  .nav-tab { padding: 0.6rem 1.2rem; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+  .nav-tab:hover { background: var(--surface-hover); color: var(--text); }
+  .nav-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .nav-tab-count { font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 0.1rem 0.5rem; border-radius: 100px; }
+  .nav-tab.active .nav-tab-count { background: rgba(255,255,255,0.25); }
+
+  /* Filter Bar */
+  .filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
+  .filter-chip { padding: 0.4rem 0.9rem; border-radius: 100px; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .filter-chip.critical { background: var(--critical-bg); color: var(--critical); border-color: var(--critical-border); }
+  .filter-chip.high { background: var(--high-bg); color: var(--high); border-color: var(--high-border); }
+  .filter-chip.medium { background: var(--medium-bg); color: var(--medium); border-color: var(--medium-border); }
+  .filter-chip.low { background: var(--low-bg); color: var(--low); border-color: var(--low-border); }
+  .filter-chip.nice { background: var(--nice-bg); color: var(--nice); border-color: var(--nice-border); }
+  .filter-chip.inactive { opacity: 0.35; }
+  .filter-chip:hover { opacity: 1; transform: scale(1.03); }
+  .filter-label { font-size: 0.8rem; color: var(--text-muted); margin-right: 0.5rem; }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; transition: all 0.2s; }
+  .card:hover { border-color: rgba(212,132,156,0.3); }
+  .card-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+  .card-severity { padding: 0.25rem 0.7rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+  .card-severity.critical { background: var(--critical-bg); color: var(--critical); border: 1px solid var(--critical-border); }
+  .card-severity.high { background: var(--high-bg); color: var(--high); border: 1px solid var(--high-border); }
+  .card-severity.medium { background: var(--medium-bg); color: var(--medium); border: 1px solid var(--medium-border); }
+  .card-severity.low { background: var(--low-bg); color: var(--low); border: 1px solid var(--low-border); }
+  .card-severity.nice { background: var(--nice-bg); color: var(--nice); border: 1px solid var(--nice-border); }
+  .card-category { padding: 0.25rem 0.7rem; border-radius: 100px; font-size: 0.7rem; color: var(--text-muted); border: 1px solid var(--border); flex-shrink: 0; }
+  .card-title { font-size: 1.05rem; font-weight: 600; flex: 1; }
+  .card-body { color: var(--text-secondary); font-size: 0.9rem; }
+  .card-body p { margin-bottom: 0.75rem; }
+  .card-body ul { margin-left: 1.2rem; margin-bottom: 0.75rem; }
+  .card-body li { margin-bottom: 0.3rem; }
+  .card-body code { background: rgba(212,132,156,0.1); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.82rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  .card-body .file-ref { color: var(--text-muted); font-size: 0.8rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+  /* Implementation Steps */
+  .steps { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .steps-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem; }
+  .step { display: flex; gap: 0.75rem; margin-bottom: 0.6rem; align-items: flex-start; }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-hover); color: var(--text-muted); font-size: 0.7rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 600; }
+  .step-text { color: var(--text-secondary); font-size: 0.85rem; }
+
+  /* Effort badge */
+  .effort-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 100px; margin-left: 0.5rem; }
+  .effort-badge.quick { background: rgba(52,211,153,0.1); color: #34d399; }
+  .effort-badge.moderate { background: rgba(255,200,68,0.1); color: #ffc844; }
+  .effort-badge.significant { background: rgba(255,140,66,0.1); color: #ff8c42; }
+
+  /* Expand/Collapse */
+  .expand-btn { background: none; border: none; color: var(--accent); font-size: 0.85rem; cursor: pointer; padding: 0.3rem 0; display: flex; align-items: center; gap: 0.3rem; margin-top: 0.5rem; }
+  .expand-btn:hover { text-decoration: underline; }
+
+  /* Roadmap section */
+  .roadmap { margin-top: 3rem; }
+  .roadmap h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  .phase-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; cursor: pointer; }
+  .phase-number { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+  .phase-number.p1 { background: var(--critical-bg); color: var(--critical); border: 1px solid var(--critical-border); }
+  .phase-number.p2 { background: var(--high-bg); color: var(--high); border: 1px solid var(--high-border); }
+  .phase-number.p3 { background: var(--medium-bg); color: var(--medium); border: 1px solid var(--medium-border); }
+  .phase-number.p4 { background: var(--nice-bg); color: var(--nice); border: 1px solid var(--nice-border); }
+  .phase-title { font-size: 1.1rem; font-weight: 600; }
+  .phase-desc { color: var(--text-muted); font-size: 0.85rem; }
+  .phase-items { margin-top: 0.5rem; }
+  .phase-item { display: flex; gap: 0.5rem; padding: 0.4rem 0; align-items: flex-start; color: var(--text-secondary); font-size: 0.9rem; }
+  .phase-item::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; margin-top: 0.55rem; }
+  .phase-effort { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem; font-style: italic; }
+
+  /* Progress Overview */
+  .progress-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+  .progress-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; text-align: center; }
+  .progress-card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .progress-card-value { font-size: 1.8rem; font-weight: 700; }
+  .progress-card-label { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* Section Headers */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; margin-top: 1rem; }
+  .section-title { font-size: 1.3rem; font-weight: 700; }
+  .section-count { color: var(--text-muted); font-size: 0.9rem; }
+
+  /* Checklist */
+  .checklist-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 0.5rem; cursor: pointer; transition: all 0.15s; }
+  .checklist-item:hover { background: var(--surface-hover); }
+  .checklist-item.checked { opacity: 0.5; }
+  .checklist-item.checked .checklist-text { text-decoration: line-through; }
+  .checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .checklist-item.checked .checkbox { background: var(--success); border-color: var(--success); }
+  .checklist-text { font-size: 0.9rem; flex: 1; }
+  .checklist-sev { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; }
+
+  /* Search */
+  .search-bar { width: 100%; padding: 0.7rem 1rem; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.9rem; margin-bottom: 1rem; outline: none; transition: border-color 0.2s; }
+  .search-bar:focus { border-color: var(--accent); }
+  .search-bar::placeholder { color: var(--text-muted); }
+
+  /* Stats Grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
+  .stat-value { font-size: 2rem; font-weight: 700; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+
+  /* Bar chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 0.5rem; }
+  .bar { border-radius: 3px 3px 0 0; flex: 1; min-width: 20px; transition: height 0.3s; }
+
+  /* Resolved state */
+  .card.resolved { border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.03); }
+  .card.resolved .card-title { text-decoration: line-through; color: var(--text-muted); }
+  .resolved-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.7rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; background: var(--success-bg); color: var(--success); border: 1px solid rgba(52,211,153,0.2); }
+  .resolved-commit { font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', 'Fira Code', monospace; margin-top: 0.5rem; }
+
+  /* Progress bar */
+  .progress-bar-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; }
+  .progress-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+  .progress-bar-title { font-size: 1rem; font-weight: 600; }
+  .progress-bar-pct { font-size: 1.2rem; font-weight: 700; color: var(--success); }
+  .progress-bar-track { height: 10px; background: var(--surface-hover); border-radius: 100px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--success), #34d399); transition: width 1s ease; }
+  .progress-bar-legend { display: flex; gap: 1.5rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; }
+
+  @media (max-width: 768px) {
+    .app-container { padding: 1rem 1rem 3rem; }
+    .header { padding: 2rem 1rem; }
+    .header h1 { font-size: 1.6rem; }
+    .header-meta { gap: 1.5rem; }
+    .progress-overview { grid-template-columns: repeat(2, 1fr); }
+    .nav-tabs { gap: 0.35rem; }
+    .nav-tab { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback } = React;
+
+const FINDINGS = [
+  // ===== CRITICAL =====
+  {
+    id: 1,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "critical",
+    category: "CSS Architecture",
+    title: "Z-index conflicts between modal layers",
+    description: "Standard modals use `z-index: 200` while the tooth modal overlay uses `z-index: 1000`. The bottom nav sits at `z-index: 100` and quick actions at `z-index: 100`. No z-index scale or naming convention exists.",
+    files: ["index.css:2721", "index.css:5024", "index.css:1633", "index.css:1948"],
+    steps: [
+      "Define z-index CSS variables: --z-dropdown(10), --z-sticky(100), --z-overlay(200), --z-modal(300), --z-toast(400)",
+      "Replace all hardcoded z-index values with variables",
+      "Ensure tooth modal uses the same --z-modal as other modals"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 2,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "critical",
+    category: "i18n",
+    title: "Hardcoded English strings bypass translations",
+    description: "Several components contain English text that won't be translated for non-English users. `FeedingModal.tsx` and `PumpingModal.tsx` both have a hardcoded \"Started at\" string. `TummyTimeModal.tsx` has hardcoded duration labels like '1 min', '3 min', '5 min'. `App.tsx` has a hardcoded version string \"HeyBub v1.0.0\".",
+    files: ["FeedingModal.tsx:288", "PumpingModal.tsx:177", "TummyTimeModal.tsx:17-23", "App.tsx:277"],
+    steps: [
+      "Add missing translation keys: 'timer.startedAt', 'duration.1min' through 'duration.30min', 'app.version'",
+      "Replace hardcoded strings with t() calls in all affected components",
+      "Run translation script to generate translations for all 7 languages"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 3,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "critical",
+    category: "Data Integrity",
+    title: "Inconsistent form validation across modals",
+    description: "Only FeedingModal validates input (duration 0-120min, amount 0-500ml, notes max 500 chars). PumpingModal, DiaperModal, PottyModal, TummyTimeModal, BathModal, and SupplementModal have zero validation. Users can submit empty or invalid data.",
+    files: ["FeedingModal.tsx:153-167", "PumpingModal.tsx", "DiaperModal.tsx", "SleepModal.tsx"],
+    steps: [
+      "Create a shared validation utility: validateModalInput({ amount, duration, notes })",
+      "Apply validation to all modal components before submission",
+      "Add inline error messages below form fields (currently errors only show as toasts)",
+      "Add max-length to all notes fields consistently"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 4,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "critical",
+    category: "CSS Architecture",
+    title: "Undefined CSS variable --card-bg referenced in production",
+    description: "The variable `var(--card-bg)` is used in `.tip-of-the-day`, `.timeline-current-time-label`, and `.confirm-modal` but is never defined in the CSS. Currently falls back to transparent or secondary fallback values, causing visual inconsistency.",
+    files: ["index.css:1142", "index.css:2206", "index.css:2245"],
+    steps: [
+      "Add --card-bg to :root and [data-theme='dark'] variable blocks",
+      "Set light: var(--surface), dark: var(--surface) or appropriate value",
+      "Audit for any other undefined variable references"
+    ],
+    effort: "quick"
+  },
+
+  // ===== HIGH =====
+  {
+    id: 5,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "high",
+    category: "Theming",
+    title: "117 hardcoded colors break dark theme consistency",
+    description: "Throughout the CSS, 117 instances of hardcoded hex/rgb colors exist instead of using CSS variables. Key offenders: diaper quick buttons (#0891b2, #92400e), feeding quick buttons (#ec4899, #8b5cf6, #f59e0b), health icons (#3b82f6, #8b5cf6, #22c55e), supplement button (#f97316). These don't adapt in dark theme and create visual inconsistency.",
+    files: ["index.css:1298-1307", "index.css:1345-1354", "index.css:2520-2543", "index.css:1392"],
+    steps: [
+      "Define new CSS variables for all widget-specific action colors (--feeding-breast, --feeding-formula, --feeding-bottle, --diaper-pee, --diaper-poo, etc.)",
+      "Add dark theme variants for each new variable",
+      "Replace all 117 hardcoded colors with CSS variable references",
+      "Add a CSS lint rule or comment convention to prevent future hardcoded colors"
+    ],
+    effort: "significant"
+  },
+  {
+    id: 6,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "high",
+    category: "Consistency",
+    title: "Modal structure and footer placement varies between components",
+    description: "Modals have inconsistent form wrapping patterns. FeedingModal wraps only quick mode in <form>, timer mode is outside. DiaperModal wraps everything in <form>. PumpingModal has nested form footers. Footer buttons are placed inside or outside conditional renders inconsistently. This causes subtle behavior differences (e.g., Enter key to submit doesn't work in all modes).",
+    files: ["FeedingModal.tsx:345", "DiaperModal.tsx:105", "PumpingModal.tsx:298"],
+    steps: [
+      "Create a shared ModalShell component: <ModalShell title onClose footer>{children}</ModalShell>",
+      "Always wrap modal content in <form> for consistent keyboard behavior",
+      "Standardize footer with: Cancel (left) + Save (right, primary)",
+      "Migrate all 8 modals to use ModalShell"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 7,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "high",
+    category: "Accessibility",
+    title: "Missing ARIA labels on interactive elements",
+    description: "Icon-only buttons throughout the app lack aria-label attributes. Modal close buttons use '×' character without semantic meaning. Quick action buttons have no accessible names. Widget cards are clickable divs without proper roles. Form hints are not linked with aria-describedby.",
+    files: ["QuickActions.tsx", "Widget.tsx", "Modal (all)"],
+    steps: [
+      "Add aria-label to all icon-only buttons (close, edit, delete, toggle)",
+      "Add role='button' and tabIndex={0} to clickable card elements",
+      "Link form hints with aria-describedby",
+      "Add aria-live='polite' regions for async operation feedback",
+      "Add aria-modal='true' and role='dialog' to modal overlays"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 8,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "high",
+    category: "Consistency",
+    title: "Inconsistent error handling across modals",
+    description: "6 out of 8 modals log errors to console.error (DiaperModal, SleepModal, PottyModal, TummyTimeModal, BathModal, SupplementModal). FeedingModal and PumpingModal silently ignore errors (only show toast). No modals display inline error states — all errors are transient toasts that can be missed.",
+    files: ["FeedingModal.tsx", "PumpingModal.tsx", "DiaperModal.tsx:65"],
+    steps: [
+      "Standardize: all modals should console.error AND show toast on failure",
+      "Add a persistent error state that displays below the form when save fails",
+      "Consider keeping the modal open on error (currently some close before error)"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 9,
+    status: "resolved",
+    commit: "4c8cadc",
+    severity: "high",
+    category: "Theming",
+    title: "Toggle switch and UI elements use hardcoded 'white'",
+    description: "The toggle switch thumb uses hardcoded `background: white` which doesn't respect dark theme. Similarly, `.baby-avatar` uses `color: white`, health tab badges use hardcoded rgba(255,255,255,...), and the modal overlay uses hardcoded rgba colors.",
+    files: ["index.css:424", "index.css:2700", "index.css:2437-2444", "index.css:2716"],
+    steps: [
+      "Replace hardcoded 'white' with var(--text-on-primary) or similar semantic variable",
+      "Add --text-on-primary and --text-on-dark variables for both themes",
+      "Replace all rgba(255,255,255,...) with rgba(var(--text-rgb), opacity) or CSS variables"
+    ],
+    effort: "quick"
+  },
+
+  // ===== MEDIUM =====
+  {
+    id: 10,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "Code Quality",
+    title: "167 inline styles should be CSS classes",
+    description: "Throughout components, 167 instances of style={{}} are used instead of CSS classes. Worst offenders: OfflineIndicator (8 inline styles), LanguageSwitcher (8), Learn.tsx (10+), Settings section in App.tsx (5+). This makes theming impossible for those elements and is harder to maintain.",
+    files: ["OfflineIndicator.tsx", "LanguageSwitcher.tsx", "Learn.tsx:54-89", "App.tsx:65-192"],
+    steps: [
+      "Create CSS classes for OfflineIndicator: .offline-banner, .offline-text, etc.",
+      "Create .language-select class for LanguageSwitcher styling",
+      "Move Learn.tsx inline styles to .learn-* CSS classes",
+      "Move Settings inline styles to existing .settings-* classes",
+      "Grep for 'style={{' and eliminate remaining instances"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 11,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "CSS Architecture",
+    title: "Hardcoded spacing values bypass design system",
+    description: "At least 9 locations use pixel-based spacing (1px, 2px, 3px, 4px, 6px, 8px, 10px) instead of the defined spacing variables (--space-xs through --space-2xl). This creates visual inconsistency, especially notable in badges, padding, and margins.",
+    files: ["index.css:578", "index.css:699", "index.css:1175", "index.css:1498", "index.css:2073"],
+    steps: [
+      "Add --space-2xs: 0.125rem (2px) to fill the gap in the spacing scale",
+      "Replace all hardcoded pixel spacing with the nearest spacing variable",
+      "Document the spacing scale in a CSS comment block for team reference"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 12,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "Accessibility",
+    title: "Missing keyboard focus states on interactive elements",
+    description: "Widget cards, time picker buttons, and modal close buttons have hover states but no visible focus indicators for keyboard navigation. The global pattern uses `outline: none` with custom box-shadow, but this is not applied to all interactive elements. Active states are also missing on form controls.",
+    files: ["index.css:756-759", "index.css:1878-1885", "index.css:2788-2790"],
+    steps: [
+      "Add :focus-visible styles to all interactive elements (widgets, buttons, links)",
+      "Use consistent focus ring: box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3)",
+      "Ensure tab order makes logical sense through the app",
+      "Test with keyboard-only navigation end-to-end"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 13,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "UX Pattern",
+    title: "No loading skeletons — content pops in abruptly",
+    description: "Dashboard, Health page, and Timeline all show a generic spinner during data loading. When content loads, it pops in all at once with no animation. Modern apps use skeleton loading (shimmer placeholders) that match the layout shape, providing a smoother perceived experience.",
+    files: ["Dashboard.tsx", "Health.tsx", "TimelineCalendar.tsx"],
+    steps: [
+      "Create a SkeletonLoader component with shimmer animation",
+      "Add skeleton variants: SkeletonWidget, SkeletonCard, SkeletonTimeline",
+      "Replace LoadingSpinner usage in main views with layout-matching skeletons",
+      "Add a subtle fade-in when real content replaces skeletons"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 14,
+    severity: "medium",
+    category: "Consistency",
+    title: "Widget time-ago calculation differs between widget types",
+    description: "FeedingWidget calculates 'time ago' using the event end time (start + duration), while DiaperWidget and others use the raw event time. This means the feeding widget shows time since feeding ended, while other widgets show time since the event was logged — a subtle but confusing inconsistency.",
+    files: ["FeedingWidget.tsx:143-149", "DiaperWidget.tsx:39"],
+    steps: [
+      "Decide on a consistent strategy: time since event started OR time since event ended",
+      "Create a shared getTimeAgo(event) utility that all widgets use",
+      "Apply consistently across all widget components"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 15,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "UX Pattern",
+    title: "No confirmation dialog for destructive actions",
+    description: "Deleting records in the timeline, removing babies from account, and clearing data operations lack a consistent confirmation pattern. Some use browser confirm(), some use custom modals, and some have no confirmation at all.",
+    files: ["TimelineCalendar.tsx", "RecordsSection.tsx"],
+    steps: [
+      "Create a reusable ConfirmDialog component with danger styling",
+      "Apply to all destructive operations: delete record, remove baby, clear data",
+      "Use consistent copy: 'Delete', 'Cancel' with description of what will happen"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 16,
+    severity: "medium",
+    category: "Performance",
+    title: "Large CSS file (3700+ lines) loaded as single bundle",
+    description: "All CSS is in a single index.css file (3700+ lines). This means users load CSS for every page, modal, and widget on initial page load, even if they only visit the dashboard. For a PWA where first paint matters, this is suboptimal.",
+    files: ["index.css"],
+    steps: [
+      "Consider CSS code splitting with CSS modules or component-scoped styles",
+      "At minimum, ensure critical CSS (nav, layout, dashboard) is inlined or prioritized",
+      "Move page-specific CSS (health, timeline, learn, settings) into lazy-loaded chunks",
+      "Use PurgeCSS or similar to remove unused styles in production"
+    ],
+    effort: "significant"
+  },
+  {
+    id: 17,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "Resilience",
+    title: "No per-page error boundaries — single boundary wraps entire app",
+    description: "Only one ErrorBoundary wraps the entire app in App.tsx. If any page or modal component throws, the entire app crashes to an error screen. Individual pages, modals, and widgets should have their own error boundaries for graceful degradation.",
+    files: ["App.tsx:552", "ErrorBoundary.tsx"],
+    steps: [
+      "Wrap each lazy-loaded page in its own ErrorBoundary with page-specific fallback",
+      "Wrap each modal in a lightweight error boundary that closes the modal on error",
+      "Wrap each widget in an error boundary that shows a 'Widget unavailable' card"
+    ],
+    effort: "moderate"
+  },
+
+  // ===== LOW =====
+  {
+    id: 18,
+    severity: "low",
+    category: "Code Quality",
+    title: "Missing .btn-ghost CSS class used in components",
+    description: "Components like TeethingCard and MilestonesCard use className='btn btn-ghost' but this class is never defined in index.css. The buttons render unstyled (just base .btn), which may cause visual inconsistency.",
+    files: ["index.css (missing)", "TeethingCard.tsx", "MilestonesCard.tsx"],
+    steps: [
+      "Add .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); } to index.css",
+      "Add hover/focus states for the ghost variant"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 19,
+    severity: "low",
+    category: "Code Quality",
+    title: "Deprecated CSS class kept for backward compatibility",
+    description: "`.settings-section { display: none; }` exists with a comment about backward compatibility. Dead CSS should be removed.",
+    files: ["index.css:437"],
+    steps: [
+      "Search for usage of .settings-section in all TSX/JSX files",
+      "If unused, remove the CSS rule entirely",
+      "If used, refactor to remove the display:none pattern"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 20,
+    severity: "low",
+    category: "Code Quality",
+    title: "TypeScript any types in App.tsx",
+    description: "App.tsx disables @typescript-eslint/no-explicit-any at line 1 and uses `any` for SettingsPageProps and buildHubUrl parameters. This reduces type safety and IDE support.",
+    files: ["App.tsx:1", "App.tsx:30", "App.tsx:300"],
+    steps: [
+      "Define proper interfaces for SettingsPageProps",
+      "Type buildHubUrl parameters explicitly",
+      "Remove the eslint-disable comment"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 21,
+    severity: "low",
+    category: "UX Polish",
+    title: "Inconsistent animation timing across components",
+    description: "Modal fade-in is 0.2s, slide-up is 0.3s. Global transition is 0.2s. Sleep glow animation is 2s infinite. There's no animation timing scale — values are chosen ad-hoc per component.",
+    files: ["index.css"],
+    steps: [
+      "Define animation timing variables: --duration-fast(150ms), --duration-normal(250ms), --duration-slow(350ms)",
+      "Apply consistently across all transitions and animations",
+      "Ensure modal enter/exit use the same timing"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 22,
+    severity: "low",
+    category: "Consistency",
+    title: "Mixed icon approaches — Lucide React + PNG files",
+    description: "The app uses lucide-react for UI icons but PNG files for widget background icons (/icons/*.png). The boundary between when to use each isn't clear. Some components might benefit from SVG-only for consistent scaling and theming.",
+    files: ["Widget components", "public/icons/"],
+    steps: [
+      "Document the icon strategy: Lucide for UI, PNG for decorative backgrounds",
+      "Consider converting PNG backgrounds to SVG for better dark-mode adaptability",
+      "Ensure all icons have consistent sizing within their context"
+    ],
+    effort: "moderate"
+  },
+
+  // ===== NICE TO HAVE =====
+  {
+    id: 23,
+    severity: "nice",
+    category: "UX Enhancement",
+    title: "Add haptic feedback for mobile interactions",
+    description: "As a Capacitor/PWA app targeting mobile, adding haptic feedback (vibration) on key actions (save, delete, quick actions) would significantly improve the tactile experience and feel more native.",
+    files: ["All modal save handlers", "QuickActions.tsx", "Widget.tsx"],
+    steps: [
+      "Install @capacitor/haptics plugin",
+      "Create a useHaptics() hook that's a no-op on web",
+      "Add impact feedback on: save actions, quick log buttons, timer start/stop",
+      "Use selection feedback on: toggle switches, tab changes"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 24,
+    severity: "nice",
+    category: "UX Enhancement",
+    title: "Add micro-animations for state transitions",
+    description: "Widget state changes (empty to filled, updating timer, quick action feedback) happen instantly with no visual transition. Adding subtle micro-animations (count-up numbers, check marks, confetti on milestones) would make the app feel more polished and delightful.",
+    files: ["Widget components", "MilestoneCelebration.tsx"],
+    steps: [
+      "Add number count-up animation when widget values change",
+      "Add a checkmark animation on successful quick log",
+      "Add a subtle pulse on timer tick",
+      "Add entrance animation when new widget data loads"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 25,
+    severity: "nice",
+    category: "UX Enhancement",
+    title: "Add pull-to-refresh gesture for PWA",
+    description: "The app refreshes data on a 30-second interval, but there's no manual pull-to-refresh gesture which is expected in mobile apps. Users might wonder if their data is current.",
+    files: ["Dashboard.tsx"],
+    steps: [
+      "Implement a pull-to-refresh component with spring animation",
+      "Trigger data refresh on pull gesture",
+      "Show a subtle 'Updated just now' indicator after refresh",
+      "Consider using the overscroll-behavior CSS property for native feel"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 26,
+    severity: "nice",
+    category: "UX Enhancement",
+    title: "Add gesture-based navigation (swipe between tabs)",
+    description: "Mobile users expect to swipe left/right between main tabs (Dashboard, Timeline, Health, Learn, Settings). Currently only the bottom nav bar provides navigation.",
+    files: ["App.tsx"],
+    steps: [
+      "Add touch event listeners for horizontal swipe detection",
+      "Implement smooth transition animation between tab views",
+      "Add visual indicator (dots or progress bar) showing swipe direction",
+      "Ensure swipe doesn't conflict with horizontal scrolling in content"
+    ],
+    effort: "significant"
+  },
+  {
+    id: 27,
+    severity: "nice",
+    category: "UX Enhancement",
+    title: "Add onboarding tooltips for first-time users",
+    description: "New users see the full dashboard immediately with no guided introduction. Adding progressive disclosure tooltips (\"Tap a widget to log\", \"Swipe for timeline\", \"Long press for quick actions\") would improve first-use experience.",
+    files: ["Dashboard.tsx", "Onboarding.tsx"],
+    steps: [
+      "Create a Tooltip/Coach component with arrow positioning",
+      "Define a sequence of 4-5 key tooltips for first visit",
+      "Track completion in localStorage",
+      "Allow dismissal and 'Don't show again' option"
+    ],
+    effort: "significant"
+  },
+  {
+    id: 28,
+    severity: "nice",
+    category: "Performance",
+    title: "Implement virtual scrolling for long lists",
+    description: "The Timeline and Records sections render all items at once. With months of baby data, this could mean hundreds or thousands of DOM nodes. Virtual scrolling would only render visible items.",
+    files: ["TimelineCalendar.tsx:582", "RecordsSection.tsx:717"],
+    steps: [
+      "Install react-window or @tanstack/virtual",
+      "Implement virtual list for Timeline event list",
+      "Implement virtual list for Records section",
+      "Ensure scroll position restoration on tab switch"
+    ],
+    effort: "significant"
+  },
+  {
+    id: 29,
+    severity: "nice",
+    category: "UX Enhancement",
+    title: "Add smart defaults and recent-value memory for modals",
+    description: "When logging a feeding, the modal always starts blank. It could remember the last feeding type, amount, and side to pre-fill — reducing taps for the most common case (repeat feedings). Same applies to supplements (last dosage) and diapers (last type).",
+    files: ["FeedingModal.tsx", "SupplementModal.tsx", "DiaperModal.tsx"],
+    steps: [
+      "Store last-used values in localStorage per modal type",
+      "Pre-fill modal fields with last-used values on open",
+      "Allow users to clear defaults with a 'Reset' button",
+      "Show a subtle indicator that values are pre-filled"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 30,
+    severity: "nice",
+    category: "Accessibility",
+    title: "Add reduced motion support",
+    description: "Users with vestibular disorders may be affected by the sleep glow animation, modal slide-up, and widget hover transforms. The app should respect the prefers-reduced-motion media query.",
+    files: ["index.css"],
+    steps: [
+      "Add @media (prefers-reduced-motion: reduce) { } block",
+      "Disable or simplify: sleep glow, modal slide, widget hover lift, spinner rotation",
+      "Replace animations with instant state changes in reduced motion mode"
+    ],
+    effort: "quick"
+  },
+  {
+    id: 31,
+    severity: "medium",
+    category: "UX Pattern",
+    title: "No empty state design for new users",
+    description: "When a user first signs up with no data, the dashboard shows empty widgets with 'tap to log' text. There's no welcoming empty state that guides users on what to do first, explains the app's purpose, or celebrates their first log.",
+    files: ["Dashboard.tsx", "Widget.tsx"],
+    steps: [
+      "Design a first-time empty state for the dashboard with illustration",
+      "Add a 'Log your first [feeding/diaper/sleep]' call-to-action",
+      "Show a congratulatory animation after the first log",
+      "Transition smoothly from empty state to populated dashboard"
+    ],
+    effort: "moderate"
+  },
+  {
+    id: 32,
+    status: "resolved",
+    commit: "e458916",
+    severity: "medium",
+    category: "UX Pattern",
+    title: "Settings page has no visual grouping or hierarchy",
+    description: "The Settings page is a flat list of toggle rows. There's no visual separation between account settings, display preferences, notification settings, and data management. Premium features are inline with free features.",
+    files: ["App.tsx (SettingsPage)"],
+    steps: [
+      "Group settings into sections: Account, Display, Notifications, Data, About",
+      "Add section headers with subtle background separation",
+      "Visually distinguish premium features (subtle lock icon, PRO badge)",
+      "Add a profile/avatar section at the top of settings"
+    ],
+    effort: "moderate"
+  }
+];
+
+const PHASES = [
+  {
+    number: 1,
+    title: "Critical Fixes (Must-Have for Production)",
+    desc: "Fix bugs and issues that directly affect functionality, data integrity, or break the app for non-English users",
+    className: "p1",
+    items: [
+      { text: "Fix z-index conflicts — define variable scale and apply consistently", resolved: true },
+      { text: "Replace all hardcoded English strings with i18n t() calls", resolved: true },
+      { text: "Add form validation to all modal components", resolved: true },
+      { text: "Define missing --card-bg CSS variable", resolved: true },
+      { text: "Standardize error handling pattern across all modals", resolved: true },
+      { text: "Fix toggle switch and UI elements using hardcoded 'white'", resolved: true }
+    ],
+    effort: "~2-3 days"
+  },
+  {
+    number: 2,
+    title: "High Priority Polish (Pre-Launch)",
+    desc: "Theming consistency, accessibility basics, and component standardization to ensure a professional first impression",
+    items: [
+      { text: "Replace 117 hardcoded colors with CSS variables + dark theme variants", resolved: true },
+      { text: "Create shared ModalShell component and migrate all modals", resolved: true },
+      { text: "Add ARIA labels and roles to all interactive elements", resolved: true },
+      { text: "Move inline styles to CSS classes (top 5 offenders)", resolved: true },
+      { text: "Add keyboard focus states to all interactive elements", resolved: true }
+    ],
+    className: "p2",
+    effort: "~4-5 days"
+  },
+  {
+    number: 3,
+    title: "UX Refinement (Post-Launch Sprint 1)",
+    desc: "Loading experience, empty states, design system cleanup, and UX patterns that make the app feel polished",
+    items: [
+      { text: "Implement skeleton loading states for dashboard, health, and timeline", resolved: true },
+      { text: "Add confirmation dialogs for all destructive actions", resolved: true },
+      { text: "Design and implement new-user empty states", resolved: false },
+      { text: "Improve Settings page visual hierarchy and grouping", resolved: true },
+      { text: "Add per-page error boundaries for graceful degradation", resolved: true },
+      { text: "Standardize spacing and animation timing variables", resolved: true },
+      { text: "Fix widget time-ago calculation consistency", resolved: false }
+    ],
+    className: "p3",
+    effort: "~5-7 days"
+  },
+  {
+    number: 4,
+    title: "Delight & Performance (Ongoing)",
+    desc: "Nice-to-have enhancements that differentiate the app and improve the mobile-native feel",
+    items: [
+      { text: "Add haptic feedback for mobile interactions", resolved: false },
+      { text: "Implement micro-animations for state transitions", resolved: false },
+      { text: "Add pull-to-refresh gesture", resolved: false },
+      { text: "Implement smart defaults / recent value memory", resolved: false },
+      { text: "Add reduced motion support", resolved: false },
+      { text: "Virtual scrolling for long lists", resolved: false },
+      { text: "Onboarding tooltips for first-time users", resolved: false },
+      { text: "Gesture-based tab navigation", resolved: false },
+      { text: "CSS code splitting for performance", resolved: false }
+    ],
+    className: "p4",
+    effort: "Ongoing sprints"
+  }
+];
+
+function ScoreRing({ score }) {
+  const circumference = 2 * Math.PI * 42;
+  const offset = circumference - (score / 100) * circumference;
+  const color = score >= 80 ? '#34d399' : score >= 60 ? '#ffc844' : '#ff4d6a';
+  return (
+    <div className="score-ring">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" strokeWidth="6" />
+        <circle cx="50" cy="50" r="42" fill="none" stroke={color} strokeWidth="6"
+          strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 1s ease' }} />
+      </svg>
+      <div className="score-ring-text" style={{ color }}>{score}</div>
+    </div>
+  );
+}
+
+function FindingCard({ finding, expanded, onToggle }) {
+  const isResolved = finding.status === 'resolved';
+  return (
+    <div className={`card ${isResolved ? 'resolved' : ''}`}>
+      <div className="card-header">
+        {isResolved && <span className="resolved-badge">&#10003; Resolved</span>}
+        <span className={`card-severity ${finding.severity}`}>{finding.severity === 'nice' ? 'nice to have' : finding.severity}</span>
+        <span className="card-category">{finding.category}</span>
+        <span className={`effort-badge ${finding.effort}`}>
+          {finding.effort === 'quick' ? '< 1hr' : finding.effort === 'moderate' ? '2-4hrs' : '1-2 days'}
+        </span>
+      </div>
+      <div className="card-title">{finding.title}</div>
+      {isResolved && finding.commit && (
+        <div className="resolved-commit">Fixed in commit <code>{finding.commit}</code></div>
+      )}
+      <div className="card-body">
+        <p>{finding.description}</p>
+        {finding.files && (
+          <p className="file-ref">
+            {finding.files.map((f, i) => <span key={i}>{i > 0 ? ' · ' : ''}<code>{f}</code></span>)}
+          </p>
+        )}
+        {expanded && finding.steps && (
+          <div className="steps">
+            <div className="steps-title">Implementation Steps</div>
+            {finding.steps.map((step, i) => (
+              <div className="step" key={i}>
+                <span className="step-num">{i + 1}</span>
+                <span className="step-text">{step}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {finding.steps && (
+          <button className="expand-btn" onClick={() => onToggle(finding.id)}>
+            {expanded ? '▲ Hide steps' : '▼ Show implementation steps'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [activeTab, setActiveTab] = useState('all');
+  const [activeSeverities, setActiveSeverities] = useState(new Set(['critical', 'high', 'medium', 'low', 'nice']));
+  const [expandedCards, setExpandedCards] = useState(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [checkedItems, setCheckedItems] = useState(new Set());
+  const [showResolved, setShowResolved] = useState(true);
+
+  const toggleSeverity = useCallback((sev) => {
+    setActiveSeverities(prev => {
+      const next = new Set(prev);
+      if (next.has(sev)) next.delete(sev);
+      else next.add(sev);
+      return next;
+    });
+  }, []);
+
+  const toggleExpand = useCallback((id) => {
+    setExpandedCards(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleCheck = useCallback((id) => {
+    setCheckedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const categories = useMemo(() => {
+    const cats = new Set(FINDINGS.map(f => f.category));
+    return ['all', ...Array.from(cats)];
+  }, []);
+
+  const filteredFindings = useMemo(() => {
+    return FINDINGS.filter(f => {
+      if (!activeSeverities.has(f.severity)) return false;
+      if (activeTab !== 'all' && f.category !== activeTab) return false;
+      if (!showResolved && f.status === 'resolved') return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        return f.title.toLowerCase().includes(q) || f.description.toLowerCase().includes(q) || f.category.toLowerCase().includes(q);
+      }
+      return true;
+    });
+  }, [activeTab, activeSeverities, searchQuery, showResolved]);
+
+  const severityCounts = useMemo(() => {
+    const counts = { critical: 0, high: 0, medium: 0, low: 0, nice: 0 };
+    FINDINGS.forEach(f => counts[f.severity]++);
+    return counts;
+  }, []);
+
+  const resolvedCount = useMemo(() => FINDINGS.filter(f => f.status === 'resolved').length, []);
+  const openCount = FINDINGS.length - resolvedCount;
+
+  const score = useMemo(() => {
+    const weights = { critical: 8, high: 5, medium: 3, low: 1, nice: 0 };
+    const openPenalty = FINDINGS.filter(f => f.status !== 'resolved').reduce((sum, f) => sum + weights[f.severity], 0);
+    const maxPenalty = FINDINGS.length * 8;
+    return Math.round(100 - (openPenalty / maxPenalty) * 100);
+  }, []);
+
+  const tabCounts = useMemo(() => {
+    const counts = { all: FINDINGS.length };
+    FINDINGS.forEach(f => {
+      counts[f.category] = (counts[f.category] || 0) + 1;
+    });
+    return counts;
+  }, []);
+
+  return (
+    <div className="app-container">
+      <div className="header">
+        <h1>Babylog UI/UX Audit Report</h1>
+        <p>Deep analysis of frontend consistency, accessibility, and production readiness</p>
+        <ScoreRing score={score} />
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Production Readiness Score ({resolvedCount}/{FINDINGS.length} resolved)</p>
+        <div className="header-meta">
+          <div className="header-stat">
+            <div className="header-stat-value" style={{ color: 'var(--critical)' }}>{severityCounts.critical}</div>
+            <div className="header-stat-label">Critical</div>
+          </div>
+          <div className="header-stat">
+            <div className="header-stat-value" style={{ color: 'var(--high)' }}>{severityCounts.high}</div>
+            <div className="header-stat-label">High</div>
+          </div>
+          <div className="header-stat">
+            <div className="header-stat-value" style={{ color: 'var(--medium)' }}>{severityCounts.medium}</div>
+            <div className="header-stat-label">Medium</div>
+          </div>
+          <div className="header-stat">
+            <div className="header-stat-value" style={{ color: 'var(--low)' }}>{severityCounts.low}</div>
+            <div className="header-stat-label">Low</div>
+          </div>
+          <div className="header-stat">
+            <div className="header-stat-value" style={{ color: 'var(--nice)' }}>{severityCounts.nice}</div>
+            <div className="header-stat-label">Nice to Have</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="progress-bar-container">
+        <div className="progress-bar-header">
+          <span className="progress-bar-title">Resolution Progress</span>
+          <span className="progress-bar-pct">{Math.round((resolvedCount / FINDINGS.length) * 100)}%</span>
+        </div>
+        <div className="progress-bar-track">
+          <div className="progress-bar-fill" style={{ width: `${(resolvedCount / FINDINGS.length) * 100}%` }} />
+        </div>
+        <div className="progress-bar-legend">
+          <span style={{ color: 'var(--success)' }}>{resolvedCount} resolved</span>
+          <span>{openCount} open</span>
+          <span>{FINDINGS.length} total</span>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{FINDINGS.length}</div>
+          <div className="stat-label">Total Findings</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: 'var(--success)' }}>{resolvedCount}</div>
+          <div className="stat-label">Resolved</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{openCount}</div>
+          <div className="stat-label">Open</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">53</div>
+          <div className="stat-label">Components Audited</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">3700+</div>
+          <div className="stat-label">CSS Lines Reviewed</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">8</div>
+          <div className="stat-label">Modals Compared</div>
+        </div>
+      </div>
+
+      <input
+        className="search-bar"
+        placeholder="Search findings by title, description, or category..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      <div className="nav-tabs">
+        {categories.map(cat => (
+          <button
+            key={cat}
+            className={`nav-tab ${activeTab === cat ? 'active' : ''}`}
+            onClick={() => setActiveTab(cat)}
+          >
+            {cat === 'all' ? 'All' : cat}
+            <span className="nav-tab-count">{tabCounts[cat] || 0}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="filter-bar">
+        <span className="filter-label">Severity:</span>
+        {['critical', 'high', 'medium', 'low', 'nice'].map(sev => (
+          <span
+            key={sev}
+            className={`filter-chip ${sev} ${!activeSeverities.has(sev) ? 'inactive' : ''}`}
+            onClick={() => toggleSeverity(sev)}
+          >
+            {sev === 'nice' ? 'Nice to Have' : sev.charAt(0).toUpperCase() + sev.slice(1)} ({severityCounts[sev]})
+          </span>
+        ))}
+        <span style={{ borderLeft: '1px solid var(--border)', height: '1.5rem', margin: '0 0.5rem' }} />
+        <span
+          className={`filter-chip ${showResolved ? '' : 'inactive'}`}
+          style={{ background: 'var(--success-bg)', color: 'var(--success)', borderColor: 'rgba(52,211,153,0.2)' }}
+          onClick={() => setShowResolved(prev => !prev)}
+        >
+          &#10003; Resolved ({resolvedCount})
+        </span>
+      </div>
+
+      <div className="section-header">
+        <span className="section-title">Findings</span>
+        <span className="section-count">{filteredFindings.length} of {FINDINGS.length}</span>
+      </div>
+
+      {filteredFindings.map(f => (
+        <FindingCard
+          key={f.id}
+          finding={f}
+          expanded={expandedCards.has(f.id)}
+          onToggle={toggleExpand}
+        />
+      ))}
+
+      {filteredFindings.length === 0 && (
+        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <p style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>No findings match your filters</p>
+          <p style={{ color: 'var(--text-muted)' }}>Try adjusting severity filters or search query</p>
+        </div>
+      )}
+
+      <div className="roadmap">
+        <h2>Production Readiness Roadmap</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>
+          Phased implementation plan to take Babylog from current state to production-ready
+        </p>
+
+        {PHASES.map((phase, idx) => {
+          const resolvedInPhase = phase.items.filter(i => i.resolved).length;
+          const totalInPhase = phase.items.length;
+          const phaseComplete = resolvedInPhase === totalInPhase;
+          return (
+            <div className={`phase ${phaseComplete ? 'resolved' : ''}`} key={idx} style={phaseComplete ? { borderColor: 'rgba(52,211,153,0.3)', background: 'rgba(52,211,153,0.03)' } : {}}>
+              <div className="phase-header">
+                <span className={`phase-number ${phase.className}`}>{phaseComplete ? '✓' : phase.number}</span>
+                <div style={{ flex: 1 }}>
+                  <div className="phase-title">{phase.title} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>({resolvedInPhase}/{totalInPhase})</span></div>
+                  <div className="phase-desc">{phase.desc}</div>
+                </div>
+              </div>
+              <div className="phase-items">
+                {phase.items.map((item, i) => {
+                  const isChecked = item.resolved || checkedItems.has(`${idx}-${i}`);
+                  return (
+                    <div
+                      key={i}
+                      className={`checklist-item ${isChecked ? 'checked' : ''}`}
+                      onClick={() => { if (!item.resolved) toggleCheck(`${idx}-${i}`); }}
+                      style={item.resolved ? { cursor: 'default' } : {}}
+                    >
+                      <div className="checkbox">
+                        {isChecked && <span style={{ color: 'white', fontSize: '0.7rem' }}>&#10003;</span>}
+                      </div>
+                      <span className="checklist-text">{item.text}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="phase-effort">Estimated effort: {phase.effort}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+        Generated by deep codebase analysis — {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>

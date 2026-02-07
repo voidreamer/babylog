@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatTimeAgo } from '../utils/formatTime';
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Play, Square, Plus } from 'lucide-react';
+import { Clock, Square, Plus, Droplets } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
+import { hapticImpact, hapticNotification } from '../utils/haptics';
+import { motion } from 'framer-motion';
 
 
 function formatTimer(seconds: number): string {
@@ -59,6 +61,32 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
         }
     }, [activePumping]);
 
+    const [quickSaving, setQuickSaving] = useState(false);
+
+    const handleQuickLog = async (amountMl: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!selectedBaby) return;
+
+        setQuickSaving(true);
+        try {
+            await api.createPumping({
+                baby_id: selectedBaby.id,
+                time: new Date().toISOString(),
+                duration_minutes: null,
+                amount_ml: amountMl,
+                notes: null,
+            });
+            hapticNotification();
+            toast.success(t('pumping.quickLogged', { amount: formatVolume(amountMl) }));
+            onPumpingChange();
+        } catch (error) {
+            console.error('Failed to log pumping:', error);
+            toast.error(t('toast_failedToSavePumping'));
+        } finally {
+            setQuickSaving(false);
+        }
+    };
+
     const handleStartPumping = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!selectedBaby) return;
@@ -68,6 +96,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
         };
         setActivePumping(newActivePumping);
         localStorage.setItem(ACTIVE_PUMPING_KEY, JSON.stringify(newActivePumping));
+        hapticImpact();
         toast.success(t('toast_pumpingStarted'));
     };
 
@@ -112,9 +141,12 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
     const timeAgo = lastPumping ? formatTimeAgo(getEndTime()) : null;
 
     return (
-        <div
+        <motion.div
             className={`widget pumping ${isPumping ? 'active-timer' : ''}`}
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             {isPumping && <div className="widget-glow" />}
 
@@ -140,23 +172,8 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                             {saving ? t('common:saving') : t('common:done')}
                         </button>
                     </div>
-                ) : quickActionsEnabled ? (
-                    <div className="feeding-widget-idle">
-                        {lastPumping ? (
-                            <>
-                                <div className="widget-time-ago">{timeAgo}</div>
-                                <div className="widget-detail">
-                                    {lastPumping.amount_ml ? formatVolume(lastPumping.amount_ml) : null}
-                                </div>
-                            </>
-                        ) : null}
-                        <button className="feeding-start-btn" onClick={handleStartPumping} disabled={saving}>
-                            <Play size={14} fill="currentColor" />
-                            {t('pumping.start')}
-                        </button>
-                    </div>
                 ) : (
-                    <div className="feeding-widget-idle">
+                    <>
                         {lastPumping ? (
                             <>
                                 <div className="widget-time-ago">{timeAgo}</div>
@@ -164,12 +181,34 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
                                     {lastPumping.amount_ml ? formatVolume(lastPumping.amount_ml) : null}
                                 </div>
                             </>
-                        ) : (
+                        ) : !quickActionsEnabled ? (
                             <div className="widget-time-ago">{t('pumping.noPumpingsYet')}</div>
+                        ) : null}
+
+                        {quickActionsEnabled && (
+                            <div className="pumping-quick-btns">
+                                <button
+                                    className="pumping-quick-btn timer"
+                                    onClick={handleStartPumping}
+                                    disabled={saving}
+                                    title={t('pumping.start')}
+                                >
+                                    <Clock size={14} />
+                                    {t('pumping.start')}
+                                </button>
+                                <button
+                                    className="pumping-quick-btn amount"
+                                    onClick={(e) => handleQuickLog(60, e)}
+                                    disabled={quickSaving || saving}
+                                >
+                                    <Droplets size={14} />
+                                    {quickSaving ? '...' : formatVolume(60)}
+                                </button>
+                            </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

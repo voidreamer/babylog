@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyBub vs Huckleberry — Marketing Battle Plan</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090d;
+      --surface: #12141c;
+      --surface2: #1a1d2a;
+      --surface3: #222638;
+      --border: #2a2e42;
+      --border-light: #363b54;
+      --text: #e8ebf6;
+      --text-dim: #7d839e;
+      --text-muted: #555a74;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.15);
+      --green: #10b981;
+      --green-light: #34d399;
+      --red: #ef4444;
+      --red-light: #f87171;
+      --yellow: #f59e0b;
+      --orange: #f97316;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
+      --teal: #14b8a6;
+      --hb-color: #6366f1;
+      --hk-color: #f97316;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(8,9,13,0.88); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; gap: 4px; height: 52px; padding: 0 20px; overflow-x: auto; }
+    .nav-brand { font-weight: 800; font-size: 14px; color: var(--accent-light); margin-right: 12px; white-space: nowrap; letter-spacing: -0.3px; }
+    .nav-btn { background: none; border: 1px solid transparent; color: var(--text-dim); padding: 5px 11px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 500; white-space: nowrap; transition: all 0.2s; font-family: inherit; }
+    .nav-btn:hover { color: var(--text); background: var(--surface2); }
+    .nav-btn.active { color: var(--accent-light); background: var(--accent-glow); border-color: rgba(99,102,241,0.25); }
+
+    .container { max-width: 1440px; margin: 0 auto; padding: 72px 24px 60px; }
+
+    .hero { text-align: center; padding: 56px 0 24px; }
+    .hero-tag { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(99,102,241,0.2); margin-bottom: 16px; }
+    .hero h1 { font-size: 48px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 12px; }
+    .hero h1 .vs { color: var(--text-dim); font-weight: 300; font-size: 36px; }
+    .hero h1 .hb { background: linear-gradient(135deg, #818cf8, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero h1 .hk { background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero .sub { color: var(--text-dim); font-size: 17px; font-weight: 300; max-width: 600px; margin: 0 auto; }
+
+    .section { margin-bottom: 56px; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .section-num { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-glow); border: 1px solid rgba(99,102,241,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--accent-light); }
+    .section-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .section-subtitle { color: var(--text-dim); font-size: 14px; margin-top: -14px; margin-bottom: 20px; margin-left: 44px; }
+
+    .grid { display: grid; gap: 14px; }
+    .g2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .g3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+    .card:hover { border-color: var(--border-light); }
+    .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .card p, .card li { color: var(--text-dim); font-size: 13px; }
+
+    .card-accent { border-left: 3px solid var(--accent); }
+    .card-green { border-left: 3px solid var(--green); }
+    .card-orange { border-left: 3px solid var(--orange); }
+    .card-red { border-left: 3px solid var(--red); }
+    .card-purple { border-left: 3px solid var(--purple); }
+    .card-blue { border-left: 3px solid var(--blue); }
+    .card-pink { border-left: 3px solid var(--pink); }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-green { background: rgba(16,185,129,0.12); color: var(--green-light); }
+    .badge-red { background: rgba(239,68,68,0.12); color: var(--red-light); }
+    .badge-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+    .badge-blue { background: rgba(59,130,246,0.12); color: var(--blue); }
+    .badge-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
+    .badge-accent { background: var(--accent-glow); color: var(--accent-light); }
+    .badge-orange { background: rgba(249,115,22,0.12); color: var(--orange); }
+
+    .metric-row { display: grid; grid-template-columns: 1fr 100px 100px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .metric-row.header { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+    .metric-row:not(.header):hover { background: var(--surface2); }
+    .metric-hb { text-align: center; font-weight: 600; color: var(--accent-light); }
+    .metric-hk { text-align: center; font-weight: 600; color: var(--orange); }
+    .metric-win { position: relative; }
+    .metric-win::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 4px; height: 4px; border-radius: 50%; }
+    .metric-hb.win::after { background: var(--green); }
+    .metric-hk.win::after { background: var(--green); }
+
+    .funnel-step { display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; transition: all 0.2s; }
+    .funnel-step:hover { border-color: var(--accent); }
+    .funnel-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+    .funnel-content { flex: 1; }
+    .funnel-content h4 { font-size: 14px; font-weight: 600; }
+    .funnel-content p { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+    .funnel-metric { text-align: right; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+    .funnel-metric strong { display: block; font-size: 16px; color: var(--accent-light); }
+
+    .channel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.2s; }
+    .channel-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .channel-header { padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
+    .channel-header h3 { font-size: 15px; font-weight: 600; }
+    .channel-body { padding: 0 18px 16px; }
+    .channel-body ul { list-style: none; }
+    .channel-body li { font-size: 12px; color: var(--text-dim); padding: 3px 0; padding-left: 14px; position: relative; }
+    .channel-body li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+    .channel-stats { display: flex; gap: 12px; padding: 12px 18px; background: var(--surface2); border-top: 1px solid var(--border); }
+    .channel-stat { font-size: 11px; color: var(--text-dim); }
+    .channel-stat strong { color: var(--text); display: block; font-size: 14px; }
+
+    .timeline-item { display: flex; gap: 16px; position: relative; padding-bottom: 20px; }
+    .timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: var(--border); }
+    .timeline-dot { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; border: 2px solid var(--border); background: var(--surface); z-index: 1; }
+    .timeline-content { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .timeline-content h4 { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .timeline-content p { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+    .timeline-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+    .timeline-tag { padding: 2px 8px; border-radius: 6px; font-size: 10px; background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+    .timeline-week { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+    .kpi-card { text-align: center; padding: 20px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .kpi-card .val { font-size: 32px; font-weight: 900; letter-spacing: -1px; margin: 6px 0; }
+    .kpi-card .label { font-size: 12px; color: var(--text-dim); }
+    .kpi-card .target { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .chart-wrap canvas { max-height: 300px; }
+
+    .attack-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+    .attack-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .attack-card.critical::before { background: linear-gradient(90deg, var(--red), var(--orange)); }
+    .attack-card.high::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+    .attack-card.medium::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .attack-card .priority { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+    .attack-card h3 { font-size: 16px; margin-bottom: 4px; }
+    .attack-card .rationale { font-size: 12px; color: var(--text-dim); margin-bottom: 10px; font-style: italic; }
+    .attack-card .actions { list-style: none; }
+    .attack-card .actions li { font-size: 12px; color: var(--text-dim); padding: 3px 0 3px 16px; position: relative; }
+    .attack-card .actions li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+    .attack-card .impact { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-muted); }
+    .attack-card .impact strong { color: var(--green-light); }
+
+    .pricing-col { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 20px; text-align: center; position: relative; }
+    .pricing-col.featured { border-color: var(--accent); box-shadow: 0 0 30px rgba(99,102,241,0.1); }
+    .pricing-col.featured::before { content: 'MOST POPULAR'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 2px 12px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+    .pricing-col .tier { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 600; }
+    .pricing-col .price { font-size: 36px; font-weight: 900; margin: 8px 0; letter-spacing: -1px; }
+    .pricing-col .price span { font-size: 14px; font-weight: 400; color: var(--text-dim); }
+    .pricing-col ul { list-style: none; text-align: left; margin-top: 16px; }
+    .pricing-col li { font-size: 12px; color: var(--text-dim); padding: 4px 0; padding-left: 18px; position: relative; }
+    .pricing-col li.included::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+    .pricing-col li.excluded::before { content: '✗'; position: absolute; left: 0; color: var(--red); opacity: 0.4; }
+    .pricing-col li.excluded { opacity: 0.5; }
+
+    .aso-keyword { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); padding: 4px 10px; border-radius: 8px; font-size: 12px; margin: 3px; }
+    .aso-vol { font-size: 10px; color: var(--text-muted); }
+    .aso-rank { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; }
+
+    .content-pillar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .content-pillar-header { padding: 14px 18px; font-weight: 600; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .content-pillar-body { padding: 12px 18px; }
+    .content-idea { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid rgba(42,46,66,0.5); }
+    .content-idea:last-child { border-bottom: none; }
+    .content-type { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; width: 48px; text-align: center; padding: 2px 4px; border-radius: 4px; flex-shrink: 0; }
+    .content-type.blog { background: rgba(59,130,246,0.12); color: var(--blue); }
+    .content-type.video { background: rgba(239,68,68,0.12); color: var(--red); }
+    .content-type.social { background: rgba(168,85,247,0.12); color: var(--purple); }
+    .content-type.email { background: rgba(16,185,129,0.12); color: var(--green); }
+    .content-idea-text { flex: 1; color: var(--text-dim); }
+    .content-seo { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 40px 0; }
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+    .tab-group { display: flex; gap: 3px; background: var(--surface); padding: 3px; border-radius: 8px; border: 1px solid var(--border); width: fit-content; margin-bottom: 16px; }
+    .tab { background: none; border: none; color: var(--text-dim); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; font-family: inherit; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { background: var(--accent); color: white; }
+
+    .progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+    .versus-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+    .versus-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .versus-vs { display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--text-muted); font-size: 13px; padding-top: 12px; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
+      .g2, .g3, .g4 { grid-template-columns: 1fr; }
+      .metric-row { grid-template-columns: 1fr 70px 70px; font-size: 12px; }
+      .versus-row { grid-template-columns: 1fr; }
+      .versus-vs { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const sections = [
+  { id: 'intel', label: 'Enemy Intel' },
+  { id: 'battlefield', label: 'Battlefield' },
+  { id: 'positioning', label: 'Positioning' },
+  { id: 'pricing', label: 'Pricing War' },
+  { id: 'aso', label: 'ASO' },
+  { id: 'acquisition', label: 'Acquisition' },
+  { id: 'content', label: 'Content' },
+  { id: 'social', label: 'Social' },
+  { id: 'retention', label: 'Retention' },
+  { id: 'funnel', label: 'Funnel' },
+  { id: 'attacks', label: 'Attack Plan' },
+  { id: 'kpis', label: 'KPIs' },
+  { id: 'warplan', label: '90-Day War' },
+];
+
+// ──────── HUCKLEBERRY INTEL ────────
+const hkIntel = {
+  founded: 'July 2017',
+  funding: '$16M total ($12.5M Series A, Nov 2021)',
+  investors: 'Morningside Ventures, Spero Ventures, Tamarisc VC',
+  team: '11-50 employees',
+  ceo: 'Jessica Toh (founded after own sleep struggles)',
+  downloads_mo: '~100K/month',
+  revenue_mo: '~$600K/month',
+  arr: '~$7.2M',
+  active_users: '506K+ weekly active (Q1 2025)',
+  total_users: '5M+ lifetime',
+  website_traffic: '1.4M monthly visits',
+  instagram: '101K followers',
+  traffic_organic: '62% organic search',
+  traffic_direct: '33% direct',
+  demo_female: '72%',
+  demo_age: '25-44',
+  geo: '60% US, UK, Canada, Australia, Netherlands',
+  app_store_rank: '#5 for "baby tracker"',
+  subtitle: 'Baby Tracker & Sleep Experts',
+};
+
+const featureComparison = [
+  { feature: 'Sleep Tracking', hb: 10, hk: 10, notes: 'Parity' },
+  { feature: 'SweetSpot/Predictions', hb: 7, hk: 9, notes: 'HK more mature AI' },
+  { feature: 'Feeding Tracking', hb: 10, hk: 8, notes: 'HB has more feed types' },
+  { feature: 'Diaper Tracking', hb: 10, hk: 7, notes: 'HB has poo details (removed by HK)' },
+  { feature: 'Health Records', hb: 10, hk: 2, notes: 'HB dominates: 8 categories' },
+  { feature: 'Growth Charts (WHO)', hb: 10, hk: 3, notes: 'HB has full WHO percentiles' },
+  { feature: 'Vaccination Tracking', hb: 10, hk: 0, notes: 'HK has none' },
+  { feature: 'Teeth/Allergy Tracking', hb: 10, hk: 0, notes: 'HK has none' },
+  { feature: 'Offline Support', hb: 10, hk: 2, notes: 'HB full offline + sync' },
+  { feature: 'Expert Sleep Plans', hb: 0, hk: 10, notes: 'HK premium differentiator' },
+  { feature: 'AI Chat (Berry)', hb: 0, hk: 8, notes: 'HK 24/7 AI parenting chat' },
+  { feature: 'Multi-Baby', hb: 10, hk: 10, notes: 'Parity' },
+  { feature: 'Family Sharing', hb: 8, hk: 8, notes: 'Parity' },
+  { feature: 'Photo/Memory Book', hb: 0, hk: 0, notes: 'Neither has this' },
+  { feature: 'Push Notifications', hb: 0, hk: 8, notes: 'Critical gap for HB' },
+  { feature: 'Apple Watch', hb: 0, hk: 7, notes: 'HK Plus feature' },
+  { feature: 'Potty Training', hb: 10, hk: 8, notes: 'HB more detailed' },
+  { feature: 'Data Export', hb: 10, hk: 5, notes: 'HB CSV + JSON' },
+  { feature: 'Languages', hb: 5, hk: 4, notes: 'HB: 3, HK: ~2' },
+  { feature: 'PWA Web Access', hb: 10, hk: 0, notes: 'HK is native only' },
+];
+
+const hkWeaknesses = [
+  { area: 'UI Regression', detail: 'Users report new updates feel "sloppy and rudimentary" — visual design regression', opportunity: 'Position HeyBub as the beautifully designed alternative', severity: 'high' },
+  { area: 'Diaper Tracking', detail: 'Removed "mixed" diaper option, forcing extra taps. Users hate this change.', opportunity: 'Market HeyBub\'s superior diaper tracking with poo color/consistency', severity: 'high' },
+  { area: 'No Health Records', detail: 'Zero vaccination, medication, allergy, or doctor visit tracking', opportunity: 'This is HeyBub\'s #1 differentiator. No competitor matches it.', severity: 'critical' },
+  { area: 'No Growth Charts', detail: 'No WHO percentile curves, no weight/height trend visualization', opportunity: 'Clinical-grade growth charts = trust signal for health-conscious parents', severity: 'critical' },
+  { area: 'Pumping Gaps', detail: 'Users want pumping totals/averages on day page — feature requests ignored', opportunity: 'Build the pumping dashboard they want, market it to pumping moms', severity: 'medium' },
+  { area: 'Premium Value', detail: 'Many users feel SweetSpot isn\'t worth $60/yr — "I can figure out wake windows myself"', opportunity: 'Offer more value at a lower price point', severity: 'high' },
+  { area: 'Bugs', detail: 'Live actions glitching, commands not executing. Users frustrated with paid bugs.', opportunity: 'Quality + reliability as brand pillars', severity: 'medium' },
+  { area: 'No Offline', detail: 'App requires internet connection for all operations', opportunity: 'Offline-first = massive advantage for parents on-the-go', severity: 'high' },
+  { area: 'No Web App', detail: 'Native mobile only. No browser access for desktop or shared devices.', opportunity: 'HeyBub\'s PWA = access from any device, instant start', severity: 'medium' },
+  { area: 'Expensive Expert Plans', detail: 'Premium at $14.99/mo or $120/yr feels steep for personalized sleep plans', opportunity: 'Undercut with AI-powered plans at a fraction of the cost', severity: 'medium' },
+];
+
+const asoKeywords = [
+  { kw: 'baby tracker', vol: 'High', hkRank: '#5', target: '#1-3' },
+  { kw: 'baby sleep tracker', vol: 'High', hkRank: '#3', target: '#1-2' },
+  { kw: 'newborn tracker', vol: 'Medium', hkRank: '#8', target: '#1-3' },
+  { kw: 'baby feeding tracker', vol: 'Medium', hkRank: '#4', target: '#1-2' },
+  { kw: 'baby health tracker', vol: 'Medium', hkRank: '—', target: '#1' },
+  { kw: 'baby growth chart', vol: 'Medium', hkRank: '—', target: '#1' },
+  { kw: 'baby vaccination tracker', vol: 'Medium', hkRank: '—', target: '#1' },
+  { kw: 'baby diaper tracker', vol: 'Medium', hkRank: '#6', target: '#1-2' },
+  { kw: 'baby log app', vol: 'Low-Med', hkRank: '#7', target: '#1' },
+  { kw: 'baby milestone tracker', vol: 'Medium', hkRank: '—', target: '#1' },
+  { kw: 'baby app for parents', vol: 'High', hkRank: '#12', target: '#1-5' },
+  { kw: 'newborn feeding log', vol: 'Low', hkRank: '—', target: '#1' },
+  { kw: 'baby weight tracker', vol: 'Low-Med', hkRank: '—', target: '#1' },
+  { kw: 'breastfeeding tracker', vol: 'Medium', hkRank: '#6', target: '#1-3' },
+  { kw: 'baby tracker offline', vol: 'Low', hkRank: '—', target: '#1' },
+];
+
+const contentPillars = [
+  { name: 'Sleep Science', icon: '😴', ideas: [
+    { type: 'blog', text: 'Wake Windows by Age: The Complete 2026 Guide', seo: '8.1K/mo' },
+    { type: 'video', text: 'TikTok: "This is what sleep regression actually looks like" (relatable chaos)', seo: 'Viral' },
+    { type: 'blog', text: 'Why Your Baby Won\'t Nap: 7 Science-Backed Reasons', seo: '5.4K/mo' },
+    { type: 'social', text: 'Instagram carousel: "4-month sleep regression survival kit"', seo: '2.1K saves' },
+    { type: 'email', text: 'Weekly sleep tips drip based on baby\'s age', seo: 'Nurture' },
+  ]},
+  { name: 'Health & Growth', icon: '📊', ideas: [
+    { type: 'blog', text: 'Baby Growth Percentiles Explained: What WHO Charts Really Mean', seo: '12K/mo' },
+    { type: 'video', text: 'TikTok: "POV: checking your baby\'s growth percentile" (satisfying chart animation)', seo: 'Viral' },
+    { type: 'blog', text: 'Baby Vaccination Schedule 2026: What Every Parent Needs to Know', seo: '15K/mo' },
+    { type: 'social', text: 'Instagram reel: "All 20 baby teeth in 60 seconds" (teething tracker demo)', seo: '5K saves' },
+    { type: 'blog', text: 'When to Call the Pediatrician: Red Flags Every New Parent Should Know', seo: '9K/mo' },
+  ]},
+  { name: 'New Parent Life', icon: '👶', ideas: [
+    { type: 'video', text: 'TikTok: "Things no one tells you about tracking your baby\'s poop" (humor)', seo: 'Viral' },
+    { type: 'social', text: 'Instagram: "First year milestones checklist" (save-worthy infographic)', seo: '8K saves' },
+    { type: 'blog', text: 'The Best Baby Apps for New Parents in 2026 (include HeyBub)', seo: '6K/mo' },
+    { type: 'video', text: 'YouTube: "Our baby tracking setup: how we use HeyBub" (authentic review)', seo: 'SEO' },
+    { type: 'email', text: 'Onboarding series: "Your first 7 days with HeyBub"', seo: 'Convert' },
+  ]},
+  { name: 'Feeding & Nutrition', icon: '🍼', ideas: [
+    { type: 'blog', text: 'How Much Should My Baby Eat? A Complete Feeding Guide by Age', seo: '11K/mo' },
+    { type: 'video', text: 'TikTok: "Tracking every feed for 30 days — here\'s what I learned"', seo: 'Viral' },
+    { type: 'blog', text: 'Breastfeeding vs Formula: What the Data Actually Shows', seo: '7K/mo' },
+    { type: 'social', text: 'Instagram: "Pumping schedule that actually works" (carousel)', seo: '3K saves' },
+    { type: 'blog', text: 'Starting Solids: The Complete Baby-Led Weaning Tracker Guide', seo: '4K/mo' },
+  ]},
+];
+
+const socialStrategy = [
+  { platform: 'TikTok', icon: '🎵', followers_target: '50K in 6mo', post_freq: '5-7x/week', content: 'Relatable parent humor, baby tracking "POV" content, sleep tips in 60sec, product demos disguised as stories', budget: '$2K/mo ads', tactics: [
+    '"Day in the life" tracking videos (authentic, not polished)',
+    'Duet/stitch parenting creators for organic reach',
+    'Sound trend participation with baby tracking twist',
+    'Sleep deprivation humor → HeyBub as the solution',
+    '"Things I track about my baby" trending format',
+  ]},
+  { platform: 'Instagram', icon: '📸', followers_target: '25K in 6mo', post_freq: '4-5x/week', content: 'Save-worthy infographics, beautiful growth charts, milestone celebrations, carousel guides', budget: '$1.5K/mo ads', tactics: [
+    'Saveable carousel posts (vaccination schedules, milestone checklists)',
+    'Reels showing beautiful WHO growth chart animations',
+    'Stories polls: "How many diapers today?" (engagement)',
+    'UGC reposts from parent community',
+    'Collab posts with micro-influencers (10K-50K followers)',
+  ]},
+  { platform: 'YouTube', icon: '📺', followers_target: '5K in 6mo', post_freq: '1-2x/week', content: 'In-depth baby tracking tutorials, "honest review" style content, sleep science explainers', budget: '$500/mo', tactics: [
+    'SEO-optimized videos: "Best Baby Tracker App 2026"',
+    '"Honest HeyBub Review" from real parent creators',
+    'Educational content: baby sleep science, growth percentiles',
+    'Comparison videos: HeyBub vs Huckleberry (fair, factual)',
+    'Shorts for discoverability → full videos for depth',
+  ]},
+  { platform: 'Facebook Groups', icon: '👥', followers_target: 'Presence in 50+ groups', post_freq: 'Daily engagement', content: 'Helpful answers in parenting groups, subtle product mentions, community building', budget: '$0', tactics: [
+    'Join top 50 parenting/newborn Facebook groups',
+    'Answer questions about sleep, feeding, health tracking',
+    'Share HeyBub features when genuinely relevant to questions',
+    'Create "HeyBub Parents" community group',
+    'Run group-exclusive promotions (3 months free)',
+  ]},
+];
+
+const retentionTactics = [
+  { name: 'Push Notification Engine', priority: 'Critical', impact: '190% retention lift', desc: 'Implement push notifications for feeding reminders, nap predictions, medication schedules, and milestone celebrations. Personalized based on baby age and user patterns.', actions: [
+    'Day 0: Welcome + setup completion nudge',
+    'Day 1-3: Feature discovery ("Did you know you can track vaccinations?")',
+    'Daily: Smart feeding/sleep reminders based on patterns',
+    'Weekly: Summary digest ("Luna slept 2 hours more this week!")',
+    'Monthly: Milestone celebrations + growth chart updates',
+    'Lapsed: Re-engagement after 3 days inactive',
+  ]},
+  { name: 'Onboarding Optimization', priority: 'Critical', impact: '2x Day-7 retention', desc: 'Current onboarding is basic. Need guided first-use experience showing core value in <60 seconds. Ask 3 questions max, then show immediate value.', actions: [
+    'Baby age → instant personalized dashboard',
+    'First event logged → celebration animation + "streak started"',
+    'Day 1 summary → "Here\'s what you tracked today!"',
+    'First week → pattern detected → show prediction teaser',
+    'Upgrade prompt only after demonstrating value (Day 5+)',
+  ]},
+  { name: 'Streak & Gamification', priority: 'High', impact: '30-40% DAU boost', desc: 'Parents already track daily — reward the behavior. Daily tracking streaks, weekly badges, monthly milestones.', actions: [
+    'Daily tracking streak counter (visible on dashboard)',
+    '"Consistent Parent" badges for 7/14/30/90 day streaks',
+    'Weekly summary celebrations with shareable graphics',
+    'Monthly baby development insights as streak rewards',
+    'Streak-based premium trial unlocks (7-day streak = 1 week free premium)',
+  ]},
+  { name: 'Referral Engine', priority: 'High', impact: 'Viral coefficient 1.2+', desc: 'Parents talk to other parents. Build a referral program that rewards sharing: 1 month free for each referral, stacking up to 1 year.', actions: [
+    'Unique referral link per user',
+    'Reward: 1 month Plus free per successful referral',
+    'Max stack: 12 months free (encourages power referrers)',
+    'Sharing triggers: milestone achievements, growth chart screenshots',
+    'Partner referral boost: daycare partners get 20% revenue share',
+  ]},
+];
+
+const warPlan = [
+  { week: 'Week 1-2', phase: 'Foundation', items: [
+    { task: 'Implement push notification infrastructure (FCM + APNs)', owner: 'Engineering', status: 'critical' },
+    { task: 'Redesign onboarding flow (3-screen max, baby age → instant value)', owner: 'Design + Eng', status: 'critical' },
+    { task: 'Create App Store listing: title, subtitle, screenshots, description', owner: 'Marketing', status: 'critical' },
+    { task: 'Set up analytics (Mixpanel/Amplitude) + error monitoring (Sentry)', owner: 'Engineering', status: 'critical' },
+    { task: 'Write 5 foundational SEO blog posts (sleep, growth, vaccines, feeding, milestones)', owner: 'Content', status: 'high' },
+    { task: 'Create social media accounts (TikTok, Instagram, YouTube)', owner: 'Marketing', status: 'high' },
+  ]},
+  { week: 'Week 3-4', phase: 'Launch Prep', items: [
+    { task: 'Submit iOS app to App Store (Capacitor build + polish)', owner: 'Engineering', status: 'critical' },
+    { task: 'Submit Android app to Google Play', owner: 'Engineering', status: 'critical' },
+    { task: 'Implement 3-tier pricing (Free/Plus $4.99/Premium $9.99)', owner: 'Engineering', status: 'critical' },
+    { task: 'Create 10 TikTok videos (batch produce, schedule daily)', owner: 'Content', status: 'high' },
+    { task: 'Reach out to 20 micro-influencers (10K-50K followers, parenting niche)', owner: 'Marketing', status: 'high' },
+    { task: 'Set up email capture: landing page + lead magnet (printable milestone checklist)', owner: 'Marketing', status: 'medium' },
+  ]},
+  { week: 'Week 5-6', phase: 'Soft Launch', items: [
+    { task: 'App Store launch day: coordinate social blast + email list + influencer posts', owner: 'Marketing', status: 'critical' },
+    { task: 'Activate Apple Search Ads ($500/week, targeting baby tracker keywords)', owner: 'Marketing', status: 'high' },
+    { task: 'Launch TikTok ad campaign ($200/week, targeting new parents)', owner: 'Marketing', status: 'high' },
+    { task: 'Implement referral program (1 month free per referral)', owner: 'Engineering', status: 'high' },
+    { task: 'Post in 30+ Facebook parenting groups (organic, helpful answers)', owner: 'Marketing', status: 'medium' },
+    { task: 'A/B test onboarding flows + paywall placement', owner: 'Growth', status: 'medium' },
+  ]},
+  { week: 'Week 7-8', phase: 'Growth Push', items: [
+    { task: 'Analyze first 2 weeks of data: conversion rates, retention, top features', owner: 'Growth', status: 'critical' },
+    { task: 'Launch "HeyBub vs Huckleberry" comparison blog post (SEO play)', owner: 'Content', status: 'high' },
+    { task: 'Scale winning ad creatives (double budget on >3% CTR ads)', owner: 'Marketing', status: 'high' },
+    { task: 'Implement photo/memory feature (engagement multiplier)', owner: 'Engineering', status: 'high' },
+    { task: 'Launch pediatrician PDF report feature (premium exclusive)', owner: 'Engineering', status: 'medium' },
+    { task: 'Start YouTube channel with first 4 videos', owner: 'Content', status: 'medium' },
+  ]},
+  { week: 'Week 9-10', phase: 'Optimize', items: [
+    { task: 'Optimize push notification timing based on user behavior data', owner: 'Growth', status: 'high' },
+    { task: 'Launch gamification: streaks, badges, shareable milestones', owner: 'Engineering', status: 'high' },
+    { task: 'Expand to 5+ languages (Spanish full, Portuguese, German, Japanese)', owner: 'Engineering', status: 'medium' },
+    { task: 'Partner with 3 parenting blogs for sponsored content', owner: 'Marketing', status: 'medium' },
+    { task: 'Create comparison landing pages for SEO (HeyBub vs X)', owner: 'Content', status: 'medium' },
+    { task: 'A/B test pricing: annual vs monthly emphasis', owner: 'Growth', status: 'medium' },
+  ]},
+  { week: 'Week 11-12', phase: 'Scale', items: [
+    { task: 'Hit 5K downloads milestone → analyze cohort retention', owner: 'Growth', status: 'critical' },
+    { task: 'Launch daycare partnership pilot (5 daycare centers)', owner: 'Business Dev', status: 'high' },
+    { task: 'Implement AI sleep coaching feature (compete with HK Premium)', owner: 'Engineering', status: 'high' },
+    { task: 'PR push: pitch to parenting publications (Scary Mommy, Romper, What to Expect)', owner: 'Marketing', status: 'high' },
+    { task: 'Plan Phase 2: B2B dashboard, smart device integrations', owner: 'Product', status: 'medium' },
+    { task: 'Review 90-day metrics, set Q2 targets', owner: 'Leadership', status: 'critical' },
+  ]},
+];
+
+// ──────── COMPONENTS ────────
+
+function Nav({ active, setActive }) {
+  return (
+    <nav className="nav">
+      <div className="nav-inner">
+        <span className="nav-brand">HeyBub War Room</span>
+        {sections.map(s => (
+          <button key={s.id} className={`nav-btn ${active === s.id ? 'active' : ''}`}
+            onClick={() => { setActive(s.id); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+function Hero() {
+  return (
+    <div className="hero fade-in">
+      <div className="hero-tag">Marketing Battle Plan</div>
+      <h1><span className="hb">HeyBub</span> <span className="vs">vs</span> <span className="hk">Huckleberry</span></h1>
+      <p className="sub">A deep-dive marketing strategy to take on the $600K/month incumbent and capture market share in the $5.5B parenting app market.</p>
+    </div>
+  );
+}
+
+function EnemyIntel() {
+  return (
+    <div id="intel" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">01</div>
+        <h2 className="section-title">Enemy Intelligence: Huckleberry</h2>
+      </div>
+      <p className="section-subtitle">Know thy enemy. Every data point about the incumbent we need to exploit.</p>
+
+      <div className="grid g3" style={{ marginBottom: 20 }}>
+        {[
+          { label: 'Monthly Revenue', value: hkIntel.revenue_mo, color: 'var(--orange)' },
+          { label: 'Monthly Downloads', value: hkIntel.downloads_mo, color: 'var(--orange)' },
+          { label: 'Active Users', value: hkIntel.active_users, color: 'var(--orange)' },
+          { label: 'Total Funding', value: hkIntel.funding, color: 'var(--red)' },
+          { label: 'Website Traffic', value: hkIntel.website_traffic, color: 'var(--orange)' },
+          { label: 'Instagram', value: hkIntel.instagram, color: 'var(--purple)' },
+        ].map((m, i) => (
+          <div key={i} className="kpi-card">
+            <div className="label">{m.label}</div>
+            <div className="val" style={{ color: m.color, fontSize: 24 }}>{m.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid g2">
+        <div className="card card-orange">
+          <h3>Profile</h3>
+          <ul style={{ listStyle: 'none' }}>
+            {[
+              ['Founded', hkIntel.founded],
+              ['CEO', hkIntel.ceo],
+              ['Team', hkIntel.team],
+              ['Investors', hkIntel.investors],
+              ['ARR', hkIntel.arr],
+              ['App Store Rank', hkIntel.app_store_rank],
+              ['Subtitle', `"${hkIntel.subtitle}"`],
+            ].map(([k, v], i) => (
+              <li key={i} style={{ fontSize: 13, padding: '3px 0', display: 'flex', gap: 8 }}>
+                <span style={{ color: 'var(--text-muted)', minWidth: 100 }}>{k}:</span>
+                <span style={{ color: 'var(--text-dim)' }}>{v}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="card card-orange">
+          <h3>Traffic & Demographics</h3>
+          <ul style={{ listStyle: 'none' }}>
+            {[
+              ['Organic Search', hkIntel.traffic_organic],
+              ['Direct Traffic', hkIntel.traffic_direct],
+              ['Demographics', `${hkIntel.demo_female} female, ages ${hkIntel.demo_age}`],
+              ['Geographic', hkIntel.geo],
+              ['Pricing (Plus)', '$11.99/mo or $5.74/mo annual'],
+              ['Pricing (Premium)', '$14.99/mo or $9.99/mo annual'],
+              ['Trial', '14-day Premium free trial'],
+            ].map(([k, v], i) => (
+              <li key={i} style={{ fontSize: 13, padding: '3px 0', display: 'flex', gap: 8 }}>
+                <span style={{ color: 'var(--text-muted)', minWidth: 120 }}>{k}:</span>
+                <span style={{ color: 'var(--text-dim)' }}>{v}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: 15, fontWeight: 600, margin: '20px 0 12px', color: 'var(--red-light)' }}>Huckleberry's Exploitable Weaknesses</h3>
+      <div className="grid g2">
+        {hkWeaknesses.map((w, i) => (
+          <div key={i} className={`card ${w.severity === 'critical' ? 'card-red' : w.severity === 'high' ? 'card-orange' : 'card-blue'}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <h3>{w.area}</h3>
+              <span className={`badge ${w.severity === 'critical' ? 'badge-red' : w.severity === 'high' ? 'badge-orange' : 'badge-blue'}`}>{w.severity}</span>
+            </div>
+            <p>{w.detail}</p>
+            <p style={{ marginTop: 6, color: 'var(--green-light)', fontSize: 12 }}>Opportunity: {w.opportunity}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Battlefield() {
+  const chartRef = useRef(null);
+  const inst = useRef(null);
+
+  useEffect(() => {
+    if (inst.current) inst.current.destroy();
+    if (!chartRef.current) return;
+    inst.current = new Chart(chartRef.current.getContext('2d'), {
+      type: 'radar',
+      data: {
+        labels: ['Sleep AI', 'Health Records', 'Growth Charts', 'Offline', 'Feeding Depth', 'Expert Plans', 'Notifications', 'Multi-Platform', 'Data Export', 'Community'],
+        datasets: [
+          { label: 'HeyBub', data: [7, 10, 10, 10, 10, 2, 2, 10, 10, 2], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.15)', pointBackgroundColor: '#6366f1', borderWidth: 2 },
+          { label: 'Huckleberry', data: [9, 2, 3, 2, 7, 10, 8, 7, 5, 4], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', pointBackgroundColor: '#f97316', borderWidth: 2 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#7d839e', font: { size: 12 } } } },
+        scales: { r: { angleLines: { color: '#2a2e42' }, grid: { color: '#2a2e42' }, pointLabels: { color: '#7d839e', font: { size: 10 } }, ticks: { display: false }, suggestedMin: 0, suggestedMax: 10 } }
+      }
+    });
+    return () => { if (inst.current) inst.current.destroy(); };
+  }, []);
+
+  return (
+    <div id="battlefield" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">02</div>
+        <h2 className="section-title">The Battlefield: Feature-by-Feature</h2>
+      </div>
+
+      <div className="chart-wrap" style={{ marginBottom: 20 }}>
+        <canvas ref={chartRef}></canvas>
+      </div>
+
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+        <div className="metric-row header">
+          <div>Feature</div><div style={{ textAlign: 'center' }}>HeyBub</div><div style={{ textAlign: 'center' }}>Huckleberry</div>
+        </div>
+        {featureComparison.map((f, i) => (
+          <div key={i} className="metric-row">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>{f.feature}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{f.notes}</span>
+            </div>
+            <div className={`metric-hb ${f.hb > f.hk ? 'win' : ''}`}>{f.hb}/10</div>
+            <div className={`metric-hk ${f.hk > f.hb ? 'win' : ''}`}>{f.hk}/10</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 12, padding: 14, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 10, fontSize: 13 }}>
+        <strong style={{ color: 'var(--green-light)' }}>Scorecard:</strong> <span style={{ color: 'var(--text-dim)' }}>HeyBub wins 11/20 features, ties 3, loses 6. HeyBub dominates in health/data depth. Huckleberry leads in AI maturity and expert services.</span>
+      </div>
+    </div>
+  );
+}
+
+function Positioning() {
+  return (
+    <div id="positioning" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">03</div>
+        <h2 className="section-title">Brand Positioning Strategy</h2>
+      </div>
+      <p className="section-subtitle">How we differentiate from Huckleberry in the minds of parents.</p>
+
+      <div className="versus-row">
+        <div className="versus-card" style={{ borderTop: '3px solid var(--orange)' }}>
+          <div style={{ fontSize: 12, color: 'var(--orange)', fontWeight: 600, marginBottom: 8 }}>HUCKLEBERRY POSITIONS AS</div>
+          <h3 style={{ fontSize: 18, marginBottom: 8 }}>"Sleep Experts for Your Baby"</h3>
+          <ul style={{ listStyle: 'none' }}>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Narrow focus: sleep tracking + sleep consulting</li>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Premium = access to human sleep experts</li>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Brand = clinical authority + AI prediction</li>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Targets: sleep-deprived parents specifically</li>
+          </ul>
+        </div>
+        <div className="versus-vs">VS</div>
+        <div className="versus-card" style={{ borderTop: '3px solid var(--accent)' }}>
+          <div style={{ fontSize: 12, color: 'var(--accent-light)', fontWeight: 600, marginBottom: 8 }}>HEYBUB SHOULD POSITION AS</div>
+          <h3 style={{ fontSize: 18, marginBottom: 8 }}>"Your Baby's Complete Health Companion"</h3>
+          <ul style={{ listStyle: 'none' }}>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Comprehensive: sleep + feeding + health + growth + development</li>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Premium = AI insights + data you can trust</li>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Brand = complete care + works anywhere (offline)</li>
+            <li style={{ fontSize: 12, color: 'var(--text-dim)', padding: '3px 0' }}>Targets: health-conscious, data-driven parents</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="grid g2" style={{ marginTop: 16 }}>
+        <div className="card card-accent">
+          <h3>Primary Tagline Options</h3>
+          <ul style={{ listStyle: 'none', marginTop: 8 }}>
+            {[
+              { tag: '"Track Everything. Miss Nothing."', why: 'Highlights completeness vs Huckleberry\'s narrow focus' },
+              { tag: '"Your Baby\'s Health, In Your Pocket."', why: 'Health-first positioning, appeals to health-conscious parents' },
+              { tag: '"The Only Baby App You\'ll Ever Need."', why: 'Replacement positioning — why use 3 apps when HeyBub does it all?' },
+              { tag: '"Smart Tracking for Growing Families."', why: 'Future-proofs for multi-baby and family expansion' },
+            ].map((t, i) => (
+              <li key={i} style={{ padding: '6px 0', borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{t.tag}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{t.why}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="card card-green">
+          <h3>Messaging Pillars</h3>
+          <ul style={{ listStyle: 'none', marginTop: 8 }}>
+            {[
+              { pillar: 'Complete', msg: '"More than sleep. HeyBub tracks feeding, health, growth, vaccines, milestones, teeth, allergies — everything your pediatrician asks about."' },
+              { pillar: 'Reliable', msg: '"Works offline, syncs when connected. Never miss a log — even in airplane mode, at the park, or during midnight feeds with no Wi-Fi."' },
+              { pillar: 'Clinical', msg: '"WHO growth percentile charts, vaccination schedules, sick day tracking. Data your pediatrician actually wants to see."' },
+              { pillar: 'Affordable', msg: '"Everything Huckleberry charges $60/yr for, plus health records they don\'t even offer. Starting at $4.99/mo."' },
+            ].map((p, i) => (
+              <li key={i} style={{ padding: '6px 0', borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--green-light)' }}>{p.pillar}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2, fontStyle: 'italic' }}>{p.msg}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16, background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08))', border: '1px solid rgba(99,102,241,0.2)' }}>
+        <h3>The "Switch" Campaign Concept</h3>
+        <p style={{ marginTop: 8, fontSize: 13, lineHeight: 1.8 }}>
+          <strong>Target:</strong> Frustrated Huckleberry users (the ones leaving 3-star reviews about bugs, diaper changes, and overpriced SweetSpot).<br/>
+          <strong>Hook:</strong> "Still paying $60/year just for nap predictions? Meet HeyBub — everything Huckleberry does, plus health records, growth charts, vaccines, and offline support. Import your data and see the difference."<br/>
+          <strong>Channels:</strong> Reddit r/NewParents, r/beyondthebump, r/sleeptrain + Facebook parenting groups + targeted App Store search ads on "huckleberry alternative".<br/>
+          <strong>Offer:</strong> "Switch from Huckleberry → Get 3 months Premium free. We'll even help you import your data."
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function PricingWar() {
+  return (
+    <div id="pricing" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">04</div>
+        <h2 className="section-title">Pricing War: Undercut & Outvalue</h2>
+      </div>
+      <p className="section-subtitle">Beat Huckleberry on value at every tier. Give more for less.</p>
+
+      <div style={{ overflowX: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(160px, 1fr))', gap: 12 }}>
+          {/* Huckleberry Tiers */}
+          <div className="pricing-col" style={{ opacity: 0.7 }}>
+            <div className="tier" style={{ color: 'var(--orange)' }}>HK Free</div>
+            <div className="price" style={{ color: 'var(--orange)' }}>$0</div>
+            <ul>
+              <li className="included">Basic tracking</li>
+              <li className="included">Sleep summaries</li>
+              <li className="included">Multi-caregiver sync</li>
+              <li className="excluded">No SweetSpot</li>
+              <li className="excluded">No insights</li>
+              <li className="excluded">No health records</li>
+              <li className="excluded">No growth charts</li>
+            </ul>
+          </div>
+          <div className="pricing-col" style={{ opacity: 0.7 }}>
+            <div className="tier" style={{ color: 'var(--orange)' }}>HK Plus</div>
+            <div className="price" style={{ color: 'var(--orange)' }}>$11.99<span>/mo</span></div>
+            <ul>
+              <li className="included">SweetSpot predictions</li>
+              <li className="included">Schedule Creator</li>
+              <li className="included">Insights + tips</li>
+              <li className="included">Apple Watch</li>
+              <li className="excluded">No expert sleep plans</li>
+              <li className="excluded">No health records</li>
+              <li className="excluded">No growth charts</li>
+            </ul>
+          </div>
+          <div className="pricing-col" style={{ opacity: 0.7 }}>
+            <div className="tier" style={{ color: 'var(--orange)' }}>HK Premium</div>
+            <div className="price" style={{ color: 'var(--orange)' }}>$14.99<span>/mo</span></div>
+            <ul>
+              <li className="included">All Plus features</li>
+              <li className="included">Berry AI chat</li>
+              <li className="included">Custom sleep plans</li>
+              <li className="included">Expert check-ins</li>
+              <li className="excluded">No health records</li>
+              <li className="excluded">No growth charts</li>
+              <li className="excluded">No offline mode</li>
+            </ul>
+          </div>
+
+          {/* HeyBub Tiers */}
+          <div className="pricing-col" style={{ borderColor: 'rgba(99,102,241,0.3)' }}>
+            <div className="tier" style={{ color: 'var(--accent-light)' }}>HB Free</div>
+            <div className="price" style={{ color: 'var(--accent-light)' }}>$0</div>
+            <ul>
+              <li className="included">Full tracking (all 8 types)</li>
+              <li className="included">Timeline + daily summary</li>
+              <li className="included">1 baby, 7-day history</li>
+              <li className="included">Offline mode</li>
+              <li className="included">Dark mode + i18n</li>
+              <li className="excluded">No sharing</li>
+              <li className="excluded">No analytics</li>
+            </ul>
+          </div>
+          <div className="pricing-col featured">
+            <div className="tier" style={{ color: 'var(--accent-light)' }}>HB Plus</div>
+            <div className="price" style={{ color: 'var(--accent-light)' }}>$4.99<span>/mo</span></div>
+            <ul>
+              <li className="included">Unlimited babies + history</li>
+              <li className="included">ALL health records</li>
+              <li className="included">WHO growth charts</li>
+              <li className="included">Family sharing (5 people)</li>
+              <li className="included">CSV + JSON export</li>
+              <li className="included">Offline + sync</li>
+              <li className="included">Predictions</li>
+            </ul>
+          </div>
+          <div className="pricing-col" style={{ borderColor: 'rgba(168,85,247,0.3)' }}>
+            <div className="tier" style={{ color: 'var(--purple)' }}>HB Premium</div>
+            <div className="price" style={{ color: 'var(--purple)' }}>$9.99<span>/mo</span></div>
+            <ul>
+              <li className="included">Everything in Plus</li>
+              <li className="included">AI sleep coaching</li>
+              <li className="included">Advanced analytics</li>
+              <li className="included">Pediatrician PDF reports</li>
+              <li className="included">Photo memory journal</li>
+              <li className="included">Priority support</li>
+              <li className="included">Smart device integrations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' }}>
+        <h3 style={{ color: 'var(--green-light)' }}>The Value Proposition Kill Shot</h3>
+        <p style={{ fontSize: 13, marginTop: 6, lineHeight: 1.8 }}>
+          HeyBub Plus at <strong>$4.99/mo</strong> includes health records, growth charts, vaccines, sharing, predictions, and export — features that Huckleberry
+          either <strong>doesn't offer at all</strong> or charges <strong>$11.99/mo</strong> for a subset of. A parent comparing feature lists side-by-side
+          gets <strong>58% more features for 58% less money</strong>. This is the core conversion message for every ad, landing page, and App Store screenshot.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ASO() {
+  return (
+    <div id="aso" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">05</div>
+        <h2 className="section-title">App Store Optimization (ASO)</h2>
+      </div>
+      <p className="section-subtitle">70% of app installs come from app store search. This is the #1 acquisition battleground.</p>
+
+      <div className="grid g2">
+        <div className="card card-accent">
+          <h3>Recommended App Store Listing</h3>
+          <ul style={{ listStyle: 'none', marginTop: 8 }}>
+            <li style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Title (30 chars max)</div>
+              <div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>HeyBub: Baby Tracker & Health</div>
+            </li>
+            <li style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Subtitle (30 chars max)</div>
+              <div style={{ fontSize: 14, fontWeight: 600, marginTop: 2 }}>Sleep, Feed, Growth & Vaccines</div>
+            </li>
+            <li style={{ padding: '6px 0' }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Why this works</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>
+                Huckleberry's subtitle is "Baby Tracker & Sleep Experts" — narrowly focused on sleep.
+                Ours signals <strong>broader value</strong> (sleep + feed + growth + vaccines) in the same character count.
+                "Health" in the title targets keywords HK doesn't rank for at all.
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div className="card card-accent">
+          <h3>Screenshot Strategy (6 screens)</h3>
+          <ul style={{ listStyle: 'none', marginTop: 8 }}>
+            {[
+              { num: 1, title: '"Track Everything in One Tap"', desc: 'Dashboard with all 8 activity widgets. Shows breadth instantly.' },
+              { num: 2, title: '"WHO Growth Charts Built In"', desc: 'Beautiful percentile curves with baby data overlay. Clinical trust.' },
+              { num: 3, title: '"Vaccination & Health Records"', desc: 'Health page showing all 8 categories. "Your pediatrician will thank you."' },
+              { num: 4, title: '"Works Offline. Always."', desc: 'Offline indicator + sync. "No Wi-Fi? No problem."' },
+              { num: 5, title: '"Smart Sleep Predictions"', desc: 'Next nap prediction with confidence interval. Competes with SweetSpot.' },
+              { num: 6, title: '"Share With Your Whole Family"', desc: 'Multi-caregiver view. "Partners, grandparents, daycare — everyone in sync."' },
+            ].map((s, i) => (
+              <li key={i} style={{ padding: '5px 0', borderBottom: i < 5 ? '1px solid var(--border)' : 'none', display: 'flex', gap: 8 }}>
+                <span style={{ color: 'var(--accent-light)', fontWeight: 800, fontSize: 14 }}>{s.num}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{s.title}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.desc}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: 14, fontWeight: 600, margin: '16px 0 10px' }}>Target Keywords & Ranking Goals</h3>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, overflowX: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 70px 70px 70px', gap: 0, fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, padding: '0 0 8px', borderBottom: '2px solid var(--border)' }}>
+          <div>Keyword</div><div style={{textAlign:'center'}}>Volume</div><div style={{textAlign:'center'}}>HK Rank</div><div style={{textAlign:'center'}}>Our Target</div>
+        </div>
+        {asoKeywords.map((k, i) => (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 70px 70px 70px', gap: 0, padding: '7px 0', borderBottom: '1px solid var(--border)', fontSize: 12 }}>
+            <div style={{ fontWeight: 500 }}>{k.kw}</div>
+            <div style={{ textAlign: 'center', color: 'var(--text-dim)' }}>{k.vol}</div>
+            <div style={{ textAlign: 'center', color: 'var(--orange)' }}>{k.hkRank}</div>
+            <div style={{ textAlign: 'center', color: 'var(--green-light)', fontWeight: 700 }}>{k.target}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+        Key insight: Huckleberry doesn't rank for "baby health tracker", "baby vaccination tracker", "baby growth chart", or "baby milestone tracker" — these are uncontested high-intent keywords where HeyBub can dominate immediately.
+      </div>
+    </div>
+  );
+}
+
+function Acquisition() {
+  return (
+    <div id="acquisition" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">06</div>
+        <h2 className="section-title">User Acquisition Channels</h2>
+      </div>
+      <p className="section-subtitle">Multi-channel acquisition strategy targeting 10K downloads in first 90 days.</p>
+
+      <div className="grid g2">
+        {[
+          { channel: 'Apple Search Ads', budget: '$2K/mo', cpi: '$1.50-3.00', vol: '700-1,300/mo', roi: 'Highest intent', priority: 'critical',
+            tactics: ['Bid on "baby tracker", "baby sleep", "newborn app"', 'Competitor targeting: "huckleberry alternative"', 'A/B test ad variants (health focus vs sleep focus)', 'Optimize for post-install events (first log, Day 7 retention)'] },
+          { channel: 'Google UAC', budget: '$1.5K/mo', cpi: '$1.00-2.50', vol: '600-1,500/mo', roi: 'High volume', priority: 'high',
+            tactics: ['Target pregnancy & newborn interest segments', 'Conversion-optimized for subscription events', 'YouTube pre-roll ads (30sec baby tracking demo)', 'Search ads on baby-related queries'] },
+          { channel: 'TikTok Ads', budget: '$2K/mo', cpi: '$0.50-1.50', vol: '1,300-4,000/mo', roi: 'Lowest CPI, youngest demo', priority: 'high',
+            tactics: ['Spark Ads: boost organic posts that perform well', 'UGC-style creative (not polished — authentic parent content)', 'Target: women 25-34, interested in parenting/babies', 'Lookalike audiences from app install conversions'] },
+          { channel: 'Instagram/Facebook', budget: '$1K/mo', cpi: '$2.00-4.00', vol: '250-500/mo', roi: 'Strong targeting', priority: 'medium',
+            tactics: ['Carousel ads showing feature breadth', 'Retargeting website visitors and partial sign-ups', 'Parenting interest + life event targeting (new baby)', 'Lead gen for email list → drip → conversion'] },
+          { channel: 'Influencer Marketing', budget: '$2K/mo', cpi: '$1.00-3.00 (estimated)', vol: '700-2,000/mo', roi: 'Trust + reach', priority: 'high',
+            tactics: ['20 micro-influencers (10K-50K, parenting niche)', 'Product seeding: free Premium for honest review', 'Commission: $2 per install via unique referral links', 'Focus: mommy bloggers, new parent TikTokers, doulas'] },
+          { channel: 'Organic/SEO/ASO', budget: '$0 (content time)', cpi: '$0 (free)', vol: '500-2,000/mo (at scale)', roi: 'Best long-term ROI', priority: 'critical',
+            tactics: ['Blog: 4 posts/month targeting high-intent keywords', 'ASO: monthly keyword optimization cycle', 'Reddit: genuine participation in parenting subreddits', 'ProductHunt launch for tech-savvy parent segment'] },
+        ].map((ch, i) => (
+          <div key={i} className="channel-card">
+            <div className="channel-header">
+              <h3>{ch.channel}</h3>
+              <span className={`badge ${ch.priority === 'critical' ? 'badge-red' : ch.priority === 'high' ? 'badge-orange' : 'badge-blue'}`}>{ch.priority}</span>
+            </div>
+            <div className="channel-body">
+              <ul>{ch.tactics.map((t, j) => <li key={j}>{t}</li>)}</ul>
+            </div>
+            <div className="channel-stats">
+              <div className="channel-stat"><strong>{ch.budget}</strong>Budget</div>
+              <div className="channel-stat"><strong>{ch.cpi}</strong>Est. CPI</div>
+              <div className="channel-stat"><strong>{ch.vol}</strong>Downloads/mo</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3>Total Acquisition Budget: ~$8.5K/month</h3>
+        <p style={{ marginTop: 6, fontSize: 13, lineHeight: 1.8 }}>
+          Estimated <strong>4,000-11,000 downloads/month</strong> across all channels. Blended CPI target: <strong>$1.50</strong>.
+          At 8% free-to-paid conversion = <strong>320-880 paid subscribers/month</strong>.
+          At $7/mo average revenue per subscriber = <strong>$2,240-$6,160 MRR added monthly</strong>.
+          Payback period: <strong>2-3 months per cohort</strong>. This is a profitable growth engine from Month 1.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Content() {
+  return (
+    <div id="content" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">07</div>
+        <h2 className="section-title">Content Marketing Engine</h2>
+      </div>
+      <p className="section-subtitle">Huckleberry gets 62% of traffic from organic search. We need to out-content them. These are the 4 content pillars with specific ideas.</p>
+
+      <div className="grid g2">
+        {contentPillars.map((pillar, i) => (
+          <div key={i} className="content-pillar">
+            <div className="content-pillar-header">{pillar.icon} {pillar.name}</div>
+            <div className="content-pillar-body">
+              {pillar.ideas.map((idea, j) => (
+                <div key={j} className="content-idea">
+                  <span className={`content-type ${idea.type}`}>{idea.type}</span>
+                  <span className="content-idea-text">{idea.text}</span>
+                  <span className="content-seo">{idea.seo}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3>Content Calendar: First 30 Days</h3>
+        <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.8 }}>
+          <strong>Week 1:</strong> Launch blog with 3 pillar posts (growth percentiles, vaccination schedule, wake windows guide). Set up TikTok/IG accounts. Film 5 TikToks.<br/>
+          <strong>Week 2:</strong> Publish 2 more blog posts. Post daily on TikTok. Create 3 Instagram carousels. Start YouTube channel with "Best Baby Tracker Apps 2026" video.<br/>
+          <strong>Week 3:</strong> "HeyBub vs Huckleberry" comparison post. Guest post on a parenting blog. Launch email newsletter with weekly baby tips.<br/>
+          <strong>Week 4:</strong> Analyze performance, double down on top performers. Create lead magnet (printable milestone checklist). Launch retargeting ads on blog visitors.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Social() {
+  return (
+    <div id="social" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">08</div>
+        <h2 className="section-title">Social Media Domination</h2>
+      </div>
+      <p className="section-subtitle">72% of millennial parents use social media for product research. Huckleberry has 101K on Instagram — we start from zero but move faster.</p>
+
+      <div className="grid g2">
+        {socialStrategy.map((s, i) => (
+          <div key={i} className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <h3>{s.icon} {s.platform}</h3>
+              <span className="badge badge-accent">{s.budget}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 16, marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Target: <strong style={{ color: 'var(--text-dim)' }}>{s.followers_target}</strong></div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Frequency: <strong style={{ color: 'var(--text-dim)' }}>{s.post_freq}</strong></div>
+            </div>
+            <p style={{ fontSize: 12, marginBottom: 10 }}>{s.content}</p>
+            <ul style={{ listStyle: 'none' }}>
+              {s.tactics.map((t, j) => (
+                <li key={j} style={{ fontSize: 11, color: 'var(--text-dim)', padding: '2px 0 2px 14px', position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 0, color: 'var(--accent)' }}>→</span>{t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Retention() {
+  return (
+    <div id="retention" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">09</div>
+        <h2 className="section-title">Retention & Engagement Engine</h2>
+      </div>
+      <p className="section-subtitle">Apps with push notifications see 190% higher retention. Apps without them lose 95% of users in 90 days. This is non-negotiable.</p>
+
+      {retentionTactics.map((tactic, i) => (
+        <div key={i} className="card" style={{ marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <h3>{tactic.name}</h3>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span className={`badge ${tactic.priority === 'Critical' ? 'badge-red' : 'badge-orange'}`}>{tactic.priority}</span>
+              <span className="badge badge-green">{tactic.impact}</span>
+            </div>
+          </div>
+          <p style={{ fontSize: 13, marginBottom: 10 }}>{tactic.desc}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 6 }}>
+            {tactic.actions.map((a, j) => (
+              <div key={j} style={{ fontSize: 11, color: 'var(--text-dim)', padding: '4px 8px', background: 'var(--surface2)', borderRadius: 6, border: '1px solid var(--border)' }}>
+                {a}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Funnel() {
+  const chartRef = useRef(null);
+  const inst = useRef(null);
+
+  useEffect(() => {
+    if (inst.current) inst.current.destroy();
+    if (!chartRef.current) return;
+    inst.current = new Chart(chartRef.current.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['App Store View', 'Download', 'Signup', 'First Log', 'Day 7 Active', 'Trial Start', 'Paid Convert'],
+        datasets: [{
+          label: 'Conversion %',
+          data: [100, 35, 70, 80, 40, 25, 8],
+          backgroundColor: ['#6366f1', '#818cf8', '#a855f7', '#8b5cf6', '#7c3aed', '#6d28d9', '#22c55e'],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: { legend: { display: false }, title: { display: true, text: 'Target Conversion Funnel', color: '#e8ebf6', font: { size: 14 } } },
+        scales: {
+          x: { ticks: { color: '#7d839e', callback: v => v + '%' }, grid: { color: '#2a2e42' } },
+          y: { ticks: { color: '#7d839e', font: { size: 11 } }, grid: { display: false } },
+        }
+      }
+    });
+    return () => { if (inst.current) inst.current.destroy(); };
+  }, []);
+
+  const funnelSteps = [
+    { num: 1, color: '#6366f1', title: 'Discovery', desc: 'App Store search, social media, content, referrals, ads', metric: '10K', metricLabel: 'views/mo' },
+    { num: 2, color: '#818cf8', title: 'Download', desc: 'ASO-optimized listing converts browsers to installers', metric: '35%', metricLabel: 'conv rate' },
+    { num: 3, color: '#a855f7', title: 'Onboarding', desc: '3-screen max: baby age → personalized dashboard → first log', metric: '<60s', metricLabel: 'to value' },
+    { num: 4, color: '#8b5cf6', title: 'Activation', desc: 'First feeding/sleep/diaper logged. Streak counter starts.', metric: '80%', metricLabel: 'Day 1 log' },
+    { num: 5, color: '#7c3aed', title: 'Retention', desc: 'Push notifications + streaks + patterns keep them coming back', metric: '40%', metricLabel: 'Day 7' },
+    { num: 6, color: '#6d28d9', title: 'Monetization', desc: 'Premium gate on analytics, export, health records after Day 5', metric: '8%', metricLabel: 'convert' },
+    { num: 7, color: '#22c55e', title: 'Referral', desc: 'Shareable milestones + referral program → viral loop', metric: '1.2x', metricLabel: 'viral coeff' },
+  ];
+
+  return (
+    <div id="funnel" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">10</div>
+        <h2 className="section-title">Conversion Funnel Design</h2>
+      </div>
+
+      <div className="chart-wrap" style={{ marginBottom: 20 }}>
+        <canvas ref={chartRef}></canvas>
+      </div>
+
+      {funnelSteps.map((step, i) => (
+        <div key={i} className="funnel-step">
+          <div className="funnel-num" style={{ background: `${step.color}20`, color: step.color, border: `2px solid ${step.color}` }}>{step.num}</div>
+          <div className="funnel-content">
+            <h4>{step.title}</h4>
+            <p>{step.desc}</p>
+          </div>
+          <div className="funnel-metric">
+            <strong style={{ color: step.color }}>{step.metric}</strong>
+            {step.metricLabel}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AttackPlan() {
+  const attacks = [
+    { priority: 'CRITICAL', pColor: 'var(--red)', cls: 'critical', title: 'Health Records: The Uncontested Moat', rationale: 'No competitor — not Huckleberry, not Baby Connect, not Glow Baby — offers the breadth of health tracking HeyBub has. 8 categories vs. zero.',
+      actions: ['Lead every ad with "Track vaccinations, growth, allergies, teeth, sick days, meds, milestones, and doctor visits"', 'Create a "Pediatrician Toolkit" landing page: "Print your baby\'s complete health record for your next visit"', 'Partner with pediatrician offices: "Recommend HeyBub to your patients"', 'SEO: Target "baby vaccination tracker", "baby growth chart app", "baby allergy tracker" — zero competition'],
+      impact: 'Expected impact: 30-40% of conversions driven by health features within 6 months' },
+    { priority: 'CRITICAL', pColor: 'var(--red)', cls: 'critical', title: 'Offline Superiority', rationale: 'Parents track at 3am with no Wi-Fi, at the park, on flights. Huckleberry requires internet for everything. This is a genuine pain point.',
+      actions: ['Screenshot in App Store: phone in airplane mode, still tracking', '"Never miss a midnight feed" messaging across all channels', 'Target keywords: "baby tracker offline", "baby app no internet"', 'Create viral TikTok: "tracking a diaper change on a plane with no wifi" → HeyBub works'],
+      impact: 'Expected impact: 15-20% of App Store conversions mention offline in reviews' },
+    { priority: 'HIGH', pColor: 'var(--orange)', cls: 'high', title: 'Price Undercut Strategy', rationale: 'Huckleberry Plus is $11.99/mo. Their users feel SweetSpot isn\'t worth $60/yr. We offer more for $4.99/mo.',
+      actions: ['Create comparison landing page: "HeyBub vs Huckleberry: Feature Comparison"', 'App Store search ads bidding on "huckleberry alternative" and "huckleberry expensive"', '"Switch" campaign: 3 months free Premium for Huckleberry users who switch', 'Reddit and Facebook group presence: when users ask "is Huckleberry worth it?" — mention HeyBub'],
+      impact: 'Expected impact: 500-1,000 switchers in first 90 days from targeted campaigns' },
+    { priority: 'HIGH', pColor: 'var(--orange)', cls: 'high', title: 'WHO Growth Charts as Trust Signal', rationale: 'Clinical-grade WHO percentile curves signal medical legitimacy. No baby tracker has this at HeyBub\'s quality. Pediatricians recognize WHO charts.',
+      actions: ['Animated growth chart GIF/video for social media (satisfying data visualization)', 'Blog post: "Understanding Your Baby\'s Growth Percentile" (targets 12K searches/month)', 'Pediatrician partnership: "See growth data in the format your doctor uses"', 'Instagram carousel: "What percentile is YOUR baby?" (engagement bait + app demo)'],
+      impact: 'Expected impact: Growth charts become #2 driver of organic installs behind sleep tracking' },
+    { priority: 'HIGH', pColor: 'var(--orange)', cls: 'high', title: 'Exploit Huckleberry\'s Diaper Frustration', rationale: 'Huckleberry removed mixed diapers, users hate extra taps. HeyBub tracks poo color, consistency, and amount — data pediatricians actually want.',
+      actions: ['TikTok: "Rating baby tracker apps by their diaper tracking" → HeyBub wins', 'Target frustrated HK users in app review response forums', 'Feature comparison screenshot: HeyBub diaper detail vs HK basic toggle', 'Blog: "Why Tracking Poop Color Matters: What Pediatricians Look For"'],
+      impact: 'Expected impact: Captures disgruntled Huckleberry users actively looking for alternatives' },
+    { priority: 'MEDIUM', pColor: 'var(--blue)', cls: 'medium', title: 'Web App Advantage', rationale: 'HeyBub runs as a PWA — accessible from any browser. Huckleberry is mobile-only. This matters for: daycare on desktop, grandparents, shared devices.',
+      actions: ['Marketing message: "Check on baby from your work laptop"', 'Target daycare centers: browser-based access, no app install needed', 'Landing page for desktop users: "Open HeyBub right now — no download needed"', 'Feature in comparison: "Works on any device with a browser"'],
+      impact: 'Expected impact: Opens B2B daycare channel + captures desktop-first users' },
+  ];
+
+  return (
+    <div id="attacks" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">11</div>
+        <h2 className="section-title">Attack Vectors</h2>
+      </div>
+      <p className="section-subtitle">Specific competitive attacks designed to capture market share from Huckleberry.</p>
+
+      <div className="grid g2">
+        {attacks.map((a, i) => (
+          <div key={i} className={`attack-card ${a.cls}`}>
+            <div className="priority" style={{ color: a.pColor }}>{a.priority} PRIORITY</div>
+            <h3>{a.title}</h3>
+            <div className="rationale">{a.rationale}</div>
+            <ul className="actions">{a.actions.map((act, j) => <li key={j}>{act}</li>)}</ul>
+            <div className="impact">Expected: <strong>{a.impact.split(': ')[1]}</strong></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function KPIs() {
+  return (
+    <div id="kpis" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">12</div>
+        <h2 className="section-title">Success KPIs</h2>
+      </div>
+      <p className="section-subtitle">The numbers we're targeting. Measured weekly, optimized continuously.</p>
+
+      <div className="grid g4">
+        {[
+          { label: 'Downloads/mo', m1: '2K', m3: '5K', m6: '15K', m12: '50K' },
+          { label: 'DAU', m1: '500', m3: '2K', m6: '8K', m12: '30K' },
+          { label: 'Day 7 Retention', m1: '25%', m3: '35%', m6: '40%', m12: '45%' },
+          { label: 'Free→Paid Conv.', m1: '5%', m3: '7%', m6: '8%', m12: '10%' },
+          { label: 'MRR', m1: '$500', m3: '$3K', m6: '$15K', m12: '$60K' },
+          { label: 'App Store Rating', m1: '4.5+', m3: '4.6+', m6: '4.7+', m12: '4.8+' },
+          { label: 'Viral Coefficient', m1: '0.3', m3: '0.6', m6: '0.9', m12: '1.2+' },
+          { label: 'Blended CPI', m1: '$2.50', m3: '$1.80', m6: '$1.20', m12: '$0.80' },
+        ].map((kpi, i) => (
+          <div key={i} className="card" style={{ padding: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>{kpi.label}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, fontSize: 11 }}>
+              {[['M1', kpi.m1], ['M3', kpi.m3], ['M6', kpi.m6], ['M12', kpi.m12]].map(([period, val], j) => (
+                <div key={j} style={{ textAlign: 'center', padding: '4px 2px', background: 'var(--surface2)', borderRadius: 4 }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 9 }}>{period}</div>
+                  <div style={{ fontWeight: 700, color: j === 3 ? 'var(--green-light)' : 'var(--text-dim)' }}>{val}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WarPlan() {
+  const statusColors = { critical: 'var(--red)', high: 'var(--orange)', medium: 'var(--blue)' };
+  const phaseColors = { 'Foundation': '#ef4444', 'Launch Prep': '#f97316', 'Soft Launch': '#f59e0b', 'Growth Push': '#22c55e', 'Optimize': '#3b82f6', 'Scale': '#a855f7' };
+
+  return (
+    <div id="warplan" className="section fade-in">
+      <div className="section-header">
+        <div className="section-num">13</div>
+        <h2 className="section-title">The 90-Day War Plan</h2>
+      </div>
+      <p className="section-subtitle">Week-by-week execution plan. Every task, every owner, every priority. No fluff — just action.</p>
+
+      {warPlan.map((period, i) => (
+        <div key={i} style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: `${phaseColors[period.phase]}20`, color: phaseColors[period.phase], border: `1px solid ${phaseColors[period.phase]}40` }}>{period.week}</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>{period.phase}</span>
+          </div>
+          {period.items.map((item, j) => (
+            <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 4, fontSize: 12 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: statusColors[item.status], flexShrink: 0 }}></span>
+              <span style={{ flex: 1, color: 'var(--text-dim)' }}>{item.task}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap', padding: '2px 6px', background: 'var(--surface2)', borderRadius: 4 }}>{item.owner}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+
+      <div className="divider"></div>
+
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08))', border: '1px solid rgba(99,102,241,0.25)' }}>
+        <h3 style={{ fontSize: 18, marginBottom: 10 }}>The Bottom Line</h3>
+        <p style={{ fontSize: 14, lineHeight: 1.9 }}>
+          Huckleberry built a <strong>$7.2M ARR business</strong> focused narrowly on sleep tracking.
+          They have 506K active users, 100K monthly downloads, and $600K/mo revenue — but they have
+          <strong> critical blind spots</strong>: no health records, no growth charts, no vaccines, no offline support,
+          and increasingly frustrated users complaining about bugs and overpriced features.
+          <br/><br/>
+          HeyBub doesn't need to beat Huckleberry at sleep — it needs to <strong>redefine the category</strong>.
+          Instead of "baby sleep tracker," HeyBub is "baby health companion." This positioning captures a
+          <strong> larger addressable audience</strong> (all parents, not just sleep-deprived ones) and creates
+          a moat through <strong>health data lock-in</strong> (vaccination records, growth charts, allergy history
+          — data parents can't easily recreate elsewhere).
+          <br/><br/>
+          With a <strong>$8.5K/month marketing budget</strong>, focused execution on the 90-day war plan,
+          and the feature advantages already built, HeyBub can realistically capture
+          <strong> 5,000+ downloads/month by Month 3</strong> and <strong>$60K MRR by Month 12</strong>.
+          The path from there to <strong>$1M+ ARR</strong> is achievable within 24 months.
+          <br/><br/>
+          <strong style={{ color: 'var(--accent-light)' }}>The features are built. The infrastructure is ready. Now it's time to go to war.</strong>
+        </p>
+      </div>
+
+      <div style={{ textAlign: 'center', padding: '40px 0 20px', color: 'var(--text-muted)', fontSize: 11 }}>
+        Generated {new Date().toLocaleDateString()} — HeyBub vs Huckleberry Marketing Battle Plan<br/>
+        Sources: Sensor Tower, Gummicube, Crunchbase, Eightception, Consumer Reports, Influencer Marketing Hub
+      </div>
+    </div>
+  );
+}
+
+// ──────── APP ────────
+
+function App() {
+  const [active, setActive] = useState('intel');
+  useEffect(() => {
+    const handler = () => {
+      const pos = window.scrollY + 100;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sections[i].id);
+        if (el && el.offsetTop <= pos) { setActive(sections[i].id); break; }
+      }
+    };
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  return (
+    <>
+      <Nav active={active} setActive={setActive} />
+      <div className="container">
+        <Hero />
+        <div className="divider" />
+        <EnemyIntel />
+        <div className="divider" />
+        <Battlefield />
+        <div className="divider" />
+        <Positioning />
+        <div className="divider" />
+        <PricingWar />
+        <div className="divider" />
+        <ASO />
+        <div className="divider" />
+        <Acquisition />
+        <div className="divider" />
+        <Content />
+        <div className="divider" />
+        <Social />
+        <div className="divider" />
+        <Retention />
+        <div className="divider" />
+        <Funnel />
+        <div className="divider" />
+        <AttackPlan />
+        <div className="divider" />
+        <KPIs />
+        <div className="divider" />
+        <WarPlan />
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

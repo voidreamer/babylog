@@ -13,8 +13,9 @@ import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
 import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from './ConfirmModal';
+import PullToRefresh from './PullToRefresh';
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -335,6 +336,7 @@ export default function TimelineCalendar() {
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     return (
+        <PullToRefresh onRefresh={loadEvents}>
         <div className="timeline-calendar">
             {/* Date Navigation */}
             <div className="timeline-calendar-header">
@@ -535,48 +537,14 @@ export default function TimelineCalendar() {
             )}
 
             {/* Custom Confirm Delete Modal */}
-            <AnimatePresence>
-                {confirmDelete && (
-                    <motion.div
-                        className="modal-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setConfirmDelete(null)}
-                    >
-                        <motion.div
-                            className="confirm-modal"
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <button className="modal-close" onClick={() => setConfirmDelete(null)}>
-                                <X size={20} />
-                            </button>
-                            <div className="confirm-modal-content">
-                                <Trash2 size={32} className="confirm-icon" />
-                                <h3>{t('timeline.deleteConfirmTitle', { type: EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event' })}</h3>
-                                <p>{t('timeline.deleteConfirmMessage')}</p>
-                                <div className="confirm-modal-actions">
-                                    <button
-                                        className="btn btn-secondary"
-                                        onClick={() => setConfirmDelete(null)}
-                                    >
-                                        {t('common:cancel')}
-                                    </button>
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={handleDeleteConfirm}
-                                    >
-                                        {t('common:delete')}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <ConfirmModal
+                open={!!confirmDelete}
+                title={confirmDelete ? t('timeline.deleteConfirmTitle', { type: EVENT_CONFIG[confirmDelete.event_type]?.label || 'Event' }) : ''}
+                message={t('timeline.deleteConfirmMessage')}
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setConfirmDelete(null)}
+            />
         </div>
+        </PullToRefresh>
     );
 }

@@ -109,7 +109,9 @@
     "savePumping": "Guardar bombeo",
     "start": "Inicio",
     "noPumpingsYet": "Aún no hay bombeos",
-    "pumpingLogged": "Bombeo registrado ({{duration}} min)"
+    "pumpingLogged": "Bombeo registrado ({{duration}} min)",
+    "startedAt": "Iniciado a las {{time}}",
+    "quickLogged": "Bombeo registrado ({{amount}})"
   },
   "potty": {
     "title": "Orinal",
@@ -142,7 +144,14 @@
     "tummy": "Barriga",
     "start": "Inicio",
     "noTummyTimeYet": "Todavía no está boca abajo",
-    "tummyTimeLogged": "Tiempo boca abajo registrado ({{duration}} min)"
+    "tummyTimeLogged": "Tiempo boca abajo registrado ({{duration}} min)",
+    "durationOptions": {
+      "1min": "1 min",
+      "3min": "3 min",
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min"
+    }
   },
   "bath": {
     "title": "Baño",

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
+import { hapticNotification } from '../utils/haptics';
 
 // Helper to parse UTC time
 
@@ -78,6 +79,15 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
     const handleSaveTimer = async () => {
         if (timerSeconds < 1) return;
 
+        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
+            toast.error(t('toast_amountMustBeBetween0And500Ml'));
+            return;
+        }
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
+
         setSaving(true);
         try {
             await api.createPumping({
@@ -87,8 +97,10 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                 amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
                 notes: notes || null,
             });
+            hapticNotification();
             onSave();
         } catch (error) {
+            console.error('Failed to save pumping (timer):', error);
             toast.error(t('toast_failedToSavePumping'));
         } finally {
             setSaving(false);
@@ -97,6 +109,16 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
 
     const handleSubmitQuick = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
+            toast.error(t('toast_amountMustBeBetween0And500Ml'));
+            return;
+        }
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
+
         setSaving(true);
 
         const data = {
@@ -113,6 +135,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             } else {
                 await api.createPumping(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save pumping:', error);
@@ -124,10 +147,10 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('pumping.title')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <div className="modal-body">
@@ -155,7 +178,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
 
                     {/* Timer Mode */}
                     {mode === 'timer' && !isEditing ? (
-                        <>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSaveTimer(); }}>
                             {/* Timer Display */}
                             <div style={{
                                 textAlign: 'center',
@@ -174,7 +197,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                 </div>
                                 {startTime && (
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 'var(--space-sm)' }}>
-                                        Started at {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {t('pumping.startedAt', { time: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
                                     </div>
                                 )}
                             </div>
@@ -247,7 +270,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                     </button>
                                 </div>
                             )}
-                        </>
+                        </form>
                     ) : (
                         /* Quick Log Mode */
                         <form onSubmit={handleSubmitQuick}>

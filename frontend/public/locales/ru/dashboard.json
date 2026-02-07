@@ -109,7 +109,9 @@
     "savePumping": "Сохранить сцеживание",
     "start": "Начать",
     "noPumpingsYet": "Сцеживаний пока нет",
-    "pumpingLogged": "Сцеживание записано ({{duration}} мин)"
+    "pumpingLogged": "Сцеживание записано ({{duration}} мин)",
+    "startedAt": "Начато в {{time}}",
+    "quickLogged": "Сцеживание записано ({{amount}})"
   },
   "potty": {
     "title": "Горшок",
@@ -142,7 +144,14 @@
     "tummy": "Животик",
     "start": "Начать",
     "noTummyTimeYet": "Времени на животике пока нет",
-    "tummyTimeLogged": "Время на животике записано ({{duration}} мин)"
+    "tummyTimeLogged": "Время на животике записано ({{duration}} мин)",
+    "durationOptions": {
+      "1min": "1 мин",
+      "3min": "3 мин",
+      "5min": "5 мин",
+      "10min": "10 мин",
+      "15min": "15 мин"
+    }
   },
   "bath": {
     "title": "Купание",

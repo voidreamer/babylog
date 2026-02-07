@@ -5,6 +5,7 @@ import TimePicker from './TimePicker';
 import { Droplets, CircleDot, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { hapticNotification } from '../utils/haptics';
 
 // Helper to parse UTC time
 const parseUTCTime = (timeStr: any): Date => {
@@ -42,6 +43,12 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (notes && notes.length > 500) {
+            toast.error(t('toast_notesMustBeLessThan500Characters'));
+            return;
+        }
+
         setSaving(true);
 
         const data = {
@@ -60,6 +67,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
             } else {
                 await api.createDiaper(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);
@@ -96,10 +104,10 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('diaper.diaperChange')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

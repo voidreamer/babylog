@@ -103,5 +103,8 @@
   "toast_couldNotStartCheckoutPleaseTryAgai": "Не удалось начать оформление. Пожалуйста, попробуйте снова.",
   "toast_premiumRestoredReloading": "Премиум восстановлен! Перезагрузка…",
   "toast_noActiveSubscriptionFoundForThisAc": "Активная подписка для этого аккаунта не найдена.",
-  "toast_couldNotCheckSubscription": "Не удалось проверить подписку."
+  "toast_couldNotCheckSubscription": "Не удалось проверить подписку.",
+  "app": {
+    "version": "HeyBub v{{version}}"
+  }
 }

@@ -109,7 +109,9 @@
     "savePumping": "保存吸奶",
     "start": "开始",
     "noPumpingsYet": "暂无吸奶记录",
-    "pumpingLogged": "已记录吸奶（{{duration}} 分钟）"
+    "pumpingLogged": "已记录吸奶（{{duration}} 分钟）",
+    "startedAt": "开始于 {{time}}",
+    "quickLogged": "已记录泵奶 ({{amount}})"
   },
   "potty": {
     "title": "如厕训练",
@@ -142,7 +144,14 @@
     "tummy": "俯趴",
     "start": "开始",
     "noTummyTimeYet": "暂无俯趴时间记录",
-    "tummyTimeLogged": "已记录俯趴时间（{{duration}} 分钟）"
+    "tummyTimeLogged": "已记录俯趴时间（{{duration}} 分钟）",
+    "durationOptions": {
+      "1min": "1分钟",
+      "3min": "3分钟",
+      "5min": "5分钟",
+      "10min": "10分钟",
+      "15min": "15分钟"
+    }
   },
   "bath": {
     "title": "洗澡",

@@ -5,6 +5,7 @@ import { Droplets, CircleDot, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 
 interface DiaperWidgetProps { babyId: number; lastDiaper: any; onDiaperChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
@@ -46,9 +47,12 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
     };
 
     return (
-        <div
+        <motion.div
             className="widget diaper"
             onClick={onOpenModal}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
         >
             {/* Background icon */}
             <div className="widget-bg-icon">
@@ -112,6 +116,6 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
+import { hapticNotification } from '../utils/haptics';
 
 // Helper to parse UTC time
 
@@ -138,8 +139,10 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                 amount_ml: amount ? Math.round(parseVolume(parseInt(amount))) : null,
                 notes: notes || null,
             });
+            hapticNotification();
             onSave();
         } catch (error) {
+            console.error('Failed to save feeding (timer):', error);
             toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
@@ -184,8 +187,10 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             } else {
                 await api.createFeeding(data);
             }
+            hapticNotification();
             onSave();
         } catch (error) {
+            console.error('Failed to save feeding (quick):', error);
             toast.error(t('toast_failedToSaveFeeding'));
         } finally {
             setSaving(false);
@@ -194,10 +199,10 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Baby size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('feeding.title')}</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
                 <div className="modal-body">
@@ -266,7 +271,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                     )}
 
                     {mode === 'timer' ? (
-                        <>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSaveTimer(); }}>
                             {/* Timer Display */}
                             <div style={{
                                 textAlign: 'center',
@@ -285,7 +290,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                 </div>
                                 {startTime && (
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 'var(--space-sm)' }}>
-                                        Started at {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {t('feeding.startedAt', { time: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
                                     </div>
                                 )}
                             </div>
@@ -339,7 +344,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                     maxLength={500}
                                 />
                             </div>
-                        </>
+                        </form>
                     ) : (
                         /* Quick Log Mode */
                         <form id="quick-form" onSubmit={handleSubmitQuick}>
