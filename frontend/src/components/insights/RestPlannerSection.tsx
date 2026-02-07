@@ -1,7 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Coffee, Lock, Moon, Clock, AlertCircle } from 'lucide-react';
+import { Coffee, Lock, Moon, Clock, AlertCircle, Beaker } from 'lucide-react';
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+function pressureColor(pressure: number): string {
+    if (pressure < 0.4) return 'var(--success)';
+    if (pressure < 0.6) return 'var(--tummy)';
+    if (pressure < 0.8) return 'var(--feeding)';
+    return 'var(--danger)';
+}
+
+const formatTime = (d: Date) =>
+    d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 // =============================================================================
 // Sub-components
@@ -56,7 +70,7 @@ function RestSummaryMessage({ summary }: { summary: any }) {
     );
 }
 
-function RestTimeline({ windows, summary }: { windows: any[]; summary: any }) {
+function RestTimeline({ windows }: { windows: any[] }) {
     if (!windows.length) return null;
 
     const now = new Date();
@@ -71,8 +85,6 @@ function RestTimeline({ windows, summary }: { windows: any[]; summary: any }) {
 
     const pct = (ts: number) => Math.max(0, Math.min(100, ((ts - rangeStart) / totalMs) * 100));
     const nowPct = pct(now.getTime());
-
-    const formatHM = (d: Date) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
     const qualityColor = (q: string) => {
         if (q === 'great') return 'var(--success)';
@@ -102,9 +114,53 @@ function RestTimeline({ windows, summary }: { windows: any[]; summary: any }) {
                 <div className="rest-timeline-now" style={{ left: `${nowPct}%` }} />
             </div>
             <div className="rest-timeline-labels">
-                <span>{formatHM(new Date(rangeStart))}</span>
-                <span>{formatHM(new Date(rangeEnd))}</span>
+                <span>{formatTime(new Date(rangeStart))}</span>
+                <span>{formatTime(new Date(rangeEnd))}</span>
             </div>
+        </div>
+    );
+}
+
+function SleepPressureBar({ pressure }: { pressure: number }) {
+    const { t } = useTranslation('dashboard');
+    const pct = Math.round(pressure * 100);
+    const color = pressureColor(pressure);
+
+    return (
+        <div className="rest-pressure-indicator">
+            <span>{t('insights.sleepPressureLabel')}</span>
+            <div className="rest-pressure-bar">
+                <div
+                    className="rest-pressure-fill"
+                    style={{ width: `${pct}%`, backgroundColor: color }}
+                />
+            </div>
+            <span>{pct}%</span>
+        </div>
+    );
+}
+
+function SignalPills({ signals }: { signals: any }) {
+    const { t } = useTranslation('dashboard');
+    if (!signals) return null;
+
+    const signalKeys = Object.keys(signals);
+    if (!signalKeys.length) return null;
+
+    const labelMap: Record<string, string> = {
+        pattern: t('insights.signal_pattern'),
+        pressure: t('insights.signal_pressure'),
+        circadian: t('insights.signal_circadian'),
+        feeding: t('insights.signal_feeding'),
+    };
+
+    return (
+        <div className="rest-signals">
+            {signalKeys.map(key => (
+                <span key={key} className="rest-signal-pill">
+                    {labelMap[key] || key}
+                </span>
+            ))}
         </div>
     );
 }
@@ -118,9 +174,25 @@ function RestWindowCard({ window: w, index }: { window: any; index: number }) {
         return 'var(--tummy)';
     };
 
-    const start = new Date(w.start);
-    const end = new Date(w.end);
-    const fmt = (d: Date) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    // Use time range if available, otherwise exact time
+    const hasRange = w.start_range?.earliest && w.start_range?.latest;
+    let timeDisplay: string;
+    if (hasRange) {
+        const earliest = new Date(w.start_range.earliest);
+        const latest = new Date(w.start_range.latest);
+        timeDisplay = t('insights.windowRange', {
+            earliest: formatTime(earliest),
+            latest: formatTime(latest),
+        });
+    } else {
+        const start = new Date(w.start);
+        const end = new Date(w.end);
+        timeDisplay = `${formatTime(start)} \u2013 ${formatTime(end)}`;
+    }
+
+    // Confidence: numeric score or categorical fallback
+    const confScore = w.confidence_score;
+    const confClass = `rest-confidence-${w.confidence}`;
 
     return (
         <motion.div
@@ -133,13 +205,15 @@ function RestWindowCard({ window: w, index }: { window: any; index: number }) {
             <div className="rest-window-header">
                 <span className="rest-window-time">
                     <Clock size={14} />
-                    {fmt(start)} &ndash; {fmt(end)}
+                    {timeDisplay}
                 </span>
                 <span className="rest-window-duration">{w.duration_minutes} min</span>
             </div>
             <div className="rest-window-badges">
-                <span className={`rest-badge rest-confidence-${w.confidence}`}>
-                    {t(`insights.confidence_${w.confidence}`)}
+                <span className={`rest-badge ${confClass}`}>
+                    {confScore != null
+                        ? t('insights.confidenceScore', { score: confScore })
+                        : t(`insights.confidence_${w.confidence}`)}
                 </span>
                 <span className={`rest-badge rest-quality-${w.quality}`}>
                     {t(`insights.quality_${w.quality}`)}
@@ -150,6 +224,10 @@ function RestWindowCard({ window: w, index }: { window: any; index: number }) {
                     </span>
                 )}
             </div>
+            {w.sleep_pressure_at_start != null && !w.is_current && (
+                <SleepPressureBar pressure={w.sleep_pressure_at_start} />
+            )}
+            {w.signals && <SignalPills signals={w.signals} />}
             {w.notes && w.notes.length > 0 && (
                 <div className="rest-window-notes">
                     {w.notes.map((note: string, i: number) => (
@@ -189,7 +267,7 @@ export default function RestPlannerSection({ restPlan, isPremium }: RestPlannerS
 
             <div className={`rest-planner-content ${!isPremium ? 'premium-blur' : ''}`}>
                 <RestSummaryMessage summary={summary} />
-                <RestTimeline windows={rest_windows} summary={summary} />
+                <RestTimeline windows={rest_windows} />
                 {rest_windows.length > 0 && (
                     <div className="rest-windows-grid">
                         {rest_windows.map((w: any, i: number) => (
@@ -199,7 +277,11 @@ export default function RestPlannerSection({ restPlan, isPremium }: RestPlannerS
                 )}
                 {restPlan.patterns_used && (
                     <div className="rest-patterns-meta">
-                        {t('insights.basedOnDays', { days: restPlan.patterns_used.data_days })}
+                        <span>{t('insights.basedOnDays', { days: restPlan.patterns_used.data_days })}</span>
+                        <span className="rest-science-badge">
+                            <Beaker size={12} />
+                            {t('insights.poweredByScience')}
+                        </span>
                     </div>
                 )}
             </div>

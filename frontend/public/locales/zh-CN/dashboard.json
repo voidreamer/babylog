@@ -309,6 +309,8 @@
     "diapers": "尿布",
     "vs": "对比",
     "perDay": "{{value}}/天",
+    "forYou": "为您推荐",
+    "forYouDesc": "基于宝宝作息模式的休息建议",
     "restPlanner": "\u4f11\u606f\u89c4\u5212",
     "upgradeToSeeRestPlanner": "\u5347\u7ea7\u4ee5\u67e5\u770b\u4f11\u606f\u89c4\u5212",
     "restNow": "\u73b0\u5728\u4f11\u606f\u5427\uff01\u5b9d\u5b9d\u6b63\u5728\u5c0f\u7761",
@@ -326,7 +328,15 @@
     "quality_fair": "\u4e00\u822c",
     "noFeedingOverlap": "\u6b64\u7a97\u53e3\u671f\u95f4\u65e0\u9884\u671f\u5582\u517b",
     "feedingMayOverlap": "\u4e00\u6b21\u5582\u517b\u53ef\u80fd\u4e0e\u6b64\u5c0f\u7761\u91cd\u53e0",
-    "currentNap": "\u5f53\u524d\u5c0f\u7761"
+    "currentNap": "\u5f53\u524d\u5c0f\u7761",
+    "confidenceScore": "{{score}}%置信度",
+    "windowRange": "~{{earliest}} – {{latest}}",
+    "sleepPressureLabel": "睡眠压力",
+    "signal_pattern": "历史模式",
+    "signal_pressure": "睡眠压力",
+    "signal_circadian": "生物节律",
+    "signal_feeding": "喂养相关性",
+    "poweredByScience": "基于睡眠科学"
   },
   "learn": {
     "insights": "洞察",

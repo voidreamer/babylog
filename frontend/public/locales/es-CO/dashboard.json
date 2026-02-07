@@ -309,6 +309,8 @@
     "diapers": "Pañales",
     "vs": "vs",
     "perDay": "{{value}}/día",
+    "forYou": "Para Ti",
+    "forYouDesc": "Sugerencias de descanso basadas en los patrones de tu bebé",
     "restPlanner": "Planificador de Descanso",
     "upgradeToSeeRestPlanner": "Mejora tu plan para ver el planificador de descanso",
     "restNow": "¡Descansa ahora! El bebé está durmiendo",
@@ -326,7 +328,15 @@
     "quality_fair": "Regular",
     "noFeedingOverlap": "No se espera alimentación durante esta ventana",
     "feedingMayOverlap": "Una alimentación puede coincidir con esta siesta",
-    "currentNap": "Siesta actual"
+    "currentNap": "Siesta actual",
+    "confidenceScore": "{{score}}% de confianza",
+    "windowRange": "~{{earliest}} – {{latest}}",
+    "sleepPressureLabel": "Presión de sueño",
+    "signal_pattern": "Patrón histórico",
+    "signal_pressure": "Presión de sueño",
+    "signal_circadian": "Ritmo biológico",
+    "signal_feeding": "Correlación alimentación",
+    "poweredByScience": "Basado en ciencia del sueño"
   },
   "learn": {
     "insights": "Perspectivas",
