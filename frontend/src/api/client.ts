@@ -316,6 +316,12 @@ class ApiClient {
     async deleteBath(id: number): Promise<any> { return this.request(`/activities/baths/${id}`, { method: 'DELETE' }); }
     async updateBath(id: number, data: any): Promise<any> { return this.request(`/activities/baths/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
+    // Rest Planner
+    async getRestPlan(babyId: number, days: number = 7): Promise<any> {
+        const tzOffset = new Date().getTimezoneOffset();
+        return this.request(`/rest-planner/${babyId}?days=${days}&tz_offset=${tzOffset}`);
+    }
+
     // Analytics
     async getAnalytics(babyId: number, days: number = 7): Promise<any> {
         const tzOffset = new Date().getTimezoneOffset();

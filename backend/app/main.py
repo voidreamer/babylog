@@ -8,7 +8,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .config import get_settings
 from .database import engine, Base
-from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export, billing, tracking, notifications, photos
+from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export, billing, tracking, notifications, photos, rest_planner
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -65,6 +65,7 @@ app.include_router(billing.router)
 app.include_router(tracking.router)
 app.include_router(notifications.router)
 app.include_router(photos.router)
+app.include_router(rest_planner.router)
 
 
 # Cache-Control middleware for performance
@@ -80,6 +81,8 @@ async def add_cache_control(request: Request, call_next):
     if "/events/dashboard" in path:
         response.headers["Cache-Control"] = "private, max-age=60"
     elif "/analytics" in path:
+        response.headers["Cache-Control"] = "private, max-age=300"
+    elif "/rest-planner" in path:
         response.headers["Cache-Control"] = "private, max-age=300"
     elif "/babies" in path:
         response.headers["Cache-Control"] = "private, max-age=60"

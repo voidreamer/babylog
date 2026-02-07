@@ -25,6 +25,7 @@
         "framer-motion": "^12.23.26",
         "i18next": "^25.8.0",
         "i18next-http-backend": "^3.0.2",
+        "i18next-resources-to-backend": "^1.2.1",
         "idb": "^8.0.0",
         "lucide-react": "^0.563.0",
         "react": "^18.2.0",
