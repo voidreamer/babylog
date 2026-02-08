@@ -73,12 +73,8 @@ resource "aws_apigatewayv2_api" "api" {
   name          = "${var.project_name}-api-${var.environment}"
   protocol_type = "HTTP"
 
-  cors_configuration {
-    allow_origins = split(",", var.cors_origins)
-    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
-    allow_headers = ["Authorization", "Content-Type"]
-    max_age       = 300
-  }
+  # CORS is handled by FastAPI CORSMiddleware (supports non-HTTP origins like capacitor://)
+  # Do NOT add cors_configuration here — it only supports http/https origins
 }
 
 # Lambda Integration
