@@ -6891,17 +6891,67 @@ a.settings-row {
   color: var(--text-muted);
 }
 
-/* Window Cards Grid */
-.rest-windows-grid {
+/* Window Cards Carousel */
+.rest-carousel {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-sm);
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
-@media (min-width: 600px) {
-  .rest-windows-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.rest-carousel-viewport {
+  grid-column: 2;
+  overflow: hidden;
+}
+
+.rest-carousel-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+}
+
+.rest-carousel-arrow:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.rest-carousel-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rest-carousel-dots {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-top: var(--space-xs);
+}
+
+.rest-carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--border);
+  padding: 0;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.rest-carousel-dot.active {
+  background: var(--sleep);
+  width: 18px;
 }
 
 .rest-window-card {
