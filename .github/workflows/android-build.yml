@@ -1,20 +1,12 @@
 # Android Debug Build
 # Builds the Capacitor Android app (debug APK, no signing required)
-# Runs on push to main and PRs
+# Runs on release tags and manual trigger only
 
 name: Android Build
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/android-build.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/android-build.yml'
+    tags: ['v*']
   workflow_dispatch: # manual trigger
 
 env:
