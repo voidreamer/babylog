@@ -151,7 +151,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
             {isPumping && <div className="widget-glow" />}
 
             <div className="widget-bg-icon">
-                <img src="/icons/pumping.png" alt="pumping" style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                <img src={`${import.meta.env.BASE_URL}icons/pumping.png`} alt="pumping" style={{ width: 80, height: 80, objectFit: 'contain' }} />
             </div>
 
             <div className="widget-add-icon" title={t('title_logPumpingManually')}>
@@ -160,7 +160,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
 
             <div className="widget-content">
                 <div className="widget-icon-row">
-                    <img src="/icons/pumping.png" alt="pumping" style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                    <img src={`${import.meta.env.BASE_URL}icons/pumping.png`} alt="pumping" style={{ width: 24, height: 24, objectFit: 'contain' }} />
                     <span className="widget-label">{t('pumping.title')}</span>
                 </div>
 

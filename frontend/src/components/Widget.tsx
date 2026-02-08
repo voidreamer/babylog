@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 // Map widget types to PNG icons (null means use Lucide fallback)
+const base = import.meta.env.BASE_URL;
 const pngIcons: Record<string, string | null> = {
-    feeding: '/icons/feeding.png',
-    diaper: '/icons/diaper.png',
-    sleep: '/icons/sleep.png',
-    pumping: '/icons/pumping.png',
+    feeding: `${base}icons/feeding.png`,
+    diaper: `${base}icons/diaper.png`,
+    sleep: `${base}icons/sleep.png`,
+    pumping: `${base}icons/pumping.png`,
     potty: null,
     tummy: null,
     bath: null,

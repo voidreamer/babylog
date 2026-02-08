@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Custom app icons
+const base = import.meta.env.BASE_URL;
 const icons: Record<string, string> = {
-    feeding: '/icons/feeding.png',
-    diaper: '/icons/diaper.png',
-    sleep: '/icons/sleep.png',
-    pumping: '/icons/pumping.png',
-    logo: '/icons/logo.png',
+    feeding: `${base}icons/feeding.png`,
+    diaper: `${base}icons/diaper.png`,
+    sleep: `${base}icons/sleep.png`,
+    pumping: `${base}icons/pumping.png`,
+    logo: `${base}icons/logo.png`,
 };
 
 // Only warn in development

@@ -57,7 +57,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
             {/* Background icon */}
             <div className="widget-bg-icon">
                 <img
-                    src="/icons/diaper.png"
+                    src={`${import.meta.env.BASE_URL}icons/diaper.png`}
                     alt="diaper"
                     style={{ width: 80, height: 80, objectFit: 'contain' }}
                 />
@@ -71,7 +71,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <img
-                        src="/icons/diaper.png"
+                        src={`${import.meta.env.BASE_URL}icons/diaper.png`}
                         alt="diaper"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
