@@ -34,10 +34,23 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Check preview infra is ready
+        id: check-infra
+        run: |
+          if [ -z "$PREVIEW_CF_ID" ]; then
+            echo "PREVIEW_CLOUDFRONT_ID secret not set — preview infra not provisioned yet."
+            echo "This is expected on the first PR before terraform apply creates the preview resources."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout code
+        if: steps.check-infra.outputs.skip != 'true'
         uses: actions/checkout@v4
 
       - name: Set up Node.js
+        if: steps.check-infra.outputs.skip != 'true'
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -45,6 +58,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Configure AWS credentials
+        if: steps.check-infra.outputs.skip != 'true'
         uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -52,10 +66,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Install dependencies
+        if: steps.check-infra.outputs.skip != 'true'
         working-directory: frontend
         run: npm ci
 
       - name: Build frontend
+        if: steps.check-infra.outputs.skip != 'true'
         working-directory: frontend
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING }}
@@ -67,6 +83,7 @@ jobs:
           npm run build -- --base "/pr-${{ github.event.pull_request.number }}/"
 
       - name: Deploy to S3
+        if: steps.check-infra.outputs.skip != 'true'
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
           aws s3 sync frontend/dist/ "s3://${PREVIEW_BUCKET}/pr-${PR_NUM}/" \
@@ -75,6 +92,7 @@ jobs:
           echo "Deployed to s3://${PREVIEW_BUCKET}/pr-${PR_NUM}/"
 
       - name: Invalidate CloudFront cache
+        if: steps.check-infra.outputs.skip != 'true'
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
           aws cloudfront create-invalidation \
@@ -83,6 +101,7 @@ jobs:
             --no-cli-pager
 
       - name: Post or update PR comment
+        if: steps.check-infra.outputs.skip != 'true'
         uses: actions/github-script@v7
         with:
           script: |
