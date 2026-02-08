@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Coffee, Lock, Moon, Clock, AlertCircle, Beaker } from 'lucide-react';
+import { Coffee, Lock, Moon, Clock, AlertCircle, Beaker, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // =============================================================================
 // Helpers
@@ -165,7 +166,7 @@ function SignalPills({ signals }: { signals: any }) {
     );
 }
 
-function RestWindowCard({ window: w, index }: { window: any; index: number }) {
+function RestWindowCard({ window: w, direction }: { window: any; direction: number }) {
     const { t } = useTranslation('dashboard');
 
     const qualityBorder = (q: string) => {
@@ -198,9 +199,10 @@ function RestWindowCard({ window: w, index }: { window: any; index: number }) {
         <motion.div
             className="rest-window-card"
             style={{ borderLeftColor: qualityBorder(w.quality) }}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.08 }}
+            initial={{ opacity: 0, x: direction * 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -60 }}
+            transition={{ duration: 0.25 }}
         >
             <div className="rest-window-header">
                 <span className="rest-window-time">
@@ -239,6 +241,64 @@ function RestWindowCard({ window: w, index }: { window: any; index: number }) {
     );
 }
 
+function RestWindowCarousel({ windows }: { windows: any[] }) {
+    const [index, setIndex] = useState(0);
+    const [direction, setDirection] = useState(1);
+
+    if (!windows.length) return null;
+
+    const prev = () => {
+        setDirection(-1);
+        setIndex(i => Math.max(0, i - 1));
+    };
+    const next = () => {
+        setDirection(1);
+        setIndex(i => Math.min(windows.length - 1, i + 1));
+    };
+
+    return (
+        <div className="rest-carousel">
+            <button
+                className="rest-carousel-arrow rest-carousel-prev"
+                onClick={prev}
+                disabled={index === 0}
+                aria-label="Previous window"
+            >
+                <ChevronLeft size={20} />
+            </button>
+            <div className="rest-carousel-viewport">
+                <AnimatePresence mode="wait" initial={false}>
+                    <RestWindowCard
+                        key={index}
+                        window={windows[index]}
+                        direction={direction}
+                    />
+                </AnimatePresence>
+            </div>
+            <button
+                className="rest-carousel-arrow rest-carousel-next"
+                onClick={next}
+                disabled={index === windows.length - 1}
+                aria-label="Next window"
+            >
+                <ChevronRight size={20} />
+            </button>
+            {windows.length > 1 && (
+                <div className="rest-carousel-dots">
+                    {windows.map((_: any, i: number) => (
+                        <button
+                            key={i}
+                            className={`rest-carousel-dot ${i === index ? 'active' : ''}`}
+                            onClick={() => { setDirection(i > index ? 1 : -1); setIndex(i); }}
+                            aria-label={`Window ${i + 1}`}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // =============================================================================
 // Main Section
 // =============================================================================
@@ -268,13 +328,7 @@ export default function RestPlannerSection({ restPlan, isPremium }: RestPlannerS
             <div className={`rest-planner-content ${!isPremium ? 'premium-blur' : ''}`}>
                 <RestSummaryMessage summary={summary} />
                 <RestTimeline windows={rest_windows} />
-                {rest_windows.length > 0 && (
-                    <div className="rest-windows-grid">
-                        {rest_windows.map((w: any, i: number) => (
-                            <RestWindowCard key={i} window={w} index={i} />
-                        ))}
-                    </div>
-                )}
+                <RestWindowCarousel windows={rest_windows} />
                 {restPlan.patterns_used && (
                     <div className="rest-patterns-meta">
                         <span>{t('insights.basedOnDays', { days: restPlan.patterns_used.data_days })}</span>
