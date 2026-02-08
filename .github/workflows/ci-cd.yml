@@ -1,15 +1,14 @@
 # Huckle CI/CD Pipeline
 # Runs tests, then deploys infrastructure and code to AWS
-# - staging branch -> staging environment
 # - main branch -> production environment
 
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main]
   pull_request:
-    branches: [main, staging]
+    branches: [main]
 
 permissions:
   contents: read
@@ -115,187 +114,6 @@ jobs:
         run: ls -lh dist/
 
   # ============================================
-  # Deploy to Staging (on staging branch)
-  # ============================================
-  deploy-staging:
-    name: Deploy to Staging
-    needs: [test-backend, test-frontend]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
-    environment: staging
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      # ----- Terraform Infrastructure -----
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-          terraform_wrapper: false
-
-      - name: Terraform Init
-        working-directory: infra
-        run: terraform init -backend-config="key=staging/terraform.tfstate"
-
-      - name: Terraform Plan
-        working-directory: infra
-        env:
-          TF_VAR_environment: staging
-          TF_VAR_database_url: ${{ secrets.DATABASE_URL_STAGING }}
-          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
-          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS_STAGING }}
-          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
-          TF_VAR_custom_domain: staging-app.heybub.app
-          TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
-          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
-          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
-        working-directory: infra
-        env:
-          TF_VAR_environment: staging
-          TF_VAR_database_url: ${{ secrets.DATABASE_URL_STAGING }}
-          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
-          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS_STAGING }}
-          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY_STAGING }}
-          TF_VAR_custom_domain: staging-app.heybub.app
-          TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
-          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
-          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
-        run: terraform apply -auto-approve tfplan
-
-      - name: Get Terraform outputs
-        id: tf-outputs
-        working-directory: infra
-        run: |
-          echo "lambda_name=$(terraform output -raw lambda_function_name)" >> $GITHUB_OUTPUT
-          echo "s3_bucket=$(terraform output -raw s3_bucket_name)" >> $GITHUB_OUTPUT
-          echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
-          echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
-
-      # ----- Backend Deploy -----
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Package backend
-        run: |
-          cd backend
-          pip install -r requirements.txt -t package/
-          cp -r app package/
-          cp -r alembic package/
-          cp alembic.ini package/
-          cd package && zip -r ../lambda.zip . -q
-
-      - name: Deploy backend to Lambda
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
-            --zip-file fileb://backend/lambda.zip \
-            --no-cli-pager
-          aws lambda wait function-updated \
-            --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
-
-      - name: Run database migrations
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
-        run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL_STAGING secret not set - skipping migrations"
-            exit 0
-          fi
-          cd backend
-          pip install -r requirements.txt -q
-          alembic upgrade head
-
-      # ----- Frontend Deploy -----
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Build frontend
-        env:
-          VITE_API_URL: ${{ steps.tf-outputs.outputs.api_url }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        run: |
-          cd frontend
-          npm ci
-          npm run build
-
-      - name: Deploy frontend to S3
-        run: |
-          aws s3 sync frontend/dist/ s3://${{ steps.tf-outputs.outputs.s3_bucket }}/ \
-            --delete \
-            --no-cli-pager
-
-      - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ steps.tf-outputs.outputs.cloudfront_id }} \
-            --paths "/*" \
-            --no-cli-pager
-
-      # ----- Post-Deploy Health Check -----
-      - name: Health check (frontend)
-        run: |
-          echo "Waiting 30s for CloudFront invalidation..."
-          sleep 30
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://staging-app.heybub.app)
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "❌ Health check failed! HTTP $HTTP_CODE"
-            exit 1
-          fi
-          echo "✅ Frontend health check passed (HTTP $HTTP_CODE)"
-
-      - name: Health check (API)
-        run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.tf-outputs.outputs.api_url }}/health 2>/dev/null || echo "000")
-          echo "API health check: HTTP $HTTP_CODE"
-          # Don't fail on API check — endpoint may not exist yet
-
-      # ----- Notifications -----
-      - name: Notify deploy success
-        if: success()
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d parse_mode=HTML \
-            -d text="✅ <b>HeyBub Tracker</b> deployed to <b>staging</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A📝 ${{ github.event.head_commit.message }}" \
-            --no-progress-meter > /dev/null || true
-
-      - name: Notify deploy failure
-        if: failure()
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d parse_mode=HTML \
-            -d text="❌ <b>HeyBub Tracker</b> staging deploy <b>FAILED</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --no-progress-meter > /dev/null || true
-
-      - name: Output deployment info
-        run: |
-          echo "## Staging Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Frontend:** https://staging-app.heybub.app" >> $GITHUB_STEP_SUMMARY
-          echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
-
-  # ============================================
   # Deploy to Production (on main branch)
   # ============================================
   deploy-production:
@@ -363,6 +181,8 @@ jobs:
           echo "s3_bucket=$(terraform output -raw s3_bucket_name)" >> $GITHUB_OUTPUT
           echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
           echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
+          echo "preview_cf_id=$(terraform output -raw preview_cloudfront_id 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
+          echo "preview_cf_domain=$(terraform output -raw preview_cloudfront_domain 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
 
       # ----- Backend Deploy -----
       - name: Set up Python
@@ -475,3 +295,9 @@ jobs:
           echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Frontend:** https://app.heybub.app" >> $GITHUB_STEP_SUMMARY
           echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ steps.tf-outputs.outputs.preview_cf_id }}" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Preview Infrastructure" >> $GITHUB_STEP_SUMMARY
+            echo "**CloudFront ID:** \`${{ steps.tf-outputs.outputs.preview_cf_id }}\` (set as PREVIEW_CLOUDFRONT_ID secret)" >> $GITHUB_STEP_SUMMARY
+            echo "**CloudFront Domain:** ${{ steps.tf-outputs.outputs.preview_cf_domain }} (CNAME previews.heybub.app)" >> $GITHUB_STEP_SUMMARY
+          fi

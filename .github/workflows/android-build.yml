@@ -1,17 +1,17 @@
 # Android Debug Build
 # Builds the Capacitor Android app (debug APK, no signing required)
-# Runs on push to staging/main and PRs
+# Runs on push to main and PRs
 
 name: Android Build
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main]
     paths:
       - 'frontend/**'
       - '.github/workflows/android-build.yml'
   pull_request:
-    branches: [main, staging]
+    branches: [main]
     paths:
       - 'frontend/**'
       - '.github/workflows/android-build.yml'
