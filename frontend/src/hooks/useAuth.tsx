@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
@@ -100,18 +101,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
             return;
         }
 
+        const basePath = import.meta.env.VITE_BASE_PATH || '/';
         const redirectTo = Capacitor.isNativePlatform()
             ? 'heybub://callback'
-            : `${window.location.origin}/callback`;
+            : `${window.location.origin}${basePath}callback`;
 
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: { redirectTo },
-        });
-
-        if (error) {
-            console.error('[Auth] Login error:', error);
-            throw error;
+        if (Capacitor.isNativePlatform()) {
+            // On native, get the OAuth URL without redirecting the WebView,
+            // then open it in SFSafariViewController via the Browser plugin.
+            // This keeps the WebView intact and lets the redirect back to
+            // heybub://callback fire the appUrlOpen event properly.
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo, skipBrowserRedirect: true },
+            });
+            if (error) {
+                console.error('[Auth] Login error:', error);
+                throw error;
+            }
+            if (data?.url) {
+                await Browser.open({ url: data.url });
+            }
+        } else {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo },
+            });
+            if (error) {
+                console.error('[Auth] Login error:', error);
+                throw error;
+            }
         }
     };
 

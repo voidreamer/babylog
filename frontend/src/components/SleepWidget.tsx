@@ -98,7 +98,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
             {/* Background icon */}
             <div className="widget-bg-icon">
                 <img
-                    src="/icons/sleep.png"
+                    src={`${import.meta.env.BASE_URL}icons/sleep.png`}
                     alt="sleep"
                     style={{ width: 80, height: 80, objectFit: 'contain' }}
                 />
@@ -112,7 +112,7 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <img
-                        src="/icons/sleep.png"
+                        src={`${import.meta.env.BASE_URL}icons/sleep.png`}
                         alt="sleep"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />

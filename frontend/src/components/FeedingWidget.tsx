@@ -180,7 +180,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             {/* Background icon */}
             <div className="widget-bg-icon">
                 <img
-                    src="/icons/feeding.png"
+                    src={`${import.meta.env.BASE_URL}icons/feeding.png`}
                     alt="feeding"
                     style={{ width: 80, height: 80, objectFit: 'contain' }}
                 />
@@ -194,7 +194,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             <div className="widget-content">
                 <div className="widget-icon-row">
                     <img
-                        src="/icons/feeding.png"
+                        src={`${import.meta.env.BASE_URL}icons/feeding.png`}
                         alt="feeding"
                         style={{ width: 24, height: 24, objectFit: 'contain' }}
                     />
