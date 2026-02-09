@@ -28,20 +28,33 @@ export default function Callback() {
             return;
         }
 
-        // Check if there's a hash fragment (OAuth response)
-        const hashParams = window.location.hash;
-        if (hashParams && hashParams.includes('access_token')) {
-            // Supabase should auto-detect and process the hash
-            // Wait for onAuthStateChange to fire
-            if (import.meta.env.DEV) console.log('[Callback] OAuth hash detected, waiting for Supabase to process...');
-        }
+        const processAuth = async () => {
+            // Parse tokens from hash fragment (e.g. #access_token=...&refresh_token=...)
+            const hash = window.location.hash.substring(1);
+            const hashParams = new URLSearchParams(hash);
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
 
-        // Give Supabase time to process the OAuth response
-        // Then check session directly
-        const checkSession = async () => {
-            // Small delay to let Supabase process the hash
+            if (accessToken && refreshToken) {
+                // Explicitly set session from hash tokens — required on native
+                // where Supabase's detectSessionInUrl has already run before the deep link arrives
+                if (import.meta.env.DEV) console.log('[Callback] Setting session from hash tokens');
+                const { error: sessionError } = await supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken,
+                });
+                if (sessionError) {
+                    console.error('[Callback] setSession error:', sessionError);
+                    setError(sessionError.message);
+                    setProcessing(false);
+                    return;
+                }
+                navigate('/', { replace: true });
+                return;
+            }
+
+            // Fallback: check if Supabase already has a session (web auto-detect)
             await new Promise(resolve => setTimeout(resolve, 500));
-
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
             if (sessionError) {
@@ -60,7 +73,7 @@ export default function Callback() {
             }
         };
 
-        checkSession();
+        processAuth();
     }, [navigate, searchParams]);
 
     // If user becomes available via onAuthStateChange, redirect

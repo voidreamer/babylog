@@ -13,8 +13,7 @@
   "ios": {
     "contentInset": "automatic",
     "preferredContentMode": "mobile",
-    "backgroundColor": "#18181b",
-    "scheme": "heybub"
+    "backgroundColor": "#18181b"
   },
   "android": {
     "allowMixedContent": false,
