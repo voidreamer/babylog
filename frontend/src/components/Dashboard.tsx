@@ -25,7 +25,6 @@ import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import ComingUp from './ComingUp';
 import TipOfTheDay from './TipOfTheDay';
-import PullToRefresh from './PullToRefresh';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -177,7 +176,6 @@ export default function Dashboard() {
     }
 
     return (
-        <PullToRefresh onRefresh={loadData}>
         <div>
             <BabyGreeting summary={dashboard?.daily_summary} latestGrowth={latestGrowth} />
 
@@ -336,6 +334,5 @@ export default function Dashboard() {
                 />
             )}
         </div>
-        </PullToRefresh>
     );
 }
