@@ -15,7 +15,7 @@ import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead,
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from './ConfirmModal';
-import PullToRefresh from './PullToRefresh';
+
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -336,7 +336,6 @@ export default function TimelineCalendar() {
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     return (
-        <PullToRefresh onRefresh={loadEvents}>
         <div className="timeline-calendar">
             {/* Date Navigation */}
             <div className="timeline-calendar-header">
@@ -545,6 +544,5 @@ export default function TimelineCalendar() {
                 onCancel={() => setConfirmDelete(null)}
             />
         </div>
-        </PullToRefresh>
     );
 }
