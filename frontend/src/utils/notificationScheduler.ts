@@ -130,6 +130,7 @@ async function scheduleAppointmentNotifications(babyId: number, babyName: string
     title: string;
     body: string;
     schedule: { at: Date };
+    extra: { type: string };
   }> = [];
 
   try {
@@ -146,6 +147,7 @@ async function scheduleAppointmentNotifications(babyId: number, babyName: string
           title: t('notifications.visitTomorrow', { babyName }),
           body: t('notifications.visitTomorrowBody', { type: visit.visit_type || '' }),
           schedule: { at: dayBeforeDate },
+          extra: { type: 'appointment' },
         });
       }
 
@@ -157,6 +159,7 @@ async function scheduleAppointmentNotifications(babyId: number, babyName: string
           title: t('notifications.visitToday', { babyName }),
           body: t('notifications.visitTodayBody', { type: visit.visit_type || '' }),
           schedule: { at: morningOf },
+          extra: { type: 'appointment' },
         });
       }
     }
@@ -181,6 +184,7 @@ async function scheduleAppointmentNotifications(babyId: number, babyName: string
             dose: String(vax.dose_number || ''),
           }),
           schedule: { at: dayBeforeDate },
+          extra: { type: 'vaccination' },
         });
       }
 
@@ -195,6 +199,7 @@ async function scheduleAppointmentNotifications(babyId: number, babyName: string
             dose: String(vax.dose_number || ''),
           }),
           schedule: { at: morningOf },
+          extra: { type: 'vaccination' },
         });
       }
     }
@@ -211,6 +216,8 @@ async function scheduleMedicationNotifications(babyId: number, babyName: string,
     title: string;
     body: string;
     schedule: { at: Date; every: 'day' };
+    extra: { type: string };
+    actionTypeId: string;
   }> = [];
 
   try {
@@ -235,6 +242,8 @@ async function scheduleMedicationNotifications(babyId: number, babyName: string,
       title: t('notifications.medicationReminder', { babyName }),
       body: t('notifications.medicationReminderBody', { medications: medNames }),
       schedule: { at: scheduleAt, every: 'day' },
+      extra: { type: 'medication' },
+      actionTypeId: 'MEDICATION_REMINDER',
     });
   } catch (e) {
     console.warn('Failed to fetch medications for notifications:', e);
@@ -260,6 +269,8 @@ export async function rescheduleAll(babyId: number, babyName: string): Promise<v
     title: string;
     body: string;
     schedule: { at: Date; every?: string };
+    extra?: { type: string };
+    actionTypeId?: string;
   }> = [];
 
   if (settings.appointments) {
@@ -281,6 +292,8 @@ export async function rescheduleAll(babyId: number, babyName: string): Promise<v
         body: n.body,
         id: n.id,
         schedule: n.schedule as any,
+        extra: n.extra,
+        actionTypeId: n.actionTypeId,
         sound: undefined,
         smallIcon: undefined,
         largeIcon: undefined,

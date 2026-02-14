@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "体調不良を削除",
   "placeholder_tempC": "体温 °C",
   "toast_toothRecordRemoved": "歯の記録を削除しました",
+  "medicationQuickLog": {
+    "title": "お薬リマインダー",
+    "taken": "服用済み",
+    "done": "完了",
+    "logged": "{{name}} を服用済みとして記録しました",
+    "loggedGeneric": "お薬を服用済みとして記録しました",
+    "noActiveMeds": "使用中のお薬はありません"
+  },
   "schedule": {
     "progress": "予防接種の進捗",
     "complete": "完了",

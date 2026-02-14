@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "बीमारी का दिन हटाएं",
   "placeholder_tempC": "तापमान °C",
   "toast_toothRecordRemoved": "दाँत का रिकॉर्ड हटाया गया",
+  "medicationQuickLog": {
+    "title": "दवा रिमाइंडर",
+    "taken": "ली गई",
+    "done": "हो गया",
+    "logged": "{{name}} ली गई के रूप में दर्ज",
+    "loggedGeneric": "दवा ली गई के रूप में दर्ज",
+    "noActiveMeds": "कोई सक्रिय दवाई नहीं"
+  },
   "schedule": {
     "progress": "टीकाकरण प्रगति",
     "complete": "पूर्ण",

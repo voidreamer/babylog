@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "Supprimer un jour de maladie",
   "placeholder_tempC": "Temp °C",
   "toast_toothRecordRemoved": "Dossier dentaire enlevé",
+  "medicationQuickLog": {
+    "title": "Rappel de médicaments",
+    "taken": "Pris",
+    "done": "Terminé",
+    "logged": "{{name}} enregistré comme pris",
+    "loggedGeneric": "Médicament enregistré comme pris",
+    "noActiveMeds": "Aucun médicament actif"
+  },
   "schedule": {
     "progress": "Progrès de la vaccination",
     "complete": "complet",

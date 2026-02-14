@@ -8,6 +8,7 @@ import './index.css'
 import { Capacitor } from '@capacitor/core';
 import { App as CapApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { supabase } from './lib/supabase';
 
 // Handle deep link redirects from OAuth on native platforms
@@ -57,6 +58,27 @@ if (Capacitor.isNativePlatform()) {
     // Warm start: app was in background and brought to foreground via URL scheme
     CapApp.addListener('appUrlOpen', ({ url }) => {
         handleDeepLink(url);
+    });
+
+    // Register iOS notification action buttons
+    LocalNotifications.registerActionTypes({
+        types: [{
+            id: 'MEDICATION_REMINDER',
+            actions: [{ id: 'LOG_TAKEN', title: 'Log Taken' }]
+        }]
+    });
+
+    // Listen for notification taps
+    // Buffer the tap data on window for cold starts (React hasn't mounted yet)
+    // React will check window.__pendingNotificationTap on mount, then listen for future events
+    LocalNotifications.addListener('localNotificationActionPerformed', (event) => {
+        const detail = {
+            id: event.notification.id,
+            actionId: event.actionId,
+            extra: event.notification.extra
+        };
+        (window as any).__pendingNotificationTap = detail;
+        window.dispatchEvent(new CustomEvent('notification-tap', { detail }));
     });
 }
 

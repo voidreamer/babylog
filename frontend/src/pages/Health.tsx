@@ -14,9 +14,15 @@ import TeethingCard from '../components/health/TeethingCard';
 import SickDaysCard from '../components/health/SickDaysCard';
 import AllergiesCard from '../components/health/AllergiesCard';
 import RecordsSection from '../components/health/RecordsSection';
+import MedicationQuickLog from '../components/health/MedicationQuickLog';
 import { useTranslation } from 'react-i18next';
 
-export default function Health() {
+interface HealthProps {
+    showMedQuickLog?: boolean;
+    onDismissMedQuickLog?: () => void;
+}
+
+export default function Health({ showMedQuickLog, onDismissMedQuickLog }: HealthProps = {}) {
     const { t } = useTranslation('health');
     const { selectedBaby } = useBaby();
     const { reschedule } = useNotificationSync(selectedBaby?.id, selectedBaby?.name);
@@ -157,6 +163,10 @@ export default function Health() {
                     onDataChanged={loadData}
                 />
             </section>
+
+            {showMedQuickLog && onDismissMedQuickLog && (
+                <MedicationQuickLog onDismiss={onDismissMedQuickLog} />
+            )}
         </div>
     );
 }

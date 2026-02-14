@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "Delete sick day",
   "placeholder_tempC": "Temp °C",
   "toast_toothRecordRemoved": "Tooth record removed",
+  "medicationQuickLog": {
+    "title": "Medication Reminder",
+    "taken": "Taken",
+    "done": "Done",
+    "logged": "{{name}} logged as taken",
+    "loggedGeneric": "Medication logged as taken",
+    "noActiveMeds": "No active medications"
+  },
   "schedule": {
     "progress": "Vaccination Progress",
     "complete": "complete",

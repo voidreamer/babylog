@@ -401,6 +401,7 @@ function MainApp() {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+    const [showMedQuickLog, setShowMedQuickLog] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
 
     const [isPremium, setIsPremium] = useState(() => {
@@ -518,6 +519,42 @@ function MainApp() {
         return () => { i18n.off('languageChanged', handleLanguageChanged); };
     }, [i18n, babiesLoading, babies]);
 
+    // Handle notification taps from native
+    useEffect(() => {
+        const processNotificationTap = (detail: { id: number; actionId: string; extra?: { type: string } }) => {
+            const { id, actionId, extra } = detail;
+            const isMedication = extra?.type === 'medication' || id >= 50000;
+
+            // Always navigate to health tab
+            setActiveTab('health');
+
+            if (isMedication && actionId === 'LOG_TAKEN') {
+                // iOS action button: log directly and show toast
+                const log = JSON.parse(localStorage.getItem('heybub-med-log') || '[]');
+                log.push({ medication_name: 'medication', timestamp: new Date().toISOString() });
+                localStorage.setItem('heybub-med-log', JSON.stringify(log));
+                toast.success(t('health:medicationQuickLog.loggedGeneric', { defaultValue: 'Medication logged as taken' }));
+            } else if (isMedication) {
+                // Default tap on medication notification: show quick-log popup
+                setShowMedQuickLog(true);
+            }
+        };
+
+        // Cold start: check for buffered tap from before React mounted
+        const pending = (window as any).__pendingNotificationTap;
+        if (pending) {
+            delete (window as any).__pendingNotificationTap;
+            processNotificationTap(pending);
+        }
+
+        // Warm start: listen for future notification taps
+        const handleEvent = (e: Event) => {
+            processNotificationTap((e as CustomEvent).detail);
+        };
+        window.addEventListener('notification-tap', handleEvent);
+        return () => window.removeEventListener('notification-tap', handleEvent);
+    }, [t]);
+
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (
             <Onboarding
@@ -589,7 +626,10 @@ function MainApp() {
                                 <div className="spinner"></div>
                             </div>
                         }>
-                            <Health />
+                            <Health
+                                showMedQuickLog={showMedQuickLog}
+                                onDismissMedQuickLog={() => setShowMedQuickLog(false)}
+                            />
                         </Suspense>
                     </ErrorBoundary>
                 )}
