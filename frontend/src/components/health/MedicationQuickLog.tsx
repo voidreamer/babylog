@@ -16,6 +16,18 @@ interface Medication {
     is_active?: boolean;
 }
 
+function medToSupplementName(medName: string): string {
+    const lower = medName.toLowerCase();
+    if (lower.includes('vitamin d')) return 'vitamin_d';
+    if (lower.includes('iron')) return 'iron';
+    if (lower.includes('dha') || lower.includes('omega')) return 'dha';
+    if (lower.includes('probiotic')) return 'probiotic';
+    if (lower.includes('multivitamin')) return 'multivitamin';
+    return 'other';
+}
+
+export { medToSupplementName };
+
 export default function MedicationQuickLog({ onDismiss }: MedicationQuickLogProps) {
     const { t } = useTranslation('health');
     const { selectedBaby } = useBaby();
@@ -33,15 +45,22 @@ export default function MedicationQuickLog({ onDismiss }: MedicationQuickLogProp
         });
     }, [selectedBaby]);
 
-    const handleLog = (med: Medication) => {
-        const log = JSON.parse(localStorage.getItem('heybub-med-log') || '[]');
-        log.push({
-            medication_name: med.medication_name,
-            timestamp: new Date().toISOString(),
-        });
-        localStorage.setItem('heybub-med-log', JSON.stringify(log));
-        setLogged((prev) => new Set(prev).add(med.id));
-        toast.success(t('medicationQuickLog.logged', { name: med.medication_name }));
+    const handleLog = async (med: Medication) => {
+        if (!selectedBaby) return;
+        try {
+            await api.createSupplement({
+                baby_id: selectedBaby.id,
+                time: new Date().toISOString(),
+                name: medToSupplementName(med.medication_name),
+                dosage: med.dosage || null,
+                notes: med.medication_name,
+            });
+            setLogged((prev) => new Set(prev).add(med.id));
+            toast.success(t('medicationQuickLog.logged', { name: med.medication_name }));
+        } catch (error) {
+            console.error('Failed to log medication as supplement:', error);
+            toast.error(t('medicationQuickLog.logFailed', { defaultValue: 'Failed to log medication' }));
+        }
     };
 
     return (

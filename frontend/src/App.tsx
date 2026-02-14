@@ -529,11 +529,24 @@ function MainApp() {
             setActiveTab('health');
 
             if (isMedication && actionId === 'LOG_TAKEN') {
-                // iOS action button: log directly and show toast
-                const log = JSON.parse(localStorage.getItem('heybub-med-log') || '[]');
-                log.push({ medication_name: 'medication', timestamp: new Date().toISOString() });
-                localStorage.setItem('heybub-med-log', JSON.stringify(log));
-                toast.success(t('health:medicationQuickLog.loggedGeneric', { defaultValue: 'Medication logged as taken' }));
+                // iOS action button: log first active medication as a supplement
+                const currentBaby = babies?.[0];
+                if (currentBaby) {
+                    api.getMedications(currentBaby.id, true).then(async (meds) => {
+                        const activeMed = meds.find((m: { is_active?: boolean }) => m.is_active);
+                        const { medToSupplementName } = await import('./components/health/MedicationQuickLog');
+                        await api.createSupplement({
+                            baby_id: currentBaby.id,
+                            time: new Date().toISOString(),
+                            name: activeMed ? medToSupplementName(activeMed.medication_name) : 'other',
+                            dosage: activeMed?.dosage || null,
+                            notes: activeMed?.medication_name || 'medication',
+                        });
+                        toast.success(t('health:medicationQuickLog.loggedGeneric', { defaultValue: 'Medication logged as taken' }));
+                    }).catch(() => {
+                        toast.error('Failed to log medication');
+                    });
+                }
             } else if (isMedication) {
                 // Default tap on medication notification: show quick-log popup
                 setShowMedQuickLog(true);
@@ -553,7 +566,7 @@ function MainApp() {
         };
         window.addEventListener('notification-tap', handleEvent);
         return () => window.removeEventListener('notification-tap', handleEvent);
-    }, [t]);
+    }, [t, babies]);
 
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (
