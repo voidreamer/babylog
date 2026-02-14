@@ -35,6 +35,3 @@ export default function Icon({ name, size = 32, className = '' }: IconProps) {
         />
     );
 }
-
-// Export icon paths for direct use
-export { icons };
