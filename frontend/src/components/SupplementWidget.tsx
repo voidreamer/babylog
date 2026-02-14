@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { rescheduleAll, getNotificationSettings } from '../utils/notificationScheduler';
 
 
 interface SupplementWidgetProps { lastSupplement: any; onSupplementChange: () => void; onOpenModal: () => void; quickActionsEnabled?: boolean; }
@@ -37,6 +38,11 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
             localStorage.setItem('lastSupplementType', supplementType);
             toast.success(t('toast_supplementLogged'));
             onSupplementChange();
+            // Cancel pending medication notification since supplement was just logged
+            const settings = getNotificationSettings();
+            if (settings.enabled && selectedBaby) {
+                rescheduleAll(selectedBaby.id, selectedBaby.name);
+            }
         } catch (error) {
             console.error('Failed to log supplement:', error);
             toast.error(t('toast_failedToLogSupplement'));

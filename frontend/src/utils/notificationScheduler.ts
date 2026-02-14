@@ -221,6 +221,12 @@ async function scheduleMedicationNotifications(babyId: number, babyName: string,
   }> = [];
 
   try {
+    // Check if a supplement was already logged today — skip if so
+    const supplements = await api.getSupplements(babyId, 10);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const loggedToday = supplements.some((s: { time?: string }) => s.time?.startsWith(todayStr));
+    if (loggedToday) return notifications;
+
     const medications = await api.getMedications(babyId);
     const activeMeds = medications.filter((m: { is_active?: boolean }) => m.is_active);
 
@@ -368,6 +374,11 @@ export async function checkAndShowWebReminders(babyId: number, babyName: string)
 
   if (settings.medications) {
     try {
+      // Check if a supplement was already logged today — skip reminder if so
+      const supplements = await api.getSupplements(babyId, 10);
+      const loggedToday = supplements.some((s: { time?: string }) => s.time?.startsWith(todayStr));
+      if (loggedToday) return;
+
       const medications = await api.getMedications(babyId);
       const activeMeds = medications.filter((m: { is_active?: boolean }) => m.is_active);
       if (activeMeds.length > 0) {
