@@ -8,6 +8,26 @@
     "addAnother": "Añadir otro bebé",
     "addAnotherDesc": "Seguimiento de varios niños"
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "enable": "Activar notificaciones",
+    "enableDesc": "Recibir recordatorios de citas y medicamentos",
+    "appointments": "Citas",
+    "appointmentsDesc": "Visitas médicas, vacunas",
+    "medications": "Medicamentos",
+    "medicationsDesc": "Recordatorio diario de medicamentos",
+    "reminderTime": "Hora del recordatorio",
+    "reminderTimeDesc": "Hora del recordatorio diario de medicamentos",
+    "permissionDenied": "Se denegó el permiso de notificaciones. Actívelo en los ajustes del dispositivo.",
+    "visitTomorrow": "{{babyName}} tiene una cita mañana",
+    "visitTomorrowBody": "Cita de {{type}} mañana",
+    "visitToday": "{{babyName}} tiene una cita hoy",
+    "visitTodayBody": "¡La cita de {{type}} es hoy!",
+    "vaccinationDue": "Vacunación próxima de {{babyName}}",
+    "vaccinationDueBody": "{{vaccine}} (dosis {{dose}}) es pronto",
+    "medicationReminder": "Medicamentos de {{babyName}}",
+    "medicationReminderBody": "Hora de: {{medications}}"
+  },
   "preferences": {
     "title": "Preferencias",
     "notifications": "Notificaciones",

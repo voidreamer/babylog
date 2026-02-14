@@ -8,6 +8,26 @@
     "addAnother": "添加另一个宝宝",
     "addAnotherDesc": "追踪多个孩子"
   },
+  "notifications": {
+    "title": "通知",
+    "enable": "开启通知",
+    "enableDesc": "获取预约和用药提醒",
+    "appointments": "预约",
+    "appointmentsDesc": "就诊、疫苗接种",
+    "medications": "药物",
+    "medicationsDesc": "每日用药提醒",
+    "reminderTime": "提醒时间",
+    "reminderTimeDesc": "每日用药提醒时间",
+    "permissionDenied": "通知权限被拒绝。请在设备设置中启用。",
+    "visitTomorrow": "{{babyName}}明天有预约",
+    "visitTomorrowBody": "{{type}}预约在明天",
+    "visitToday": "{{babyName}}今天有预约",
+    "visitTodayBody": "{{type}}预约就在今天！",
+    "vaccinationDue": "{{babyName}}的疫苗接种即将到来",
+    "vaccinationDueBody": "{{vaccine}}（第{{dose}}剂）即将到期",
+    "medicationReminder": "{{babyName}}的药物",
+    "medicationReminderBody": "该服药了：{{medications}}"
+  },
   "preferences": {
     "title": "偏好设置",
     "notifications": "通知",

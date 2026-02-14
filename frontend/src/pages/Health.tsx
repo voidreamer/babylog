@@ -5,6 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import { Baby } from 'lucide-react';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../data/whoGrowthData';
+import { useNotificationSync } from '../hooks/useNotificationSync';
 
 // Components
 import GrowthCard from '../components/health/GrowthCard';
@@ -13,11 +14,18 @@ import TeethingCard from '../components/health/TeethingCard';
 import SickDaysCard from '../components/health/SickDaysCard';
 import AllergiesCard from '../components/health/AllergiesCard';
 import RecordsSection from '../components/health/RecordsSection';
+import MedicationQuickLog from '../components/health/MedicationQuickLog';
 import { useTranslation } from 'react-i18next';
 
-export default function Health() {
+interface HealthProps {
+    showMedQuickLog?: boolean;
+    onDismissMedQuickLog?: () => void;
+}
+
+export default function Health({ showMedQuickLog, onDismissMedQuickLog }: HealthProps = {}) {
     const { t } = useTranslation('health');
     const { selectedBaby } = useBaby();
+    const { reschedule } = useNotificationSync(selectedBaby?.id, selectedBaby?.name);
     const [loading, setLoading] = useState(true);
 
     // Data
@@ -60,6 +68,7 @@ export default function Health() {
             setTeeth(t);
             setSickDays(s);
             setAllergies(a);
+            reschedule();
         } catch (error) {
             toast.error(t('failedToLoad'));
         } finally {
@@ -154,6 +163,10 @@ export default function Health() {
                     onDataChanged={loadData}
                 />
             </section>
+
+            {showMedQuickLog && onDismissMedQuickLog && (
+                <MedicationQuickLog onDismiss={onDismissMedQuickLog} />
+            )}
         </div>
     );
 }

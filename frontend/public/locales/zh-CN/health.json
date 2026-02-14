@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "删除生病记录",
   "placeholder_tempC": "体温 °C",
   "toast_toothRecordRemoved": "牙齿记录已删除",
+  "medicationQuickLog": {
+    "title": "用药提醒",
+    "taken": "已服用",
+    "done": "完成",
+    "logged": "{{name}} 已记录为已服用",
+    "loggedGeneric": "药物已记录为已服用",
+    "noActiveMeds": "没有正在使用的药物"
+  },
   "schedule": {
     "progress": "疫苗接种进度",
     "complete": "已完成",

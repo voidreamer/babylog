@@ -8,6 +8,26 @@
     "addAnother": "एक और शिशु जोड़ें",
     "addAnotherDesc": "कई बच्चों को ट्रैक करें"
   },
+  "notifications": {
+    "title": "सूचनाएं",
+    "enable": "सूचनाएं चालू करें",
+    "enableDesc": "अपॉइंटमेंट और दवाओं के लिए रिमाइंडर पाएं",
+    "appointments": "अपॉइंटमेंट",
+    "appointmentsDesc": "डॉक्टर की विज़िट, टीकाकरण",
+    "medications": "दवाइयाँ",
+    "medicationsDesc": "दैनिक दवा रिमाइंडर",
+    "reminderTime": "रिमाइंडर का समय",
+    "reminderTimeDesc": "दैनिक दवा रिमाइंडर का समय",
+    "permissionDenied": "सूचना की अनुमति अस्वीकृत हुई। इसे अपने डिवाइस की सेटिंग्स में चालू करें।",
+    "visitTomorrow": "{{babyName}} का कल अपॉइंटमेंट है",
+    "visitTomorrowBody": "{{type}} अपॉइंटमेंट कल है",
+    "visitToday": "{{babyName}} का आज अपॉइंटमेंट है",
+    "visitTodayBody": "{{type}} अपॉइंटमेंट आज है!",
+    "vaccinationDue": "{{babyName}} का टीकाकरण आ रहा है",
+    "vaccinationDueBody": "{{vaccine}} (खुराक {{dose}}) जल्द है",
+    "medicationReminder": "{{babyName}} की दवाइयाँ",
+    "medicationReminderBody": "दवा का समय: {{medications}}"
+  },
   "preferences": {
     "title": "प्राथमिकताएं",
     "notifications": "सूचनाएं",

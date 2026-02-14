@@ -8,6 +8,26 @@
     "addAnother": "Добавить ещё малыша",
     "addAnotherDesc": "Отслеживать нескольких детей"
   },
+  "notifications": {
+    "title": "Уведомления",
+    "enable": "Включить уведомления",
+    "enableDesc": "Получать напоминания о визитах и лекарствах",
+    "appointments": "Визиты",
+    "appointmentsDesc": "Приёмы врача, прививки",
+    "medications": "Лекарства",
+    "medicationsDesc": "Ежедневное напоминание о лекарствах",
+    "reminderTime": "Время напоминания",
+    "reminderTimeDesc": "Время ежедневного напоминания о лекарствах",
+    "permissionDenied": "Разрешение на уведомления отклонено. Включите в настройках устройства.",
+    "visitTomorrow": "У {{babyName}} завтра приём",
+    "visitTomorrowBody": "Приём {{type}} завтра",
+    "visitToday": "У {{babyName}} сегодня приём",
+    "visitTodayBody": "Приём {{type}} сегодня!",
+    "vaccinationDue": "Скоро прививка {{babyName}}",
+    "vaccinationDueBody": "{{vaccine}} (доза {{dose}}) скоро",
+    "medicationReminder": "Лекарства {{babyName}}",
+    "medicationReminderBody": "Время принять: {{medications}}"
+  },
   "preferences": {
     "title": "Настройки",
     "notifications": "Уведомления",

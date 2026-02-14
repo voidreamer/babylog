@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "Удалить день болезни",
   "placeholder_tempC": "Темп. °C",
   "toast_toothRecordRemoved": "Запись о зубе удалена",
+  "medicationQuickLog": {
+    "title": "Напоминание о лекарствах",
+    "taken": "Принято",
+    "done": "Готово",
+    "logged": "{{name}} отмечено как принято",
+    "loggedGeneric": "Лекарство отмечено как принято",
+    "noActiveMeds": "Нет активных лекарств"
+  },
   "schedule": {
     "progress": "Прогресс вакцинации",
     "complete": "завершено",

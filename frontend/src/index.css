@@ -437,6 +437,43 @@ h4 {
   color: var(--danger);
 }
 
+/* Notification sub-rows */
+.settings-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem 0.75rem 3.5rem;
+  border-bottom: 1px solid var(--border-light, var(--border));
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.settings-sub-row:last-child {
+  border-bottom: none;
+}
+
+.settings-sub-row:hover {
+  background: var(--surface-hover);
+}
+
+.notification-time-input {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.notification-time-input:focus {
+  border-color: var(--primary);
+}
+
 /* Toggle switch */
 .toggle-switch {
   width: 48px;
@@ -7091,4 +7128,140 @@ a.settings-row {
   background: var(--sleep-bg);
   padding: 2px 8px;
   border-radius: var(--radius-full);
+}
+
+/* ============================================================================
+   Medication Quick-Log
+   ============================================================================ */
+
+.med-quick-log-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 64, 68, 0.3);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: var(--z-overlay);
+  animation: fadeIn 0.2s ease;
+  padding: 1rem;
+}
+
+.med-quick-log-sheet {
+  background: var(--background);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%;
+  max-width: 500px;
+  animation: slideUp 0.3s ease;
+  padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+}
+
+.med-quick-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.med-quick-log-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.med-quick-log-body {
+  padding: var(--space-md) var(--space-lg);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.med-quick-log-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-lg) 0;
+}
+
+.med-quick-log-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.med-quick-log-item:last-child {
+  border-bottom: none;
+}
+
+.med-quick-log-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.med-quick-log-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.med-quick-log-dosage {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.med-quick-log-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.med-quick-log-btn:hover {
+  background: var(--surface-hover);
+}
+
+.med-quick-log-btn.done {
+  background: var(--diaper-bg);
+  color: var(--diaper-text);
+  border-color: var(--diaper);
+}
+
+.med-quick-log-footer {
+  padding: var(--space-sm) var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.med-quick-log-done {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.med-quick-log-done:hover {
+  background: var(--primary-dark);
+}
+
+@media (min-width: 768px) {
+  .med-quick-log-overlay {
+    align-items: center;
+  }
+
+  .med-quick-log-sheet {
+    border-radius: var(--radius-xl);
+  }
 }

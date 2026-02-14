@@ -239,6 +239,14 @@
   "arialabel_deleteSickDay": "Borrar baja por enfermedad",
   "placeholder_tempC": "Temp °C",
   "toast_toothRecordRemoved": "Registro dental eliminado",
+  "medicationQuickLog": {
+    "title": "Recordatorio de medicamentos",
+    "taken": "Tomado",
+    "done": "Listo",
+    "logged": "{{name}} registrado como tomado",
+    "loggedGeneric": "Medicamento registrado como tomado",
+    "noActiveMeds": "No hay medicamentos activos"
+  },
   "schedule": {
     "progress": "Avance de la vacunación",
     "complete": "completa",
