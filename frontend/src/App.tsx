@@ -24,7 +24,7 @@ const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
 import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown, Bell } from 'lucide-react';
-import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, type NotificationSettings } from './utils/notificationScheduler';
+import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
@@ -47,21 +47,28 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
     };
 
     const toggleNotificationsEnabled = async () => {
-        if (!notifSettings.enabled) {
-            const granted = await requestNotificationPermission();
-            if (!granted) {
-                toast.error(t('settings:notifications.permissionDenied'));
-                return;
+        try {
+            if (!notifSettings.enabled) {
+                console.log('[Notifications] Requesting permission...');
+                const granted = await requestNotificationPermission();
+                console.log('[Notifications] Permission granted:', granted);
+                if (!granted) {
+                    toast.error(t('settings:notifications.permissionDenied'));
+                    return;
+                }
+                const next = { ...notifSettings, enabled: true };
+                setNotifSettings(next);
+                saveNotificationSettings(next);
+                if (currentBaby) rescheduleAll(currentBaby.id, currentBaby.name);
+            } else {
+                const next = { ...notifSettings, enabled: false };
+                setNotifSettings(next);
+                saveNotificationSettings(next);
+                cancelAll();
             }
-            const next = { ...notifSettings, enabled: true };
-            setNotifSettings(next);
-            saveNotificationSettings(next);
-            if (currentBaby) rescheduleAll(currentBaby.id, currentBaby.name);
-        } else {
-            const next = { ...notifSettings, enabled: false };
-            setNotifSettings(next);
-            saveNotificationSettings(next);
-            cancelAll();
+        } catch (e) {
+            console.error('[Notifications] Toggle failed:', e);
+            toast.error('Failed to toggle notifications: ' + (e as Error).message);
         }
     };
 
@@ -169,6 +176,19 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                                 />
                             </div>
                         )}
+                        <div className="settings-sub-row" onClick={async () => {
+                            const ok = await sendTestNotification();
+                            if (ok) toast.success('Test notification sent! Check in ~3 seconds.');
+                            else toast.error('Failed to send test notification.');
+                        }}>
+                            <div className="settings-row-left">
+                                <div>
+                                    <div className="settings-row-label">Send Test Notification</div>
+                                    <div className="settings-row-desc">Fires in ~3 seconds to verify setup</div>
+                                </div>
+                            </div>
+                            <ChevronRight size={18} className="settings-arrow" />
+                        </div>
                     </>
                 )}
             </div>
@@ -372,7 +392,7 @@ function buildHubUrl(session, theme) {
 }
 
 function MainApp() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
@@ -471,7 +491,7 @@ function MainApp() {
         }
     }, [babies, babiesLoading, online]);
 
-    // Reschedule notifications on app launch
+    // Reschedule notifications on app launch and language change
     useEffect(() => {
         if (!babiesLoading && babies.length > 0) {
             const baby = babies[0];
@@ -482,6 +502,21 @@ function MainApp() {
             }
         }
     }, [babiesLoading, babies]);
+
+    // Reschedule notifications when language changes so text updates
+    useEffect(() => {
+        const handleLanguageChanged = () => {
+            if (!babiesLoading && babies.length > 0) {
+                const baby = babies[0];
+                const settings = getNotificationSettings();
+                if (settings.enabled) {
+                    rescheduleAll(baby.id, baby.name);
+                }
+            }
+        };
+        i18n.on('languageChanged', handleLanguageChanged);
+        return () => { i18n.off('languageChanged', handleLanguageChanged); };
+    }, [i18n, babiesLoading, babies]);
 
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (

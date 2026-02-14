@@ -164,9 +164,9 @@ describe('notificationScheduler', () => {
     it('shows toast for active medications when enabled', async () => {
       saveNotificationSettings({ enabled: true, appointments: false, medications: true, medicationTime: '09:00' });
       vi.mocked(api.getMedications).mockResolvedValueOnce([
-        { id: 1, name: 'Vitamin D', is_active: true },
-        { id: 2, name: 'Iron', is_active: true },
-        { id: 3, name: 'Old Med', is_active: false },
+        { id: 1, medication_name: 'Vitamin D', is_active: true },
+        { id: 2, medication_name: 'Iron', is_active: true },
+        { id: 3, medication_name: 'Old Med', is_active: false },
       ]);
 
       await checkAndShowWebReminders(1, 'TestBaby');
@@ -176,7 +176,7 @@ describe('notificationScheduler', () => {
     it('skips medications toast when no active meds', async () => {
       saveNotificationSettings({ enabled: true, appointments: false, medications: true, medicationTime: '09:00' });
       vi.mocked(api.getMedications).mockResolvedValueOnce([
-        { id: 1, name: 'Old Med', is_active: false },
+        { id: 1, medication_name: 'Old Med', is_active: false },
       ]);
 
       await checkAndShowWebReminders(1, 'TestBaby');

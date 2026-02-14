@@ -41,23 +41,61 @@ export function saveNotificationSettings(settings: NotificationSettings): void {
 const isNative = () => Capacitor.isNativePlatform();
 
 export async function requestNotificationPermission(): Promise<boolean> {
-  if (isNative()) {
-    const result = await LocalNotifications.requestPermissions();
-    return result.display === 'granted';
+  try {
+    if (isNative()) {
+      const result = await LocalNotifications.requestPermissions();
+      return result.display === 'granted';
+    }
+    // Web fallback
+    if (!('Notification' in window)) return false;
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+  } catch (e) {
+    console.error('requestNotificationPermission failed:', e);
+    return false;
   }
-  // Web fallback
-  if (!('Notification' in window)) return false;
-  const permission = await Notification.requestPermission();
-  return permission === 'granted';
 }
 
 export async function checkNotificationPermission(): Promise<boolean> {
-  if (isNative()) {
-    const result = await LocalNotifications.checkPermissions();
-    return result.display === 'granted';
+  try {
+    if (isNative()) {
+      const result = await LocalNotifications.checkPermissions();
+      return result.display === 'granted';
+    }
+    if (!('Notification' in window)) return false;
+    return Notification.permission === 'granted';
+  } catch (e) {
+    console.error('checkNotificationPermission failed:', e);
+    return false;
   }
-  if (!('Notification' in window)) return false;
-  return Notification.permission === 'granted';
+}
+
+export async function sendTestNotification(): Promise<boolean> {
+  try {
+    if (!isNative()) {
+      toast.info('Test notification! Notifications are working.', { duration: 5000 });
+      return true;
+    }
+    const hasPermission = await checkNotificationPermission();
+    if (!hasPermission) {
+      console.warn('No notification permission for test');
+      return false;
+    }
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 99999,
+          title: 'HeyBub Test',
+          body: 'Notifications are working! 🎉',
+          schedule: { at: new Date(Date.now() + 3000) },
+        },
+      ],
+    });
+    return true;
+  } catch (e) {
+    console.error('sendTestNotification failed:', e);
+    return false;
+  }
 }
 
 // --- ID ranges ---
@@ -181,7 +219,7 @@ async function scheduleMedicationNotifications(babyId: number, babyName: string,
 
     if (activeMeds.length === 0) return notifications;
 
-    const medNames = activeMeds.map((m: { name?: string }) => m.name || '').join(', ');
+    const medNames = activeMeds.map((m: { medication_name?: string }) => m.medication_name || '').join(', ');
     const [hours, minutes] = medicationTime.split(':').map(Number);
 
     // Schedule a daily repeating notification
@@ -320,7 +358,7 @@ export async function checkAndShowWebReminders(babyId: number, babyName: string)
       const medications = await api.getMedications(babyId);
       const activeMeds = medications.filter((m: { is_active?: boolean }) => m.is_active);
       if (activeMeds.length > 0) {
-        const medNames = activeMeds.map((m: { name?: string }) => m.name || '').join(', ');
+        const medNames = activeMeds.map((m: { medication_name?: string }) => m.medication_name || '').join(', ');
         toast.info(t('notifications.medicationReminderBody', { medications: medNames }), {
           description: babyName,
           duration: 8000,
