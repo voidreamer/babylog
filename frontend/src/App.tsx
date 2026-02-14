@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { BabyProvider, useBaby } from './hooks/useBaby';
 import { useOfflineSync } from './hooks/useOfflineSync';
-import { useAnalytics } from './hooks/useAnalytics';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
 import { hapticSelection } from './utils/haptics';
@@ -396,7 +395,6 @@ function MainApp() {
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
-    const { track, trackPageView } = useAnalytics();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
@@ -451,10 +449,6 @@ function MainApp() {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
     }, [theme]);
-
-    useEffect(() => {
-        trackPageView(activeTab);
-    }, [activeTab, trackPageView]);
 
     useEffect(() => {
         const checkPremiumStatus = async () => {

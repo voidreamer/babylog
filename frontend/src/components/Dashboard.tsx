@@ -24,7 +24,6 @@ import SupplementModal from './SupplementModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import ComingUp from './ComingUp';
-import TipOfTheDay from './TipOfTheDay';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -269,9 +268,6 @@ export default function Dashboard() {
 
             {/* Daily Summary */}
             <DailySummary summary={dashboard?.daily_summary} visibleWidgets={visibleWidgets} />
-
-            {/* Tip of the Day */}
-            <TipOfTheDay />
 
             {/* Modals */}
             {feedingModal && (
