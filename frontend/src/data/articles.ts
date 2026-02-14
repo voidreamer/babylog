@@ -265,6 +265,3 @@ export function getArticlesForAge(ageMonths: number): Article[] {
   return articles.filter(a => ageMonths >= a.ageMonthsMin && ageMonths <= a.ageMonthsMax);
 }
 
-export function getArticlesByCategory(category: Article['category']): Article[] {
-  return articles.filter(a => a.category === category);
-}

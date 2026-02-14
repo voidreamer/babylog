@@ -105,5 +105,3 @@ export default function Widget({ type, label, value, detail, isSleeping, onClick
         </motion.div>
     );
 }
-
-export { formatTimeAgo };
