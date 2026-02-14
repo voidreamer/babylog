@@ -23,7 +23,8 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown, Bell } from 'lucide-react';
+import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
 import { Toaster, toast } from 'sonner';
 
@@ -31,22 +32,37 @@ import { Toaster, toast } from 'sonner';
 interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; }
 function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
-    const [notifications, setNotifications] = useState(() => localStorage.getItem('heybub-notifications') !== 'false');
+    const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings);
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
 
     const currentBaby = babies?.[0];
 
-    const toggleNotifications = async () => {
-        const { subscribeToPush, unsubscribeFromPush } = await import('./utils/pushNotifications');
-        const next = !notifications;
-        if (next) {
-            const ok = await subscribeToPush();
-            if (!ok) return; // Permission denied or not supported
-        } else {
-            await unsubscribeFromPush();
+    const updateNotifSettings = (patch: Partial<NotificationSettings>) => {
+        const next = { ...notifSettings, ...patch };
+        setNotifSettings(next);
+        saveNotificationSettings(next);
+        if (next.enabled && currentBaby) {
+            rescheduleAll(currentBaby.id, currentBaby.name);
         }
-        setNotifications(next);
-        localStorage.setItem('heybub-notifications', String(next));
+    };
+
+    const toggleNotificationsEnabled = async () => {
+        if (!notifSettings.enabled) {
+            const granted = await requestNotificationPermission();
+            if (!granted) {
+                toast.error(t('settings:notifications.permissionDenied'));
+                return;
+            }
+            const next = { ...notifSettings, enabled: true };
+            setNotifSettings(next);
+            saveNotificationSettings(next);
+            if (currentBaby) rescheduleAll(currentBaby.id, currentBaby.name);
+        } else {
+            const next = { ...notifSettings, enabled: false };
+            setNotifSettings(next);
+            saveNotificationSettings(next);
+            cancelAll();
+        }
     };
 
     const toggleUnits = () => {
@@ -101,19 +117,65 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 </div>
             )}
 
+            {/* Notifications */}
+            <div className="settings-group">
+                <div className="settings-group-title">{t('settings:notifications.title')}</div>
+                <div className="settings-row" onClick={toggleNotificationsEnabled}>
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box lavender">
+                            <Bell size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:notifications.enable')}</div>
+                            <div className="settings-row-desc">{t('settings:notifications.enableDesc')}</div>
+                        </div>
+                    </div>
+                    <div className={`toggle-switch ${notifSettings.enabled ? 'active' : ''}`} />
+                </div>
+                {notifSettings.enabled && (
+                    <>
+                        <div className="settings-sub-row" onClick={() => updateNotifSettings({ appointments: !notifSettings.appointments })}>
+                            <div className="settings-row-left">
+                                <div>
+                                    <div className="settings-row-label">{t('settings:notifications.appointments')}</div>
+                                    <div className="settings-row-desc">{t('settings:notifications.appointmentsDesc')}</div>
+                                </div>
+                            </div>
+                            <div className={`toggle-switch ${notifSettings.appointments ? 'active' : ''}`} />
+                        </div>
+                        <div className="settings-sub-row" onClick={() => updateNotifSettings({ medications: !notifSettings.medications })}>
+                            <div className="settings-row-left">
+                                <div>
+                                    <div className="settings-row-label">{t('settings:notifications.medications')}</div>
+                                    <div className="settings-row-desc">{t('settings:notifications.medicationsDesc')}</div>
+                                </div>
+                            </div>
+                            <div className={`toggle-switch ${notifSettings.medications ? 'active' : ''}`} />
+                        </div>
+                        {notifSettings.medications && (
+                            <div className="settings-sub-row">
+                                <div className="settings-row-left">
+                                    <div>
+                                        <div className="settings-row-label">{t('settings:notifications.reminderTime')}</div>
+                                        <div className="settings-row-desc">{t('settings:notifications.reminderTimeDesc')}</div>
+                                    </div>
+                                </div>
+                                <input
+                                    type="time"
+                                    className="notification-time-input"
+                                    value={notifSettings.medicationTime}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => updateNotifSettings({ medicationTime: e.target.value })}
+                                />
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
             {/* Preferences */}
             <div className="settings-group">
                 <div className="settings-group-title">{t('settings:preferences.title')}</div>
-                <div className="settings-row" onClick={toggleNotifications}>
-                    <div className="settings-row-left">
-                        <div className="settings-icon-box sky">🔔</div>
-                        <div>
-                            <div className="settings-row-label">{t('settings:preferences.notifications')}</div>
-                            <div className="settings-row-desc">{t('settings:preferences.notificationsDesc')}</div>
-                        </div>
-                    </div>
-                    <div className={`toggle-switch ${notifications ? 'active' : ''}`} />
-                </div>
                 <div className="settings-row" onClick={toggleTheme}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box peach">
@@ -408,6 +470,18 @@ function MainApp() {
             setShowOnboarding(true);
         }
     }, [babies, babiesLoading, online]);
+
+    // Reschedule notifications on app launch
+    useEffect(() => {
+        if (!babiesLoading && babies.length > 0) {
+            const baby = babies[0];
+            const settings = getNotificationSettings();
+            if (settings.enabled) {
+                rescheduleAll(baby.id, baby.name);
+                checkAndShowWebReminders(baby.id, baby.name);
+            }
+        }
+    }, [babiesLoading, babies]);
 
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (

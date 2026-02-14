@@ -8,6 +8,26 @@
     "addAnother": "もう一人登録",
     "addAnotherDesc": "複数のお子様を管理"
   },
+  "notifications": {
+    "title": "通知",
+    "enable": "通知を有効にする",
+    "enableDesc": "予約や投薬のリマインダーを受け取る",
+    "appointments": "予約",
+    "appointmentsDesc": "診察、予防接種",
+    "medications": "お薬",
+    "medicationsDesc": "毎日の投薬リマインダー",
+    "reminderTime": "リマインダー時刻",
+    "reminderTimeDesc": "毎日の投薬リマインダーの時刻",
+    "permissionDenied": "通知の許可が拒否されました。デバイスの設定で有効にしてください。",
+    "visitTomorrow": "{{babyName}}の明日の予約",
+    "visitTomorrowBody": "{{type}}の予約が明日です",
+    "visitToday": "{{babyName}}の本日の予約",
+    "visitTodayBody": "{{type}}の予約は今日です！",
+    "vaccinationDue": "{{babyName}}の予防接種が近づいています",
+    "vaccinationDueBody": "{{vaccine}}（{{dose}}回目）がもうすぐです",
+    "medicationReminder": "{{babyName}}のお薬",
+    "medicationReminderBody": "お薬の時間です：{{medications}}"
+  },
   "preferences": {
     "title": "環境設定",
     "notifications": "通知",

@@ -8,6 +8,26 @@
     "addAnother": "Add Another Baby",
     "addAnotherDesc": "Track multiple children"
   },
+  "notifications": {
+    "title": "Notifications",
+    "enable": "Enable Notifications",
+    "enableDesc": "Get reminders for appointments and medications",
+    "appointments": "Appointments",
+    "appointmentsDesc": "Doctor visits, vaccinations",
+    "medications": "Medications",
+    "medicationsDesc": "Daily medication reminder",
+    "reminderTime": "Reminder Time",
+    "reminderTimeDesc": "When to send daily medication reminder",
+    "permissionDenied": "Notification permission was denied. Enable it in your device settings.",
+    "visitTomorrow": "{{babyName}} has an appointment tomorrow",
+    "visitTomorrowBody": "{{type}} appointment tomorrow",
+    "visitToday": "{{babyName}} has an appointment today",
+    "visitTodayBody": "{{type}} appointment is today!",
+    "vaccinationDue": "{{babyName}}'s vaccination coming up",
+    "vaccinationDueBody": "{{vaccine}} (dose {{dose}}) is due soon",
+    "medicationReminder": "{{babyName}}'s medications",
+    "medicationReminderBody": "Time for: {{medications}}"
+  },
   "preferences": {
     "title": "Preferences",
     "notifications": "Notifications",

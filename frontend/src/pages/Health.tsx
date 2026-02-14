@@ -5,6 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import { Baby } from 'lucide-react';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../data/whoGrowthData';
+import { useNotificationSync } from '../hooks/useNotificationSync';
 
 // Components
 import GrowthCard from '../components/health/GrowthCard';
@@ -18,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 export default function Health() {
     const { t } = useTranslation('health');
     const { selectedBaby } = useBaby();
+    const { reschedule } = useNotificationSync(selectedBaby?.id, selectedBaby?.name);
     const [loading, setLoading] = useState(true);
 
     // Data
@@ -60,6 +62,7 @@ export default function Health() {
             setTeeth(t);
             setSickDays(s);
             setAllergies(a);
+            reschedule();
         } catch (error) {
             toast.error(t('failedToLoad'));
         } finally {
