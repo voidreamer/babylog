@@ -458,7 +458,7 @@ h4 {
 
 .notification-time-input {
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
   background: var(--surface-hover);
@@ -3813,6 +3813,18 @@ h4 {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text);
+}
+
+.widget-age-hint {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  margin-left: 4px;
+  vertical-align: middle;
 }
 
 .widget-settings-check {
@@ -7264,4 +7276,9 @@ a.settings-row {
   .med-quick-log-sheet {
     border-radius: var(--radius-xl);
   }
+}
+
+/* Prevent iOS zoom on input focus */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea { font-size: 16px !important; }
 }

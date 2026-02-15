@@ -378,7 +378,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return children;
 }
 
-function buildHubUrl(session, theme) {
+function buildHubUrl(session: { access_token?: string; refresh_token?: string } | null, theme: string) {
     const url = new URL('https://heybub.app');
     if (session?.access_token && session?.refresh_token) {
         url.searchParams.set('auth_relay', session.access_token);
