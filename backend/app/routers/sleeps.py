@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from typing import List, Optional
 from datetime import datetime, timezone
 from ..database import get_db
 from ..models import Sleep, Baby
 from ..schemas import SleepCreate, SleepUpdate, SleepResponse
 from ..auth import get_current_user, get_user_email
-from .utils import verify_baby_access
+from .utils import verify_baby_access, require_write_access, baby_access_filter
 
 router = APIRouter(prefix="/sleeps", tags=["sleeps"])
 
@@ -23,8 +22,8 @@ def get_sleeps(
 ):
     """Get all sleep sessions for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
+
     return db.query(Sleep).filter(
         Sleep.baby_id == baby_id
     ).order_by(Sleep.start_time.desc()).offset(skip).limit(limit).all()
@@ -39,7 +38,7 @@ def get_current_sleep(
 ):
     """Get the current active sleep session (if baby is sleeping)."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Sleep).filter(
         Sleep.baby_id == baby_id,
@@ -56,13 +55,10 @@ def get_sleep(
 ):
     """Get a specific sleep session by ID."""
     user_id = user.get("sub")
-    
+
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     
     if not sleep:
@@ -80,8 +76,9 @@ def create_sleep(
 ):
     """Start or log a sleep session."""
     user_id = user.get("sub")
-    verify_baby_access(db, sleep_data.baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, sleep_data.baby_id, user_id, user_email)
+    require_write_access(role)
+
     sleep = Sleep(
         baby_id=sleep_data.baby_id,
         start_time=sleep_data.start_time,
@@ -104,18 +101,19 @@ def update_sleep(
 ):
     """Update a sleep session (e.g., end the sleep)."""
     user_id = user.get("sub")
-    
+
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not sleep:
         raise HTTPException(status_code=404, detail="Sleep not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, sleep.baby_id, user_id, user_email)
+    require_write_access(role)
+
     update_data = sleep_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(sleep, field, value)
@@ -134,18 +132,19 @@ def end_sleep(
 ):
     """End an active sleep session (sets end_time to now)."""
     user_id = user.get("sub")
-    
+
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not sleep:
         raise HTTPException(status_code=404, detail="Sleep not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, sleep.baby_id, user_id, user_email)
+    require_write_access(role)
+
     if sleep.end_time:
         raise HTTPException(status_code=400, detail="Sleep already ended")
     
@@ -164,18 +163,19 @@ def delete_sleep(
 ):
     """Delete a sleep record."""
     user_id = user.get("sub")
-    
+
     sleep = db.query(Sleep).join(Baby).filter(
         Sleep.id == sleep_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not sleep:
         raise HTTPException(status_code=404, detail="Sleep not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, sleep.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(sleep)
     db.commit()
     return None

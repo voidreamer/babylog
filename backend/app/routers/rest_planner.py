@@ -22,6 +22,7 @@ from ..auth import get_current_user, get_user_email
 from ..models import Baby, Feeding, Sleep
 from ..benchmarks import calculate_age_weeks, get_wake_window_benchmarks
 from ..predictions import make_aware, calculate_standard_deviation, calculate_sleep_pressure
+from .utils import verify_baby_access
 
 router = APIRouter(prefix="/rest-planner", tags=["rest-planner"])
 logger = logging.getLogger(__name__)
@@ -40,21 +41,6 @@ CIRCADIAN_GATES: Dict[Tuple[int, int], List[Tuple[float, float]]] = {
     (78, 999): [(13.0, 0.9)],                                # 18m+
 }
 CIRCADIAN_SIGMA = 1.0
-
-
-def get_baby_or_404(db: Session, baby_id: int, user_id: str, user_email: str) -> Baby:
-    """Get baby by ID, ensuring user has access."""
-    from fastapi import HTTPException
-    baby = db.query(Baby).filter(Baby.id == baby_id).first()
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    has_access = (
-        baby.user_id == user_id
-        or (user_email and user_email in (baby.shared_with_emails or []))
-    )
-    if not has_access:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    return baby
 
 
 # =============================================================================
@@ -739,7 +725,7 @@ async def get_rest_plan(
     from fastapi import HTTPException
     try:
         user_id = user.get("sub")
-        baby = get_baby_or_404(db, baby_id, user_id, user_email)
+        baby, _role = verify_baby_access(db, baby_id, user_id, user_email)
         now = datetime.now(timezone.utc)
         start_date = now - timedelta(days=days)
 

@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from typing import List
 from ..database import get_db
 from ..models import Feeding, Baby
 from ..schemas import FeedingCreate, FeedingUpdate, FeedingResponse
 from ..auth import get_current_user, get_user_email
-from .utils import verify_baby_access
+from .utils import verify_baby_access, require_write_access, baby_access_filter
 
 router = APIRouter(prefix="/feedings", tags=["feedings"])
 
@@ -22,8 +21,8 @@ def get_feedings(
 ):
     """Get all feedings for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
+
     return db.query(Feeding).filter(
         Feeding.baby_id == baby_id
     ).order_by(Feeding.time.desc()).offset(skip).limit(limit).all()
@@ -38,13 +37,10 @@ def get_feeding(
 ):
     """Get a specific feeding by ID."""
     user_id = user.get("sub")
-    
+
     feeding = db.query(Feeding).join(Baby).filter(
         Feeding.id == feeding_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     
     if not feeding:
@@ -62,8 +58,9 @@ def create_feeding(
 ):
     """Log a new feeding."""
     user_id = user.get("sub")
-    verify_baby_access(db, feeding_data.baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, feeding_data.baby_id, user_id, user_email)
+    require_write_access(role)
+
     feeding = Feeding(
         baby_id=feeding_data.baby_id,
         time=feeding_data.time,
@@ -88,18 +85,19 @@ def update_feeding(
 ):
     """Update a feeding record."""
     user_id = user.get("sub")
-    
+
     feeding = db.query(Feeding).join(Baby).filter(
         Feeding.id == feeding_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not feeding:
         raise HTTPException(status_code=404, detail="Feeding not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, feeding.baby_id, user_id, user_email)
+    require_write_access(role)
+
     update_data = feeding_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(feeding, field, value)
@@ -118,18 +116,19 @@ def delete_feeding(
 ):
     """Delete a feeding record."""
     user_id = user.get("sub")
-    
+
     feeding = db.query(Feeding).join(Baby).filter(
         Feeding.id == feeding_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not feeding:
         raise HTTPException(status_code=404, detail="Feeding not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, feeding.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(feeding)
     db.commit()
     return None

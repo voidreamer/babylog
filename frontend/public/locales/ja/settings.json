@@ -4,9 +4,7 @@
     "title": "赤ちゃんのプロフィール",
     "born": "{{date}}生まれ",
     "growthData": "成長データ",
-    "growthDataDesc": "体重・身長を更新",
-    "addAnother": "もう一人登録",
-    "addAnotherDesc": "複数のお子様を管理"
+    "growthDataDesc": "体重・身長を更新"
   },
   "notifications": {
     "title": "通知",
@@ -53,7 +51,8 @@
     },
     "caregivers": "保育者",
     "caregiversDesc": "家族と共有",
-    "comingSoon": "近日公開"
+    "sharedWithYou": "あなたと共有中",
+    "shared": "{{count}}人と共有"
   },
   "data": {
     "title": "データ",
@@ -67,8 +66,8 @@
   },
   "navigation": {
     "title": "ナビゲーション",
-    "backToHub": "HeyBub Hubに戻る",
-    "backToHubDesc": "メインサイトに戻る"
+    "hubTitle": "HeyBub Hub",
+    "hubDesc": "親のための記事、サービスなど"
   },
   "support": {
     "title": "サポート",

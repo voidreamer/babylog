@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { api } from '../api/client';
-import ShareModal from './ShareModal';
+import CaregiverModal from './CaregiverModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 import UpgradeDialog from './UpgradeDialog';
@@ -231,7 +231,7 @@ export default function BabySelector(): React.ReactElement | null {
             )}
 
             {showShareModal && selectedBaby && (
-                <ShareModal
+                <CaregiverModal
                     baby={selectedBaby}
                     onClose={() => setShowShareModal(false)}
                     onShare={() => refresh()}

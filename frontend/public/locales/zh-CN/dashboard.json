@@ -345,12 +345,17 @@
     "months": "个月"
   },
   "share": {
-    "shareTitle": "共享 {{name}}",
-    "addByEmail": "通过邮箱添加",
-    "share": "共享",
-    "sharedWith": "已共享给",
+    "title": "{{name}}的照顾者",
+    "addCaregiver": "添加照顾者",
+    "emailPlaceholder": "伴侣@示例.com",
+    "add": "添加",
+    "owner": "所有者",
+    "caregiver": "照顾者",
+    "viewer": "查看者",
+    "caregiverDesc": "可以记录和编辑活动",
+    "viewerDesc": "只能查看数据",
     "remove": "移除",
-    "shareHint": "输入邮箱地址，将 {{name}} 的访问权限共享给另一个人。",
+    "noCaregiversHint": "输入电子邮件地址添加照顾者。",
     "done": "完成"
   },
   "babySelector": {

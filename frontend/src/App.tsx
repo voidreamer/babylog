@@ -13,7 +13,7 @@ import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
-import Learn from './components/Learn';
+import Insights from './components/Insights';
 import LanguageSwitcher from './components/LanguageSwitcher';
 
 // Lazy load routes for bundle splitting
@@ -22,17 +22,19 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown, Bell } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
+import CaregiverModal from './components/CaregiverModal';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; onRefreshBabies: () => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl, onRefreshBabies }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
     const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings);
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
+    const [showShareModal, setShowShareModal] = useState(false);
 
     const currentBaby = babies?.[0];
 
@@ -106,16 +108,6 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <div>
                                 <div className="settings-row-label">{t('settings:babyProfile.growthData')}</div>
                                 <div className="settings-row-desc">{t('settings:babyProfile.growthDataDesc')}</div>
-                            </div>
-                        </div>
-                        <ChevronRight size={18} className="settings-arrow" />
-                    </div>
-                    <div className="settings-row" onClick={() => setActiveTab('home')}>
-                        <div className="settings-row-left">
-                            <div className="settings-icon-box lavender">👶</div>
-                            <div>
-                                <div className="settings-row-label">{t('settings:babyProfile.addAnother')}</div>
-                                <div className="settings-row-desc">{t('settings:babyProfile.addAnotherDesc')}</div>
                             </div>
                         </div>
                         <ChevronRight size={18} className="settings-arrow" />
@@ -258,15 +250,28 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         <ChevronRight size={18} className="settings-arrow" />
                     )}
                 </div>
-                <div className="settings-row">
+                <div className="settings-row" onClick={currentBaby?.is_owner !== false ? () => setShowShareModal(true) : undefined}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box butter">👥</div>
                         <div>
                             <div className="settings-row-label">{t('settings:account.caregivers')}</div>
-                            <div className="settings-row-desc">{t('settings:account.caregiversDesc')}</div>
+                            <div className="settings-row-desc">
+                                {currentBaby?.is_owner === false
+                                    ? t('settings:account.sharedWithYou')
+                                    : t('settings:account.caregiversDesc')}
+                            </div>
                         </div>
                     </div>
-                    <span className="settings-badge lavender">{t('settings:account.comingSoon')}</span>
+                    {currentBaby?.is_owner !== false ? (
+                        <>
+                            {(currentBaby?.shared_with?.length ?? 0) > 0 && (
+                                <span className="settings-badge mint">{t('settings:account.shared', { count: currentBaby.shared_with.length })}</span>
+                            )}
+                            <ChevronRight size={18} className="settings-arrow" />
+                        </>
+                    ) : (
+                        <span className="settings-badge lavender">{t('settings:account.sharedWithYou')}</span>
+                    )}
                 </div>
                 <div
                     className={`settings-row ${!isPremium ? 'settings-row--disabled' : ''}`}
@@ -293,11 +298,11 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 <a className="settings-row" href={hubUrl}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
-                            <ArrowLeft size={16} />
+                            <Globe size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:navigation.backToHub')}</div>
-                            <div className="settings-row-desc">{t('settings:navigation.backToHubDesc')}</div>
+                            <div className="settings-row-label">{t('settings:navigation.hubTitle')}</div>
+                            <div className="settings-row-desc">{t('settings:navigation.hubDesc')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -356,6 +361,14 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             </div>
 
             <p className="settings-version">{t('app.version', { version: '1.0.0' })}</p>
+
+            {showShareModal && currentBaby && (
+                <CaregiverModal
+                    baby={currentBaby}
+                    onClose={() => setShowShareModal(false)}
+                    onShare={() => onRefreshBabies()}
+                />
+            )}
         </div>
     );
 }
@@ -393,7 +406,7 @@ function buildHubUrl(session: { access_token?: string; refresh_token?: string } 
 function MainApp() {
     const { t, i18n } = useTranslation('common');
     const { user, session, logout } = useAuth();
-    const { babies, loading: babiesLoading } = useBaby();
+    const { babies, loading: babiesLoading, refresh } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -640,9 +653,9 @@ function MainApp() {
                         </Suspense>
                     </ErrorBoundary>
                 )}
-                {activeTab === 'learn' && (
+                {activeTab === 'insights' && (
                     <ErrorBoundary level="page">
-                        <Learn isPremium={isPremium} />
+                        <Insights isPremium={isPremium} />
                     </ErrorBoundary>
                 )}
                 {activeTab === 'settings' && (
@@ -661,6 +674,7 @@ function MainApp() {
                         onManage={handleManageSubscription}
                         setActiveTab={setActiveTab}
                         hubUrl={buildHubUrl(session, theme)}
+                        onRefreshBabies={refresh}
                     />
                 )}
             </main>
@@ -691,8 +705,8 @@ function MainApp() {
                     <span>{t('nav.health')}</span>
                 </button>
                 <button
-                    className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('learn'); }}
+                    className={`bottom-nav-item ${activeTab === 'insights' ? 'active' : ''}`}
+                    onClick={() => { hapticSelection(); setActiveTab('insights'); }}
                 >
                     <PieChart size={22} />
                     <span>{t('nav.insights')}</span>

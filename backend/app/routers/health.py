@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, or_
+from sqlalchemy import desc
 from typing import List
 from datetime import datetime, timedelta, timezone
 
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user, get_user_id, get_user_email
+from .utils import baby_access_filter, verify_baby_access, require_write_access
 
 router = APIRouter(
     prefix="/health",
@@ -19,10 +20,7 @@ def get_accessible_baby(db: Session, baby_id: int, user_id: str, user_email: str
     """Get a baby if user owns it or it's shared with them."""
     baby = db.query(models.Baby).filter(
         models.Baby.id == baby_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     return baby
 
@@ -49,15 +47,14 @@ def get_doctor_visits(
 
 @router.post("/doctor-visits/", response_model=schemas.DoctorVisitResponse)
 def create_doctor_visit(
-    visit: schemas.DoctorVisitCreate, 
-    db: Session = Depends(get_db), 
+    visit: schemas.DoctorVisitCreate,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, visit.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    
+    baby, role = verify_baby_access(db, visit.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db_visit = models.DoctorVisit(**visit.model_dump())
     db.add(db_visit)
     db.commit()
@@ -75,13 +72,13 @@ def update_doctor_visit(
 ):
     visit = db.query(models.DoctorVisit).join(models.Baby).filter(
         models.DoctorVisit.id == visit_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
+
+    _, role = verify_baby_access(db, visit.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in visit_data.model_dump().items():
         if key != 'baby_id':
@@ -101,13 +98,13 @@ def delete_doctor_visit(
 ):
     visit = db.query(models.DoctorVisit).join(models.Baby).filter(
         models.DoctorVisit.id == visit_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
+
+    _, role = verify_baby_access(db, visit.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db.delete(visit)
     db.commit()
@@ -136,15 +133,14 @@ def get_vaccinations(
 
 @router.post("/vaccinations/", response_model=schemas.VaccinationResponse)
 def create_vaccination(
-    vaccination: schemas.VaccinationCreate, 
-    db: Session = Depends(get_db), 
+    vaccination: schemas.VaccinationCreate,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, vaccination.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    
+    baby, role = verify_baby_access(db, vaccination.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db_vacc = models.Vaccination(**vaccination.model_dump())
     db.add(db_vacc)
     db.commit()
@@ -162,13 +158,13 @@ def update_vaccination(
 ):
     vacc = db.query(models.Vaccination).join(models.Baby).filter(
         models.Vaccination.id == vaccination_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not vacc:
         raise HTTPException(status_code=404, detail="Vaccination not found")
+
+    _, role = verify_baby_access(db, vacc.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in vaccination_data.model_dump().items():
         if key != 'baby_id':
@@ -181,21 +177,21 @@ def update_vaccination(
 
 @router.delete("/vaccinations/{vaccination_id}")
 def delete_vaccination(
-    vaccination_id: int, 
-    db: Session = Depends(get_db), 
+    vaccination_id: int,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
     vacc = db.query(models.Vaccination).join(models.Baby).filter(
         models.Vaccination.id == vaccination_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not vacc:
         raise HTTPException(status_code=404, detail="Vaccination not found")
-    
+
+    _, role = verify_baby_access(db, vacc.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(vacc)
     db.commit()
     return {"message": "Deleted"}
@@ -226,15 +222,14 @@ def get_medications(
 
 @router.post("/medications/", response_model=schemas.MedicationResponse)
 def create_medication(
-    medication: schemas.MedicationCreate, 
-    db: Session = Depends(get_db), 
+    medication: schemas.MedicationCreate,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, medication.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    
+    baby, role = verify_baby_access(db, medication.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db_med = models.Medication(**medication.model_dump())
     db.add(db_med)
     db.commit()
@@ -252,13 +247,13 @@ def update_medication(
 ):
     med = db.query(models.Medication).join(models.Baby).filter(
         models.Medication.id == medication_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
+
+    _, role = verify_baby_access(db, med.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in medication_data.model_dump().items():
         if key != 'baby_id':
@@ -278,13 +273,13 @@ def toggle_medication_active(
 ):
     med = db.query(models.Medication).join(models.Baby).filter(
         models.Medication.id == medication_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
+
+    _, role = verify_baby_access(db, med.baby_id, user_id, user_email)
+    require_write_access(role)
 
     med.is_active = not med.is_active
     db.commit()
@@ -294,21 +289,21 @@ def toggle_medication_active(
 
 @router.delete("/medications/{medication_id}")
 def delete_medication(
-    medication_id: int, 
-    db: Session = Depends(get_db), 
+    medication_id: int,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
     med = db.query(models.Medication).join(models.Baby).filter(
         models.Medication.id == medication_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
-    
+
+    _, role = verify_baby_access(db, med.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(med)
     db.commit()
     return {"message": "Deleted"}
@@ -336,15 +331,14 @@ def get_milestones(
 
 @router.post("/milestones/", response_model=schemas.MilestoneResponse)
 def create_milestone(
-    milestone: schemas.MilestoneCreate, 
-    db: Session = Depends(get_db), 
+    milestone: schemas.MilestoneCreate,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, milestone.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    
+    baby, role = verify_baby_access(db, milestone.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db_milestone = models.Milestone(**milestone.model_dump())
     db.add(db_milestone)
     db.commit()
@@ -362,13 +356,13 @@ def update_milestone(
 ):
     milestone = db.query(models.Milestone).join(models.Baby).filter(
         models.Milestone.id == milestone_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not milestone:
         raise HTTPException(status_code=404, detail="Milestone not found")
+
+    _, role = verify_baby_access(db, milestone.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in milestone_data.model_dump().items():
         if key != 'baby_id':
@@ -381,21 +375,21 @@ def update_milestone(
 
 @router.delete("/milestones/{milestone_id}")
 def delete_milestone(
-    milestone_id: int, 
-    db: Session = Depends(get_db), 
+    milestone_id: int,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
     milestone = db.query(models.Milestone).join(models.Baby).filter(
         models.Milestone.id == milestone_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not milestone:
         raise HTTPException(status_code=404, detail="Milestone not found")
-    
+
+    _, role = verify_baby_access(db, milestone.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(milestone)
     db.commit()
     return {"message": "Deleted"}
@@ -423,15 +417,14 @@ def get_growth_records(
 
 @router.post("/growth/", response_model=schemas.GrowthRecordResponse)
 def create_growth_record(
-    record: schemas.GrowthRecordCreate, 
-    db: Session = Depends(get_db), 
+    record: schemas.GrowthRecordCreate,
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, record.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    
+    baby, role = verify_baby_access(db, record.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db_record = models.GrowthRecord(**record.model_dump())
     db.add(db_record)
     db.commit()
@@ -449,13 +442,13 @@ def update_growth_record(
 ):
     record = db.query(models.GrowthRecord).join(models.Baby).filter(
         models.GrowthRecord.id == record_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
+
+    _, role = verify_baby_access(db, record.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in record_data.model_dump().items():
         if key != 'baby_id':
@@ -475,13 +468,13 @@ def delete_growth_record(
 ):
     record = db.query(models.GrowthRecord).join(models.Baby).filter(
         models.GrowthRecord.id == record_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
+
+    _, role = verify_baby_access(db, record.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db.delete(record)
     db.commit()
@@ -515,9 +508,8 @@ def create_tooth(
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, tooth.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
+    baby, role = verify_baby_access(db, tooth.baby_id, user_id, user_email)
+    require_write_access(role)
 
     # Check if tooth at this position already exists
     existing = db.query(models.Tooth).filter(
@@ -544,13 +536,13 @@ def update_tooth(
 ):
     tooth = db.query(models.Tooth).join(models.Baby).filter(
         models.Tooth.id == tooth_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not tooth:
         raise HTTPException(status_code=404, detail="Tooth not found")
+
+    _, role = verify_baby_access(db, tooth.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in tooth_data.model_dump().items():
         if key != 'baby_id':
@@ -570,13 +562,13 @@ def delete_tooth(
 ):
     tooth = db.query(models.Tooth).join(models.Baby).filter(
         models.Tooth.id == tooth_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not tooth:
         raise HTTPException(status_code=404, detail="Tooth not found")
+
+    _, role = verify_baby_access(db, tooth.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db.delete(tooth)
     db.commit()
@@ -610,9 +602,8 @@ def create_sick_day(
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, sick_day.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
+    baby, role = verify_baby_access(db, sick_day.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db_sick_day = models.SickDay(**sick_day.model_dump())
     db.add(db_sick_day)
@@ -631,13 +622,13 @@ def update_sick_day(
 ):
     sick_day = db.query(models.SickDay).join(models.Baby).filter(
         models.SickDay.id == sick_day_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not sick_day:
         raise HTTPException(status_code=404, detail="Sick day not found")
+
+    _, role = verify_baby_access(db, sick_day.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in sick_day_data.model_dump().items():
         if key != 'baby_id':
@@ -657,13 +648,13 @@ def delete_sick_day(
 ):
     sick_day = db.query(models.SickDay).join(models.Baby).filter(
         models.SickDay.id == sick_day_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not sick_day:
         raise HTTPException(status_code=404, detail="Sick day not found")
+
+    _, role = verify_baby_access(db, sick_day.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db.delete(sick_day)
     db.commit()
@@ -697,9 +688,8 @@ def create_allergy(
     user_id: str = Depends(get_user_id),
     user_email: str = Depends(get_user_email)
 ):
-    baby = get_accessible_baby(db, allergy.baby_id, user_id, user_email)
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
+    baby, role = verify_baby_access(db, allergy.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db_allergy = models.Allergy(**allergy.model_dump())
     db.add(db_allergy)
@@ -718,13 +708,13 @@ def update_allergy(
 ):
     allergy = db.query(models.Allergy).join(models.Baby).filter(
         models.Allergy.id == allergy_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not allergy:
         raise HTTPException(status_code=404, detail="Allergy not found")
+
+    _, role = verify_baby_access(db, allergy.baby_id, user_id, user_email)
+    require_write_access(role)
 
     for key, value in allergy_data.model_dump().items():
         if key != 'baby_id':
@@ -744,13 +734,13 @@ def delete_allergy(
 ):
     allergy = db.query(models.Allergy).join(models.Baby).filter(
         models.Allergy.id == allergy_id,
-        or_(
-            models.Baby.user_id == user_id,
-            models.Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     if not allergy:
         raise HTTPException(status_code=404, detail="Allergy not found")
+
+    _, role = verify_baby_access(db, allergy.baby_id, user_id, user_email)
+    require_write_access(role)
 
     db.delete(allergy)
     db.commit()

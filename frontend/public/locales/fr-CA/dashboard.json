@@ -345,12 +345,17 @@
     "months": "mois"
   },
   "share": {
-    "shareTitle": "Partager {{name}}",
-    "addByEmail": "Ajouter par courriel",
-    "share": "Partager",
-    "sharedWith": "Partagé avec",
+    "title": "Aidants de {{name}}",
+    "addCaregiver": "Ajouter un aidant",
+    "emailPlaceholder": "partenaire@exemple.com",
+    "add": "Ajouter",
+    "owner": "Propriétaire",
+    "caregiver": "Aidant",
+    "viewer": "Observateur",
+    "caregiverDesc": "Peut enregistrer et modifier les activités",
+    "viewerDesc": "Peut seulement voir les données",
     "remove": "Retirer",
-    "shareHint": "Saisissez un e-mail pour partager l'accès à {{name}} avec une autre personne.",
+    "noCaregiversHint": "Ajoutez un aidant en entrant son adresse courriel.",
     "done": "Terminé"
   },
   "babySelector": {

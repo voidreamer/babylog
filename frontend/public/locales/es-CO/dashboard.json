@@ -345,13 +345,18 @@
     "months": "meses"
   },
   "share": {
-    "shareTitle": "Compartir {{name}}",
-    "addByEmail": "Añadir por correo electrónico",
-    "share": "Compartir",
-    "sharedWith": "Compartido con",
+    "title": "Cuidadores de {{name}}",
+    "addCaregiver": "Agregar cuidador",
+    "emailPlaceholder": "pareja@ejemplo.com",
+    "add": "Agregar",
+    "owner": "Propietario",
+    "caregiver": "Cuidador",
+    "viewer": "Observador",
+    "caregiverDesc": "Puede registrar y editar actividades",
+    "viewerDesc": "Solo puede ver datos",
     "remove": "Eliminar",
-    "shareHint": "Introduzca un correo electrónico para compartir el acceso a {{name}} con otra persona.",
-    "done": "Hecho"
+    "noCaregiversHint": "Agrega un cuidador ingresando su correo electrónico.",
+    "done": "Listo"
   },
   "babySelector": {
     "addBaby": "+ Añadir bebé",

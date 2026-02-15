@@ -345,13 +345,18 @@
     "months": "महीने"
   },
   "share": {
-    "shareTitle": "{{name}} शेयर करें",
-    "addByEmail": "ईमेल से जोड़ें",
-    "share": "शेयर करें",
-    "sharedWith": "इनके साथ शेयर किया गया",
+    "title": "{{name}} के केयरगिवर",
+    "addCaregiver": "केयरगिवर जोड़ें",
+    "emailPlaceholder": "साथी@example.com",
+    "add": "जोड़ें",
+    "owner": "मालिक",
+    "caregiver": "केयरगिवर",
+    "viewer": "दर्शक",
+    "caregiverDesc": "गतिविधियाँ दर्ज और संपादित कर सकते हैं",
+    "viewerDesc": "केवल डेटा देख सकते हैं",
     "remove": "हटाएं",
-    "shareHint": "{{name}} का एक्सेस किसी अन्य व्यक्ति के साथ शेयर करने के लिए ईमेल दर्ज करें।",
-    "done": "हो गया"
+    "noCaregiversHint": "ईमेल पता दर्ज करके केयरगिवर जोड़ें।",
+    "done": "पूर्ण"
   },
   "babySelector": {
     "addBaby": "+ शिशु जोड़ें",

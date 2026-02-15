@@ -345,12 +345,17 @@
     "months": "ヶ月"
   },
   "share": {
-    "shareTitle": "{{name}}を共有",
-    "addByEmail": "メールで追加",
-    "share": "共有",
-    "sharedWith": "共有相手",
+    "title": "{{name}}のケアギバー",
+    "addCaregiver": "ケアギバーを追加",
+    "emailPlaceholder": "パートナー@example.com",
+    "add": "追加",
+    "owner": "オーナー",
+    "caregiver": "ケアギバー",
+    "viewer": "閲覧者",
+    "caregiverDesc": "活動を記録・編集できます",
+    "viewerDesc": "データの閲覧のみ",
     "remove": "削除",
-    "shareHint": "メールアドレスを入力して、{{name}}のアクセスを他の方と共有できます。",
+    "noCaregiversHint": "メールアドレスを入力してケアギバーを追加してください。",
     "done": "完了"
   },
   "babySelector": {

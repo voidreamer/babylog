@@ -4,9 +4,7 @@
     "title": "Baby Profile",
     "born": "Born {{date}}",
     "growthData": "Growth Data",
-    "growthDataDesc": "Update weight, height",
-    "addAnother": "Add Another Baby",
-    "addAnotherDesc": "Track multiple children"
+    "growthDataDesc": "Update weight, height"
   },
   "notifications": {
     "title": "Notifications",
@@ -53,7 +51,8 @@
     },
     "caregivers": "Caregivers",
     "caregiversDesc": "Share with family",
-    "comingSoon": "Coming soon"
+    "sharedWithYou": "Shared with you",
+    "shared": "{{count}} shared"
   },
   "data": {
     "title": "Data",
@@ -67,8 +66,8 @@
   },
   "navigation": {
     "title": "Navigation",
-    "backToHub": "Back to HeyBub Hub",
-    "backToHubDesc": "Return to the main site"
+    "hubTitle": "HeyBub Hub",
+    "hubDesc": "Articles, services & more for parents"
   },
   "support": {
     "title": "Support",

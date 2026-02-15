@@ -4,9 +4,7 @@
     "title": "शिशु प्रोफ़ाइल",
     "born": "जन्म {{date}}",
     "growthData": "ग्रोथ डेटा",
-    "growthDataDesc": "वज़न, लंबाई अपडेट करें",
-    "addAnother": "एक और शिशु जोड़ें",
-    "addAnotherDesc": "कई बच्चों को ट्रैक करें"
+    "growthDataDesc": "वज़न, लंबाई अपडेट करें"
   },
   "notifications": {
     "title": "सूचनाएं",
@@ -53,7 +51,8 @@
     },
     "caregivers": "देखभालकर्ता",
     "caregiversDesc": "परिवार के साथ शेयर करें",
-    "comingSoon": "जल्द आ रहा है"
+    "sharedWithYou": "आपके साथ साझा किया गया",
+    "shared": "{{count}} साझा"
   },
   "data": {
     "title": "डेटा",
@@ -67,8 +66,8 @@
   },
   "navigation": {
     "title": "नेविगेशन",
-    "backToHub": "HeyBub Hub पर वापस जाएं",
-    "backToHubDesc": "मुख्य साइट पर लौटें"
+    "hubTitle": "HeyBub Hub",
+    "hubDesc": "माता-पिता के लिए लेख, सेवाएं और अधिक"
   },
   "support": {
     "title": "सहायता",

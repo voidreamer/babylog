@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Numeric
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from .database import Base
@@ -45,7 +45,7 @@ class Baby(Base):
     birth_date = Column(DateTime, nullable=True)
     gender = Column(String, nullable=True)  # 'boy', 'girl', or null
     profile_photo_url = Column(String, nullable=True)
-    shared_with_emails = Column(ARRAY(String), default=list)
+    shared_with = Column(JSONB, default=list, server_default="[]")
     created_at = Column(DateTime, default=utc_now)
 
     # Relationships

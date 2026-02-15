@@ -345,12 +345,17 @@
     "months": "months"
   },
   "share": {
-    "shareTitle": "Share {{name}}",
-    "addByEmail": "Add by email",
-    "share": "Share",
-    "sharedWith": "Shared with",
+    "title": "Caregivers for {{name}}",
+    "addCaregiver": "Add caregiver",
+    "emailPlaceholder": "partner@example.com",
+    "add": "Add",
+    "owner": "Owner",
+    "caregiver": "Caregiver",
+    "viewer": "Viewer",
+    "caregiverDesc": "Can log and edit activities",
+    "viewerDesc": "Can view data only",
     "remove": "Remove",
-    "shareHint": "Enter an email to share access to {{name}} with another person.",
+    "noCaregiversHint": "Add a caregiver by entering their email address.",
     "done": "Done"
   },
   "babySelector": {
