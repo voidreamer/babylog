@@ -111,7 +111,8 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
         setSaving(true);
         try {
             // Calculate date from birth_date + selected month
-            const birthDate = new Date(baby.birth_date + 'T12:00:00');
+            const dateStr = baby.birth_date.split('T')[0]; // normalize to YYYY-MM-DD
+            const birthDate = new Date(dateStr + 'T12:00:00');
             const recordDate = addMonths(birthDate, effectiveMonth);
 
             const data = {
