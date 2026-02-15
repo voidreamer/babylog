@@ -31,7 +31,8 @@
     "refPercentile": "50th percentile: {{value}} {{unit}}",
     "month": "Month",
     "months": "months",
-    "current": "current"
+    "current": "current",
+    "birthDateRequired": "Please set baby's birth date first"
   },
   "milestones": {
     "title": "Milestones",

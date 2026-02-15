@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 
 // CDC/WHO recommended vaccination schedule (0-24 months)
 const VACCINATION_SCHEDULE = [
@@ -122,8 +123,8 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
       setMarkingVaccine(null);
       setMarkDate(new Date().toISOString().split('T')[0]);
       if (onDataChanged) onDataChanged();
-    } catch {
-      toast.error(t('failedToSave'));
+    } catch (error) {
+      showApiError(error, t('failedToSave'), t);
     } finally {
       setSaving(false);
     }

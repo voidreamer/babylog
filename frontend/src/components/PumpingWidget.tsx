@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Clock, Square, Plus, Droplets } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
@@ -81,7 +82,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
             onPumpingChange();
         } catch (error) {
             console.error('Failed to log pumping:', error);
-            toast.error(t('toast_failedToSavePumping'));
+            showApiError(error, t('toast_failedToSavePumping'), t);
         } finally {
             setQuickSaving(false);
         }
@@ -122,7 +123,7 @@ export default function PumpingWidget({ lastPumping, onPumpingChange, onOpenModa
             onPumpingChange();
         } catch (error) {
             console.error('Failed to save pumping:', error);
-            toast.error(t('toast_failedToSavePumping'));
+            showApiError(error, t('toast_failedToSavePumping'), t);
         } finally {
             setSaving(false);
         }

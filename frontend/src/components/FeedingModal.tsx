@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Baby, Pencil, Timer, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
@@ -143,7 +144,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             onSave();
         } catch (error) {
             console.error('Failed to save feeding (timer):', error);
-            toast.error(t('toast_failedToSaveFeeding'));
+            showApiError(error, t('toast_failedToSaveFeeding'), t);
         } finally {
             setSaving(false);
         }
@@ -191,7 +192,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
             onSave();
         } catch (error) {
             console.error('Failed to save feeding (quick):', error);
-            toast.error(t('toast_failedToSaveFeeding'));
+            showApiError(error, t('toast_failedToSaveFeeding'), t);
         } finally {
             setSaving(false);
         }

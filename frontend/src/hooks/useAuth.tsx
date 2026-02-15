@@ -4,6 +4,9 @@ import { Browser } from '@capacitor/browser';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
+const isDev = import.meta.env.DEV;
+const log = (...args: unknown[]) => isDev && console.log(...args);
+
 interface AuthContextValue {
     user: SupabaseUser | null;
     session: Session | null;
@@ -31,7 +34,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const refreshToken = params.get('refresh_token');
 
         if (accessToken && refreshToken) {
-            console.log('[Auth] Auth relay detected, setting session');
+            log('[Auth] Auth relay detected, setting session');
             // Consume theme param before cleaning URL
             const themeParam = params.get('theme');
             if (themeParam === 'dark' || themeParam === 'light') {
@@ -53,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 if (error) {
                     console.error('[Auth] Auth relay failed:', error);
                 } else {
-                    console.log('[Auth] Auth relay success');
+                    log('[Auth] Auth relay success');
                     setSession(session);
                     setUser(session?.user ?? null);
                 }
@@ -75,14 +78,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Check active session on mount
         supabase.auth.getSession().then(({ data: { session } }) => {
-            console.log('[Auth] Initial session:', session ? session.user?.email : 'none');
+            log('[Auth] Initial session:', session ? session.user?.email : 'none');
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            console.log('[Auth] State change:', _event, session?.user?.email ?? 'no-user');
+            log('[Auth] State change:', _event, session?.user?.email ?? 'no-user');
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
@@ -90,12 +93,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Listen for native deep link auth (main.tsx passes session via window global)
         const handleNativeAuth = () => {
-            console.log('[Auth] native-auth-success event fired');
+            log('[Auth] native-auth-success event fired');
             const nativeSession = (window as any).__nativeSession;
-            console.log('[Auth] __nativeSession:', nativeSession ? 'exists' : 'missing');
+            log('[Auth] __nativeSession:', nativeSession ? 'exists' : 'missing');
             delete (window as any).__nativeSession;
             if (nativeSession) {
-                console.log('[Auth] Setting session from native:', nativeSession.user?.email);
+                log('[Auth] Setting session from native:', nativeSession.user?.email);
                 setSession(nativeSession);
                 setUser(nativeSession.user ?? null);
                 setLoading(false);
@@ -109,9 +112,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         let browserCleanup: (() => void) | null = null;
         if (Capacitor.isNativePlatform()) {
             Browser.addListener('browserFinished', async () => {
-                console.log('[Auth] Browser dismissed, checking session');
+                log('[Auth] Browser dismissed, checking session');
                 const { data: { session: s } } = await supabase.auth.getSession();
-                console.log('[Auth] Session after browser close:', s ? s.user?.email : 'none');
+                log('[Auth] Session after browser close:', s ? s.user?.email : 'none');
                 if (s) {
                     setSession(s);
                     setUser(s.user ?? null);

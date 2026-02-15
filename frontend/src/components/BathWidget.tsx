@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ShowerHead, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -30,7 +31,7 @@ export default function BathWidget({ lastBath, onBathChange, onOpenModal, quickA
             onBathChange();
         } catch (error) {
             console.error('Failed to log bath:', error);
-            toast.error(t('toast_failedToLogBath'));
+            showApiError(error, t('toast_failedToLogBath'), t);
         } finally {
             setSaving(false);
         }

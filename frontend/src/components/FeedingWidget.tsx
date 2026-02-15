@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Baby, Play, Square, Plus, Milk } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { hapticImpact, hapticNotification } from '../utils/haptics';
 import { motion } from 'framer-motion';
@@ -108,7 +109,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             onFeedingChange();
         } catch (error) {
             console.error('Failed to save feeding:', error);
-            toast.error(t('toast_failedToSaveFeeding'));
+            showApiError(error, t('toast_failedToSaveFeeding'), t);
         } finally {
             setSaving(false);
         }
@@ -135,7 +136,7 @@ export default function FeedingWidget({ babyId, lastFeeding, onFeedingChange, on
             onFeedingChange();
         } catch (error) {
             console.error('Failed to log feeding:', error);
-            toast.error(t('toast_failedToSaveFeeding'));
+            showApiError(error, t('toast_failedToSaveFeeding'), t);
         } finally {
             setQuickSaving(null);
         }

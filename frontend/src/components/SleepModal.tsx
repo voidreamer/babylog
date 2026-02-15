@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
             onSave();
         } catch (error) {
             console.error('Failed to log sleep:', error);
-            toast.error(t('toast_failedToLogSleep'));
+            showApiError(error, t('toast_failedToLogSleep'), t);
         } finally {
             setSaving(false);
         }

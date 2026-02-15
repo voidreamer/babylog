@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { format, parseISO } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +70,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             setIsAdding(false);
             if (onAllergyAdded) onAllergyAdded();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -81,7 +82,7 @@ export default function AllergiesCard({ baby, allergies, onAllergyAdded, onAller
             toast.success(t('toast_allergyRemoved'));
             if (onAllergyDeleted) onAllergyDeleted();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 

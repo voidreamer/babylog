@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Star, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { format, parseISO } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +45,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             setIsAdding(false);
             if (onMilestoneAdded) onMilestoneAdded();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -56,7 +57,7 @@ export default function MilestonesCard({ baby, milestones, onMilestoneAdded, onM
             toast.success(t('toast_milestoneDeleted'));
             if (onMilestoneDeleted) onMilestoneDeleted();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 

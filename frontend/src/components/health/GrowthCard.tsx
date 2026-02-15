@@ -4,6 +4,7 @@ import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { addMonths, format } from 'date-fns';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
@@ -97,6 +98,11 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!baby.birth_date) {
+            toast.error(t('growth.birthDateRequired'));
+            return;
+        }
+
         if (!formData.weight && !formData.height && !formData.head) {
             toast.error(t('toast_pleaseEnterAtLeastOneMeasurement'));
             return;
@@ -123,7 +129,8 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             setIsAdding(false);
             if (onRecordAdded) onRecordAdded();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            console.error('Failed to save growth record:', error);
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }

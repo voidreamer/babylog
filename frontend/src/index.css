@@ -859,42 +859,27 @@ h4 {
 }
 
 .widget.sleeping {
-  animation: sleeping-glow 2s ease-in-out infinite;
+  animation: sleeping-glow 3s ease-in-out infinite;
 }
 
-/* Sleep glow effect */
 .widget-glow {
   position: absolute;
-  inset: -50%;
-  background: radial-gradient(circle, rgba(96, 165, 250, 0.3) 0%, transparent 70%);
-  animation: glow-pulse 2s ease-in-out infinite;
+  inset: -4px;
+  border-radius: inherit;
+  background: transparent;
+  border: 2px solid rgba(96, 165, 250, 0.3);
+  animation: glow-pulse 3s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes sleeping-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4), inset 0 0 20px rgba(96, 165, 250, 0.1);
-  }
-
-  50% {
-    box-shadow: 0 0 40px rgba(96, 165, 250, 0.6), inset 0 0 30px rgba(96, 165, 250, 0.2);
-  }
+  0%, 100% { box-shadow: 0 0 8px rgba(96, 165, 250, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(96, 165, 250, 0.35); }
 }
 
 @keyframes glow-pulse {
-
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 /* Large semi-transparent background icon */

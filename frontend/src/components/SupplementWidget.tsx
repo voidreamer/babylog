@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pill, Plus, Check } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -45,7 +46,7 @@ export default function SupplementWidget({ lastSupplement, onSupplementChange, o
             }
         } catch (error) {
             console.error('Failed to log supplement:', error);
-            toast.error(t('toast_failedToLogSupplement'));
+            showApiError(error, t('toast_failedToLogSupplement'), t);
         } finally {
             setSaving(false);
         }

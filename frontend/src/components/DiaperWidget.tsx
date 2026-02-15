@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Droplets, CircleDot, Plus } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
@@ -31,7 +32,7 @@ export default function DiaperWidget({ babyId, lastDiaper, onDiaperChange, onOpe
             onDiaperChange();
         } catch (error) {
             console.error('Failed to log diaper:', error);
-            toast.error(t('toast_failedToLogDiaper'));
+            showApiError(error, t('toast_failedToLogDiaper'), t);
         } finally {
             setSaving(null);
         }

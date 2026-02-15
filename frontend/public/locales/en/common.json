@@ -88,6 +88,8 @@
     "weightKg": "Weight (kg)",
     "heightCm": "Height (cm)"
   },
+  "permissionDenied": "View-only access",
+  "permissionDeniedDesc": "Ask the baby's owner to upgrade your permissions.",
   "offlineIndicator": {
     "youreOffline": "You're offline",
     "changesPending": "{{count}} change{{s}} pending",

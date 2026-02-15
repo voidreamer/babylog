@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Droplets, CircleDot, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { hapticNotification } from '../utils/haptics';
 
@@ -71,7 +72,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
             onSave();
         } catch (error) {
             console.error('Failed to save diaper:', error);
-            toast.error(t('toast_failedToSaveDiaperChange'));
+            showApiError(error, t('toast_failedToSaveDiaperChange'), t);
         } finally {
             setSaving(false);
         }

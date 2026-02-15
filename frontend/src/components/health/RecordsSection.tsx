@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp, CalendarCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { format, parseISO, isFuture } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
@@ -126,7 +127,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
             setIsAdding(false);
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -138,7 +139,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
             toast.success(t('toast_visitDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 
@@ -331,7 +332,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
             setIsAdding(false);
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -343,7 +344,7 @@ function VaccinationsPanel({ baby, vaccinations, onDataChanged }: { baby: any; v
             toast.success(t('toast_vaccinationDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 
@@ -546,7 +547,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             setIsAdding(false);
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -558,7 +559,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             toast.success(t('toast_medicationDeleted'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 
@@ -568,7 +569,7 @@ function MedicationsPanel({ baby, medications, onDataChanged }: { baby: any; med
             toast.success(med.is_active ? t('records.medicationStopped') : t('records.medicationReactivated'));
             if (onDataChanged) onDataChanged();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         }
     };
 
