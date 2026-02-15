@@ -37,11 +37,19 @@ class BabyUpdate(BaseModel):
     profile_photo_url: Optional[str] = None
 
 
+CaregiverRole = Literal["viewer", "caregiver"]
+
+
+class CaregiverEntry(BaseModel):
+    email: str
+    role: CaregiverRole = "caregiver"
+
+
 class BabyResponse(BabyBase):
     id: int
     user_id: str
     owner_email: Optional[str] = None
-    shared_with_emails: List[str] = []
+    shared_with: List[CaregiverEntry] = []
     is_owner: bool = True
     created_at: datetime
 
@@ -53,6 +61,12 @@ class BabyResponse(BabyBase):
 
 class BabyShareRequest(BaseModel):
     email: str
+    role: CaregiverRole = "caregiver"
+
+
+class CaregiverRoleUpdate(BaseModel):
+    email: str
+    role: CaregiverRole
 
 
 # ============================================================================

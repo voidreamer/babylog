@@ -13,7 +13,6 @@ import BathWidget from './BathWidget';
 import SupplementWidget from './SupplementWidget';
 import PottyWidget from './PottyWidget';
 import WidgetSettings from './WidgetSettings';
-import SleepPressureWidget from './SleepPressureWidget';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
 import SleepModal from './SleepModal';
@@ -32,12 +31,7 @@ import { useTranslation } from 'react-i18next';
 // Default visible widgets - stored in localStorage
 const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
 
-interface DashboardProps {
-    isPremium?: boolean;
-    onNavigateToInsights?: () => void;
-}
-
-export default function Dashboard({ isPremium = false, onNavigateToInsights }: DashboardProps) {
+export default function Dashboard() {
     const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [dashboard, setDashboard] = useState<any>(null);
@@ -258,13 +252,6 @@ export default function Dashboard({ isPremium = false, onNavigateToInsights }: D
                         onSupplementChange={loadData}
                         onOpenModal={() => setSupplementModal(true)}
                         quickActionsEnabled={quickActionsEnabled}
-                    />
-                )}
-
-                {visibleWidgets.includes('pressure') && (
-                    <SleepPressureWidget
-                        isPremium={isPremium}
-                        onNavigateToInsights={onNavigateToInsights || (() => {})}
                     />
                 )}
 

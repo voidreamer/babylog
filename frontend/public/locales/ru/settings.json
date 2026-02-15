@@ -4,9 +4,7 @@
     "title": "Профиль малыша",
     "born": "Родился(ась) {{date}}",
     "growthData": "Данные о росте",
-    "growthDataDesc": "Обновить вес, рост",
-    "addAnother": "Добавить ещё малыша",
-    "addAnotherDesc": "Отслеживать нескольких детей"
+    "growthDataDesc": "Обновить вес, рост"
   },
   "notifications": {
     "title": "Уведомления",
@@ -68,8 +66,8 @@
   },
   "navigation": {
     "title": "Навигация",
-    "backToHub": "Вернуться в HeyBub Hub",
-    "backToHubDesc": "Перейти на главный сайт"
+    "hubTitle": "HeyBub Hub",
+    "hubDesc": "Статьи, услуги и многое другое для родителей"
   },
   "support": {
     "title": "Поддержка",

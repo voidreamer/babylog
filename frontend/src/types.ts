@@ -2,13 +2,20 @@
 // Core Domain Types
 // ============================================================================
 
+export type CaregiverRole = 'viewer' | 'caregiver';
+
+export interface CaregiverEntry {
+  email: string;
+  role: CaregiverRole;
+}
+
 export interface Baby {
   id: number;
   name: string;
   birth_date: string | null;
   gender: string | null;
   is_owner?: boolean;
-  shared_with_emails?: string[];
+  shared_with?: CaregiverEntry[];
   created_at?: string;
 }
 

@@ -22,10 +22,10 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown, Bell } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
-import ShareModal from './components/ShareModal';
+import CaregiverModal from './components/CaregiverModal';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
@@ -108,16 +108,6 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                             <div>
                                 <div className="settings-row-label">{t('settings:babyProfile.growthData')}</div>
                                 <div className="settings-row-desc">{t('settings:babyProfile.growthDataDesc')}</div>
-                            </div>
-                        </div>
-                        <ChevronRight size={18} className="settings-arrow" />
-                    </div>
-                    <div className="settings-row" onClick={() => setActiveTab('home')}>
-                        <div className="settings-row-left">
-                            <div className="settings-icon-box lavender">👶</div>
-                            <div>
-                                <div className="settings-row-label">{t('settings:babyProfile.addAnother')}</div>
-                                <div className="settings-row-desc">{t('settings:babyProfile.addAnotherDesc')}</div>
                             </div>
                         </div>
                         <ChevronRight size={18} className="settings-arrow" />
@@ -274,8 +264,8 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     {currentBaby?.is_owner !== false ? (
                         <>
-                            {(currentBaby?.shared_with_emails?.length ?? 0) > 0 && (
-                                <span className="settings-badge mint">{t('settings:account.shared', { count: currentBaby.shared_with_emails.length })}</span>
+                            {(currentBaby?.shared_with?.length ?? 0) > 0 && (
+                                <span className="settings-badge mint">{t('settings:account.shared', { count: currentBaby.shared_with.length })}</span>
                             )}
                             <ChevronRight size={18} className="settings-arrow" />
                         </>
@@ -308,11 +298,11 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 <a className="settings-row" href={hubUrl}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box sky">
-                            <ArrowLeft size={16} />
+                            <Globe size={16} />
                         </div>
                         <div>
-                            <div className="settings-row-label">{t('settings:navigation.backToHub')}</div>
-                            <div className="settings-row-desc">{t('settings:navigation.backToHubDesc')}</div>
+                            <div className="settings-row-label">{t('settings:navigation.hubTitle')}</div>
+                            <div className="settings-row-desc">{t('settings:navigation.hubDesc')}</div>
                         </div>
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
@@ -373,7 +363,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             <p className="settings-version">{t('app.version', { version: '1.0.0' })}</p>
 
             {showShareModal && currentBaby && (
-                <ShareModal
+                <CaregiverModal
                     baby={currentBaby}
                     onClose={() => setShowShareModal(false)}
                     onShare={() => onRefreshBabies()}
@@ -641,7 +631,7 @@ function MainApp() {
             <main>
                 {activeTab === 'home' && (
                     <ErrorBoundary level="page">
-                        <Dashboard isPremium={isPremium} onNavigateToInsights={() => setActiveTab('insights')} />
+                        <Dashboard />
                     </ErrorBoundary>
                 )}
                 {activeTab === 'timeline' && (

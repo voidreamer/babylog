@@ -3,13 +3,15 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { toast } from 'sonner';
 import { api } from '../api/client';
 
+interface CaregiverEntry { email: string; role: 'viewer' | 'caregiver'; }
+
 interface Baby {
     id: number;
     name: string;
     birth_date: string | null;
     gender: string | null;
     is_owner?: boolean;
-    shared_with_emails?: string[];
+    shared_with?: CaregiverEntry[];
     [key: string]: any;
 }
 

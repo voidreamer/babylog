@@ -4,9 +4,7 @@
     "title": "Perfil del bebé",
     "born": "Nacido {{date}}",
     "growthData": "Datos de crecimiento",
-    "growthDataDesc": "Actualizar peso, altura",
-    "addAnother": "Añadir otro bebé",
-    "addAnotherDesc": "Seguimiento de varios niños"
+    "growthDataDesc": "Actualizar peso, altura"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -68,8 +66,8 @@
   },
   "navigation": {
     "title": "Navegación",
-    "backToHub": "Volver a HeyBub Hub",
-    "backToHubDesc": "Regresar al sitio principal"
+    "hubTitle": "HeyBub Hub",
+    "hubDesc": "Artículos, servicios y más para padres"
   },
   "support": {
     "title": "Ayuda",

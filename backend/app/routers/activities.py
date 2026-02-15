@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from typing import List
 from ..database import get_db
 from ..models import Potty, TummyTime, Bath, Baby, Supplement
@@ -11,7 +10,7 @@ from ..schemas import (
     SupplementCreate, SupplementResponse
 )
 from ..auth import get_current_user, get_user_email
-from .utils import verify_baby_access
+from .utils import verify_baby_access, require_write_access, baby_access_filter
 
 router = APIRouter(prefix="/activities", tags=["activities"])
 
@@ -31,7 +30,7 @@ def get_potty_logs(
 ):
     """Get all potty logs for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Potty).filter(
         Potty.baby_id == baby_id
@@ -47,7 +46,8 @@ def create_potty_log(
 ):
     """Log a potty training event."""
     user_id = user.get("sub")
-    verify_baby_access(db, potty_data.baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, potty_data.baby_id, user_id, user_email)
+    require_write_access(role)
     
     potty = Potty(
         baby_id=potty_data.baby_id,
@@ -71,18 +71,18 @@ def delete_potty_log(
 ):
     """Delete a potty log."""
     user_id = user.get("sub")
-    
+
     potty = db.query(Potty).join(Baby).filter(
         Potty.id == potty_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not potty:
         raise HTTPException(status_code=404, detail="Potty log not found")
-    
+
+    _, role = verify_baby_access(db, potty.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(potty)
     db.commit()
     return None
@@ -98,18 +98,18 @@ def update_potty_log(
 ):
     """Update a potty log."""
     user_id = user.get("sub")
-    
+
     potty = db.query(Potty).join(Baby).filter(
         Potty.id == potty_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not potty:
         raise HTTPException(status_code=404, detail="Potty log not found")
-    
+
+    _, role = verify_baby_access(db, potty.baby_id, user_id, user_email)
+    require_write_access(role)
+
     potty.time = potty_data.time
     potty.result = potty_data.result
     potty.potty_type = potty_data.potty_type
@@ -134,7 +134,7 @@ def get_tummy_times(
 ):
     """Get all tummy time logs for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(TummyTime).filter(
         TummyTime.baby_id == baby_id
@@ -150,7 +150,8 @@ def create_tummy_time(
 ):
     """Log a tummy time session."""
     user_id = user.get("sub")
-    verify_baby_access(db, tummy_data.baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, tummy_data.baby_id, user_id, user_email)
+    require_write_access(role)
     
     tummy = TummyTime(
         baby_id=tummy_data.baby_id,
@@ -173,18 +174,18 @@ def delete_tummy_time(
 ):
     """Delete a tummy time log."""
     user_id = user.get("sub")
-    
+
     tummy = db.query(TummyTime).join(Baby).filter(
         TummyTime.id == tummy_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not tummy:
         raise HTTPException(status_code=404, detail="Tummy time not found")
-    
+
+    _, role = verify_baby_access(db, tummy.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(tummy)
     db.commit()
     return None
@@ -200,18 +201,18 @@ def update_tummy_time(
 ):
     """Update a tummy time log."""
     user_id = user.get("sub")
-    
+
     tummy = db.query(TummyTime).join(Baby).filter(
         TummyTime.id == tummy_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not tummy:
         raise HTTPException(status_code=404, detail="Tummy time not found")
-    
+
+    _, role = verify_baby_access(db, tummy.baby_id, user_id, user_email)
+    require_write_access(role)
+
     tummy.start_time = tummy_data.start_time
     tummy.duration_minutes = tummy_data.duration_minutes
     tummy.notes = tummy_data.notes
@@ -235,7 +236,7 @@ def get_baths(
 ):
     """Get all bath logs for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Bath).filter(
         Bath.baby_id == baby_id
@@ -251,7 +252,8 @@ def create_bath(
 ):
     """Log a bath."""
     user_id = user.get("sub")
-    verify_baby_access(db, bath_data.baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, bath_data.baby_id, user_id, user_email)
+    require_write_access(role)
     
     bath = Bath(
         baby_id=bath_data.baby_id,
@@ -273,18 +275,18 @@ def delete_bath(
 ):
     """Delete a bath log."""
     user_id = user.get("sub")
-    
+
     bath = db.query(Bath).join(Baby).filter(
         Bath.id == bath_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not bath:
         raise HTTPException(status_code=404, detail="Bath not found")
-    
+
+    _, role = verify_baby_access(db, bath.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(bath)
     db.commit()
     return None
@@ -300,18 +302,18 @@ def update_bath(
 ):
     """Update a bath log."""
     user_id = user.get("sub")
-    
+
     bath = db.query(Bath).join(Baby).filter(
         Bath.id == bath_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not bath:
         raise HTTPException(status_code=404, detail="Bath not found")
-    
+
+    _, role = verify_baby_access(db, bath.baby_id, user_id, user_email)
+    require_write_access(role)
+
     bath.time = bath_data.time
     bath.notes = bath_data.notes
     db.commit()
@@ -334,7 +336,7 @@ def get_supplements(
 ):
     """Get all supplement logs for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
     
     return db.query(Supplement).filter(
         Supplement.baby_id == baby_id
@@ -350,7 +352,8 @@ def create_supplement(
 ):
     """Log a supplement given to baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, supplement_data.baby_id, user_id, user_email)
+    baby, role = verify_baby_access(db, supplement_data.baby_id, user_id, user_email)
+    require_write_access(role)
     
     supplement = Supplement(
         baby_id=supplement_data.baby_id,
@@ -374,18 +377,18 @@ def delete_supplement(
 ):
     """Delete a supplement log."""
     user_id = user.get("sub")
-    
+
     supplement = db.query(Supplement).join(Baby).filter(
         Supplement.id == supplement_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not supplement:
         raise HTTPException(status_code=404, detail="Supplement log not found")
-    
+
+    _, role = verify_baby_access(db, supplement.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(supplement)
     db.commit()
     return None
@@ -401,18 +404,18 @@ def update_supplement(
 ):
     """Update a supplement log."""
     user_id = user.get("sub")
-    
+
     supplement = db.query(Supplement).join(Baby).filter(
         Supplement.id == supplement_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not supplement:
         raise HTTPException(status_code=404, detail="Supplement log not found")
-    
+
+    _, role = verify_baby_access(db, supplement.baby_id, user_id, user_email)
+    require_write_access(role)
+
     supplement.time = supplement_data.time
     supplement.name = supplement_data.name
     supplement.dosage = supplement_data.dosage

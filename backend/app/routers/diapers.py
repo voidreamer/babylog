@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from typing import List
 from ..database import get_db
 from ..models import Diaper, Baby
 from ..schemas import DiaperCreate, DiaperUpdate, DiaperResponse
 from ..auth import get_current_user, get_user_email
-from .utils import verify_baby_access
+from .utils import verify_baby_access, require_write_access, baby_access_filter
 
 router = APIRouter(prefix="/diapers", tags=["diapers"])
 
@@ -22,8 +21,8 @@ def get_diapers(
 ):
     """Get all diaper changes for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
+
     return db.query(Diaper).filter(
         Diaper.baby_id == baby_id
     ).order_by(Diaper.time.desc()).offset(skip).limit(limit).all()
@@ -38,13 +37,10 @@ def get_diaper(
 ):
     """Get a specific diaper change by ID."""
     user_id = user.get("sub")
-    
+
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     
     if not diaper:
@@ -62,8 +58,9 @@ def create_diaper(
 ):
     """Log a new diaper change."""
     user_id = user.get("sub")
-    verify_baby_access(db, diaper_data.baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, diaper_data.baby_id, user_id, user_email)
+    require_write_access(role)
+
     diaper = Diaper(
         baby_id=diaper_data.baby_id,
         time=diaper_data.time,
@@ -89,18 +86,19 @@ def update_diaper(
 ):
     """Update a diaper record."""
     user_id = user.get("sub")
-    
+
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not diaper:
         raise HTTPException(status_code=404, detail="Diaper not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, diaper.baby_id, user_id, user_email)
+    require_write_access(role)
+
     update_data = diaper_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(diaper, field, value)
@@ -119,18 +117,19 @@ def delete_diaper(
 ):
     """Delete a diaper record."""
     user_id = user.get("sub")
-    
+
     diaper = db.query(Diaper).join(Baby).filter(
         Diaper.id == diaper_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email)
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not diaper:
         raise HTTPException(status_code=404, detail="Diaper not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, diaper.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(diaper)
     db.commit()
     return None

@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
 
 // Mock baby data
-export const mockBaby = { id: 1, name: 'Luna', birth_date: '2024-06-15T00:00:00Z', gender: 'girl', is_owner: true, shared_with_emails: [] };
+export const mockBaby = { id: 1, name: 'Luna', birth_date: '2024-06-15T00:00:00Z', gender: 'girl', is_owner: true, shared_with: [] };
 export const mockBaby2 = { id: 2, name: 'Max', birth_date: '2024-01-10T00:00:00Z', gender: 'boy', is_owner: true };
 
 export const mockFeeding = {

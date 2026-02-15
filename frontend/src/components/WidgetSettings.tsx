@@ -16,7 +16,6 @@ const ALL_WIDGETS = [
     { id: 'tummy', labelKey: 'tummyTime.title', icon: Timer, color: 'var(--tummy)' },
     { id: 'bath', labelKey: 'bath.title', icon: BathIcon, color: 'var(--bath)' },
     { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: '#16a34a' },
-    { id: 'pressure', labelKey: 'sleepPressure.title', icon: Moon, color: 'var(--sleep)' },
 ];
 
 interface WidgetSettingsProps { visibleWidgets: string[]; onToggle: (id: string) => void; quickActionsEnabled: boolean; onToggleQuickActions: () => void; }

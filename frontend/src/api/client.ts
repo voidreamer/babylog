@@ -84,12 +84,16 @@ class ApiClient {
         return this.request(`/babies/${id}`, { method: 'DELETE' });
     }
 
-    async shareBaby(id: number, email: string): Promise<any> {
-        return this.request(`/babies/${id}/share`, { method: 'POST', body: JSON.stringify({ email }) });
+    async shareBaby(id: number, email: string, role: string = 'caregiver'): Promise<any> {
+        return this.request(`/babies/${id}/share`, { method: 'POST', body: JSON.stringify({ email, role }) });
     }
 
     async unshareBaby(id: number, email: string): Promise<any> {
         return this.request(`/babies/${id}/share/${encodeURIComponent(email)}`, { method: 'DELETE' });
+    }
+
+    async updateCaregiverRole(babyId: number, email: string, role: string): Promise<any> {
+        return this.request(`/babies/${babyId}/share/${encodeURIComponent(email)}`, { method: 'PATCH', body: JSON.stringify({ email, role }) });
     }
 
     // Feedings

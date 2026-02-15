@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from typing import List
 from ..database import get_db
 from ..models import Pumping, Baby
 from ..schemas import PumpingCreate, PumpingUpdate, PumpingResponse
 from ..auth import get_current_user, get_user_email
-from .utils import verify_baby_access
+from .utils import verify_baby_access, require_write_access, baby_access_filter
 
 router = APIRouter(prefix="/pumpings", tags=["pumpings"])
 
@@ -22,8 +21,8 @@ def get_pumpings(
 ):
     """Get all pumping sessions for a baby."""
     user_id = user.get("sub")
-    verify_baby_access(db, baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
+
     return db.query(Pumping).filter(
         Pumping.baby_id == baby_id
     ).order_by(Pumping.time.desc()).offset(skip).limit(limit).all()
@@ -38,13 +37,10 @@ def get_pumping(
 ):
     """Get a specific pumping session by ID."""
     user_id = user.get("sub")
-    
+
     pumping = db.query(Pumping).join(Baby).filter(
         Pumping.id == pumping_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email) if user_email else False
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
     
     if not pumping:
@@ -62,8 +58,9 @@ def create_pumping(
 ):
     """Log a new pumping session."""
     user_id = user.get("sub")
-    verify_baby_access(db, pumping_data.baby_id, user_id, user_email)
-    
+    baby, role = verify_baby_access(db, pumping_data.baby_id, user_id, user_email)
+    require_write_access(role)
+
     pumping = Pumping(
         baby_id=pumping_data.baby_id,
         time=pumping_data.time,
@@ -87,18 +84,19 @@ def update_pumping(
 ):
     """Update a pumping record."""
     user_id = user.get("sub")
-    
+
     pumping = db.query(Pumping).join(Baby).filter(
         Pumping.id == pumping_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email) if user_email else False
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not pumping:
         raise HTTPException(status_code=404, detail="Pumping not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, pumping.baby_id, user_id, user_email)
+    require_write_access(role)
+
     update_data = pumping_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(pumping, field, value)
@@ -117,18 +115,19 @@ def delete_pumping(
 ):
     """Delete a pumping record."""
     user_id = user.get("sub")
-    
+
     pumping = db.query(Pumping).join(Baby).filter(
         Pumping.id == pumping_id,
-        or_(
-            Baby.user_id == user_id,
-            Baby.shared_with_emails.any(user_email) if user_email else False
-        )
+        baby_access_filter(user_id, user_email)
     ).first()
-    
+
     if not pumping:
         raise HTTPException(status_code=404, detail="Pumping not found")
-    
+
+    # Verify write access
+    _, role = verify_baby_access(db, pumping.baby_id, user_id, user_email)
+    require_write_access(role)
+
     db.delete(pumping)
     db.commit()
     return None

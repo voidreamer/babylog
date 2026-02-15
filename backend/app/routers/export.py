@@ -13,30 +13,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-from ..auth import get_current_user
+from ..auth import get_current_user, get_user_email
 from ..database import get_db
 from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement
+from .utils import verify_baby_access
 
 router = APIRouter(prefix="/export", tags=["export"])
-
-
-def get_baby_with_access(baby_id: int, user: dict, db: Session) -> Baby:
-    """Get baby if user has access."""
-    baby = db.query(Baby).filter(Baby.id == baby_id).first()
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-
-    user_email = user.get("email", "")
-    has_access = (
-        baby.user_id == user["sub"] or
-        user_email == baby.owner_email or
-        (baby.shared_with_emails and user_email in baby.shared_with_emails)
-    )
-
-    if not has_access:
-        raise HTTPException(status_code=403, detail="Access denied")
-
-    return baby
 
 
 def format_datetime(dt: Optional[datetime]) -> str:
@@ -60,6 +42,7 @@ async def export_baby_data_csv(
     start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """
@@ -68,7 +51,8 @@ async def export_baby_data_csv(
     Returns a downloadable CSV file with the requested data.
     Premium feature - requires active subscription.
     """
-    baby = get_baby_with_access(baby_id, user, db)
+    user_id = user.get("sub")
+    baby, _role = verify_baby_access(db, baby_id, user_id, user_email)
 
     # Parse date filters
     start_dt = None
@@ -296,6 +280,7 @@ async def export_baby_data_json(
     start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
     user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
 ):
     """
@@ -304,7 +289,8 @@ async def export_baby_data_json(
     Returns a complete JSON export for data portability.
     Premium feature - requires active subscription.
     """
-    baby = get_baby_with_access(baby_id, user, db)
+    user_id = user.get("sub")
+    baby, _role = verify_baby_access(db, baby_id, user_id, user_email)
 
     # Parse date filters
     start_dt = None

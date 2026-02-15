@@ -4,9 +4,7 @@
     "title": "宝宝资料",
     "born": "出生于 {{date}}",
     "growthData": "生长数据",
-    "growthDataDesc": "更新体重、身高",
-    "addAnother": "添加另一个宝宝",
-    "addAnotherDesc": "追踪多个孩子"
+    "growthDataDesc": "更新体重、身高"
   },
   "notifications": {
     "title": "通知",
@@ -68,8 +66,8 @@
   },
   "navigation": {
     "title": "导航",
-    "backToHub": "返回 HeyBub Hub",
-    "backToHubDesc": "返回主站"
+    "hubTitle": "HeyBub Hub",
+    "hubDesc": "为父母提供文章、服务等"
   },
   "support": {
     "title": "支持",

@@ -19,6 +19,7 @@ from ..database import get_db
 from ..auth import get_current_user, get_user_email
 from ..models import Baby, Feeding, Sleep, Diaper
 from ..benchmarks import get_all_benchmarks, calculate_age_weeks
+from .utils import verify_baby_access
 from ..predictions import (
     predict_next_nap_wake_window,
     calculate_confidence_interval,
@@ -39,21 +40,6 @@ def make_aware(dt: Optional[datetime]) -> Optional[datetime]:
     if dt.tzinfo is None:
         return dt.replace(tzinfo=timezone.utc)
     return dt
-
-
-def get_baby_or_404(db: Session, baby_id: int, user_id: str, user_email: str) -> Baby:
-    """Get baby by ID, ensuring user has access."""
-    baby = db.query(Baby).filter(Baby.id == baby_id).first()
-    if not baby:
-        raise HTTPException(status_code=404, detail="Baby not found")
-    # Check ownership or sharing (by user_id or email)
-    has_access = (
-        baby.user_id == user_id or 
-        (user_email and user_email in (baby.shared_with_emails or []))
-    )
-    if not has_access:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    return baby
 
 
 def calculate_average_time_of_day(timestamps: List[datetime]) -> Optional[str]:
@@ -133,7 +119,7 @@ async def get_baby_analytics(
     """
     try:
         user_id = user.get("sub")
-        baby = get_baby_or_404(db, baby_id, user_id, user_email)
+        baby, _role = verify_baby_access(db, baby_id, user_id, user_email)
         
         # Calculate date range
         now = datetime.now(timezone.utc)

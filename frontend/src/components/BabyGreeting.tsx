@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { api } from '../api/client';
 import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil } from 'lucide-react';
-import ShareModal from './ShareModal';
+import CaregiverModal from './CaregiverModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -339,7 +339,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
             )}
 
             {showShareModal && selectedBaby && (
-                <ShareModal
+                <CaregiverModal
                     baby={selectedBaby}
                     onClose={() => setShowShareModal(false)}
                     onShare={() => refresh()}

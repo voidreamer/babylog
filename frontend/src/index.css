@@ -858,53 +858,6 @@ h4 {
   border-color: var(--pumping-light);
 }
 
-.widget.pressure {
-  background: var(--sleep-bg);
-  border-color: var(--sleep-light);
-  cursor: pointer;
-}
-
-.pressure-widget-bar {
-  width: 100%;
-  height: 8px;
-  background: var(--surface-hover);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  margin-top: var(--space-sm);
-}
-
-.pressure-widget-bar-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width 0.6s ease, background-color 0.6s ease;
-}
-
-.pressure-widget-status {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-top: var(--space-xs);
-}
-
-.pressure-widget-teaser {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  margin-top: var(--space-sm);
-}
-
-.pressure-widget-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-sm) 0;
-}
-
-.pressure-widget-loading .spinner {
-  width: 20px;
-  height: 20px;
-}
-
 .widget.sleeping {
   animation: sleeping-glow 2s ease-in-out infinite;
 }
@@ -3061,6 +3014,170 @@ h4 {
   padding-top: 0;
   display: flex;
   gap: var(--space-md);
+}
+
+/* ============================================================================
+   Caregiver Modal
+   ============================================================================ */
+
+.caregiver-modal {
+  max-width: 440px;
+}
+
+.caregiver-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-hover);
+  border-radius: var(--radius-md);
+}
+
+.caregiver-card-owner {
+  margin: 0 var(--space-lg);
+  background: var(--surface-hover);
+}
+
+.caregiver-card-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.caregiver-email {
+  font-size: 0.9rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caregiver-owner-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--surface-active);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.caregiver-role-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.caregiver-role-badge.caregiver {
+  background: var(--mint-bg, #d1fae5);
+  color: var(--mint-text, #065f46);
+}
+
+.caregiver-role-badge.viewer {
+  background: var(--lavender-bg, #ede9fe);
+  color: var(--lavender-text, #5b21b6);
+}
+
+.caregiver-role-badge:hover {
+  opacity: 0.8;
+}
+
+.caregiver-remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.caregiver-remove-btn:hover {
+  color: var(--error);
+  background: var(--surface-hover);
+}
+
+.caregiver-add-form {
+  padding: var(--space-md) var(--space-lg);
+}
+
+.caregiver-add-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.caregiver-email-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.caregiver-add-btn {
+  white-space: nowrap;
+}
+
+.caregiver-role-selector {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.caregiver-role-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-sm);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.caregiver-role-option.active {
+  border-color: var(--primary);
+  background: var(--primary-light, rgba(99, 102, 241, 0.08));
+}
+
+.caregiver-role-option-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.caregiver-role-option-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.caregiver-error {
+  color: var(--error);
+  margin-top: var(--space-xs);
+  font-size: 0.85rem;
+}
+
+.caregiver-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: 0 var(--space-lg);
+  margin-top: var(--space-sm);
+}
+
+.caregiver-empty-hint {
+  color: var(--text-secondary);
+  padding: var(--space-md) var(--space-lg);
+  font-size: 0.9rem;
 }
 
 /* ============================================================================
