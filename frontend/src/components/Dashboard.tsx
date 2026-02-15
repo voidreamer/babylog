@@ -27,9 +27,21 @@ import ComingUp from './ComingUp';
 import { motion } from 'framer-motion';
 import { Baby } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { calculateAgeInMonths } from '../utils/ageUtils';
 
-// Default visible widgets - stored in localStorage
-const DEFAULT_VISIBLE_WIDGETS = ['feeding', 'diaper', 'sleep', 'pumping'];
+type ModalType = 'feeding'|'diaper'|'sleep'|'pumping'|'potty'|'tummy'|'bath'|'supplement'|null;
+
+function getDefaultWidgets(ageMonths: number | null): string[] {
+    const widgets = ['feeding', 'diaper', 'sleep'];
+    if (ageMonths === null || ageMonths <= 12) {
+        widgets.push('pumping', 'tummy', 'supplement');
+    }
+    if (ageMonths !== null && ageMonths >= 18) {
+        widgets.push('potty');
+    }
+    widgets.push('bath');
+    return widgets;
+}
 
 export default function Dashboard() {
     const { t } = useTranslation('dashboard');
@@ -39,20 +51,14 @@ export default function Dashboard() {
     const [upcoming, setUpcoming] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Modal states
-    const [feedingModal, setFeedingModal] = useState(false);
-    const [diaperModal, setDiaperModal] = useState(false);
-    const [sleepModal, setSleepModal] = useState(false);
-    const [pumpingModal, setPumpingModal] = useState(false);
-    const [pottyModal, setPottyModal] = useState(false);
-    const [tummyModal, setTummyModal] = useState(false);
-    const [bathModal, setBathModal] = useState(false);
-    const [supplementModal, setSupplementModal] = useState(false);
+    // Single modal state
+    const [activeModal, setActiveModal] = useState<ModalType>(null);
 
-    // Widget visibility from localStorage
+    // Widget visibility from localStorage (age-gated defaults)
+    const ageMonths = selectedBaby?.birth_date ? calculateAgeInMonths(selectedBaby.birth_date) : null;
     const [visibleWidgets, setVisibleWidgets] = useState(() => {
         const saved = localStorage.getItem('visibleWidgets');
-        return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_WIDGETS;
+        return saved ? JSON.parse(saved) : getDefaultWidgets(ageMonths);
     });
 
     // Quick actions setting from localStorage (default: enabled)
@@ -136,16 +142,8 @@ export default function Dashboard() {
     }, [selectedBaby]);
 
     const handleEventLogged = () => {
+        setActiveModal(null);
         loadData();
-        // Close all modals
-        setFeedingModal(false);
-        setDiaperModal(false);
-        setSleepModal(false);
-        setPumpingModal(false);
-        setPottyModal(false);
-        setTummyModal(false);
-        setBathModal(false);
-        setSupplementModal(false);
     };
 
     if (!selectedBaby) {
@@ -185,7 +183,7 @@ export default function Dashboard() {
                         babyId={selectedBaby.id}
                         lastFeeding={dashboard?.last_feeding}
                         onFeedingChange={loadData}
-                        onOpenModal={() => setFeedingModal(true)}
+                        onOpenModal={() => setActiveModal('feeding')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -195,7 +193,7 @@ export default function Dashboard() {
                         babyId={selectedBaby.id}
                         lastDiaper={dashboard?.last_diaper}
                         onDiaperChange={loadData}
-                        onOpenModal={() => setDiaperModal(true)}
+                        onOpenModal={() => setActiveModal('diaper')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -206,7 +204,7 @@ export default function Dashboard() {
                         currentSleep={dashboard?.current_sleep}
                         lastSleep={dashboard?.last_sleep}
                         onSleepChange={loadData}
-                        onOpenModal={() => setSleepModal(true)}
+                        onOpenModal={() => setActiveModal('sleep')}
                     />
                 )}
 
@@ -214,7 +212,7 @@ export default function Dashboard() {
                     <PumpingWidget
                         lastPumping={dashboard?.last_pumping}
                         onPumpingChange={loadData}
-                        onOpenModal={() => setPumpingModal(true)}
+                        onOpenModal={() => setActiveModal('pumping')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -223,7 +221,7 @@ export default function Dashboard() {
                     <PottyWidget
                         lastPotty={dashboard?.last_potty}
                         onPottyChange={loadData}
-                        onOpenModal={() => setPottyModal(true)}
+                        onOpenModal={() => setActiveModal('potty')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -232,7 +230,7 @@ export default function Dashboard() {
                     <TummyTimeWidget
                         lastTummy={dashboard?.last_tummy}
                         onTummyChange={loadData}
-                        onOpenModal={() => setTummyModal(true)}
+                        onOpenModal={() => setActiveModal('tummy')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -241,7 +239,7 @@ export default function Dashboard() {
                     <BathWidget
                         lastBath={dashboard?.last_bath}
                         onBathChange={loadData}
-                        onOpenModal={() => setBathModal(true)}
+                        onOpenModal={() => setActiveModal('bath')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -250,7 +248,7 @@ export default function Dashboard() {
                     <SupplementWidget
                         lastSupplement={dashboard?.last_supplement}
                         onSupplementChange={loadData}
-                        onOpenModal={() => setSupplementModal(true)}
+                        onOpenModal={() => setActiveModal('supplement')}
                         quickActionsEnabled={quickActionsEnabled}
                     />
                 )}
@@ -270,62 +268,62 @@ export default function Dashboard() {
             <DailySummary summary={dashboard?.daily_summary} visibleWidgets={visibleWidgets} />
 
             {/* Modals */}
-            {feedingModal && (
+            {activeModal === 'feeding' && (
                 <FeedingModal
                     babyId={selectedBaby.id}
-                    onClose={() => setFeedingModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {diaperModal && (
+            {activeModal === 'diaper' && (
                 <DiaperModal
                     babyId={selectedBaby.id}
-                    onClose={() => setDiaperModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {sleepModal && (
+            {activeModal === 'sleep' && (
                 <SleepModal
                     babyId={selectedBaby.id}
-                    onClose={() => setSleepModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {pumpingModal && (
+            {activeModal === 'pumping' && (
                 <PumpingModal
                     babyId={selectedBaby.id}
-                    onClose={() => setPumpingModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {pottyModal && (
+            {activeModal === 'potty' && (
                 <PottyModal
-                    onClose={() => setPottyModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {tummyModal && (
+            {activeModal === 'tummy' && (
                 <TummyTimeModal
-                    onClose={() => setTummyModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {bathModal && (
+            {activeModal === 'bath' && (
                 <BathModal
-                    onClose={() => setBathModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}
 
-            {supplementModal && (
+            {activeModal === 'supplement' && (
                 <SupplementModal
-                    onClose={() => setSupplementModal(false)}
+                    onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
             )}

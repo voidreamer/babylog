@@ -6,22 +6,26 @@ import {
     Settings, X, Baby, Droplets, Moon, Heart,
     Toilet, Timer, Bath as BathIcon, Check, Plus, Pill, Zap
 } from 'lucide-react';
+import { useBaby } from '../hooks/useBaby';
+import { calculateAgeInMonths } from '../utils/ageUtils';
 
 const ALL_WIDGETS = [
-    { id: 'feeding', labelKey: 'feeding.title', icon: Baby, color: 'var(--feeding)' },
-    { id: 'diaper', labelKey: 'diaper.title', icon: Droplets, color: 'var(--diaper)' },
-    { id: 'sleep', labelKey: 'sleep.title', icon: Moon, color: 'var(--sleep)' },
-    { id: 'pumping', labelKey: 'pumping.title', icon: Heart, color: 'var(--pumping)' },
-    { id: 'potty', labelKey: 'potty.title', icon: Toilet, color: 'var(--potty)' },
-    { id: 'tummy', labelKey: 'tummyTime.title', icon: Timer, color: 'var(--tummy)' },
-    { id: 'bath', labelKey: 'bath.title', icon: BathIcon, color: 'var(--bath)' },
-    { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: '#16a34a' },
+    { id: 'feeding', labelKey: 'feeding.title', icon: Baby, color: 'var(--feeding)', ageHint: null },
+    { id: 'diaper', labelKey: 'diaper.title', icon: Droplets, color: 'var(--diaper)', ageHint: null },
+    { id: 'sleep', labelKey: 'sleep.title', icon: Moon, color: 'var(--sleep)', ageHint: null },
+    { id: 'pumping', labelKey: 'pumping.title', icon: Heart, color: 'var(--pumping)', ageHint: '0\u201312m' },
+    { id: 'potty', labelKey: 'potty.title', icon: Toilet, color: 'var(--potty)', ageHint: '18m+' },
+    { id: 'tummy', labelKey: 'tummyTime.title', icon: Timer, color: 'var(--tummy)', ageHint: '0\u201312m' },
+    { id: 'bath', labelKey: 'bath.title', icon: BathIcon, color: 'var(--bath)', ageHint: null },
+    { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: '#16a34a', ageHint: '0\u201312m' },
 ];
 
 interface WidgetSettingsProps { visibleWidgets: string[]; onToggle: (id: string) => void; quickActionsEnabled: boolean; onToggleQuickActions: () => void; }
 export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsEnabled, onToggleQuickActions }: WidgetSettingsProps) {
     const { t } = useTranslation('dashboard');
+    const { selectedBaby } = useBaby();
     const [isOpen, setIsOpen] = useState(false);
+    const ageMonths = selectedBaby?.birth_date ? calculateAgeInMonths(selectedBaby.birth_date) : null;
 
     const enabledCount = visibleWidgets.length;
     const disabledCount = ALL_WIDGETS.length - enabledCount;
@@ -97,7 +101,12 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                                             >
                                                 <Icon size={20} />
                                             </div>
-                                            <span className="widget-settings-label">{t(widget.labelKey)}</span>
+                                            <span className="widget-settings-label">
+                                                {t(widget.labelKey)}
+                                                {widget.ageHint && (
+                                                    <span className="widget-age-hint">{widget.ageHint}</span>
+                                                )}
+                                            </span>
                                             <div className={`widget-settings-check ${isEnabled ? 'visible' : ''}`}>
                                                 <Check size={14} />
                                             </div>

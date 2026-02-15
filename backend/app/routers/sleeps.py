@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from ..database import get_db
 from ..models import Sleep, Baby
 from ..schemas import SleepCreate, SleepUpdate, SleepResponse
@@ -148,7 +148,7 @@ def end_sleep(
     if sleep.end_time:
         raise HTTPException(status_code=400, detail="Sleep already ended")
     
-    sleep.end_time = datetime.utcnow()
+    sleep.end_time = datetime.now(timezone.utc)
     db.commit()
     db.refresh(sleep)
     return sleep

@@ -125,6 +125,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
 
 interface VaccModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps) {
+    const { t } = useTranslation('health');
     const [vaccineName, setVaccineName] = useState(editData?.vaccine_name || '');
     const [doseNumber, setDoseNumber] = useState(editData?.dose_number || 1);
     const [givenDate, setGivenDate] = useState(
@@ -214,6 +215,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
 
 interface MedModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
+    const { t } = useTranslation('health');
     const [medicationName, setMedicationName] = useState(editData?.medication_name || '');
     const [dosage, setDosage] = useState(editData?.dosage || '');
     const [frequency, setFrequency] = useState(editData?.frequency || '');
@@ -296,6 +298,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
 
 interface MilestoneModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneModalProps) {
+    const { t } = useTranslation('health');
     const isCustomMilestone = editData && !MILESTONE_OPTIONS.includes(editData.milestone_type);
     const [milestoneType, setMilestoneType] = useState(
         editData ? (isCustomMilestone ? 'Other' : editData.milestone_type) : ''
@@ -378,6 +381,7 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
 
 interface GrowthModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalProps) {
+    const { t } = useTranslation('health');
     const [recordedDate, setRecordedDate] = useState(
         editData ? format(parseUTCTime(editData.recorded_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
     );
