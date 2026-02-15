@@ -762,7 +762,7 @@ def get_upcoming(
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
 
-    today = datetime.now(timezone.utc)
+    today = datetime.now(timezone.utc).replace(tzinfo=None)
     horizon = today + timedelta(days=30)
     upcoming = []
 
