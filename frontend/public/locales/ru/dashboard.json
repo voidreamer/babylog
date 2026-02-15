@@ -425,5 +425,13 @@
   },
   "sleepRing": {
     "goal": "цель"
+  },
+  "sleepPressure": {
+    "title": "Давление сна",
+    "napIn": "Сон через {{minutes}} мин",
+    "restNow": "Время отдохнуть!",
+    "collectingData": "Сбор данных...",
+    "premium": "Обновите для разблокировки",
+    "noWindows": "Сон не прогнозируется"
   }
 }

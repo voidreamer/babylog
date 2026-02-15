@@ -425,5 +425,13 @@
   },
   "sleepRing": {
     "goal": "目标"
+  },
+  "sleepPressure": {
+    "title": "睡眠压力",
+    "napIn": "{{minutes}} 分钟后小睡",
+    "restNow": "休息时间到了！",
+    "collectingData": "正在收集数据...",
+    "premium": "升级以解锁",
+    "noWindows": "暂无预测的小睡"
   }
 }

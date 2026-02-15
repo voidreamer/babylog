@@ -53,7 +53,8 @@
     },
     "caregivers": "保育者",
     "caregiversDesc": "家族と共有",
-    "comingSoon": "近日公開"
+    "sharedWithYou": "あなたと共有中",
+    "shared": "{{count}}人と共有"
   },
   "data": {
     "title": "データ",

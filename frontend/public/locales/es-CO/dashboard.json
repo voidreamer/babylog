@@ -425,5 +425,13 @@
   },
   "sleepRing": {
     "goal": "meta"
+  },
+  "sleepPressure": {
+    "title": "Presión de sueño",
+    "napIn": "Siesta en {{minutes}} min",
+    "restNow": "¡Hora de descansar!",
+    "collectingData": "Recopilando datos...",
+    "premium": "Actualizar para desbloquear",
+    "noWindows": "No se predicen siestas"
   }
 }

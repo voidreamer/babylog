@@ -53,7 +53,8 @@
     },
     "caregivers": "Опекуны",
     "caregiversDesc": "Поделиться с семьёй",
-    "comingSoon": "Скоро"
+    "sharedWithYou": "Доступ предоставлен вам",
+    "shared": "{{count}} общий доступ"
   },
   "data": {
     "title": "Данные",

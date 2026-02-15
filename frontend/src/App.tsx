@@ -13,7 +13,7 @@ import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
-import Learn from './components/Learn';
+import Insights from './components/Insights';
 import LanguageSwitcher from './components/LanguageSwitcher';
 
 // Lazy load routes for bundle splitting
@@ -25,14 +25,16 @@ const Health = lazy(() => import('./pages/Health'));
 import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, ArrowLeft, Crown, Bell } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
+import ShareModal from './components/ShareModal';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; onRefreshBabies: () => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl, onRefreshBabies }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
     const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings);
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
+    const [showShareModal, setShowShareModal] = useState(false);
 
     const currentBaby = babies?.[0];
 
@@ -258,15 +260,28 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                         <ChevronRight size={18} className="settings-arrow" />
                     )}
                 </div>
-                <div className="settings-row">
+                <div className="settings-row" onClick={currentBaby?.is_owner !== false ? () => setShowShareModal(true) : undefined}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box butter">👥</div>
                         <div>
                             <div className="settings-row-label">{t('settings:account.caregivers')}</div>
-                            <div className="settings-row-desc">{t('settings:account.caregiversDesc')}</div>
+                            <div className="settings-row-desc">
+                                {currentBaby?.is_owner === false
+                                    ? t('settings:account.sharedWithYou')
+                                    : t('settings:account.caregiversDesc')}
+                            </div>
                         </div>
                     </div>
-                    <span className="settings-badge lavender">{t('settings:account.comingSoon')}</span>
+                    {currentBaby?.is_owner !== false ? (
+                        <>
+                            {(currentBaby?.shared_with_emails?.length ?? 0) > 0 && (
+                                <span className="settings-badge mint">{t('settings:account.shared', { count: currentBaby.shared_with_emails.length })}</span>
+                            )}
+                            <ChevronRight size={18} className="settings-arrow" />
+                        </>
+                    ) : (
+                        <span className="settings-badge lavender">{t('settings:account.sharedWithYou')}</span>
+                    )}
                 </div>
                 <div
                     className={`settings-row ${!isPremium ? 'settings-row--disabled' : ''}`}
@@ -356,6 +371,14 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             </div>
 
             <p className="settings-version">{t('app.version', { version: '1.0.0' })}</p>
+
+            {showShareModal && currentBaby && (
+                <ShareModal
+                    baby={currentBaby}
+                    onClose={() => setShowShareModal(false)}
+                    onShare={() => onRefreshBabies()}
+                />
+            )}
         </div>
     );
 }
@@ -393,7 +416,7 @@ function buildHubUrl(session, theme) {
 function MainApp() {
     const { t, i18n } = useTranslation('common');
     const { user, session, logout } = useAuth();
-    const { babies, loading: babiesLoading } = useBaby();
+    const { babies, loading: babiesLoading, refresh } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -618,7 +641,7 @@ function MainApp() {
             <main>
                 {activeTab === 'home' && (
                     <ErrorBoundary level="page">
-                        <Dashboard />
+                        <Dashboard isPremium={isPremium} onNavigateToInsights={() => setActiveTab('insights')} />
                     </ErrorBoundary>
                 )}
                 {activeTab === 'timeline' && (
@@ -640,9 +663,9 @@ function MainApp() {
                         </Suspense>
                     </ErrorBoundary>
                 )}
-                {activeTab === 'learn' && (
+                {activeTab === 'insights' && (
                     <ErrorBoundary level="page">
-                        <Learn isPremium={isPremium} />
+                        <Insights isPremium={isPremium} />
                     </ErrorBoundary>
                 )}
                 {activeTab === 'settings' && (
@@ -661,6 +684,7 @@ function MainApp() {
                         onManage={handleManageSubscription}
                         setActiveTab={setActiveTab}
                         hubUrl={buildHubUrl(session, theme)}
+                        onRefreshBabies={refresh}
                     />
                 )}
             </main>
@@ -691,8 +715,8 @@ function MainApp() {
                     <span>{t('nav.health')}</span>
                 </button>
                 <button
-                    className={`bottom-nav-item ${activeTab === 'learn' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('learn'); }}
+                    className={`bottom-nav-item ${activeTab === 'insights' ? 'active' : ''}`}
+                    onClick={() => { hapticSelection(); setActiveTab('insights'); }}
                 >
                     <PieChart size={22} />
                     <span>{t('nav.insights')}</span>

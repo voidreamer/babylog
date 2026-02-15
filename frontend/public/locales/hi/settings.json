@@ -53,7 +53,8 @@
     },
     "caregivers": "देखभालकर्ता",
     "caregiversDesc": "परिवार के साथ शेयर करें",
-    "comingSoon": "जल्द आ रहा है"
+    "sharedWithYou": "आपके साथ साझा किया गया",
+    "shared": "{{count}} साझा"
   },
   "data": {
     "title": "डेटा",

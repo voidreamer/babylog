@@ -425,5 +425,13 @@
   },
   "sleepRing": {
     "goal": "लक्ष्य"
+  },
+  "sleepPressure": {
+    "title": "नींद का दबाव",
+    "napIn": "{{minutes}} मिनट में झपकी",
+    "restNow": "आराम का समय!",
+    "collectingData": "डेटा एकत्र हो रहा है...",
+    "premium": "अनलॉक करने के लिए अपग्रेड करें",
+    "noWindows": "कोई झपकी का अनुमान नहीं"
   }
 }

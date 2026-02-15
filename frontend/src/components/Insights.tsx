@@ -14,8 +14,8 @@ import { TrendingUp, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-interface LearnProps { isPremium?: boolean; }
-export default function Learn({ isPremium = false }: LearnProps) {
+interface InsightsProps { isPremium?: boolean; }
+export default function Insights({ isPremium = false }: InsightsProps) {
     const { t } = useTranslation('common');
     const { selectedBaby } = useBaby();
 

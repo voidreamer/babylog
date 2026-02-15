@@ -425,5 +425,13 @@
   },
   "sleepRing": {
     "goal": "goal"
+  },
+  "sleepPressure": {
+    "title": "Sleep Pressure",
+    "napIn": "Nap in {{minutes}} min",
+    "restNow": "Rest time!",
+    "collectingData": "Collecting data...",
+    "premium": "Upgrade to unlock",
+    "noWindows": "No naps predicted"
   }
 }

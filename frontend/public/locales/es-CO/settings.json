@@ -53,7 +53,8 @@
     },
     "caregivers": "Cuidadores",
     "caregiversDesc": "Compartir con la familia",
-    "comingSoon": "Próximamente"
+    "sharedWithYou": "Compartido contigo",
+    "shared": "{{count}} compartido(s)"
   },
   "data": {
     "title": "Datos",

@@ -425,5 +425,13 @@
   },
   "sleepRing": {
     "goal": "目標"
+  },
+  "sleepPressure": {
+    "title": "睡眠圧",
+    "napIn": "{{minutes}}分後にお昼寝",
+    "restNow": "休む時間です！",
+    "collectingData": "データ収集中...",
+    "premium": "アップグレードして解放",
+    "noWindows": "お昼寝の予測なし"
   }
 }

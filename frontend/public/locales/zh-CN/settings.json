@@ -53,7 +53,8 @@
     },
     "caregivers": "看护人",
     "caregiversDesc": "与家人共享",
-    "comingSoon": "即将推出"
+    "sharedWithYou": "已与您共享",
+    "shared": "{{count}} 人共享"
   },
   "data": {
     "title": "数据",
