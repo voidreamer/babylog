@@ -3205,31 +3205,27 @@ h4 {
   border: 1px solid var(--border-light, var(--border));
 }
 
-.auth-logo {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--potty) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--space-lg);
-  color: var(--text);
-  box-shadow: var(--shadow-sm);
+.auth-baby-icon {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto var(--space-md);
+  filter: drop-shadow(0 4px 12px rgba(212, 132, 156, 0.25));
+  animation: float 2s ease-in-out infinite;
 }
 
 .auth-title {
   font-family: var(--font-family-heading);
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   margin-bottom: var(--space-xs);
-  color: var(--text);
+  color: var(--primary);
 }
 
-.auth-subtitle {
+.auth-tagline {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   margin-bottom: var(--space-xl);
+  line-height: 1.5;
 }
 
 .google-btn {
@@ -3256,27 +3252,22 @@ h4 {
   box-shadow: var(--shadow-sm);
 }
 
-.auth-features {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-sm);
+.auth-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
   margin-top: var(--space-xl);
 }
 
-.auth-feature {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-size: 0.8rem;
+.auth-pill {
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) var(--space-md);
   background: var(--background);
   border-radius: var(--radius-full);
-}
-
-.auth-feature svg {
-  color: var(--primary);
+  border: 1px solid var(--border-light, var(--border));
 }
 
 .auth-footer {
@@ -3441,9 +3432,29 @@ h4 {
 
 .loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--space-2xl);
+  gap: var(--space-md);
+}
+
+.loading-logo {
+  width: 80px;
+  height: 80px;
+  animation: float 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(212, 132, 156, 0.3));
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+    opacity: 1;
+  }
 }
 
 .spinner {

@@ -1,27 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import { Baby, Utensils, Moon, Droplets, TrendingUp } from 'lucide-react';
 
 export default function Login() {
-    const { login } = useAuth();
+    const { user, login } = useAuth();
     const { t } = useTranslation('auth');
 
-    const features = [
-        { icon: Utensils, text: t('login.features.feedings') },
-        { icon: Moon, text: t('login.features.sleep') },
-        { icon: Droplets, text: t('login.features.diapers') },
-        { icon: TrendingUp, text: t('login.features.growth') },
-    ];
+    // Redirect to dashboard if already authenticated (e.g. after native OAuth deep link)
+    if (user) return <Navigate to="/" replace />;
 
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <div className="auth-logo">
-                    <Baby size={48} />
-                </div>
+                <img src="/icons/loading.png" alt="" className="auth-baby-icon" />
                 <h1 className="auth-title">{t('login.title')}</h1>
-                <p className="auth-subtitle">{t('login.subtitle')}</p>
+                <p className="auth-tagline">{t('login.tagline')}</p>
+
                 <button className="google-btn" onClick={login}>
                     <svg width="20" height="20" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -31,14 +25,14 @@ export default function Login() {
                     </svg>
                     {t('login.signInGoogle')}
                 </button>
-                <div className="auth-features">
-                    {features.map((feature, i) => (
-                        <div key={i} className="auth-feature">
-                            <feature.icon size={16} />
-                            <span>{feature.text}</span>
-                        </div>
-                    ))}
+
+                <div className="auth-pills">
+                    <span className="auth-pill">{t('login.features.sleep')}</span>
+                    <span className="auth-pill">{t('login.features.feedings')}</span>
+                    <span className="auth-pill">{t('login.features.diapers')}</span>
+                    <span className="auth-pill">{t('login.features.growth')}</span>
                 </div>
+
                 <p className="auth-footer">{t('login.footer')}</p>
             </div>
         </div>

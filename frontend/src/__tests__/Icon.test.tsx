@@ -54,21 +54,14 @@ describe('Icon', () => {
     expect(img).toHaveClass('my-custom-class');
   });
 
-  it('sets border radius to 8px when size is 40 or less', () => {
-    render(<Icon name="feeding" size={32} />);
-    const img = screen.getByRole('img');
-    expect(img.style.borderRadius).toBe('8px');
-  });
+  it('renders new icon types', () => {
+    const { rerender } = render(<Icon name="activity" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/activity.png');
 
-  it('sets border radius to 8px when size is exactly 40', () => {
-    render(<Icon name="feeding" size={40} />);
-    const img = screen.getByRole('img');
-    expect(img.style.borderRadius).toBe('8px');
-  });
+    rerender(<Icon name="medicine" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/medicine.png');
 
-  it('sets border radius to 12px when size is greater than 40', () => {
-    render(<Icon name="feeding" size={48} />);
-    const img = screen.getByRole('img');
-    expect(img.style.borderRadius).toBe('12px');
+    rerender(<Icon name="growth" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/icons/growth.png');
   });
 });

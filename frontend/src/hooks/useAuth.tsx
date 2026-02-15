@@ -4,9 +4,6 @@ import { Browser } from '@capacitor/browser';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
-const isDev = import.meta.env.DEV;
-const log = (...args: unknown[]) => isDev && console.log(...args);
-
 interface AuthContextValue {
     user: SupabaseUser | null;
     session: Session | null;
@@ -34,7 +31,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const refreshToken = params.get('refresh_token');
 
         if (accessToken && refreshToken) {
-            log('[Auth] Auth relay detected, setting session');
+            console.log('[Auth] Auth relay detected, setting session');
             // Consume theme param before cleaning URL
             const themeParam = params.get('theme');
             if (themeParam === 'dark' || themeParam === 'light') {
@@ -54,9 +51,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 refresh_token: refreshToken,
             }).then(({ data: { session }, error }) => {
                 if (error) {
-                    log('[Auth] Auth relay failed:', error);
+                    console.error('[Auth] Auth relay failed:', error);
                 } else {
-                    log('[Auth] Auth relay success');
+                    console.log('[Auth] Auth relay success');
                     setSession(session);
                     setUser(session?.user ?? null);
                 }
@@ -78,20 +75,58 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Check active session on mount
         supabase.auth.getSession().then(({ data: { session } }) => {
+            console.log('[Auth] Initial session:', session ? session.user?.email : 'none');
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
-            log('[Auth] Initial session check:', session ? 'logged in' : 'not logged in');
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            log('[Auth] Auth state changed:', _event);
+            console.log('[Auth] State change:', _event, session?.user?.email ?? 'no-user');
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        // Listen for native deep link auth (main.tsx passes session via window global)
+        const handleNativeAuth = () => {
+            console.log('[Auth] native-auth-success event fired');
+            const nativeSession = (window as any).__nativeSession;
+            console.log('[Auth] __nativeSession:', nativeSession ? 'exists' : 'missing');
+            delete (window as any).__nativeSession;
+            if (nativeSession) {
+                console.log('[Auth] Setting session from native:', nativeSession.user?.email);
+                setSession(nativeSession);
+                setUser(nativeSession.user ?? null);
+                setLoading(false);
+            }
+        };
+        window.addEventListener('native-auth-success', handleNativeAuth);
+
+        // Fallback for native: re-check session when SFSafariViewController closes.
+        // Browser.close() in main.tsx fires 'browserFinished' after setSession succeeds,
+        // so getSession() is guaranteed to have the fresh session at this point.
+        let browserCleanup: (() => void) | null = null;
+        if (Capacitor.isNativePlatform()) {
+            Browser.addListener('browserFinished', async () => {
+                console.log('[Auth] Browser dismissed, checking session');
+                const { data: { session: s } } = await supabase.auth.getSession();
+                console.log('[Auth] Session after browser close:', s ? s.user?.email : 'none');
+                if (s) {
+                    setSession(s);
+                    setUser(s.user ?? null);
+                    setLoading(false);
+                }
+            }).then(handle => {
+                browserCleanup = () => handle.remove();
+            });
+        }
+
+        return () => {
+            subscription.unsubscribe();
+            window.removeEventListener('native-auth-success', handleNativeAuth);
+            browserCleanup?.();
+        };
     }, []);
 
     const login = async () => {

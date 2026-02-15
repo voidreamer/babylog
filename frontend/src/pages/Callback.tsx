@@ -105,7 +105,7 @@ export default function Callback() {
 
     return (
         <div className="loading" style={{ minHeight: '100vh' }}>
-            <div className="spinner"></div>
+            <img src="/icons/loading.png" alt="" className="loading-logo" />
         </div>
     );
 }

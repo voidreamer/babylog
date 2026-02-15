@@ -380,8 +380,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     if (loading) {
         return (
-            <div className="loading">
-                <div className="spinner"></div>
+            <div className="loading" style={{ minHeight: '100vh' }}>
+                <img src="/icons/loading.png" alt="" className="loading-logo" />
             </div>
         );
     }
@@ -621,8 +621,8 @@ function MainApp() {
 
     if (babiesLoading) {
         return (
-            <div className="loading">
-                <div className="spinner"></div>
+            <div className="loading" style={{ minHeight: '100vh' }}>
+                <img src="/icons/loading.png" alt="" className="loading-logo" />
             </div>
         );
     }
