@@ -15,11 +15,12 @@ import { supabase } from './lib/supabase';
 // When Google OAuth completes, Supabase redirects to heybub://callback#access_token=...
 // iOS opens the app — we parse the tokens and set the session directly
 if (Capacitor.isNativePlatform()) {
-    let handled = false;
+    let lastHandledUrl = '';
 
     const handleDeepLink = async (url: string) => {
-        if (handled) {
-            console.log('[DeepLink] already handled, skipping');
+        // Deduplicate by URL (same deep link can fire from both getLaunchUrl and appUrlOpen)
+        if (url === lastHandledUrl) {
+            console.log('[DeepLink] duplicate URL, skipping');
             return;
         }
         console.log('[DeepLink] handling:', url);
@@ -31,19 +32,23 @@ if (Capacitor.isNativePlatform()) {
             const refreshToken = params.get('refresh_token');
 
             if (accessToken && refreshToken) {
-                handled = true;
+                lastHandledUrl = url;
                 console.log('[DeepLink] Setting session from tokens');
-                Browser.close().catch(() => {});
-                const { error } = await supabase.auth.setSession({
+                const { data, error } = await supabase.auth.setSession({
                     access_token: accessToken,
                     refresh_token: refreshToken,
                 });
-                if (!error) {
-                    window.location.href = import.meta.env.VITE_BASE_PATH || '/';
-                    return;
+                // Close the Safari overlay after session is set
+                Browser.close().catch(() => {});
+                if (error) {
+                    console.error('[DeepLink] setSession error:', error);
+                    lastHandledUrl = '';
+                } else {
+                    console.log('[DeepLink] Session set successfully, user:', data.user?.email);
+                    // Pass session directly to React AuthProvider — avoids async getSession race
+                    (window as any).__nativeSession = data.session;
+                    window.dispatchEvent(new Event('native-auth-success'));
                 }
-                console.error('[DeepLink] setSession error:', error);
-                handled = false;
             }
         }
     };

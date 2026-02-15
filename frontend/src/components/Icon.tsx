@@ -6,6 +6,9 @@ const icons: Record<string, string> = {
     diaper: `${base}icons/diaper.png`,
     sleep: `${base}icons/sleep.png`,
     pumping: `${base}icons/pumping.png`,
+    activity: `${base}icons/activity.png`,
+    medicine: `${base}icons/medicine.png`,
+    growth: `${base}icons/growth.png`,
     logo: `${base}icons/logo.png`,
 };
 
@@ -28,10 +31,7 @@ export default function Icon({ name, size = 32, className = '' }: IconProps) {
             width={size}
             height={size}
             className={className}
-            style={{
-                objectFit: 'contain',
-                borderRadius: size > 40 ? '12px' : '8px'
-            }}
+            style={{ objectFit: 'contain' }}
         />
     );
 }
