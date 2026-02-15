@@ -1,8 +1,12 @@
+import { readFileSync } from 'fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+    define: {
+        __APP_VERSION__: JSON.stringify(JSON.parse(readFileSync('package.json', 'utf-8')).version),
+    },
     plugins: [
         react(),
         VitePWA({
@@ -12,8 +16,8 @@ export default defineConfig({
                 name: 'HeyBub - Baby Tracker',
                 short_name: 'HeyBub',
                 description: 'Track your baby\'s sleep, feeding, and diaper changes',
-                theme_color: '#6366f1',
-                background_color: '#fef7ed',
+                theme_color: '#d4849c',
+                background_color: '#fefdfb',
                 display: 'standalone',
                 orientation: 'portrait',
                 start_url: '/',
