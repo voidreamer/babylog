@@ -199,15 +199,6 @@ jobs:
           cp alembic.ini package/
           cd package && zip -r ../lambda.zip . -q
 
-      - name: Deploy backend to Lambda
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
-            --zip-file fileb://backend/lambda.zip \
-            --no-cli-pager
-          aws lambda wait function-updated \
-            --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
-
       - name: Run database migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -219,6 +210,15 @@ jobs:
           cd backend
           pip install -r requirements.txt -q
           alembic upgrade head
+
+      - name: Deploy backend to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
+            --zip-file fileb://backend/lambda.zip \
+            --no-cli-pager
+          aws lambda wait function-updated \
+            --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
 
       # ----- Frontend Deploy -----
       - name: Set up Node.js

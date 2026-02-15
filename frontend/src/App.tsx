@@ -8,6 +8,8 @@ import { useOfflineSync } from './hooks/useOfflineSync';
 import { api } from './api/client';
 import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from './utils/rateLimiter';
 import { hapticSelection } from './utils/haptics';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -360,7 +362,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 </button>
             </div>
 
-            <p className="settings-version">{t('app.version', { version: '1.0.0' })}</p>
+            <p className="settings-version">{t('app.version', { version: __APP_VERSION__ })}</p>
 
             {showShareModal && currentBaby && (
                 <CaregiverModal
@@ -461,6 +463,12 @@ function MainApp() {
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
+        // Update meta theme-color for browser/OS chrome
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#1a1614' : '#d4849c');
+        if (Capacitor.isNativePlatform()) {
+            StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light });
+        }
     }, [theme]);
 
     useEffect(() => {
