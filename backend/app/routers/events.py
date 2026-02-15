@@ -39,10 +39,10 @@ def get_timeline(
         try:
             target_date = datetime.strptime(date.split('T')[0], '%Y-%m-%d')
         except ValueError:
-            target_date = datetime.now(timezone.utc)
+            target_date = datetime.now(timezone.utc).replace(tzinfo=None)
     else:
-        target_date = datetime.now(timezone.utc)
-    
+        target_date = datetime.now(timezone.utc).replace(tzinfo=None)
+
     # Calculate day boundaries in UTC, adjusted for user's timezone
     # getTimezoneOffset() returns positive for west of UTC (e.g., 300 for EST/UTC-5)
     # To convert local midnight to UTC: add the offset
@@ -280,7 +280,7 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         if s.end_time is None:
             # Ongoing sleep - count from start (or day start if started earlier) to now
             effective_start = max(s.start_time, start_of_day)
-            effective_end = min(datetime.now(timezone.utc), end_of_day)
+            effective_end = min(datetime.now(timezone.utc).replace(tzinfo=None), end_of_day)
         else:
             # Completed sleep - count only the portion within this day
             effective_start = max(s.start_time, start_of_day)
@@ -426,9 +426,9 @@ def get_dashboard(
         try:
             summary_date = datetime.strptime(local_date.split('T')[0], '%Y-%m-%d')
         except ValueError:
-            summary_date = datetime.now(timezone.utc)
+            summary_date = datetime.now(timezone.utc).replace(tzinfo=None)
     else:
-        summary_date = datetime.now(timezone.utc)
+        summary_date = datetime.now(timezone.utc).replace(tzinfo=None)
     
     # Daily summary (with timezone offset)
     daily_summary = get_daily_summary_for_baby(db, baby_id, summary_date, tz_offset)

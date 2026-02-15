@@ -148,7 +148,7 @@ def end_sleep(
     if sleep.end_time:
         raise HTTPException(status_code=400, detail="Sleep already ended")
     
-    sleep.end_time = datetime.now(timezone.utc)
+    sleep.end_time = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
     db.refresh(sleep)
     return sleep
