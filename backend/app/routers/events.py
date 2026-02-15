@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_, func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from ..database import get_db
 from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement
@@ -39,9 +39,9 @@ def get_timeline(
         try:
             target_date = datetime.strptime(date.split('T')[0], '%Y-%m-%d')
         except ValueError:
-            target_date = datetime.utcnow()
+            target_date = datetime.now(timezone.utc)
     else:
-        target_date = datetime.utcnow()
+        target_date = datetime.now(timezone.utc)
     
     # Calculate day boundaries in UTC, adjusted for user's timezone
     # getTimezoneOffset() returns positive for west of UTC (e.g., 300 for EST/UTC-5)
@@ -280,7 +280,7 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         if s.end_time is None:
             # Ongoing sleep - count from start (or day start if started earlier) to now
             effective_start = max(s.start_time, start_of_day)
-            effective_end = min(datetime.utcnow(), end_of_day)
+            effective_end = min(datetime.now(timezone.utc), end_of_day)
         else:
             # Completed sleep - count only the portion within this day
             effective_start = max(s.start_time, start_of_day)
@@ -426,9 +426,9 @@ def get_dashboard(
         try:
             summary_date = datetime.strptime(local_date.split('T')[0], '%Y-%m-%d')
         except ValueError:
-            summary_date = datetime.utcnow()
+            summary_date = datetime.now(timezone.utc)
     else:
-        summary_date = datetime.utcnow()
+        summary_date = datetime.now(timezone.utc)
     
     # Daily summary (with timezone offset)
     daily_summary = get_daily_summary_for_baby(db, baby_id, summary_date, tz_offset)
