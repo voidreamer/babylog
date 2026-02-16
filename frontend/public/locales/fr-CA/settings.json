@@ -4,7 +4,22 @@
     "title": "Profil du bébé",
     "born": "Né {{date}}",
     "growthData": "Données sur la croissance",
-    "growthDataDesc": "Mise à jour du poids et de la taille"
+    "growthDataDesc": "Mise à jour du poids et de la taille",
+    "changePhoto": "Changer la photo",
+    "photoUpdated": "Photo mise à jour!",
+    "photoFailed": "Erreur lors du téléversement de la photo",
+    "birthDetails": "Détails de naissance",
+    "bloodType": "Groupe sanguin",
+    "bloodTypePlaceholder": "Sélectionner",
+    "birthplace": "Lieu de naissance",
+    "birthplacePlaceholder": "ex. Hôpital de la ville",
+    "birthTime": "Heure de naissance",
+    "birthWeight": "Poids à la naissance",
+    "birthLength": "Taille à la naissance",
+    "saved": "Profil enregistré!",
+    "saveFailed": "Erreur lors de la sauvegarde",
+    "saveChanges": "Sauvegarder",
+    "readOnly": "Lecture seule"
   },
   "notifications": {
     "title": "Notifications",

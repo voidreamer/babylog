@@ -28,6 +28,8 @@ import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, Chev
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
 import CaregiverModal from './components/CaregiverModal';
+import BabyProfile from './components/BabyProfile';
+import BabyAvatar from './components/BabyAvatar';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
@@ -37,8 +39,13 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
     const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings);
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showBabyProfile, setShowBabyProfile] = useState(false);
 
     const currentBaby = babies?.[0];
+
+    if (showBabyProfile) {
+        return <BabyProfile onBack={() => setShowBabyProfile(false)} />;
+    }
 
     const updateNotifSettings = (patch: Partial<NotificationSettings>) => {
         const next = { ...notifSettings, ...patch };
@@ -97,14 +104,15 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
             {currentBaby && (
                 <div className="settings-group">
                     <div className="settings-group-title">{t('settings:babyProfile.title')}</div>
-                    <div className="settings-row">
+                    <div className="settings-row" onClick={() => setShowBabyProfile(true)} style={{ cursor: 'pointer' }}>
                         <div className="settings-row-left">
-                            <div className="settings-icon-box blush"><Baby size={16} /></div>
+                            <BabyAvatar name={currentBaby.name} photoUrl={currentBaby.profile_photo_url} size={32} />
                             <div>
                                 <div className="settings-row-label">{currentBaby.name}</div>
                                 <div className="settings-row-desc">{currentBaby.birth_date ? t('settings:babyProfile.born', { date: formatDob(currentBaby.birth_date) }) : ''}</div>
                             </div>
                         </div>
+                        <ChevronRight size={18} className="settings-arrow" />
                     </div>
                     <div className="settings-row" onClick={() => setActiveTab('health')}>
                         <div className="settings-row-left">

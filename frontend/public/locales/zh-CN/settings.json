@@ -4,7 +4,22 @@
     "title": "宝宝资料",
     "born": "出生于 {{date}}",
     "growthData": "生长数据",
-    "growthDataDesc": "更新体重、身高"
+    "growthDataDesc": "更新体重、身高",
+    "changePhoto": "更换照片",
+    "photoUpdated": "照片已更新！",
+    "photoFailed": "照片上传失败",
+    "birthDetails": "出生信息",
+    "bloodType": "血型",
+    "bloodTypePlaceholder": "请选择",
+    "birthplace": "出生地点",
+    "birthplacePlaceholder": "例如 市中心医院",
+    "birthTime": "出生时间",
+    "birthWeight": "出生体重",
+    "birthLength": "出生身长",
+    "saved": "资料已保存！",
+    "saveFailed": "保存失败",
+    "saveChanges": "保存修改",
+    "readOnly": "仅查看"
   },
   "notifications": {
     "title": "通知",

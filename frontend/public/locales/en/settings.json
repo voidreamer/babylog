@@ -4,7 +4,22 @@
     "title": "Baby Profile",
     "born": "Born {{date}}",
     "growthData": "Growth Data",
-    "growthDataDesc": "Update weight, height"
+    "growthDataDesc": "Update weight, height",
+    "changePhoto": "Change Photo",
+    "photoUpdated": "Photo updated!",
+    "photoFailed": "Failed to upload photo",
+    "birthDetails": "Birth Details",
+    "bloodType": "Blood Type",
+    "bloodTypePlaceholder": "Select",
+    "birthplace": "Birthplace",
+    "birthplacePlaceholder": "e.g. City Hospital",
+    "birthTime": "Birth Time",
+    "birthWeight": "Birth Weight",
+    "birthLength": "Birth Length",
+    "saved": "Profile saved!",
+    "saveFailed": "Failed to save",
+    "saveChanges": "Save Changes",
+    "readOnly": "View only"
   },
   "notifications": {
     "title": "Notifications",

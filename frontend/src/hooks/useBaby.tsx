@@ -10,6 +10,10 @@ interface Baby {
     name: string;
     birth_date: string | null;
     gender: string | null;
+    profile_photo_url?: string | null;
+    blood_type?: string | null;
+    birthplace?: string | null;
+    birth_time?: string | null;
     is_owner?: boolean;
     shared_with?: CaregiverEntry[];
     [key: string]: any;

@@ -4,7 +4,22 @@
     "title": "赤ちゃんのプロフィール",
     "born": "{{date}}生まれ",
     "growthData": "成長データ",
-    "growthDataDesc": "体重・身長を更新"
+    "growthDataDesc": "体重・身長を更新",
+    "changePhoto": "写真を変更",
+    "photoUpdated": "写真を更新しました！",
+    "photoFailed": "写真のアップロードに失敗しました",
+    "birthDetails": "出生情報",
+    "bloodType": "血液型",
+    "bloodTypePlaceholder": "選択",
+    "birthplace": "出生場所",
+    "birthplacePlaceholder": "例: 市立病院",
+    "birthTime": "出生時刻",
+    "birthWeight": "出生時体重",
+    "birthLength": "出生時身長",
+    "saved": "プロフィールを保存しました！",
+    "saveFailed": "保存に失敗しました",
+    "saveChanges": "変更を保存",
+    "readOnly": "閲覧のみ"
   },
   "notifications": {
     "title": "通知",

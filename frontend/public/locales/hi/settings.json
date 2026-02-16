@@ -4,7 +4,22 @@
     "title": "शिशु प्रोफ़ाइल",
     "born": "जन्म {{date}}",
     "growthData": "ग्रोथ डेटा",
-    "growthDataDesc": "वज़न, लंबाई अपडेट करें"
+    "growthDataDesc": "वज़न, लंबाई अपडेट करें",
+    "changePhoto": "फ़ोटो बदलें",
+    "photoUpdated": "फ़ोटो अपडेट हो गया!",
+    "photoFailed": "फ़ोटो अपलोड विफल",
+    "birthDetails": "जन्म विवरण",
+    "bloodType": "रक्त समूह",
+    "bloodTypePlaceholder": "चुनें",
+    "birthplace": "जन्म स्थान",
+    "birthplacePlaceholder": "जैसे सिटी हॉस्पिटल",
+    "birthTime": "जन्म का समय",
+    "birthWeight": "जन्म का वजन",
+    "birthLength": "जन्म की लंबाई",
+    "saved": "प्रोफ़ाइल सेव हो गया!",
+    "saveFailed": "सेव विफल",
+    "saveChanges": "बदलाव सेव करें",
+    "readOnly": "केवल देखें"
   },
   "notifications": {
     "title": "सूचनाएं",
