@@ -55,7 +55,7 @@ export default function CaregiverModal({ baby, onClose, onShare }: CaregiverModa
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal caregiver-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal caregiver-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2>{t('share.title', { name: baby.name })}</h2>
                     <button className="modal-close" onClick={onClose}><X size={20} /></button>

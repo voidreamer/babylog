@@ -59,6 +59,8 @@ export default function UpgradeDialog({ onClose }: UpgradeDialogProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-content upgrade-modal-content"
+        role="dialog"
+        aria-modal="true"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

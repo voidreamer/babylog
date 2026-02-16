@@ -62,6 +62,8 @@ export default function WidgetSettings({ visibleWidgets, onToggle, quickActionsE
                         />
                         <motion.div
                             className="modal widget-settings-modal"
+                            role="dialog"
+                            aria-modal="true"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

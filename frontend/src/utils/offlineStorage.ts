@@ -21,7 +21,6 @@ const STORES = {
     DOCTOR_VISITS: 'doctor_visits',
     VACCINATIONS: 'vaccinations',
     MEDICATIONS: 'medications',
-    MILESTONES: 'milestones',
     GROWTH_RECORDS: 'growth_records',
     PHOTOS: 'photos'
 } as const;
@@ -320,25 +319,6 @@ export async function getCachedMedications(babyId: number): Promise<any[]> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function cacheMilestones(babyId: number, milestones: any[]): Promise<void> {
-    const db = await getDB();
-    const tx = db.transaction(STORES.MILESTONES, 'readwrite');
-    const store = tx.objectStore(STORES.MILESTONES);
-    const index = store.index('baby_id');
-    const oldKeys = await index.getAllKeys(babyId);
-    for (const key of oldKeys) { await store.delete(key); }
-    for (const milestone of milestones) { await store.put({ ...milestone, baby_id: babyId }); }
-    await tx.done;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function getCachedMilestones(babyId: number): Promise<any[]> {
-    const db = await getDB();
-    const index = db.transaction(STORES.MILESTONES).objectStore(STORES.MILESTONES).index('baby_id');
-    return index.getAll(babyId);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheGrowthRecords(babyId: number, records: any[]): Promise<void> {
     const db = await getDB();
     const tx = db.transaction(STORES.GROWTH_RECORDS, 'readwrite');
@@ -429,7 +409,7 @@ export async function clearAllOfflineData(): Promise<void> {
         [STORES.BABIES, STORES.FEEDINGS, STORES.SLEEPS, STORES.DIAPERS,
          STORES.PUMPINGS, STORES.ACTIVITIES, STORES.PENDING_SYNC, STORES.METADATA,
          STORES.DOCTOR_VISITS, STORES.VACCINATIONS, STORES.MEDICATIONS,
-         STORES.MILESTONES, STORES.GROWTH_RECORDS, STORES.PHOTOS],
+         STORES.GROWTH_RECORDS, STORES.PHOTOS],
         'readwrite'
     );
 
@@ -445,7 +425,6 @@ export async function clearAllOfflineData(): Promise<void> {
         tx.objectStore(STORES.DOCTOR_VISITS).clear(),
         tx.objectStore(STORES.VACCINATIONS).clear(),
         tx.objectStore(STORES.MEDICATIONS).clear(),
-        tx.objectStore(STORES.MILESTONES).clear(),
         tx.objectStore(STORES.GROWTH_RECORDS).clear(),
         tx.objectStore(STORES.PHOTOS).clear(),
     ]);
@@ -496,7 +475,6 @@ export async function getCacheStats(): Promise<Record<string, number>> {
         doctorVisits: await db.count(STORES.DOCTOR_VISITS),
         vaccinations: await db.count(STORES.VACCINATIONS),
         medications: await db.count(STORES.MEDICATIONS),
-        milestones: await db.count(STORES.MILESTONES),
         growthRecords: await db.count(STORES.GROWTH_RECORDS),
         photos: await db.count(STORES.PHOTOS),
     };
@@ -513,7 +491,6 @@ export default {
     cacheDoctorVisits, getCachedDoctorVisits,
     cacheVaccinations, getCachedVaccinations,
     cacheMedications, getCachedMedications,
-    cacheMilestones, getCachedMilestones,
     cacheGrowthRecords, getCachedGrowthRecords,
     queueForSync, getPendingSyncActions, removeSyncAction, updateSyncActionRetry,
     clearPendingSyncActions, getPendingSyncCount,

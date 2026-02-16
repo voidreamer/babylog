@@ -33,18 +33,6 @@
     "months": "महीने",
     "current": "वर्तमान"
   },
-  "milestones": {
-    "title": "मील के पत्थर",
-    "addMilestone": "मील का पत्थर जोड़ें",
-    "category": "श्रेणी",
-    "date": "तारीख",
-    "description": "विवरण",
-    "noMilestones": "अभी कोई मील का पत्थर दर्ज नहीं",
-    "total": "{{count}} कुल",
-    "selectMilestone": "एक मील का पत्थर चुनें...",
-    "customMilestone": "कस्टम मील का पत्थर",
-    "dateAchieved": "प्राप्ति की तारीख"
-  },
   "teething": {
     "title": "दाँत निकलना",
     "addTooth": "दाँत जोड़ें",
@@ -156,8 +144,6 @@
     "logVaccination": "टीकाकरण दर्ज करें",
     "editMedication": "दवाई संपादित करें",
     "addMedication": "दवाई जोड़ें",
-    "editMilestone": "मील का पत्थर संपादित करें",
-    "logMilestone": "मील का पत्थर दर्ज करें",
     "editGrowth": "विकास संपादित करें",
     "logGrowth": "विकास दर्ज करें",
     "date": "तारीख",
@@ -172,8 +158,7 @@
     "medicationName": "दवाई का नाम",
     "dosage": "खुराक",
     "frequency": "कितनी बार",
-    "startDate": "शुरू की तारीख",
-    "milestone": "मील का पत्थर"
+    "startDate": "शुरू की तारीख"
   },
   "failedToLoad": "स्वास्थ्य डेटा लोड करने में विफल",
   "failedToSave": "सहेजने में विफल",
@@ -197,8 +182,6 @@
   "toast_vaccinationLogged": "टीकाकरण दर्ज हुआ",
   "toast_medicationUpdated": "दवाई अपडेट हुई",
   "toast_medicationAdded": "दवाई जोड़ी गई",
-  "toast_milestoneUpdated": "मील का पत्थर अपडेट हुआ",
-  "toast_milestoneLogged": "मील का पत्थर दर्ज हुआ",
   "toast_growthRecordUpdated": "विकास रिकॉर्ड अपडेट हुआ",
   "toast_growthRecordLogged": "विकास रिकॉर्ड दर्ज हुआ",
   "placeholder_optional": "वैकल्पिक",
@@ -208,11 +191,6 @@
   "placeholder_doctorclinicName": "डॉक्टर/क्लिनिक का नाम",
   "placeholder_eg25ml": "जैसे, 2.5ml",
   "placeholder_egTwiceDaily": "जैसे, दिन में दो बार",
-  "toast_pleaseDescribeTheMilestone": "कृपया मील का पत्थर वर्णित करें",
-  "toast_milestoneAdded": "मील का पत्थर जोड़ा गया!",
-  "toast_milestoneDeleted": "मील का पत्थर हटाया गया",
-  "arialabel_deleteMilestone": "मील का पत्थर हटाएं",
-  "placeholder_whatMilestoneEgFirstSteps": "कौन सा मील का पत्थर? (जैसे, पहले कदम)",
   "toast_visitRecorded": "विज़िट दर्ज हुई",
   "toast_visitDeleted": "विज़िट हटाई गई",
   "toast_pleaseEnterVaccineName": "कृपया टीके का नाम दर्ज करें",

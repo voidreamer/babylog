@@ -33,18 +33,6 @@
     "months": "meses",
     "current": "actual"
   },
-  "milestones": {
-    "title": "Hitos",
-    "addMilestone": "Añadir hito",
-    "category": "Categoría",
-    "date": "Fecha",
-    "description": "Descripción",
-    "noMilestones": "Aún no se han registrado hitos",
-    "total": "{{count}} total",
-    "selectMilestone": "Seleccione un hito...",
-    "customMilestone": "Hito personalizado",
-    "dateAchieved": "Fecha de realización"
-  },
   "teething": {
     "title": "Dentición",
     "addTooth": "Añadir diente",
@@ -156,8 +144,6 @@
     "logVaccination": "Registro Vacunación",
     "editMedication": "Editar medicación",
     "addMedication": "Añadir medicación",
-    "editMilestone": "Editar hito",
-    "logMilestone": "Hito de registro",
     "editGrowth": "Editar Crecimiento",
     "logGrowth": "Registrar crecimiento",
     "date": "Fecha",
@@ -172,8 +158,7 @@
     "medicationName": "Nombre del medicamento",
     "dosage": "Dosificación",
     "frequency": "Frecuencia",
-    "startDate": "Fecha de inicio",
-    "milestone": "Hito"
+    "startDate": "Fecha de inicio"
   },
   "failedToLoad": "Error al cargar los datos sanitarios",
   "failedToSave": "No se ha podido guardar",
@@ -197,8 +182,6 @@
   "toast_vaccinationLogged": "Vacunación registrada",
   "toast_medicationUpdated": "Medicación actualizada",
   "toast_medicationAdded": "Medicación añadida",
-  "toast_milestoneUpdated": "Hito actualizado",
-  "toast_milestoneLogged": "Hito registrado",
   "toast_growthRecordUpdated": "Registro de crecimiento actualizado",
   "toast_growthRecordLogged": "Récord de crecimiento registrado",
   "placeholder_optional": "Opcional",
@@ -208,11 +191,6 @@
   "placeholder_doctorclinicName": "Médico/Nombre de la clínica",
   "placeholder_eg25ml": "por ejemplo, 2,5 ml",
   "placeholder_egTwiceDaily": "por ejemplo, Dos veces al día",
-  "toast_pleaseDescribeTheMilestone": "Describa el hito",
-  "toast_milestoneAdded": "¡Hito añadido!",
-  "toast_milestoneDeleted": "Hito eliminado",
-  "arialabel_deleteMilestone": "Eliminar hito",
-  "placeholder_whatMilestoneEgFirstSteps": "¿Qué hito? (por ejemplo, Primeros pasos)",
   "toast_visitRecorded": "Visita registrada",
   "toast_visitDeleted": "Visita eliminada",
   "toast_pleaseEnterVaccineName": "Introduzca el nombre de la vacuna",

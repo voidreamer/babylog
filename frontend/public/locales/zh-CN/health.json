@@ -33,18 +33,6 @@
     "months": "个月",
     "current": "当前"
   },
-  "milestones": {
-    "title": "发育里程碑",
-    "addMilestone": "添加里程碑",
-    "category": "类别",
-    "date": "日期",
-    "description": "描述",
-    "noMilestones": "暂无里程碑记录",
-    "total": "共 {{count}} 项",
-    "selectMilestone": "选择一个里程碑...",
-    "customMilestone": "自定义里程碑",
-    "dateAchieved": "达成日期"
-  },
   "teething": {
     "title": "出牙",
     "addTooth": "添加牙齿",
@@ -156,8 +144,6 @@
     "logVaccination": "记录疫苗接种",
     "editMedication": "编辑用药记录",
     "addMedication": "添加用药",
-    "editMilestone": "编辑里程碑",
-    "logMilestone": "记录里程碑",
     "editGrowth": "编辑生长记录",
     "logGrowth": "记录生长",
     "date": "日期",
@@ -172,8 +158,7 @@
     "medicationName": "药物名称",
     "dosage": "剂量",
     "frequency": "频率",
-    "startDate": "开始日期",
-    "milestone": "里程碑"
+    "startDate": "开始日期"
   },
   "failedToLoad": "加载健康数据失败",
   "failedToSave": "保存失败",
@@ -197,8 +182,6 @@
   "toast_vaccinationLogged": "疫苗已记录",
   "toast_medicationUpdated": "用药已更新",
   "toast_medicationAdded": "用药已添加",
-  "toast_milestoneUpdated": "里程碑已更新",
-  "toast_milestoneLogged": "里程碑已记录",
   "toast_growthRecordUpdated": "生长记录已更新",
   "toast_growthRecordLogged": "生长记录已保存",
   "placeholder_optional": "可选",
@@ -208,11 +191,6 @@
   "placeholder_doctorclinicName": "医生/诊所名称",
   "placeholder_eg25ml": "例如 2.5ml",
   "placeholder_egTwiceDaily": "例如每天两次",
-  "toast_pleaseDescribeTheMilestone": "请描述里程碑",
-  "toast_milestoneAdded": "里程碑已添加！",
-  "toast_milestoneDeleted": "里程碑已删除",
-  "arialabel_deleteMilestone": "删除里程碑",
-  "placeholder_whatMilestoneEgFirstSteps": "什么里程碑？（例如第一次走路）",
   "toast_visitRecorded": "就诊已记录",
   "toast_visitDeleted": "就诊已删除",
   "toast_pleaseEnterVaccineName": "请输入疫苗名称",

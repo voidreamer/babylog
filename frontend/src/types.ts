@@ -154,14 +154,6 @@ export interface Medication {
   notes: string | null;
 }
 
-export interface Milestone {
-  id: number;
-  baby_id: number;
-  milestone_type: string;
-  achieved_date: string;
-  notes: string | null;
-}
-
 export interface GrowthRecord {
   id: number;
   baby_id: number;

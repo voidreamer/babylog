@@ -33,18 +33,6 @@
     "months": "месяцев",
     "current": "текущий"
   },
-  "milestones": {
-    "title": "Достижения",
-    "addMilestone": "Добавить достижение",
-    "category": "Категория",
-    "date": "Дата",
-    "description": "Описание",
-    "noMilestones": "Достижения ещё не записаны",
-    "total": "{{count}} всего",
-    "selectMilestone": "Выберите достижение...",
-    "customMilestone": "Своё достижение",
-    "dateAchieved": "Дата достижения"
-  },
   "teething": {
     "title": "Зубки",
     "addTooth": "Добавить зуб",
@@ -156,8 +144,6 @@
     "logVaccination": "Записать прививку",
     "editMedication": "Редактировать лекарство",
     "addMedication": "Добавить лекарство",
-    "editMilestone": "Редактировать достижение",
-    "logMilestone": "Записать достижение",
     "editGrowth": "Редактировать рост",
     "logGrowth": "Записать рост",
     "date": "Дата",
@@ -172,8 +158,7 @@
     "medicationName": "Название лекарства",
     "dosage": "Дозировка",
     "frequency": "Частота",
-    "startDate": "Дата начала",
-    "milestone": "Достижение"
+    "startDate": "Дата начала"
   },
   "failedToLoad": "Не удалось загрузить данные о здоровье",
   "failedToSave": "Не удалось сохранить",
@@ -197,8 +182,6 @@
   "toast_vaccinationLogged": "Прививка записана",
   "toast_medicationUpdated": "Лекарство обновлено",
   "toast_medicationAdded": "Лекарство добавлено",
-  "toast_milestoneUpdated": "Достижение обновлено",
-  "toast_milestoneLogged": "Достижение записано",
   "toast_growthRecordUpdated": "Запись о росте обновлена",
   "toast_growthRecordLogged": "Запись о росте записана",
   "placeholder_optional": "Необязательно",
@@ -208,11 +191,6 @@
   "placeholder_doctorclinicName": "Имя врача / название клиники",
   "placeholder_eg25ml": "напр., 2.5ml",
   "placeholder_egTwiceDaily": "напр., два раза в день",
-  "toast_pleaseDescribeTheMilestone": "Пожалуйста, опишите достижение",
-  "toast_milestoneAdded": "Достижение добавлено!",
-  "toast_milestoneDeleted": "Достижение удалено",
-  "arialabel_deleteMilestone": "Удалить достижение",
-  "placeholder_whatMilestoneEgFirstSteps": "Какое достижение? (напр., первые шаги)",
   "toast_visitRecorded": "Визит записан",
   "toast_visitDeleted": "Визит удалён",
   "toast_pleaseEnterVaccineName": "Пожалуйста, введите название вакцины",
