@@ -48,10 +48,16 @@ export function BabyProvider({ children }: BabyProviderProps) {
             const data = await api.getBabies();
             setBabies(data);
 
-            if (data.length > 0 && !selectedBaby) {
-                const savedBabyId = localStorage.getItem('selected_baby_id');
-                const saved = data.find((b: Baby) => b.id === parseInt(savedBabyId || '0'));
-                setSelectedBaby(saved || data[0]);
+            if (data.length > 0) {
+                if (selectedBaby) {
+                    // Refresh selectedBaby with latest data (e.g. after photo upload)
+                    const updated = data.find((b: Baby) => b.id === selectedBaby.id);
+                    if (updated) setSelectedBaby(updated);
+                } else {
+                    const savedBabyId = localStorage.getItem('selected_baby_id');
+                    const saved = data.find((b: Baby) => b.id === parseInt(savedBabyId || '0'));
+                    setSelectedBaby(saved || data[0]);
+                }
             }
         } catch (error) {
             console.error('Failed to load babies:', error);
