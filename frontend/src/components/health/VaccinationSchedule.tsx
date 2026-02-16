@@ -2,10 +2,10 @@
 import { useState, useMemo } from 'react';
 import { Check, Clock, AlertTriangle, Calendar, ChevronDown, ChevronUp, Syringe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { showApiError } from '../../utils/errorHandling';
+import { calculateAgeInMonths } from '../../utils/ageUtils';
 
 // CDC/WHO recommended vaccination schedule (0-24 months)
 const VACCINATION_SCHEDULE = [
@@ -64,9 +64,7 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
   // Calculate baby's age in months
   const babyAgeMonths = useMemo(() => {
     if (!baby?.birth_date) return null;
-    const birth = new Date(baby.birth_date);
-    const now = new Date();
-    return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+    return calculateAgeInMonths(baby.birth_date);
   }, [baby?.birth_date]);
 
   // Build a set of administered vaccine names (normalized)

@@ -341,6 +341,7 @@
   "learn": {
     "insights": "Perspectives",
     "forBaby": "Pour {{name}}, {{months}} {{monthLabel}} anciens",
+    "forBabyAge": "Pour {{name}}, {{age}}",
     "month": "mois",
     "months": "mois"
   },

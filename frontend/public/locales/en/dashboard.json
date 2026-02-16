@@ -341,6 +341,7 @@
   "learn": {
     "insights": "Insights",
     "forBaby": "For {{name}}, {{months}} {{monthLabel}} old",
+    "forBabyAge": "For {{name}}, {{age}}",
     "month": "month",
     "months": "months"
   },

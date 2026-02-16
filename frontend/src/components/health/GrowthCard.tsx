@@ -3,6 +3,7 @@ import { useState, lazy, Suspense } from 'react';
 import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
+import { calculateAgeInMonths } from '../../utils/ageUtils';
 
 // Lazy load the GrowthChart component - only loads when user clicks "Full Chart"
 const GrowthChart = lazy(() => import('./GrowthChart'));
@@ -45,7 +46,7 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
 
     // Calculate baby's age in months
     const babyAgeMonths = baby?.birth_date
-        ? Math.floor((new Date().getTime() - new Date(baby.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 30.44))
+        ? calculateAgeInMonths(baby.birth_date)
         : null;
 
     // Get WHO percentile data for current age

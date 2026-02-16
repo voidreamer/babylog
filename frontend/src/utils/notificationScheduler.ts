@@ -300,9 +300,6 @@ export async function rescheduleAll(babyId: number, babyName: string): Promise<v
         schedule: n.schedule as any,
         extra: n.extra,
         actionTypeId: n.actionTypeId,
-        sound: undefined,
-        smallIcon: undefined,
-        largeIcon: undefined,
       })),
     });
   } catch (e) {

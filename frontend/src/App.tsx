@@ -83,7 +83,9 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
 
     const formatDob = (dateStr: string) => {
         try {
-            return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+            // Normalize: extract date part and parse at noon to avoid UTC timezone shift
+            const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+            return new Date(datePart + 'T12:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
         } catch { return dateStr; }
     };
 

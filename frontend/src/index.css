@@ -862,13 +862,32 @@ h4 {
   border-color: rgba(96, 165, 250, 0.4);
 }
 
-/* Floating zzz animation for sleep widget */
+/* Sleep widget - centered baby icon with zzz */
+.sleep-center-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.sleep-baby-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.sleep-label {
+  text-align: center;
+  font-weight: 600;
+  margin-top: var(--space-2xs);
+}
+
 .sleep-zzz {
   position: absolute;
-  top: 6px;
-  right: 10px;
+  top: -4px;
+  right: -16px;
   pointer-events: none;
-  z-index: 2;
 }
 
 .sleep-zzz span {
@@ -888,15 +907,15 @@ h4 {
 
 .sleep-zzz span:nth-child(2) {
   font-size: 13px;
-  right: 6px;
-  top: -4px;
+  right: -6px;
+  top: -8px;
   animation-delay: 0.6s;
 }
 
 .sleep-zzz span:nth-child(3) {
   font-size: 16px;
-  right: 14px;
-  top: -10px;
+  right: -14px;
+  top: -18px;
   animation-delay: 1.2s;
 }
 
@@ -904,7 +923,7 @@ h4 {
   0% { opacity: 0; transform: translateY(0); }
   20% { opacity: 0.8; }
   80% { opacity: 0.6; }
-  100% { opacity: 0; transform: translateY(-18px); }
+  100% { opacity: 0; transform: translateY(-14px); }
 }
 
 /* Subtle glow for active timer widgets (feeding, pumping, tummy time) */
@@ -1139,14 +1158,23 @@ h4 {
 }
 
 /* Sleep Widget - Stateful */
-.sleep-widget-awake,
-.sleep-widget-sleeping {
+.sleep-widget-awake {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
   margin-top: var(--space-xs);
   flex: 1;
   justify-content: flex-end;
+}
+
+.sleep-widget-sleeping {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+  justify-content: center;
+  padding-top: var(--space-xs);
 }
 
 .sleep-start-btn,
