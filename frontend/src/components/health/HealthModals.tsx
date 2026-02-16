@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { api } from '../../api/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { showApiError } from '../../utils/errorHandling';
 import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
 import { parseUTCTime } from '../../utils/parseTime';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
             }
             onSave();
         } catch (error) {
-            toast.error(t('toast_failedToSave'));
+            showApiError(error, t('toast_failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -161,7 +162,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
             }
             onSave();
         } catch (error) {
-            toast.error(t('toast_failedToSave'));
+            showApiError(error, t('toast_failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -248,7 +249,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
             }
             onSave();
         } catch (error) {
-            toast.error(t('toast_failedToSave'));
+            showApiError(error, t('toast_failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -330,7 +331,7 @@ export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneM
             }
             onSave();
         } catch (error) {
-            toast.error(t('toast_failedToSave'));
+            showApiError(error, t('toast_failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -413,7 +414,7 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
             }
             onSave();
         } catch (error) {
-            toast.error(t('toast_failedToSave'));
+            showApiError(error, t('toast_failedToSave'), t);
         } finally {
             setSaving(false);
         }

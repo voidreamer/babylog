@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Smile, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from '../ConfirmModal';
@@ -95,7 +96,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
             setShowDatePicker(false);
             if (onToothAdded) onToothAdded();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -108,7 +109,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
             setSelectedTooth(null);
             if (onToothDeleted) onToothDeleted();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 

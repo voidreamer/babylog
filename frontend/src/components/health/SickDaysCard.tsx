@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Thermometer, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
@@ -94,7 +95,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             setIsAdding(false);
             if (onSickDayAdded) onSickDayAdded();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }
@@ -106,7 +107,7 @@ export default function SickDaysCard({ baby, sickDays, onSickDayAdded, onSickDay
             toast.success(t('toast_sickDayRemoved'));
             if (onSickDayDeleted) onSickDayDeleted();
         } catch (error) {
-            toast.error(t('failedToDelete'));
+            showApiError(error, t('failedToDelete'), t);
         }
     };
 

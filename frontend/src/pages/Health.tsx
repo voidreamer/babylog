@@ -9,7 +9,6 @@ import { useNotificationSync } from '../hooks/useNotificationSync';
 
 // Components
 import GrowthCard from '../components/health/GrowthCard';
-import MilestonesCard from '../components/health/MilestonesCard';
 import TeethingCard from '../components/health/TeethingCard';
 import SickDaysCard from '../components/health/SickDaysCard';
 import AllergiesCard from '../components/health/AllergiesCard';
@@ -32,7 +31,6 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
     const [visits, setVisits] = useState<any[]>([]);
     const [vaccinations, setVaccinations] = useState<any[]>([]);
     const [medications, setMedications] = useState<any[]>([]);
-    const [milestones, setMilestones] = useState<any[]>([]);
     const [growthRecords, setGrowthRecords] = useState<any[]>([]);
     const [teeth, setTeeth] = useState<any[]>([]);
     const [sickDays, setSickDays] = useState<any[]>([]);
@@ -50,11 +48,10 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
         if (!selectedBaby) return;
         setLoading(true);
         try {
-            const [v, va, m, mi, g, t, s, a] = await Promise.all([
+            const [v, va, m, g, t, s, a] = await Promise.all([
                 api.getDoctorVisits(selectedBaby.id),
                 api.getVaccinations(selectedBaby.id),
                 api.getMedications(selectedBaby.id),
-                api.getMilestones(selectedBaby.id),
                 api.getGrowthRecords(selectedBaby.id),
                 api.getTeeth(selectedBaby.id),
                 api.getSickDays(selectedBaby.id),
@@ -63,7 +60,6 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
             setVisits(v);
             setVaccinations(va);
             setMedications(m);
-            setMilestones(mi);
             setGrowthRecords(g);
             setTeeth(t);
             setSickDays(s);
@@ -122,13 +118,6 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
 
             {/* Cards Grid */}
             <section className="health-cards-grid">
-                <MilestonesCard
-                    baby={selectedBaby}
-                    milestones={milestones}
-                    onMilestoneAdded={loadData}
-                    onMilestoneDeleted={loadData}
-                />
-
                 {showTeething && (
                     <TeethingCard
                         baby={selectedBaby}

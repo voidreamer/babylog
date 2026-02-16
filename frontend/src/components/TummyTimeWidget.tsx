@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Sun, Square, Plus, Clock } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { hapticImpact, hapticNotification } from '../utils/haptics';
@@ -74,7 +75,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
             onTummyChange();
         } catch (error) {
             console.error('Failed to log tummy time:', error);
-            toast.error(t('toast_failedToSaveTummyTime'));
+            showApiError(error, t('toast_failedToSaveTummyTime'), t);
         } finally {
             setQuickSaving(null);
         }
@@ -111,7 +112,7 @@ export default function TummyTimeWidget({ lastTummy, onTummyChange, onOpenModal,
             onTummyChange();
         } catch (error) {
             console.error('Failed to save tummy time:', error);
-            toast.error(t('toast_failedToSaveTummyTime'));
+            showApiError(error, t('toast_failedToSaveTummyTime'), t);
         } finally {
             setSaving(false);
         }

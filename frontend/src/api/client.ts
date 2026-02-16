@@ -23,6 +23,15 @@ import {
     cacheGrowthRecords, getCachedGrowthRecords
 } from '../utils/offlineStorage';
 
+export class ApiError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+    }
+}
+
 interface RequestOptions extends RequestInit {
     headers?: Record<string, string>;
 }
@@ -51,7 +60,7 @@ class ApiClient {
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
-            throw new Error(error.detail || 'API Error');
+            throw new ApiError(error.detail || 'API Error', response.status);
         }
 
         if (response.status === 204) return null;

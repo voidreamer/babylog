@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
 import { ShowerHead } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
@@ -55,7 +56,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
             onSave();
         } catch (error) {
             console.error('Failed to log bath:', error);
-            toast.error(t('toast_failedToSaveBath'));
+            showApiError(error, t('toast_failedToSaveBath'), t);
         } finally {
             setSaving(false);
         }

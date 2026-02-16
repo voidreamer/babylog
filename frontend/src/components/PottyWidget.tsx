@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CircleDot, Plus, Check, X } from 'lucide-react';
 import { api } from '../api/client';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { useBaby } from '../hooks/useBaby';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -31,7 +32,7 @@ export default function PottyWidget({ lastPotty, onPottyChange, onOpenModal, qui
             onPottyChange();
         } catch (error) {
             console.error('Failed to log potty:', error);
-            toast.error(t('toast_failedToLogPotty'));
+            showApiError(error, t('toast_failedToLogPotty'), t);
         } finally {
             setSaving(null);
         }

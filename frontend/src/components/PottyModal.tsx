@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
 import { CircleDot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -71,7 +72,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
             onSave();
         } catch (error) {
             console.error('Failed to log potty:', error);
-            toast.error(t('toast_failedToSavePotty'));
+            showApiError(error, t('toast_failedToSavePotty'), t);
         } finally {
             setSaving(false);
         }

@@ -4,6 +4,7 @@ import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { addMonths, format } from 'date-fns';
 import { api } from '../../api/client';
+import { showApiError } from '../../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
@@ -97,6 +98,11 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!baby.birth_date) {
+            toast.error(t('growth.birthDateRequired'));
+            return;
+        }
+
         if (!formData.weight && !formData.height && !formData.head) {
             toast.error(t('toast_pleaseEnterAtLeastOneMeasurement'));
             return;
@@ -105,7 +111,8 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
         setSaving(true);
         try {
             // Calculate date from birth_date + selected month
-            const birthDate = new Date(baby.birth_date + 'T12:00:00');
+            const dateStr = baby.birth_date.split('T')[0]; // normalize to YYYY-MM-DD
+            const birthDate = new Date(dateStr + 'T12:00:00');
             const recordDate = addMonths(birthDate, effectiveMonth);
 
             const data = {
@@ -123,7 +130,8 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
             setIsAdding(false);
             if (onRecordAdded) onRecordAdded();
         } catch (error) {
-            toast.error(t('failedToSave'));
+            console.error('Failed to save growth record:', error);
+            showApiError(error, t('failedToSave'), t);
         } finally {
             setSaving(false);
         }

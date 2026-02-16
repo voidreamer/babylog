@@ -859,42 +859,68 @@ h4 {
 }
 
 .widget.sleeping {
-  animation: sleeping-glow 2s ease-in-out infinite;
+  border-color: rgba(96, 165, 250, 0.4);
 }
 
-/* Sleep glow effect */
+/* Floating zzz animation for sleep widget */
+.sleep-zzz {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sleep-zzz span {
+  position: absolute;
+  font-weight: 700;
+  color: var(--sleep-light, rgba(96, 165, 250, 0.7));
+  animation: zzz-float 3s ease-in-out infinite;
+  opacity: 0;
+}
+
+.sleep-zzz span:nth-child(1) {
+  font-size: 10px;
+  right: 0;
+  top: 0;
+  animation-delay: 0s;
+}
+
+.sleep-zzz span:nth-child(2) {
+  font-size: 13px;
+  right: 6px;
+  top: -4px;
+  animation-delay: 0.6s;
+}
+
+.sleep-zzz span:nth-child(3) {
+  font-size: 16px;
+  right: 14px;
+  top: -10px;
+  animation-delay: 1.2s;
+}
+
+@keyframes zzz-float {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-18px); }
+}
+
+/* Subtle glow for active timer widgets (feeding, pumping, tummy time) */
 .widget-glow {
   position: absolute;
-  inset: -50%;
-  background: radial-gradient(circle, rgba(96, 165, 250, 0.3) 0%, transparent 70%);
-  animation: glow-pulse 2s ease-in-out infinite;
+  inset: -4px;
+  border-radius: inherit;
+  background: transparent;
+  border: 2px solid rgba(96, 165, 250, 0.3);
+  animation: glow-pulse 3s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes sleeping-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4), inset 0 0 20px rgba(96, 165, 250, 0.1);
-  }
-
-  50% {
-    box-shadow: 0 0 40px rgba(96, 165, 250, 0.6), inset 0 0 30px rgba(96, 165, 250, 0.2);
-  }
-}
-
 @keyframes glow-pulse {
-
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 /* Large semi-transparent background icon */

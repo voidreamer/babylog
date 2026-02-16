@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
 import { Pill } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
@@ -80,7 +81,7 @@ export default function SupplementModal({ editEvent, onClose, onSave }: Suppleme
             onSave();
         } catch (error) {
             console.error('Failed to log supplement:', error);
-            toast.error(t('toast_failedToSaveSupplement'));
+            showApiError(error, t('toast_failedToSaveSupplement'), t);
         } finally {
             setSaving(false);
         }

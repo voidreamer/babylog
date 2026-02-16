@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import TimePicker from './TimePicker';
 import { Milk, Pencil, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { showApiError } from '../utils/errorHandling';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../hooks/useUnits';
@@ -101,7 +102,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             onSave();
         } catch (error) {
             console.error('Failed to save pumping (timer):', error);
-            toast.error(t('toast_failedToSavePumping'));
+            showApiError(error, t('toast_failedToSavePumping'), t);
         } finally {
             setSaving(false);
         }
@@ -139,7 +140,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             onSave();
         } catch (error) {
             console.error('Failed to save pumping:', error);
-            toast.error(t('toast_failedToSavePumping'));
+            showApiError(error, t('toast_failedToSavePumping'), t);
         } finally {
             setSaving(false);
         }
