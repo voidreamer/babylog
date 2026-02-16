@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { api } from '../api/client';
-import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil } from 'lucide-react';
+import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil, Sun, CloudSun, Moon, Baby } from 'lucide-react';
 import CaregiverModal from './CaregiverModal';
 import AddBabyForm from './AddBabyForm';
 import { toast } from 'sonner';
@@ -12,9 +12,9 @@ import { useTranslation } from 'react-i18next';
 // Get time-based greeting
 function getGreeting() {
     const hour = new Date().getHours();
-    if (hour < 12) return { text: 'goodMorning', icon: '☀️' };
-    if (hour < 17) return { text: 'goodAfternoon', icon: '🌤️' };
-    return { text: 'goodEvening', icon: '🌙' };
+    if (hour < 12) return { text: 'goodMorning', icon: 'sun' };
+    if (hour < 17) return { text: 'goodAfternoon', icon: 'cloud-sun' };
+    return { text: 'goodEvening', icon: 'moon' };
 }
 
 // Calculate age from birth date
@@ -140,7 +140,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
         return (
             <div className="baby-greeting baby-greeting-empty">
                 <div className="baby-greeting-header">
-                    <span className="greeting-icon">👶</span>
+                    <span className="greeting-icon"><Baby size={20} /></span>
                     <span className="greeting-text">{t('greeting.welcome')}</span>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>
@@ -156,7 +156,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
 
                 {showAddForm && (
                     <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
-                        <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
                                 <h2 className="modal-title">{t('greeting.addBaby')}</h2>
                                 <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
@@ -186,7 +186,11 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
         <>
             <div className="baby-greeting">
                 <div className="baby-greeting-header">
-                    <span className="greeting-icon">{greeting.icon}</span>
+                    <span className="greeting-icon">
+                        {greeting.icon === 'sun' && <Sun size={20} />}
+                        {greeting.icon === 'cloud-sun' && <CloudSun size={20} />}
+                        {greeting.icon === 'moon' && <Moon size={20} />}
+                    </span>
                     <span className="greeting-text">{t(`greeting.${greeting.text}`)}!</span>
                 </div>
 
@@ -302,7 +306,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
 
             {showAddForm && (
                 <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2 className="modal-title">{t('greeting.addBaby')}</h2>
                             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
@@ -320,7 +324,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
 
             {showEditForm && selectedBaby && (
                 <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2 className="modal-title">{t('greeting.editBaby', { name: selectedBaby.name })}</h2>
                             <button className="modal-close" onClick={() => setShowEditForm(false)}>×</button>

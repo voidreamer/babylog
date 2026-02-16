@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
  * Format a date string (ISO format) to a human-readable date.
  * Handles both date-only ("2026-02-07") and full ISO ("2026-02-07T00:00:00Z") strings.
  * For date-only strings, appends T12:00:00 to avoid timezone shift issues.
- * Used across health components (TeethingCard, MilestonesCard, RecordsSection, AllergiesCard).
+ * Used across health components (TeethingCard, RecordsSection, AllergiesCard).
  */
 export function formatDate(dateStr: string): string {
     try {

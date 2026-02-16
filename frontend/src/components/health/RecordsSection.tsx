@@ -17,7 +17,7 @@ type DetailView = 'visits' | 'vaccinations' | 'medications' | null;
 function RecordDetailSheet({ title, icon, onClose, children }: { title: string; icon: React.ReactNode; onClose: () => void; children: React.ReactNode }) {
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal records-detail-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal records-detail-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title">{icon} {title}</h2>
                     <button className="modal-close" onClick={onClose}><X size={20} /></button>

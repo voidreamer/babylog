@@ -86,7 +86,7 @@ export async function sendTestNotification(): Promise<boolean> {
         {
           id: 99999,
           title: 'HeyBub Test',
-          body: 'Notifications are working! 🎉',
+          body: 'Notifications are working!',
           schedule: { at: new Date(Date.now() + 3000) },
         },
       ],

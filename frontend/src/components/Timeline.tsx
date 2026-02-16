@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { format } from 'date-fns';
 import Icon from './Icon';
+import { ClipboardList } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 
@@ -18,7 +19,7 @@ export default function Timeline({ events, onRefresh }: TimelineProps) {
     if (!events || events.length === 0) {
         return (
             <div className="empty-state">
-                <div className="empty-state-icon" style={{ fontSize: '2rem', opacity: 0.5 }}>📝</div>
+                <div className="empty-state-icon" style={{ opacity: 0.5 }}><ClipboardList size={32} /></div>
                 <p className="empty-state-text">{t('timeline.noEventsToday')}</p>
             </div>
         );

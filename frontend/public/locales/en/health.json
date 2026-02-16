@@ -34,18 +34,6 @@
     "current": "current",
     "birthDateRequired": "Please set baby's birth date first"
   },
-  "milestones": {
-    "title": "Milestones",
-    "addMilestone": "Add Milestone",
-    "category": "Category",
-    "date": "Date",
-    "description": "Description",
-    "noMilestones": "No milestones recorded yet",
-    "total": "{{count}} total",
-    "selectMilestone": "Select a milestone...",
-    "customMilestone": "Custom Milestone",
-    "dateAchieved": "Date Achieved"
-  },
   "teething": {
     "title": "Teething",
     "addTooth": "Add Tooth",
@@ -157,8 +145,6 @@
     "logVaccination": "Log Vaccination",
     "editMedication": "Edit Medication",
     "addMedication": "Add Medication",
-    "editMilestone": "Edit Milestone",
-    "logMilestone": "Log Milestone",
     "editGrowth": "Edit Growth",
     "logGrowth": "Log Growth",
     "date": "Date",
@@ -173,8 +159,7 @@
     "medicationName": "Medication Name",
     "dosage": "Dosage",
     "frequency": "Frequency",
-    "startDate": "Start Date",
-    "milestone": "Milestone"
+    "startDate": "Start Date"
   },
   "failedToLoad": "Failed to load health data",
   "failedToSave": "Failed to save",
@@ -198,8 +183,6 @@
   "toast_vaccinationLogged": "Vaccination logged",
   "toast_medicationUpdated": "Medication updated",
   "toast_medicationAdded": "Medication added",
-  "toast_milestoneUpdated": "Milestone updated",
-  "toast_milestoneLogged": "Milestone logged",
   "toast_growthRecordUpdated": "Growth record updated",
   "toast_growthRecordLogged": "Growth record logged",
   "placeholder_optional": "Optional",
@@ -209,11 +192,6 @@
   "placeholder_doctorclinicName": "Doctor/Clinic name",
   "placeholder_eg25ml": "e.g., 2.5ml",
   "placeholder_egTwiceDaily": "e.g., Twice daily",
-  "toast_pleaseDescribeTheMilestone": "Please describe the milestone",
-  "toast_milestoneAdded": "Milestone added!",
-  "toast_milestoneDeleted": "Milestone deleted",
-  "arialabel_deleteMilestone": "Delete milestone",
-  "placeholder_whatMilestoneEgFirstSteps": "What milestone? (e.g., First steps)",
   "toast_visitRecorded": "Visit recorded",
   "toast_visitDeleted": "Visit deleted",
   "toast_pleaseEnterVaccineName": "Please enter vaccine name",

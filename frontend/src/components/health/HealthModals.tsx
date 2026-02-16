@@ -4,17 +4,10 @@ import { api } from '../../api/client';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { showApiError } from '../../utils/errorHandling';
-import { ClipboardList, Syringe, Pill, Star, TrendingUp } from 'lucide-react';
+import { ClipboardList, Syringe, Pill, TrendingUp } from 'lucide-react';
 import { parseUTCTime } from '../../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 
-
-const MILESTONE_OPTIONS = [
-    'First smile', 'First laugh', 'Rolled over', 'Sat up independently',
-    'First tooth', 'Started crawling', 'First steps', 'First word',
-    'First solid food', 'Slept through the night', 'Waved goodbye',
-    'Clapped hands', 'Other'
-];
 
 interface VisitModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
 export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProps) {
@@ -66,7 +59,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Doctor Visit</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
@@ -170,7 +163,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Vaccination</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
@@ -257,7 +250,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Add'} Medication</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
@@ -281,89 +274,6 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
                         <div className="form-group">
                             <label className="form-label">Start Date</label>
                             <input type="date" className="form-input" value={startDate} onChange={e => setStartDate(e.target.value)} required />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Notes</label>
-                            <input type="text" className="form-input" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('placeholder_optional')} maxLength={500} />
-                        </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
-}
-
-interface MilestoneModalProps { babyId: number; editData?: any; onClose: () => void; onSave: () => void; }
-export function MilestoneModal({ babyId, editData, onClose, onSave }: MilestoneModalProps) {
-    const { t } = useTranslation('health');
-    const isCustomMilestone = editData && !MILESTONE_OPTIONS.includes(editData.milestone_type);
-    const [milestoneType, setMilestoneType] = useState(
-        editData ? (isCustomMilestone ? 'Other' : editData.milestone_type) : ''
-    );
-    const [customType, setCustomType] = useState(isCustomMilestone ? editData.milestone_type : '');
-    const [achievedDate, setAchievedDate] = useState(
-        editData ? format(parseUTCTime(editData.achieved_date), 'yyyy-MM-dd') : new Date().toISOString().slice(0, 10)
-    );
-    const [notes, setNotes] = useState(editData?.notes || '');
-    const [saving, setSaving] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        try {
-            const data = {
-                baby_id: babyId,
-                milestone_type: milestoneType === 'Other' ? customType : milestoneType,
-                achieved_date: achievedDate,
-                notes: notes || null,
-            };
-
-            if (editData) {
-                await api.updateMilestone(editData.id, data);
-                toast.success(t('toast_milestoneUpdated'));
-            } else {
-                await api.createMilestone(data);
-                toast.success(t('toast_milestoneLogged'));
-            }
-            onSave();
-        } catch (error) {
-            showApiError(error, t('toast_failedToSave'), t);
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2 className="modal-title"><Star size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Milestone</h2>
-                    <button className="modal-close" onClick={onClose}>×</button>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label className="form-label">Milestone</label>
-                            <select className="form-input" value={milestoneType} onChange={e => setMilestoneType(e.target.value)} required>
-                                <option value="">Select a milestone...</option>
-                                {MILESTONE_OPTIONS.map(opt => (
-                                    <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                            </select>
-                        </div>
-                        {milestoneType === 'Other' && (
-                            <div className="form-group">
-                                <label className="form-label">Custom Milestone</label>
-                                <input type="text" className="form-input" value={customType} onChange={e => setCustomType(e.target.value)} required />
-                            </div>
-                        )}
-                        <div className="form-group">
-                            <label className="form-label">Date Achieved</label>
-                            <input type="date" className="form-input" value={achievedDate} onChange={e => setAchievedDate(e.target.value)} required />
                         </div>
                         <div className="form-group">
                             <label className="form-label">Notes</label>
@@ -422,7 +332,7 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Growth</h2>
                     <button className="modal-close" onClick={onClose}>×</button>

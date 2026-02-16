@@ -24,7 +24,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell, Baby, TrendingUp, Mail } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
 import CaregiverModal from './components/CaregiverModal';
@@ -99,7 +99,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     <div className="settings-group-title">{t('settings:babyProfile.title')}</div>
                     <div className="settings-row">
                         <div className="settings-row-left">
-                            <div className="settings-icon-box blush">👶</div>
+                            <div className="settings-icon-box blush"><Baby size={16} /></div>
                             <div>
                                 <div className="settings-row-label">{currentBaby.name}</div>
                                 <div className="settings-row-desc">{currentBaby.birth_date ? t('settings:babyProfile.born', { date: formatDob(currentBaby.birth_date) }) : ''}</div>
@@ -108,7 +108,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <div className="settings-row" onClick={() => setActiveTab('health')}>
                         <div className="settings-row-left">
-                            <div className="settings-icon-box butter">📈</div>
+                            <div className="settings-icon-box butter"><TrendingUp size={16} /></div>
                             <div>
                                 <div className="settings-row-label">{t('settings:babyProfile.growthData')}</div>
                                 <div className="settings-row-desc">{t('settings:babyProfile.growthDataDesc')}</div>
@@ -206,7 +206,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 <LanguageSwitcher />
                 <div className="settings-row" onClick={toggleUnits}>
                     <div className="settings-row-left">
-                        <div className="settings-icon-box mint">🌐</div>
+                        <div className="settings-icon-box mint"><Globe size={16} /></div>
                         <div>
                             <div className="settings-row-label">{t('settings:preferences.units')}</div>
                             <div className="settings-row-desc">{unitsSystem === 'metric' ? t('settings:preferences.unitsMetric') : t('settings:preferences.unitsImperial')}</div>
@@ -318,7 +318,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 <div className="settings-group-title">{t('settings:support.title')}</div>
                 <a className="settings-row" href="mailto:support@heybub.app">
                     <div className="settings-row-left">
-                        <div className="settings-icon-box peach">📧</div>
+                        <div className="settings-icon-box peach"><Mail size={16} /></div>
                         <div>
                             <div className="settings-row-label">{t('settings:support.contactUs')}</div>
                         </div>
@@ -341,7 +341,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                 </button>
                 <a className="settings-row" href="https://heybub.app/terms" target="_blank" rel="noopener noreferrer">
                     <div className="settings-row-left">
-                        <div className="settings-icon-box cloud">📋</div>
+                        <div className="settings-icon-box cloud"><FileText size={16} /></div>
                         <div>
                             <div className="settings-row-label">{t('settings:support.termsOfService')}</div>
                         </div>

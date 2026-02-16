@@ -19,7 +19,6 @@ import {
     cacheDoctorVisits, getCachedDoctorVisits,
     cacheVaccinations, getCachedVaccinations,
     cacheMedications, getCachedMedications,
-    cacheMilestones, getCachedMilestones,
     cacheGrowthRecords, getCachedGrowthRecords
 } from '../utils/offlineStorage';
 
@@ -274,15 +273,6 @@ class ApiClient {
     async deleteMedication(id: number): Promise<any> { return this.request(`/health/medications/${id}`, { method: 'DELETE' }); }
     async updateMedication(id: number, data: any): Promise<any> { return this.request(`/health/medications/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async toggleMedicationActive(id: number): Promise<any> { return this.request(`/health/medications/${id}/toggle`, { method: 'PATCH' }); }
-
-    // Health - Milestones
-    async getMilestones(babyId: number): Promise<any[]> {
-        try { const milestones = await this.request(`/health/milestones/?baby_id=${babyId}`); if (milestones) await cacheMilestones(babyId, milestones); return milestones; }
-        catch (error) { if (!isOnline()) { return await getCachedMilestones(babyId); } throw error; }
-    }
-    async createMilestone(data: any): Promise<any> { return this.request('/health/milestones/', { method: 'POST', body: JSON.stringify(data) }); }
-    async deleteMilestone(id: number): Promise<any> { return this.request(`/health/milestones/${id}`, { method: 'DELETE' }); }
-    async updateMilestone(id: number, data: any): Promise<any> { return this.request(`/health/milestones/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
     // Health - Growth
     async getGrowthRecords(babyId: number): Promise<any[]> {

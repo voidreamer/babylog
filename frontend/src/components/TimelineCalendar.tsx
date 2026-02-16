@@ -326,7 +326,7 @@ export default function TimelineCalendar() {
     if (!selectedBaby) {
         return (
             <div className="empty-state">
-                <div className="empty-state-icon">👶</div>
+                <div className="empty-state-icon"><Baby size={32} /></div>
                 <h2 className="empty-state-title">{t('common:noBabySelected')}</h2>
             </div>
         );

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
-import { Milk, Pencil, Timer } from 'lucide-react';
+import { Milk, Pencil, Timer, Play, Square } from 'lucide-react';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import { parseUTCTime } from '../utils/parseTime';
@@ -213,7 +213,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         style={{ background: 'var(--pumping)' }}
                                         disabled={saving}
                                     >
-                                        ▶️ {t('pumping.startPumping')}
+                                        <Play size={14} /> {t('pumping.startPumping')}
                                     </button>
                                 ) : (
                                     <button
@@ -221,7 +221,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
                                         className="btn btn-secondary btn-block btn-lg"
                                         onClick={handleStopTimer}
                                     >
-                                        ⏹️ {t('feeding.stop')}
+                                        <Square size={14} /> {t('feeding.stop')}
                                     </button>
                                 )}
                             </div>

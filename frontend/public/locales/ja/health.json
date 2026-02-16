@@ -33,18 +33,6 @@
     "months": "ヶ月",
     "current": "現在"
   },
-  "milestones": {
-    "title": "マイルストーン",
-    "addMilestone": "マイルストーンを追加",
-    "category": "カテゴリ",
-    "date": "日付",
-    "description": "説明",
-    "noMilestones": "マイルストーンはまだ記録されていません",
-    "total": "合計{{count}}件",
-    "selectMilestone": "マイルストーンを選択...",
-    "customMilestone": "カスタムマイルストーン",
-    "dateAchieved": "達成日"
-  },
   "teething": {
     "title": "歯の成長",
     "addTooth": "歯を追加",
@@ -156,8 +144,6 @@
     "logVaccination": "予防接種を記録",
     "editMedication": "お薬を編集",
     "addMedication": "お薬を追加",
-    "editMilestone": "マイルストーンを編集",
-    "logMilestone": "マイルストーンを記録",
     "editGrowth": "成長記録を編集",
     "logGrowth": "成長を記録",
     "date": "日付",
@@ -172,8 +158,7 @@
     "medicationName": "お薬の名前",
     "dosage": "用量",
     "frequency": "頻度",
-    "startDate": "開始日",
-    "milestone": "マイルストーン"
+    "startDate": "開始日"
   },
   "failedToLoad": "健康データの読み込みに失敗しました",
   "failedToSave": "保存に失敗しました",
@@ -197,8 +182,6 @@
   "toast_vaccinationLogged": "予防接種を記録しました",
   "toast_medicationUpdated": "お薬を更新しました",
   "toast_medicationAdded": "お薬を追加しました",
-  "toast_milestoneUpdated": "マイルストーンを更新しました",
-  "toast_milestoneLogged": "マイルストーンを記録しました",
   "toast_growthRecordUpdated": "成長記録を更新しました",
   "toast_growthRecordLogged": "成長記録を保存しました",
   "placeholder_optional": "任意",
@@ -208,11 +191,6 @@
   "placeholder_doctorclinicName": "医師名/クリニック名",
   "placeholder_eg25ml": "例：2.5ml",
   "placeholder_egTwiceDaily": "例：1日2回",
-  "toast_pleaseDescribeTheMilestone": "マイルストーンの内容を入力してください",
-  "toast_milestoneAdded": "マイルストーンを追加しました！",
-  "toast_milestoneDeleted": "マイルストーンを削除しました",
-  "arialabel_deleteMilestone": "マイルストーンを削除",
-  "placeholder_whatMilestoneEgFirstSteps": "マイルストーン（例：はじめての一歩）",
   "toast_visitRecorded": "診察を記録しました",
   "toast_visitDeleted": "診察を削除しました",
   "toast_pleaseEnterVaccineName": "ワクチン名を入力してください",

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
-import { Baby, Pencil, Timer, User } from 'lucide-react';
+import { Baby, Pencil, Timer, User, Play, Square } from 'lucide-react';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import { parseUTCTime } from '../utils/parseTime';
@@ -305,7 +305,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                         onClick={handleStartTimer}
                                         style={{ background: 'var(--feeding)' }}
                                     >
-                                        ▶️ {t('feeding.startFeeding')}
+                                        <Play size={14} /> {t('feeding.startFeeding')}
                                     </button>
                                 ) : (
                                     <button
@@ -313,7 +313,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
                                         className="btn btn-secondary btn-block btn-lg"
                                         onClick={handleStopTimer}
                                     >
-                                        ⏹️ {t('feeding.stop')}
+                                        <Square size={14} /> {t('feeding.stop')}
                                     </button>
                                 )}
                             </div>

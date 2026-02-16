@@ -33,18 +33,6 @@
     "months": "mois",
     "current": "actuel"
   },
-  "milestones": {
-    "title": "Jalons",
-    "addMilestone": "Ajouter un jalon",
-    "category": "Catégorie",
-    "date": "Date",
-    "description": "Description",
-    "noMilestones": "Aucune étape n'a encore été enregistrée",
-    "total": "{{count}} total",
-    "selectMilestone": "Sélectionnez une étape...",
-    "customMilestone": "Jalon personnalisé",
-    "dateAchieved": "Date de réalisation"
-  },
   "teething": {
     "title": "Dentition",
     "addTooth": "Ajouter une dent",
@@ -156,8 +144,6 @@
     "logVaccination": "Journal de bord Vaccination",
     "editMedication": "Modifier les médicaments",
     "addMedication": "Ajouter un médicament",
-    "editMilestone": "Modifier le jalon",
-    "logMilestone": "Jalon du journal",
     "editGrowth": "Modifier la croissance",
     "logGrowth": "Enregistrer croissance",
     "date": "Date",
@@ -172,8 +158,7 @@
     "medicationName": "Nom du médicament",
     "dosage": "Dosage",
     "frequency": "Fréquence",
-    "startDate": "Date de début",
-    "milestone": "Jalon"
+    "startDate": "Date de début"
   },
   "failedToLoad": "Échec du chargement des données de santé",
   "failedToSave": "Échec de la sauvegarde",
@@ -197,8 +182,6 @@
   "toast_vaccinationLogged": "Vaccination enregistrée",
   "toast_medicationUpdated": "Mise à jour des médicaments",
   "toast_medicationAdded": "Médicaments ajoutés",
-  "toast_milestoneUpdated": "Mise à jour d'un jalon",
-  "toast_milestoneLogged": "Jalon consigné",
   "toast_growthRecordUpdated": "Mise à jour du registre de croissance",
   "toast_growthRecordLogged": "Record de croissance enregistré",
   "placeholder_optional": "En option",
@@ -208,11 +191,6 @@
   "placeholder_doctorclinicName": "Nom du médecin/de la clinique",
   "placeholder_eg25ml": "par exemple, 2,5 ml",
   "placeholder_egTwiceDaily": "par exemple, deux fois par jour",
-  "toast_pleaseDescribeTheMilestone": "Veuillez décrire l'étape",
-  "toast_milestoneAdded": "Jalon ajouté !",
-  "toast_milestoneDeleted": "Jalon supprimé",
-  "arialabel_deleteMilestone": "Supprimer un jalon",
-  "placeholder_whatMilestoneEgFirstSteps": "Quelle étape (par exemple, les premiers pas) ?",
   "toast_visitRecorded": "Visite enregistrée",
   "toast_visitDeleted": "Visite supprimée",
   "toast_pleaseEnterVaccineName": "Veuillez saisir le nom du vaccin",

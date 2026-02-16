@@ -72,7 +72,7 @@ export default function BabySelector(): React.ReactElement | null {
 
                 {showAddForm && (
                     <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
-                        <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
                                 <h2 className="modal-title">{t('babySelector.addYourBaby')}</h2>
                                 <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
@@ -214,7 +214,7 @@ export default function BabySelector(): React.ReactElement | null {
 
             {showAddForm && (
                 <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2 className="modal-title">{t('greeting.addBaby')}</h2>
                             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
