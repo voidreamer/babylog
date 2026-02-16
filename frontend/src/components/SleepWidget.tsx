@@ -112,21 +112,23 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                                 <span>z</span><span>z</span><span>z</span>
                             </div>
                         </div>
-                        <span className="widget-label sleep-label">{t('sleep.sleeping')}</span>
-                        <div className="sleep-elapsed">
-                            <Clock size={14} />
-                            <motion.span key={elapsed} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }}>
-                                {elapsed}
-                            </motion.span>
+                        <div className="sleep-info">
+                            <span className="widget-label sleep-label">{t('sleep.sleeping')}</span>
+                            <div className="sleep-elapsed">
+                                <Clock size={14} />
+                                <motion.span key={elapsed} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }}>
+                                    {elapsed}
+                                </motion.span>
+                            </div>
+                            <button
+                                className="sleep-wake-btn"
+                                onClick={handleWakeUp}
+                                disabled={saving}
+                            >
+                                <Sun size={16} />
+                                {saving ? t('sleep.waking') : t('sleep.wakeUp')}
+                            </button>
                         </div>
-                        <button
-                            className="sleep-wake-btn"
-                            onClick={handleWakeUp}
-                            disabled={saving}
-                        >
-                            <Sun size={16} />
-                            {saving ? t('sleep.waking') : t('sleep.wakeUp')}
-                        </button>
                     </div>
                 ) : (
                     /* Awake state */
