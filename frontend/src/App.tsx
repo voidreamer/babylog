@@ -382,6 +382,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         return (
             <div className="loading" style={{ minHeight: '100vh' }}>
                 <img src="/icons/loading.png" alt="" className="loading-logo" />
+                <span className="loading-text">Getting things ready...</span>
             </div>
         );
     }
@@ -623,6 +624,7 @@ function MainApp() {
         return (
             <div className="loading" style={{ minHeight: '100vh' }}>
                 <img src="/icons/loading.png" alt="" className="loading-logo" />
+                <span className="loading-text">Loading your little one...</span>
             </div>
         );
     }

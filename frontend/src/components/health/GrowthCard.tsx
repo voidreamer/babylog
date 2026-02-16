@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, lazy, Suspense, useMemo } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { TrendingUp, ChevronRight, Plus } from 'lucide-react';
-import { toast } from 'sonner';
-import { addMonths, format } from 'date-fns';
-import { api } from '../../api/client';
-import { showApiError } from '../../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
@@ -38,19 +34,11 @@ function getPercentileLabel(position: number | null): string {
     return '>97th';
 }
 
-interface GrowthCardProps { baby: any; growthRecords: any[]; onRecordAdded?: () => void; whoData?: any; }
-export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData }: GrowthCardProps) {
+interface GrowthCardProps { baby: any; growthRecords: any[]; onRecordAdded?: () => void; whoData?: any; defaultChartVisible?: boolean; onOpenGrowthModal?: () => void; }
+export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData, defaultChartVisible = false, onOpenGrowthModal }: GrowthCardProps) {
     const { t } = useTranslation('health');
-    const { formatWeight, formatLength, weightPlaceholder, lengthPlaceholder, parseWeight, parseLength, weightUnit, lengthUnit } = useUnits();
-    const [showChart, setShowChart] = useState(false);
-    const [isAdding, setIsAdding] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-    const [formData, setFormData] = useState({
-        weight: '',
-        height: '',
-        head: ''
-    });
+    const { formatWeight, formatLength } = useUnits();
+    const [showChart, setShowChart] = useState(defaultChartVisible);
 
     // Get latest record
     const latestRecord = growthRecords && growthRecords.length > 0 ? growthRecords[0] : null;
@@ -59,16 +47,6 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
     const babyAgeMonths = baby?.birth_date
         ? Math.floor((new Date().getTime() - new Date(baby.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 30.44))
         : null;
-
-    // Available months for selection (0 to current age, max 24)
-    const availableMonths = useMemo(() => {
-        if (babyAgeMonths === null) return [];
-        const maxMonth = Math.min(babyAgeMonths, 24);
-        return Array.from({ length: maxMonth + 1 }, (_, i) => i);
-    }, [babyAgeMonths]);
-
-    // Default to current month when form opens
-    const effectiveMonth = selectedMonth ?? babyAgeMonths ?? 0;
 
     // Get WHO percentile data for current age
     const getWhoDataForAge = (dataSet: any[], ageMonths: number | null) => {
@@ -94,48 +72,6 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
     const heightPosition = latestRecord?.height_cm && heightWho
         ? getPercentilePosition(parseFloat(latestRecord.height_cm), heightWho.p3, heightWho.p97)
         : null;
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!baby.birth_date) {
-            toast.error(t('growth.birthDateRequired'));
-            return;
-        }
-
-        if (!formData.weight && !formData.height && !formData.head) {
-            toast.error(t('toast_pleaseEnterAtLeastOneMeasurement'));
-            return;
-        }
-
-        setSaving(true);
-        try {
-            // Calculate date from birth_date + selected month
-            const dateStr = baby.birth_date.split('T')[0]; // normalize to YYYY-MM-DD
-            const birthDate = new Date(dateStr + 'T12:00:00');
-            const recordDate = addMonths(birthDate, effectiveMonth);
-
-            const data = {
-                baby_id: baby.id,
-                recorded_date: format(recordDate, 'yyyy-MM-dd'),
-                weight_kg: formData.weight ? parseWeight(parseFloat(formData.weight)) : null,
-                height_cm: formData.height ? parseLength(parseFloat(formData.height)) : null,
-                head_cm: formData.head ? parseLength(parseFloat(formData.head)) : null,
-            };
-
-            await api.createGrowthRecord(data);
-            toast.success(t('toast_growthRecorded'));
-            setFormData({ weight: '', height: '', head: '' });
-            setSelectedMonth(null);
-            setIsAdding(false);
-            if (onRecordAdded) onRecordAdded();
-        } catch (error) {
-            console.error('Failed to save growth record:', error);
-            showApiError(error, t('failedToSave'), t);
-        } finally {
-            setSaving(false);
-        }
-    };
 
     return (
         <div className="health-card">
@@ -199,64 +135,14 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
                 </div>
             </div>
 
-            {/* Inline Quick Entry */}
-            {isAdding ? (
-                <form onSubmit={handleSubmit} className="growth-quick-entry">
-                    <select
-                        value={effectiveMonth}
-                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                        className="growth-input growth-month-select"
-                    >
-                        {availableMonths.map((m) => (
-                            <option key={m} value={m}>
-                                {t('growth.month')} {m}{m === babyAgeMonths ? ` (${t('growth.current')})` : ''}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        type="number"
-                        step="0.01"
-                        placeholder={weightPlaceholder}
-                        value={formData.weight}
-                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                        className="growth-input"
-                    />
-                    <input
-                        type="number"
-                        step="0.1"
-                        placeholder={lengthPlaceholder}
-                        value={formData.height}
-                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                        className="growth-input"
-                    />
-                    <input
-                        type="number"
-                        step="0.1"
-                        placeholder={`${t('growth.head')} (${lengthUnit})`}
-                        value={formData.head}
-                        onChange={(e) => setFormData({ ...formData, head: e.target.value })}
-                        className="growth-input"
-                    />
-                    <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                        {saving ? '...' : t('common:save')}
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => { setIsAdding(false); setSelectedMonth(null); }}
-                    >
-                        {t('common:cancel')}
-                    </button>
-                </form>
-            ) : (
-                <button
-                    className="growth-add-btn"
-                    onClick={() => setIsAdding(true)}
-                >
-                    <Plus size={16} />
-                    {t('growth.logMeasurement')}
-                </button>
-            )}
+            {/* Log Measurement Button */}
+            <button
+                className="growth-add-btn"
+                onClick={onOpenGrowthModal}
+            >
+                <Plus size={16} />
+                {t('growth.logMeasurement')}
+            </button>
 
             {/* Expandable Chart - Lazy loaded */}
             {showChart && baby && (

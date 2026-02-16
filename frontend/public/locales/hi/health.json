@@ -112,6 +112,7 @@
     "visits": "विज़िट",
     "vaccinations": "टीके",
     "medications": "दवाइयाँ",
+    "activeMeds": "सक्रिय दवाएं",
     "addVisit": "विज़िट जोड़ें",
     "addVaccination": "टीकाकरण जोड़ें",
     "addMedication": "दवाई जोड़ें",

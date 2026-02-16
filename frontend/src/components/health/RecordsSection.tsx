@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp, CalendarCheck } from 'lucide-react';
+import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp, ChevronRight, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { showApiError } from '../../utils/errorHandling';
@@ -8,69 +8,100 @@ import { format, parseISO, isFuture } from 'date-fns';
 import { formatDate } from '../../utils/formatDate';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
-import VaccinationSchedule from './VaccinationSchedule';
 import ConfirmModal from '../ConfirmModal';
 
 const VISIT_TYPE_KEYS = ['checkup', 'sick', 'vaccination', 'specialist', 'emergency'] as const;
 
+type DetailView = 'visits' | 'vaccinations' | 'medications' | null;
+
+function RecordDetailSheet({ title, icon, onClose, children }: { title: string; icon: React.ReactNode; onClose: () => void; children: React.ReactNode }) {
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal records-detail-modal" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2 className="modal-title">{icon} {title}</h2>
+                    <button className="modal-close" onClick={onClose}><X size={20} /></button>
+                </div>
+                <div className="modal-body records-detail-body">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 interface RecordsSectionProps { baby: any; visits: any[]; vaccinations: any[]; medications: any[]; onDataChanged?: () => void; }
 export default function RecordsSection({ baby, visits, vaccinations, medications, onDataChanged }: RecordsSectionProps) {
     const { t } = useTranslation('health');
-    const [activeTab, setActiveTab] = useState('visits');
+    const [detailView, setDetailView] = useState<DetailView>(null);
+
+    const activeMedsCount = medications?.filter(m => m.is_active).length ?? 0;
+
+    // Find next upcoming visit
+    const nextVisit = visits?.find(v => v.next_visit_date && isFuture(parseISO(v.next_visit_date)));
 
     return (
-        <div className="records-section">
-            <div className="records-tabs">
-                <button
-                    className={`records-tab ${activeTab === 'visits' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('visits')}
-                >
-                    <Stethoscope size={16} />
-                    {t('records.visits')}
-                    {visits?.length > 0 && <span className="tab-count">{visits.length}</span>}
+        <>
+            <div className="records-summary-grid">
+                <button className="records-summary-card" onClick={() => setDetailView('visits')}>
+                    <div className="records-summary-icon visits"><Stethoscope size={20} /></div>
+                    <div className="records-summary-info">
+                        <span className="records-summary-count">{visits?.length ?? 0}</span>
+                        <span className="records-summary-label">{t('records.visits')}</span>
+                        {nextVisit?.next_visit_date && (
+                            <span className="records-summary-hint">{t('records.nextVisit', { date: formatDate(nextVisit.next_visit_date) })}</span>
+                        )}
+                    </div>
+                    <ChevronRight size={16} className="records-summary-arrow" />
                 </button>
-                <button
-                    className={`records-tab ${activeTab === 'vaccinations' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('vaccinations')}
-                >
-                    <Syringe size={16} />
-                    {t('records.vaccinations')}
-                    {vaccinations?.length > 0 && <span className="tab-count">{vaccinations.length}</span>}
+
+                <button className="records-summary-card" onClick={() => setDetailView('vaccinations')}>
+                    <div className="records-summary-icon vaccinations"><Syringe size={20} /></div>
+                    <div className="records-summary-info">
+                        <span className="records-summary-count">{vaccinations?.length ?? 0}</span>
+                        <span className="records-summary-label">{t('records.vaccinations')}</span>
+                    </div>
+                    <ChevronRight size={16} className="records-summary-arrow" />
                 </button>
-                <button
-                    className={`records-tab ${activeTab === 'schedule' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('schedule')}
-                >
-                    <CalendarCheck size={16} />
-                    {t('records.schedule')}
-                </button>
-                <button
-                    className={`records-tab ${activeTab === 'medications' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('medications')}
-                >
-                    <Pill size={16} />
-                    {t('records.medications')}
-                    {medications?.filter(m => m.is_active).length > 0 && (
-                        <span className="tab-count">{medications.filter(m => m.is_active).length}</span>
-                    )}
+
+                <button className="records-summary-card" onClick={() => setDetailView('medications')}>
+                    <div className="records-summary-icon medications"><Pill size={20} /></div>
+                    <div className="records-summary-info">
+                        <span className="records-summary-count">{activeMedsCount}</span>
+                        <span className="records-summary-label">{t('records.activeMeds')}</span>
+                    </div>
+                    <ChevronRight size={16} className="records-summary-arrow" />
                 </button>
             </div>
 
-            <div className="records-content">
-                {activeTab === 'visits' && (
+            {detailView === 'visits' && (
+                <RecordDetailSheet
+                    title={t('records.visits')}
+                    icon={<Stethoscope size={20} />}
+                    onClose={() => setDetailView(null)}
+                >
                     <VisitsPanel baby={baby} visits={visits} onDataChanged={onDataChanged} />
-                )}
-                {activeTab === 'vaccinations' && (
+                </RecordDetailSheet>
+            )}
+            {detailView === 'vaccinations' && (
+                <RecordDetailSheet
+                    title={t('records.vaccinations')}
+                    icon={<Syringe size={20} />}
+                    onClose={() => setDetailView(null)}
+                >
                     <VaccinationsPanel baby={baby} vaccinations={vaccinations} onDataChanged={onDataChanged} />
-                )}
-                {activeTab === 'schedule' && (
-                    <VaccinationSchedule baby={baby} vaccinations={vaccinations} onDataChanged={onDataChanged} />
-                )}
-                {activeTab === 'medications' && (
+                </RecordDetailSheet>
+            )}
+            {detailView === 'medications' && (
+                <RecordDetailSheet
+                    title={t('records.medications')}
+                    icon={<Pill size={20} />}
+                    onClose={() => setDetailView(null)}
+                >
                     <MedicationsPanel baby={baby} medications={medications} onDataChanged={onDataChanged} />
-                )}
-            </div>
-        </div>
+                </RecordDetailSheet>
+            )}
+        </>
     );
 }
 

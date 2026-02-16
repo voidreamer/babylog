@@ -151,7 +151,14 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
   };
 
   return (
-    <div className="vaccination-schedule">
+    <div className="health-card vaccination-schedule-card">
+      <div className="health-card-header">
+        <h3 className="health-card-title">
+          <Syringe size={18} />
+          {t('schedule.progress')}
+        </h3>
+      </div>
+      <div className="vaccination-schedule">
       {/* Progress bar */}
       <div className="vax-progress">
         <div className="vax-progress-header">
@@ -268,6 +275,7 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );
