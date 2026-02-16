@@ -112,6 +112,7 @@
     "visits": "就诊",
     "vaccinations": "疫苗",
     "medications": "用药",
+    "activeMeds": "活跃用药",
     "addVisit": "添加就诊",
     "addVaccination": "添加疫苗",
     "addMedication": "添加用药",

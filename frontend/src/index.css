@@ -6057,6 +6057,106 @@ h4 {
   gap: var(--space-sm);
 }
 
+/* Records Summary Cards */
+.records-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+.records-summary-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+.records-summary-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.records-summary-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.records-summary-icon.visits {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.records-summary-icon.vaccinations {
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+}
+
+.records-summary-icon.medications {
+  background: rgba(168, 85, 247, 0.12);
+  color: #a855f7;
+}
+
+.records-summary-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.records-summary-count {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.records-summary-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.records-summary-hint {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.records-summary-arrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Records Detail Modal */
+.records-detail-modal {
+  max-height: 85vh;
+}
+
+.records-detail-body {
+  overflow-y: auto;
+  max-height: calc(85vh - 60px);
+  padding: var(--space-md);
+}
+
+/* Vaccination Schedule Card wrapper */
+.vaccination-schedule-card .vaccination-schedule {
+  margin-top: 0;
+}
+
 /* Vaccination reminders */
 .vaccination-reminders {
   background: rgba(234, 179, 8, 0.1);
@@ -6451,21 +6551,23 @@ h4 {
     padding: 4px 8px;
   }
 
-  /* Records section */
-  .records-tab {
-    padding: var(--space-sm);
-    font-size: 0.75rem;
-    gap: var(--space-2xs);
+  /* Records summary cards - stack vertically on mobile */
+  .records-summary-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
   }
 
-  .records-tab svg {
-    width: 14px;
-    height: 14px;
+  .records-summary-card {
+    padding: var(--space-sm) var(--space-md);
   }
 
-  .tab-count {
-    font-size: 0.6rem;
-    padding: 1px 4px;
+  .records-summary-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .records-summary-count {
+    font-size: 1.1rem;
   }
 
   .record-form-row {
@@ -6601,7 +6703,7 @@ h4 {
 .widget:focus-visible,
 .health-add-btn:focus-visible,
 .records-add-btn:focus-visible,
-.records-tab:focus-visible {
+.records-summary-card:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
@@ -6618,7 +6720,7 @@ h4 {
 .widget:focus:not(:focus-visible),
 .health-add-btn:focus:not(:focus-visible),
 .records-add-btn:focus:not(:focus-visible),
-.records-tab:focus:not(:focus-visible) {
+.records-summary-card:focus:not(:focus-visible) {
   outline: none;
   box-shadow: none;
 }

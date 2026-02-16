@@ -6,14 +6,17 @@ import { toast } from 'sonner';
 import { Baby } from 'lucide-react';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../data/whoGrowthData';
 import { useNotificationSync } from '../hooks/useNotificationSync';
+import { motion } from 'framer-motion';
 
 // Components
 import GrowthCard from '../components/health/GrowthCard';
+import VaccinationSchedule from '../components/health/VaccinationSchedule';
 import TeethingCard from '../components/health/TeethingCard';
 import SickDaysCard from '../components/health/SickDaysCard';
 import AllergiesCard from '../components/health/AllergiesCard';
 import RecordsSection from '../components/health/RecordsSection';
 import MedicationQuickLog from '../components/health/MedicationQuickLog';
+import { GrowthModal } from '../components/health/HealthModals';
 import { useTranslation } from 'react-i18next';
 
 interface HealthProps {
@@ -21,11 +24,17 @@ interface HealthProps {
     onDismissMedQuickLog?: () => void;
 }
 
+const sectionVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0 },
+};
+
 export default function Health({ showMedQuickLog, onDismissMedQuickLog }: HealthProps = {}) {
     const { t } = useTranslation('health');
     const { selectedBaby } = useBaby();
     const { reschedule } = useNotificationSync(selectedBaby?.id, selectedBaby?.name);
     const [loading, setLoading] = useState(true);
+    const [showGrowthModal, setShowGrowthModal] = useState(false);
 
     // Data
     const [visits, setVisits] = useState<any[]>([]);
@@ -97,8 +106,12 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
         return (
             <div className="health-dashboard">
                 <div className="skeleton skeleton-card" />
+                <div className="skeleton skeleton-card" style={{ height: '120px' }} />
                 <div className="health-cards-grid">
-                    {[1,2,3].map(i => <div key={i} className="skeleton skeleton-card" />)}
+                    {[1,2,3].map(i => <div key={i} className="skeleton skeleton-card" style={{ height: '150px' }} />)}
+                </div>
+                <div className="records-summary-grid">
+                    {[1,2,3].map(i => <div key={i} className="skeleton skeleton-card" style={{ height: '80px' }} />)}
                 </div>
             </div>
         );
@@ -106,18 +119,47 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
 
     return (
         <div className="health-dashboard">
-            {/* Top Row: Growth Chart (always visible) */}
-            <section className="health-section health-section-primary">
+            {/* Section 1: Growth (full width, chart visible by default) */}
+            <motion.section
+                className="health-section health-section-primary"
+                variants={sectionVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.3, delay: 0 }}
+            >
                 <GrowthCard
                     baby={selectedBaby}
                     growthRecords={growthRecords}
                     onRecordAdded={loadData}
                     whoData={whoData}
+                    defaultChartVisible={true}
+                    onOpenGrowthModal={() => setShowGrowthModal(true)}
                 />
-            </section>
+            </motion.section>
 
-            {/* Cards Grid */}
-            <section className="health-cards-grid">
+            {/* Section 2: Vaccination Schedule (standalone card) */}
+            <motion.section
+                className="health-section"
+                variants={sectionVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.3, delay: 0.1 }}
+            >
+                <VaccinationSchedule
+                    baby={selectedBaby}
+                    vaccinations={vaccinations}
+                    onDataChanged={loadData}
+                />
+            </motion.section>
+
+            {/* Section 3: Conditions Grid */}
+            <motion.section
+                className="health-cards-grid"
+                variants={sectionVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.3, delay: 0.2 }}
+            >
                 {showTeething && (
                     <TeethingCard
                         baby={selectedBaby}
@@ -140,10 +182,16 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
                     onSickDayAdded={loadData}
                     onSickDayDeleted={loadData}
                 />
-            </section>
+            </motion.section>
 
-            {/* Records Section (Visits, Vaccinations, Medications) */}
-            <section className="health-section">
+            {/* Section 4: Medical Records (summary cards) */}
+            <motion.section
+                className="health-section"
+                variants={sectionVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.3, delay: 0.3 }}
+            >
                 <RecordsSection
                     baby={selectedBaby}
                     visits={visits}
@@ -151,7 +199,19 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
                     medications={medications}
                     onDataChanged={loadData}
                 />
-            </section>
+            </motion.section>
+
+            {/* Growth Modal */}
+            {showGrowthModal && (
+                <GrowthModal
+                    babyId={selectedBaby.id}
+                    onClose={() => setShowGrowthModal(false)}
+                    onSave={() => {
+                        setShowGrowthModal(false);
+                        loadData();
+                    }}
+                />
+            )}
 
             {showMedQuickLog && onDismissMedQuickLog && (
                 <MedicationQuickLog onDismiss={onDismissMedQuickLog} />

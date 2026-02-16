@@ -113,6 +113,7 @@
     "visits": "Visits",
     "vaccinations": "Vaccines",
     "medications": "Meds",
+    "activeMeds": "Active Meds",
     "addVisit": "Add Visit",
     "addVaccination": "Add Vaccination",
     "addMedication": "Add Medication",
