@@ -5,7 +5,7 @@ import { api } from '../api/client';
 import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil, Sun, CloudSun, Moon, Baby } from 'lucide-react';
 import CaregiverModal from './CaregiverModal';
 import AddBabyForm from './AddBabyForm';
-import BabyAvatar from './BabyAvatar';
+import BabyAvatar, { getAvatarColor } from './BabyAvatar';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -57,16 +57,6 @@ function getEncouragement(summary: any): string {
 }
 
 // Generate consistent pastel color from name
-function getAvatarColor(name: string | null): string {
-    if (!name) return 'hsl(280, 70%, 70%)';
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const hue = Math.abs(hash % 360);
-    return `hsl(${hue}, 70%, 75%)`;
-}
-
 interface BabyGreetingProps { summary: any; latestGrowth: any; }
 export default function BabyGreeting({ summary }: BabyGreetingProps) {
     const { t } = useTranslation('dashboard');
@@ -354,4 +344,3 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
     );
 }
 
-export { getAvatarColor };
