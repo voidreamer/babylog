@@ -1,17 +1,17 @@
 import { Capacitor } from '@capacitor/core';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { resizeImage } from './imageResize';
 import { supabase } from '../lib/supabase';
 import { api } from '../api/client';
 
 /**
  * Pick a photo from camera or gallery.
- * On native: uses Capacitor Camera plugin with prompt (camera or gallery).
+ * On native: uses Capacitor Camera plugin (dynamically imported).
  * On web: creates a hidden file input.
  */
 export async function pickPhoto(): Promise<File | null> {
     if (Capacitor.isNativePlatform()) {
         try {
+            const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
             const photo = await Camera.getPhoto({
                 resultType: CameraResultType.Uri,
                 source: CameraSource.Prompt,
@@ -27,7 +27,7 @@ export async function pickPhoto(): Promise<File | null> {
             const blob = await response.blob();
             return new File([blob], 'photo.jpg', { type: 'image/jpeg' });
         } catch {
-            // User cancelled
+            // User cancelled or plugin not available
             return null;
         }
     }
