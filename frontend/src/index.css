@@ -870,19 +870,17 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .sleep-baby-img {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 }
 
 .sleep-label {
-  text-align: center;
   font-weight: 600;
-  margin-top: var(--space-2xs);
 }
 
 .sleep-zzz {
@@ -1171,12 +1169,20 @@ h4 {
 
 .sleep-widget-sleeping {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-md);
   flex: 1;
-  justify-content: center;
   padding-top: var(--space-xs);
+}
+
+.sleep-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  flex: 1;
+  min-width: 0;
 }
 
 .sleep-start-btn,
@@ -1208,6 +1214,7 @@ h4 {
 .sleep-wake-btn {
   background: var(--warning);
   color: var(--text-on-color);
+  align-self: flex-start;
 }
 
 .sleep-wake-btn:hover:not(:disabled) {
@@ -1224,7 +1231,6 @@ h4 {
 .sleep-elapsed {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-xs);
   font-size: 1.1rem;
   font-weight: 700;
