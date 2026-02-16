@@ -303,7 +303,8 @@ h4 {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem var(--space-md);
-  padding-bottom: 100px;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 .page-header {
@@ -3567,7 +3568,8 @@ h4 {
 
   .app-container {
     padding: var(--space-sm);
-    padding-bottom: 90px;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 
   .page-header {
