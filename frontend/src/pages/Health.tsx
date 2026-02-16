@@ -18,6 +18,7 @@ import RecordsSection from '../components/health/RecordsSection';
 import MedicationQuickLog from '../components/health/MedicationQuickLog';
 import { GrowthModal } from '../components/health/HealthModals';
 import { useTranslation } from 'react-i18next';
+import { calculateAgeInMonths } from '../utils/ageUtils';
 
 interface HealthProps {
     showMedQuickLog?: boolean;
@@ -87,7 +88,7 @@ export default function Health({ showMedQuickLog, onDismissMedQuickLog }: Health
 
     // Calculate baby's age in months for teething visibility
     const babyAgeMonths = selectedBaby?.birth_date
-        ? Math.floor((new Date().getTime() - new Date(selectedBaby.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 30.44))
+        ? calculateAgeInMonths(selectedBaby.birth_date)
         : null;
 
     // Show teething card if baby is 4+ months old (teeth typically start around 6 months)

@@ -341,6 +341,7 @@
   "learn": {
     "insights": "洞察",
     "forBaby": "关于 {{name}}，{{months}} {{monthLabel}}大",
+    "forBabyAge": "{{name}}，{{age}}",
     "month": "个月",
     "months": "个月"
   },

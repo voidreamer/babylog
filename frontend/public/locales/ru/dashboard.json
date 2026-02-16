@@ -341,6 +341,7 @@
   "learn": {
     "insights": "Аналитика",
     "forBaby": "Для {{name}}, {{months}} {{monthLabel}}",
+    "forBabyAge": "Для {{name}}, {{age}}",
     "month": "месяц",
     "months": "месяцев"
   },

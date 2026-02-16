@@ -341,6 +341,7 @@
   "learn": {
     "insights": "分析",
     "forBaby": "{{name}}、生後{{months}}{{monthLabel}}",
+    "forBabyAge": "{{name}}、{{age}}",
     "month": "ヶ月",
     "months": "ヶ月"
   },

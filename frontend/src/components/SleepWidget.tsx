@@ -93,37 +93,26 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
         >
-            {/* Background icon */}
-            <div className="widget-bg-icon">
-                <img
-                    src={`${import.meta.env.BASE_URL}icons/${isSleeping ? 'sleep2' : 'sleep'}.png`}
-                    alt="sleep"
-                    style={{ width: 80, height: 80, objectFit: 'contain' }}
-                />
-            </div>
-
-            {isSleeping && <div className="sleep-zzz" aria-hidden="true">
-                <span>z</span><span>z</span><span>z</span>
-            </div>}
-
             {/* Plus icon for manual logging */}
             <div className="widget-add-icon" title={t('title_logCompletedSleep')}>
                 <Plus size={18} />
             </div>
 
             <div className="widget-content">
-                <div className="widget-icon-row">
-                    <img
-                        src={`${import.meta.env.BASE_URL}icons/${isSleeping ? 'sleep2' : 'sleep'}.png`}
-                        alt="sleep"
-                        style={{ width: 24, height: 24, objectFit: 'contain' }}
-                    />
-                    <span className="widget-label">{isSleeping ? t('sleep.sleeping') : t('sleep.title')}</span>
-                </div>
-
                 {isSleeping ? (
-                    /* Sleeping state */
+                    /* Sleeping state — centered icon + zzz */
                     <div className="sleep-widget-sleeping">
+                        <div className="sleep-center-icon">
+                            <img
+                                src={`${import.meta.env.BASE_URL}icons/sleep2.png`}
+                                alt="sleeping"
+                                className="sleep-baby-img"
+                            />
+                            <div className="sleep-zzz" aria-hidden="true">
+                                <span>z</span><span>z</span><span>z</span>
+                            </div>
+                        </div>
+                        <span className="widget-label sleep-label">{t('sleep.sleeping')}</span>
                         <div className="sleep-elapsed">
                             <Clock size={14} />
                             <motion.span key={elapsed} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }}>
@@ -142,6 +131,14 @@ export default function SleepWidget({ babyId, currentSleep, lastSleep, onSleepCh
                 ) : (
                     /* Awake state */
                     <div className="sleep-widget-awake">
+                        <div className="widget-icon-row">
+                            <img
+                                src={`${import.meta.env.BASE_URL}icons/sleep.png`}
+                                alt="sleep"
+                                style={{ width: 24, height: 24, objectFit: 'contain' }}
+                            />
+                            <span className="widget-label">{t('sleep.title')}</span>
+                        </div>
                         {lastSleep ? (
                             <div className="widget-time-ago">{timeAgo}</div>
                         ) : null}

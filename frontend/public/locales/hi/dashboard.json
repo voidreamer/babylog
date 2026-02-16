@@ -341,6 +341,7 @@
   "learn": {
     "insights": "जानकारियाँ",
     "forBaby": "{{name}} के लिए, {{months}} {{monthLabel}} का",
+    "forBabyAge": "{{name}} के लिए, {{age}}",
     "month": "महीना",
     "months": "महीने"
   },
