@@ -4,7 +4,22 @@
     "title": "Профиль малыша",
     "born": "Родился(ась) {{date}}",
     "growthData": "Данные о росте",
-    "growthDataDesc": "Обновить вес, рост"
+    "growthDataDesc": "Обновить вес, рост",
+    "changePhoto": "Изменить фото",
+    "photoUpdated": "Фото обновлено!",
+    "photoFailed": "Не удалось загрузить фото",
+    "birthDetails": "Данные о рождении",
+    "bloodType": "Группа крови",
+    "bloodTypePlaceholder": "Выбрать",
+    "birthplace": "Место рождения",
+    "birthplacePlaceholder": "напр. Городская больница",
+    "birthTime": "Время рождения",
+    "birthWeight": "Вес при рождении",
+    "birthLength": "Рост при рождении",
+    "saved": "Профиль сохранён!",
+    "saveFailed": "Не удалось сохранить",
+    "saveChanges": "Сохранить изменения",
+    "readOnly": "Только просмотр"
   },
   "notifications": {
     "title": "Уведомления",

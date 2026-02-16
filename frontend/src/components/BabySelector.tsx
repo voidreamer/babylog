@@ -9,6 +9,7 @@ import UpgradeDialog from './UpgradeDialog';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from './ConfirmModal';
 import { hapticSelection } from '../utils/haptics';
+import BabyAvatar from './BabyAvatar';
 
 export default function BabySelector(): React.ReactElement | null {
     const { t } = useTranslation('common');
@@ -99,9 +100,12 @@ export default function BabySelector(): React.ReactElement | null {
                 className="baby-selector"
                 onClick={() => setShowDropdown(!showDropdown)}
             >
-                <div className="baby-avatar">
-                    {selectedBaby ? getInitial(selectedBaby.name) : '?'}
-                </div>
+                <BabyAvatar
+                    name={selectedBaby?.name || '?'}
+                    photoUrl={selectedBaby?.profile_photo_url}
+                    size={28}
+                    className="baby-avatar"
+                />
                 <span className="baby-name">{selectedBaby?.name || t('babySelector.selectBaby')}</span>
                 <span style={{ marginLeft: 'auto' }}>▼</span>
             </div>
@@ -139,7 +143,7 @@ export default function BabySelector(): React.ReactElement | null {
                                 setShowDropdown(false);
                             }}
                         >
-                            <div className="baby-avatar">{getInitial(baby.name)}</div>
+                            <BabyAvatar name={baby.name} photoUrl={baby.profile_photo_url} size={28} className="baby-avatar" />
                             <span>{baby.name}</span>
                             {!baby.is_owner && (
                                 <span style={{

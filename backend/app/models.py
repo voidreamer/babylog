@@ -45,6 +45,9 @@ class Baby(Base):
     birth_date = Column(DateTime, nullable=True)
     gender = Column(String, nullable=True)  # 'boy', 'girl', or null
     profile_photo_url = Column(String, nullable=True)
+    blood_type = Column(String(5), nullable=True)
+    birthplace = Column(String(200), nullable=True)
+    birth_time = Column(String(5), nullable=True)
     shared_with = Column(JSONB, default=list, server_default="[]")
     created_at = Column(DateTime, default=utc_now)
 

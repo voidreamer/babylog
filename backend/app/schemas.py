@@ -24,6 +24,9 @@ class BabyBase(BaseModel):
     birth_date: Optional[datetime] = None
     gender: Optional[GenderEnum] = None
     profile_photo_url: Optional[str] = None
+    blood_type: Optional[str] = None
+    birthplace: Optional[str] = None
+    birth_time: Optional[str] = None
 
 
 class BabyCreate(BabyBase):
@@ -35,6 +38,9 @@ class BabyUpdate(BaseModel):
     birth_date: Optional[datetime] = None
     gender: Optional[GenderEnum] = None
     profile_photo_url: Optional[str] = None
+    blood_type: Optional[str] = None
+    birthplace: Optional[str] = None
+    birth_time: Optional[str] = None
 
 
 CaregiverRole = Literal["viewer", "caregiver"]

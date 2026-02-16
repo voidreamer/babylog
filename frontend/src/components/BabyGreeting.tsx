@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil, Sun, CloudSun, Moon, Baby } from 'lucide-react';
 import CaregiverModal from './CaregiverModal';
 import AddBabyForm from './AddBabyForm';
+import BabyAvatar from './BabyAvatar';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -199,12 +200,12 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
                     className="baby-greeting-content baby-greeting-selector"
                     onClick={() => setShowDropdown(!showDropdown)}
                 >
-                    <div
+                    <BabyAvatar
+                        name={selectedBaby.name}
+                        photoUrl={selectedBaby.profile_photo_url}
+                        size={36}
                         className="baby-greeting-avatar"
-                        style={{ background: avatarColor }}
-                    >
-                        {selectedBaby.name.charAt(0).toUpperCase()}
-                    </div>
+                    />
 
                     <div className="baby-greeting-info">
                         <div className="baby-greeting-name">
@@ -227,12 +228,12 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
                                     setShowDropdown(false);
                                 }}
                             >
-                                <div
+                                <BabyAvatar
+                                    name={baby.name}
+                                    photoUrl={baby.profile_photo_url}
+                                    size={28}
                                     className="baby-dropdown-avatar"
-                                    style={{ background: getAvatarColor(baby.name) }}
-                                >
-                                    {baby.name.charAt(0).toUpperCase()}
-                                </div>
+                                />
                                 <span className="baby-dropdown-name">{baby.name}</span>
                                 {!baby.is_owner && (
                                     <span className="baby-dropdown-shared">{t('greeting.shared')}</span>
