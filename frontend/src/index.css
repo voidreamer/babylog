@@ -3340,15 +3340,18 @@ h4 {
 
 .onboarding-container {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
-  padding-top: calc(env(safe-area-inset-top, 0px) + var(--space-xl));
+  padding: var(--space-md);
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--space-lg));
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-md));
   background: var(--background);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .onboarding-progress {
@@ -3377,7 +3380,7 @@ h4 {
 
 .onboarding-back {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--space-md));
+  top: var(--space-md);
   left: var(--space-md);
   background: none;
   border: none;
@@ -3396,12 +3399,13 @@ h4 {
 .onboarding-card {
   background: var(--surface);
   border-radius: var(--radius-xl);
-  padding: 2.5rem 2rem;
+  padding: 2rem 1.5rem;
   width: 100%;
   max-width: 420px;
   text-align: center;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-light, var(--border));
+  position: relative;
 }
 
 .onboarding-form-card {
@@ -3409,16 +3413,16 @@ h4 {
 }
 
 .onboarding-brand-icon {
-  width: 96px;
-  height: 96px;
-  margin: 0 auto var(--space-md);
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--space-sm);
   filter: drop-shadow(0 4px 12px rgba(212, 132, 156, 0.25));
   animation: float 2s ease-in-out infinite;
 }
 
 .onboarding-brand-title {
   font-family: var(--font-family-heading);
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 800;
   margin-bottom: var(--space-xs);
   color: var(--primary);
@@ -3457,6 +3461,40 @@ h4 {
 .onboarding-email {
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+/* Step navigation (prev / next) */
+.onboarding-step-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.onboarding-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.onboarding-nav-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.onboarding-nav-btn:disabled {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Feature pills on welcome step */

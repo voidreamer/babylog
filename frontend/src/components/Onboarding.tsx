@@ -4,7 +4,7 @@ import { useBaby } from '../hooks/useBaby';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';
 import AddBabyForm from './AddBabyForm';
-import { ArrowRight, ArrowLeft, LogOut, Sun, Moon } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LogOut, Sun, Moon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../i18n/languages';
@@ -26,11 +26,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     const { refresh } = useBaby();
     const { logout, user } = useAuth();
     const [step, setStep] = useState(1);
-    const [direction, setDirection] = useState(1); // 1=forward, -1=back
+    const [direction, setDirection] = useState(1);
     const [saving, setSaving] = useState(false);
     const [babyName, setBabyName] = useState('');
 
-    // Language state — auto-detect from browser
     const [selectedLanguage, setSelectedLanguage] = useState(() => {
         const stored = localStorage.getItem('language');
         if (stored) return stored;
@@ -39,7 +38,6 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         return match?.code || 'en';
     });
 
-    // Theme state
     const [selectedTheme, setSelectedTheme] = useState(() => {
         const stored = localStorage.getItem('theme');
         if (stored === 'handwritten') return 'light';
@@ -47,24 +45,20 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         return stored || 'light';
     });
 
-    // Units state
     const [selectedUnits, setSelectedUnits] = useState(() => {
         return localStorage.getItem('heybub-units') || 'metric';
     });
 
-    // Apply theme preview
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', selectedTheme);
         localStorage.setItem('theme', selectedTheme);
     }, [selectedTheme]);
 
-    // Apply language immediately
     useEffect(() => {
         i18n.changeLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
     }, [selectedLanguage, i18n]);
 
-    // Apply units
     useEffect(() => {
         localStorage.setItem('heybub-units', selectedUnits);
     }, [selectedUnits]);
@@ -133,17 +127,36 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </div>
     );
 
-    const renderBackButton = () => (
-        step > 1 && step < 6 && (
-            <button className="onboarding-back" onClick={() => goTo(step - 1)}>
-                <ArrowLeft size={20} />
+    // Small circular prev/next buttons shown on steps 2-5
+    const renderStepNav = (canGoBack: boolean, onNext: () => void) => (
+        <div className="onboarding-step-nav">
+            <button
+                className="onboarding-nav-btn"
+                onClick={() => goTo(step - 1)}
+                disabled={!canGoBack}
+            >
+                <ChevronLeft size={18} />
             </button>
-        )
+            <button
+                className="btn btn-primary btn-lg"
+                onClick={onNext}
+                style={{ flex: 1, maxWidth: 220 }}
+            >
+                {t('auth:onboarding.continue')} <ArrowRight size={18} />
+            </button>
+            <button
+                className="onboarding-nav-btn"
+                onClick={onNext}
+                disabled={step >= 5}
+                style={step >= 5 ? { opacity: 0, pointerEvents: 'none' } : undefined}
+            >
+                <ChevronRight size={18} />
+            </button>
+        </div>
     );
 
     const renderStep = () => {
         switch (step) {
-            // Step 1: Welcome
             case 1:
                 return (
                     <div className="onboarding-card">
@@ -165,14 +178,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         </button>
                         <div className="onboarding-footer">
                             {user?.email && <span className="onboarding-email">{user.email}</span>}
-                            <button className="btn-link" onClick={logout} style={{ marginTop: 'var(--space-md)' }}>
+                            <button className="btn-link" onClick={logout} style={{ marginTop: '8px' }}>
                                 <LogOut size={14} /> {t('auth:onboarding.signOut')}
                             </button>
                         </div>
                     </div>
                 );
 
-            // Step 2: Language
             case 2:
                 return (
                     <div className="onboarding-card">
@@ -192,13 +204,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                                 </button>
                             ))}
                         </div>
-                        <button className="btn btn-primary btn-lg" onClick={() => goTo(3)}>
-                            {t('auth:onboarding.continue')} <ArrowRight size={18} />
-                        </button>
+                        {renderStepNav(true, () => goTo(3))}
                     </div>
                 );
 
-            // Step 3: Theme
             case 3:
                 return (
                     <div className="onboarding-card">
@@ -226,13 +235,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                                 <span className="theme-desc">{t('auth:onboarding.darkThemeDesc')}</span>
                             </button>
                         </div>
-                        <button className="btn btn-primary btn-lg" onClick={() => goTo(4)}>
-                            {t('auth:onboarding.continue')} <ArrowRight size={18} />
-                        </button>
+                        {renderStepNav(true, () => goTo(4))}
                     </div>
                 );
 
-            // Step 4: Units
             case 4:
                 return (
                     <div className="onboarding-card">
@@ -256,16 +262,16 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                                 <span className="units-values">{t('auth:onboarding.imperialValues', { defaultValue: 'lbs, in, oz' })}</span>
                             </button>
                         </div>
-                        <button className="btn btn-primary btn-lg" onClick={() => goTo(5)}>
-                            {t('auth:onboarding.continue')} <ArrowRight size={18} />
-                        </button>
+                        {renderStepNav(true, () => goTo(5))}
                     </div>
                 );
 
-            // Step 5: Add Baby
             case 5:
                 return (
                     <div className="onboarding-card onboarding-form-card">
+                        <button className="onboarding-back" onClick={() => goTo(4)}>
+                            <ArrowLeft size={20} />
+                        </button>
                         <h2 className="onboarding-form-title">{t('auth:onboarding.addYourBaby')}</h2>
                         <AddBabyForm
                             onSubmit={handleBabySubmit}
@@ -276,7 +282,6 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     </div>
                 );
 
-            // Step 6: All Set
             case 6:
                 return (
                     <div className="onboarding-card">
@@ -298,7 +303,6 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
     return (
         <div className="onboarding-container">
-            {renderBackButton()}
             {renderProgressDots()}
             <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
@@ -309,6 +313,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     animate="center"
                     exit="exit"
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
+                    style={{ width: '100%', maxWidth: 420 }}
                 >
                     {renderStep()}
                 </motion.div>
