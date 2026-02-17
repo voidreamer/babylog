@@ -94,5 +94,18 @@
     "syncingChanges": "変更を同期中...",
     "changesToSync": "{{count}}件の変更を同期",
     "syncNow": "今すぐ同期"
+  },
+  "tour": {
+    "quickActionsTitle": "クイックアクション",
+    "quickActionsDesc": "タップして授乳、おむつ、睡眠、搾乳をすばやく記録。",
+    "widgetsTitle": "ダッシュボード",
+    "widgetsDesc": "ウィジェットで今日の活動を一目で確認。タップして詳細を見たり記録を追加。",
+    "navTitle": "ナビゲーション",
+    "navDesc": "ホーム、タイムライン、健康、統計、設定を切り替え。",
+    "doneTitle": "準備完了！",
+    "doneDesc": "赤ちゃんの一日を記録しましょう。頑張って！",
+    "next": "次へ",
+    "skip": "スキップ",
+    "finish": "始めよう！"
   }
 }

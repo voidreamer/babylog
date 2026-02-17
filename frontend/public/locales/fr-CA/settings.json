@@ -89,6 +89,15 @@
     "contactUs": "Nous contacter",
     "privacyPolicy": "Politique de confidentialité",
     "termsOfService": "Conditions d'utilisation",
+    "replayOnboarding": "Revoir le Tour de Bienvenue",
+    "replayOnboardingDesc": "Revoir l'introduction de l'application",
+    "deleteAccount": "Supprimer le Compte",
+    "deleteAccountDesc": "Supprimer définitivement toutes vos données",
+    "deleteAccountConfirmTitle": "Supprimer votre Compte?",
+    "deleteAccountConfirmDesc": "Cela supprimera définitivement votre compte, tous les profils de bébé et toutes les données de suivi. Cette action est irréversible.",
+    "deleteAccountConfirm": "Tout Supprimer",
+    "deletingAccount": "Suppression...",
+    "deleteAccountFailed": "Échec de la suppression du compte. Veuillez réessayer.",
     "signOut": "Se déconnecter"
   },
   "units": {

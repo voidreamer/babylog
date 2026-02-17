@@ -89,6 +89,15 @@
     "contactUs": "お問い合わせ",
     "privacyPolicy": "プライバシーポリシー",
     "termsOfService": "利用規約",
+    "replayOnboarding": "ウェルカムツアーを再生",
+    "replayOnboardingDesc": "アプリの紹介をもう一度見る",
+    "deleteAccount": "アカウントを削除",
+    "deleteAccountDesc": "すべてのデータを完全に削除",
+    "deleteAccountConfirmTitle": "アカウントを削除しますか？",
+    "deleteAccountConfirmDesc": "アカウント、すべての赤ちゃんプロフィール、すべての記録データが完全に削除されます。この操作は元に戻せません。",
+    "deleteAccountConfirm": "すべて削除",
+    "deletingAccount": "削除中...",
+    "deleteAccountFailed": "アカウントの削除に失敗しました。もう一度お試しください。",
     "signOut": "サインアウト"
   },
   "units": {

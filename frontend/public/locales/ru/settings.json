@@ -89,6 +89,15 @@
     "contactUs": "Связаться с нами",
     "privacyPolicy": "Политика конфиденциальности",
     "termsOfService": "Условия использования",
+    "replayOnboarding": "Повторить Тур",
+    "replayOnboardingDesc": "Посмотреть знакомство с приложением снова",
+    "deleteAccount": "Удалить Аккаунт",
+    "deleteAccountDesc": "Навсегда удалить все данные",
+    "deleteAccountConfirmTitle": "Удалить Аккаунт?",
+    "deleteAccountConfirmDesc": "Это навсегда удалит ваш аккаунт, все профили малышей и все данные отслеживания. Это действие нельзя отменить.",
+    "deleteAccountConfirm": "Удалить Всё",
+    "deletingAccount": "Удаление...",
+    "deleteAccountFailed": "Не удалось удалить аккаунт. Попробуйте снова.",
     "signOut": "Выйти"
   },
   "units": {

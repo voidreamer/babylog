@@ -85,11 +85,6 @@ async function getDB() {
                 const store = db.createObjectStore(STORES.MEDICATIONS, { keyPath: 'id' });
                 store.createIndex('baby_id', 'baby_id');
             }
-            if (!db.objectStoreNames.contains(STORES.MILESTONES)) {
-                const store = db.createObjectStore(STORES.MILESTONES, { keyPath: 'id' });
-                store.createIndex('baby_id', 'baby_id');
-                store.createIndex('achieved_date', 'achieved_date');
-            }
             if (!db.objectStoreNames.contains(STORES.GROWTH_RECORDS)) {
                 const store = db.createObjectStore(STORES.GROWTH_RECORDS, { keyPath: 'id' });
                 store.createIndex('baby_id', 'baby_id');

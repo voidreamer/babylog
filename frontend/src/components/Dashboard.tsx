@@ -43,6 +43,28 @@ function getDefaultWidgets(ageMonths: number | null): string[] {
     return widgets;
 }
 
+// Warm the IDB cache for all event types so offline mode has real data.
+// Throttled to once every 5 minutes so the 30s dashboard poll doesn't spam the API.
+let lastCacheWarm = 0;
+const CACHE_WARM_INTERVAL = 5 * 60 * 1000;
+
+function warmOfflineCache(babyId: number): void {
+    if (!navigator.onLine) return;
+    const now = Date.now();
+    if (now - lastCacheWarm < CACHE_WARM_INTERVAL) return;
+    lastCacheWarm = now;
+    Promise.all([
+        api.getFeedings(babyId),
+        api.getDiapers(babyId),
+        api.getSleeps(babyId),
+        api.getPumpings(babyId),
+        api.getPottyLogs(babyId),
+        api.getTummyTimes(babyId),
+        api.getBaths(babyId),
+        api.getSupplements(babyId),
+    ]).catch(() => {}); // fire-and-forget; errors are silently ignored
+}
+
 export default function Dashboard() {
     const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
@@ -121,6 +143,8 @@ export default function Dashboard() {
                 setLatestGrowth(growthRecords[growthRecords.length - 1]);
             }
             setUpcoming(upcomingData?.upcoming || []);
+            // Keep IDB warm so all event types are available offline
+            warmOfflineCache(selectedBaby.id);
         } catch (error) {
             console.error('Failed to load dashboard:', error);
             toast.error(t('failedToLoadDashboard'), {

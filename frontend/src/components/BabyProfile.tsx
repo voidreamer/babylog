@@ -78,9 +78,10 @@ export default function BabyProfile({ onBack }: BabyProfileProps) {
             await uploadProfilePhoto(file, selectedBaby.id, user.id);
             await refresh();
             toast.success(t('settings:babyProfile.photoUpdated'));
-        } catch (err) {
-            console.error('Photo upload failed:', err);
-            toast.error(t('settings:babyProfile.photoFailed'));
+        } catch (err: any) {
+            const msg = err?.message || JSON.stringify(err);
+            console.error('Photo upload failed:', msg, err);
+            toast.error(msg || t('settings:babyProfile.photoFailed'));
         } finally {
             setUploading(false);
         }
@@ -128,9 +129,10 @@ export default function BabyProfile({ onBack }: BabyProfileProps) {
 
             await refresh();
             toast.success(t('settings:babyProfile.saved'));
-        } catch (err) {
-            console.error('Save failed:', err);
-            toast.error(t('settings:babyProfile.saveFailed'));
+        } catch (err: any) {
+            const msg = err?.message || JSON.stringify(err);
+            console.error('Save failed:', msg, err);
+            toast.error(msg || t('settings:babyProfile.saveFailed'));
         } finally {
             setSaving(false);
         }

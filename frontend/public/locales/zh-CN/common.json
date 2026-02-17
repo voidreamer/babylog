@@ -94,5 +94,18 @@
     "syncingChanges": "正在同步更改...",
     "changesToSync": "{{count}} 条更改待同步",
     "syncNow": "立即同步"
+  },
+  "tour": {
+    "quickActionsTitle": "快捷操作",
+    "quickActionsDesc": "点击快速记录喂养、换尿布、睡眠和吸奶。",
+    "widgetsTitle": "您的仪表盘",
+    "widgetsDesc": "小组件一目了然地显示今天的活动。点击查看详情或记录更多。",
+    "navTitle": "导航",
+    "navDesc": "在主页、时间线、健康、统计和设置之间切换。",
+    "doneTitle": "一切就绪！",
+    "doneDesc": "开始记录宝宝的一天吧。加油！",
+    "next": "下一步",
+    "skip": "跳过",
+    "finish": "开始吧！"
   }
 }
