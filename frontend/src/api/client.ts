@@ -22,6 +22,157 @@ import {
     cacheGrowthRecords, getCachedGrowthRecords
 } from '../utils/offlineStorage';
 
+// ---------------------------------------------------------------------------
+// Offline helpers
+// ---------------------------------------------------------------------------
+
+/** Convert a UTC ISO string (with or without Z) to a local YYYY-MM-DD string. */
+function toLocalDateStr(utcStr: string): string {
+    const s = utcStr.endsWith('Z') ? utcStr : utcStr + 'Z';
+    const d = new Date(s);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Return true if the UTC time string falls on the given local YYYY-MM-DD date. */
+function isOnLocalDate(utcStr: string | null | undefined, localDate: string): boolean {
+    if (!utcStr) return false;
+    try { return toLocalDateStr(utcStr) === localDate; } catch { return false; }
+}
+
+/** True if the error indicates we should use the offline cache (no network or request timed out). */
+function shouldUseFallback(error: unknown): boolean {
+    return !isOnline() || (error as Error)?.name === 'AbortError';
+}
+
+/**
+ * Build a dashboard-shaped response from IDB cache.
+ * Used offline so widgets and DailySummary show real data.
+ */
+async function buildOfflineDashboard(babyId: number, localDate: string | null): Promise<any> {
+    const today = localDate || toLocalDateStr(new Date().toISOString());
+
+    const [feedings, diapers, sleeps, pumpings, potty, tummy, baths, supplements] = await Promise.all([
+        getCachedFeedings(babyId), getCachedDiapers(babyId), getCachedSleeps(babyId), getCachedPumpings(babyId),
+        getCachedActivities(babyId, 'potty'), getCachedActivities(babyId, 'tummy_time'),
+        getCachedActivities(babyId, 'bath'), getCachedActivities(babyId, 'supplement'),
+    ]);
+
+    feedings.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    diapers.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    sleeps.sort((a: any, b: any) => new Date(b.start_time || '').getTime() - new Date(a.start_time || '').getTime());
+    pumpings.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    potty.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    tummy.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    baths.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    supplements.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+
+    const currentSleep = sleeps.find((s: any) => !s.end_time) || null;
+    const lastSleep = sleeps.find((s: any) => s.end_time) || sleeps[0] || null;
+
+    const feedToday   = feedings.filter((f: any) => isOnLocalDate(f.time, today));
+    const diaperToday = diapers.filter((d: any) => isOnLocalDate(d.time, today));
+    const sleepToday  = sleeps.filter((s: any) => isOnLocalDate(s.start_time, today));
+    const pumpToday   = pumpings.filter((p: any) => isOnLocalDate(p.time, today));
+    const pottyToday  = potty.filter((p: any) => isOnLocalDate(p.time, today));
+    const tummyToday  = tummy.filter((t: any) => isOnLocalDate(t.time, today));
+    const bathToday   = baths.filter((b: any) => isOnLocalDate(b.time, today));
+
+    const sleepMinutes = sleepToday.filter((s: any) => s.end_time).reduce((acc: number, s: any) => {
+        const start = new Date(s.start_time.endsWith('Z') ? s.start_time : s.start_time + 'Z').getTime();
+        const end   = new Date(s.end_time.endsWith('Z') ? s.end_time : s.end_time + 'Z').getTime();
+        return acc + Math.round((end - start) / 60000);
+    }, 0);
+
+    return {
+        last_feeding:   feedings[0] || null,
+        last_diaper:    diapers[0] || null,
+        last_sleep:     lastSleep,
+        current_sleep:  currentSleep,
+        last_pumping:   pumpings[0] || null,
+        last_potty:     potty[0] || null,
+        last_tummy:     tummy[0] || null,
+        last_bath:      baths[0] || null,
+        last_supplement: supplements[0] || null,
+        daily_summary: {
+            total_feedings:     feedToday.length,
+            total_ml:           feedToday.reduce((acc: number, f: any) => acc + (f.amount_ml || 0), 0),
+            total_diapers:      diaperToday.length,
+            pee_count:          diaperToday.filter((d: any) => d.type === 'pee' || d.diaper_type === 'pee').length,
+            poo_count:          diaperToday.filter((d: any) => d.type === 'poo' || d.diaper_type === 'poo').length,
+            mixed_count:        diaperToday.filter((d: any) => d.type === 'mixed' || d.diaper_type === 'mixed').length,
+            total_sleep_minutes: sleepMinutes,
+            sleep_count:        sleepToday.length,
+            pumping_count:      pumpToday.length,
+            total_pumping_ml:   pumpToday.reduce((acc: number, p: any) => acc + (p.amount_ml || 0), 0),
+            potty_count:        pottyToday.length,
+            potty_success_count: pottyToday.filter((p: any) => p.result === 'success').length,
+            tummy_count:        tummyToday.length,
+            tummy_minutes:      tummyToday.reduce((acc: number, t: any) => acc + (t.duration_minutes || 0), 0),
+            bath_count:         bathToday.length,
+        },
+    };
+}
+
+/**
+ * Build a timeline-shaped event list from IDB cache for a given local date.
+ * Events are shaped to match the server response format that TimelineCalendar expects.
+ */
+async function buildOfflineTimeline(babyId: number, date: string | null): Promise<any[]> {
+    const targetDate = date || toLocalDateStr(new Date().toISOString());
+
+    const [feedings, diapers, sleeps, pumpings, potty, tummy, baths, supplements] = await Promise.all([
+        getCachedFeedings(babyId), getCachedDiapers(babyId), getCachedSleeps(babyId), getCachedPumpings(babyId),
+        getCachedActivities(babyId, 'potty'), getCachedActivities(babyId, 'tummy_time'),
+        getCachedActivities(babyId, 'bath'), getCachedActivities(babyId, 'supplement'),
+    ]);
+
+    const events: any[] = [
+        ...feedings.filter((f: any) => isOnLocalDate(f.time, targetDate)).map((f: any) => ({
+            ...f, event_type: 'feeding', time: f.time,
+            details: { type: f.type, duration_minutes: f.duration_minutes, amount_ml: f.amount_ml },
+        })),
+        ...diapers.filter((d: any) => isOnLocalDate(d.time, targetDate)).map((d: any) => ({
+            ...d, event_type: 'diaper', time: d.time,
+            details: { type: d.type || d.diaper_type },
+        })),
+        ...sleeps.filter((s: any) => isOnLocalDate(s.start_time, targetDate)).map((s: any) => {
+            const startMs = new Date(s.start_time.endsWith('Z') ? s.start_time : s.start_time + 'Z').getTime();
+            const endMs   = s.end_time ? new Date(s.end_time.endsWith('Z') ? s.end_time : s.end_time + 'Z').getTime() : null;
+            return {
+                ...s, event_type: 'sleep', time: s.start_time,
+                details: { end_time: s.end_time || null, duration_minutes: endMs ? Math.round((endMs - startMs) / 60000) : undefined },
+            };
+        }),
+        ...pumpings.filter((p: any) => isOnLocalDate(p.time, targetDate)).map((p: any) => ({
+            ...p, event_type: 'pumping', time: p.time,
+            details: { duration_minutes: p.duration_minutes, amount_ml: p.amount_ml },
+        })),
+        ...potty.filter((p: any) => isOnLocalDate(p.time, targetDate)).map((p: any) => ({
+            ...p, event_type: 'potty', time: p.time,
+            details: { result: p.result },
+        })),
+        // activity_type is 'tummy_time' in IDB but event_type is 'tummy' in timeline
+        ...tummy.filter((t: any) => isOnLocalDate(t.time, targetDate)).map((t: any) => ({
+            ...t, event_type: 'tummy', time: t.time,
+            details: { duration_minutes: t.duration_minutes },
+        })),
+        ...baths.filter((b: any) => isOnLocalDate(b.time, targetDate)).map((b: any) => ({
+            ...b, event_type: 'bath', time: b.time,
+            details: { notes: b.notes },
+        })),
+        ...supplements.filter((s: any) => isOnLocalDate(s.time, targetDate)).map((s: any) => ({
+            ...s, event_type: 'supplement', time: s.time,
+            details: { name: s.name, dosage: s.dosage },
+        })),
+    ];
+
+    return events;
+}
+
+// ---------------------------------------------------------------------------
+// API Client
+// ---------------------------------------------------------------------------
+
 export class ApiError extends Error {
     status: number;
     constructor(message: string, status: number) {
@@ -50,7 +201,18 @@ class ApiClient {
         const authHeaders = await this.getAuthHeaders();
         const headers = { ...authHeaders, ...options.headers };
 
-        const response = await fetch(url, { ...options, headers, cache: 'no-store' });
+        // Abort after 15 s to prevent the app hanging on poor connectivity
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        let response: Response;
+        try {
+            response = await fetch(url, { ...options, headers, cache: 'no-store', signal: controller.signal });
+        } catch (err) {
+            clearTimeout(timeoutId);
+            throw err;
+        }
+        clearTimeout(timeoutId);
 
         if (response.status === 401) {
             const errorBody = await response.text();
@@ -78,12 +240,16 @@ class ApiClient {
 
     // Babies
     async getBabies(): Promise<any[]> {
+        // Immediately return cache if offline — prevents the startup loading screen from hanging
+        if (!isOnline()) { log('Offline: returning cached babies immediately'); return await getCachedBabies(); }
         try {
             const babies = await this.request('/babies/');
             if (babies) await cacheBabies(babies);
             return babies;
         } catch (error) {
-            if (!isOnline()) { log('Offline: returning cached babies'); return await getCachedBabies(); }
+            // On any network failure (server down, timeout, etc.) fall back to cache if available
+            const cached = await getCachedBabies();
+            if (cached.length > 0) { log('Network error: falling back to cached babies'); return cached; }
             throw error;
         }
     }
@@ -116,12 +282,13 @@ class ApiClient {
 
     // Feedings
     async getFeedings(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { log('Offline: returning cached feedings'); return await getCachedFeedings(babyId); }
         try {
             const feedings = await this.request(`/feedings/?baby_id=${babyId}&limit=${limit}`);
             if (feedings) await cacheFeedings(babyId, feedings);
             return feedings;
         } catch (error) {
-            if (!isOnline()) { log('Offline: returning cached feedings'); return await getCachedFeedings(babyId); }
+            if (shouldUseFallback(error)) { log('Fallback: returning cached feedings'); return await getCachedFeedings(babyId); }
             throw error;
         }
     }
@@ -145,12 +312,13 @@ class ApiClient {
 
     // Diapers
     async getDiapers(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { log('Offline: returning cached diapers'); return await getCachedDiapers(babyId); }
         try {
             const diapers = await this.request(`/diapers/?baby_id=${babyId}&limit=${limit}`);
             if (diapers) await cacheDiapers(babyId, diapers);
             return diapers;
         } catch (error) {
-            if (!isOnline()) { log('Offline: returning cached diapers'); return await getCachedDiapers(babyId); }
+            if (shouldUseFallback(error)) { log('Fallback: returning cached diapers'); return await getCachedDiapers(babyId); }
             throw error;
         }
     }
@@ -174,12 +342,13 @@ class ApiClient {
 
     // Sleeps
     async getSleeps(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { log('Offline: returning cached sleeps'); return await getCachedSleeps(babyId); }
         try {
             const sleeps = await this.request(`/sleeps/?baby_id=${babyId}&limit=${limit}`);
             if (sleeps) await cacheSleeps(babyId, sleeps);
             return sleeps;
         } catch (error) {
-            if (!isOnline()) { log('Offline: returning cached sleeps'); return await getCachedSleeps(babyId); }
+            if (shouldUseFallback(error)) { log('Fallback: returning cached sleeps'); return await getCachedSleeps(babyId); }
             throw error;
         }
     }
@@ -206,12 +375,13 @@ class ApiClient {
 
     // Pumpings
     async getPumpings(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { log('Offline: returning cached pumpings'); return await getCachedPumpings(babyId); }
         try {
             const pumpings = await this.request(`/pumpings/?baby_id=${babyId}&limit=${limit}`);
             if (pumpings) await cachePumpings(babyId, pumpings);
             return pumpings;
         } catch (error) {
-            if (!isOnline()) { log('Offline: returning cached pumpings'); return await getCachedPumpings(babyId); }
+            if (shouldUseFallback(error)) { log('Fallback: returning cached pumpings'); return await getCachedPumpings(babyId); }
             throw error;
         }
     }
@@ -235,31 +405,34 @@ class ApiClient {
 
     // Events
     async getTimeline(babyId: number, date: string | null = null, tzOffset: number | null = null): Promise<any[]> {
+        if (!isOnline()) { log('Offline: building timeline from cache'); return await buildOfflineTimeline(babyId, date); }
         const params = new URLSearchParams({ baby_id: String(babyId) });
         if (date) params.append('date', date);
         if (tzOffset !== null) params.append('tz_offset', String(tzOffset));
         try { return await this.request(`/events/timeline?${params}`); }
-        catch (error) { if (!isOnline()) { log('Offline: timeline not available'); return []; } throw error; }
+        catch (error) {
+            if (shouldUseFallback(error)) { log('Fallback: building timeline from cache'); return await buildOfflineTimeline(babyId, date); }
+            throw error;
+        }
     }
 
     async getDashboard(babyId: number, localDate: string | null = null, tzOffset: number | null = null): Promise<any> {
+        if (!isOnline()) { log('Offline: building dashboard from cache'); return await buildOfflineDashboard(babyId, localDate); }
         const params = new URLSearchParams({ baby_id: String(babyId) });
         if (localDate) params.append('local_date', localDate);
         if (tzOffset !== null) params.append('tz_offset', String(tzOffset));
         try { return await this.request(`/events/dashboard?${params}`); }
         catch (error) {
-            if (!isOnline()) {
-                log('Offline: dashboard not available');
-                return { last_feeding: null, last_diaper: null, last_sleep: null, current_sleep: null, last_pumping: null, daily_summary: { feedings_count: 0, diapers_count: 0, sleep_duration_hours: 0 } };
-            }
+            if (shouldUseFallback(error)) { log('Fallback: building dashboard from cache'); return await buildOfflineDashboard(babyId, localDate); }
             throw error;
         }
     }
 
     // Health - Doctor Visits
     async getDoctorVisits(babyId: number): Promise<any[]> {
+        if (!isOnline()) { return await getCachedDoctorVisits(babyId); }
         try { const visits = await this.request(`/health/doctor-visits/?baby_id=${babyId}`); if (visits) await cacheDoctorVisits(babyId, visits); return visits; }
-        catch (error) { if (!isOnline()) { log('Offline: returning cached doctor visits'); return await getCachedDoctorVisits(babyId); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedDoctorVisits(babyId); } throw error; }
     }
     async createDoctorVisit(data: any): Promise<any> { return this.request('/health/doctor-visits/', { method: 'POST', body: JSON.stringify(data) }); }
     async deleteDoctorVisit(id: number): Promise<any> { return this.request(`/health/doctor-visits/${id}`, { method: 'DELETE' }); }
@@ -267,8 +440,9 @@ class ApiClient {
 
     // Health - Vaccinations
     async getVaccinations(babyId: number): Promise<any[]> {
+        if (!isOnline()) { return await getCachedVaccinations(babyId); }
         try { const vaccinations = await this.request(`/health/vaccinations/?baby_id=${babyId}`); if (vaccinations) await cacheVaccinations(babyId, vaccinations); return vaccinations; }
-        catch (error) { if (!isOnline()) { return await getCachedVaccinations(babyId); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedVaccinations(babyId); } throw error; }
     }
     async createVaccination(data: any): Promise<any> { return this.request('/health/vaccinations/', { method: 'POST', body: JSON.stringify(data) }); }
     async deleteVaccination(id: number): Promise<any> { return this.request(`/health/vaccinations/${id}`, { method: 'DELETE' }); }
@@ -276,8 +450,9 @@ class ApiClient {
 
     // Health - Medications
     async getMedications(babyId: number, activeOnly: boolean = false): Promise<any[]> {
+        if (!isOnline()) { const cached = await getCachedMedications(babyId); return activeOnly ? cached.filter((m: any) => m.is_active) : cached; }
         try { const medications = await this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`); if (medications) await cacheMedications(babyId, medications); return medications; }
-        catch (error) { if (!isOnline()) { const cached = await getCachedMedications(babyId); return activeOnly ? cached.filter((m: any) => m.is_active) : cached; } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { const cached = await getCachedMedications(babyId); return activeOnly ? cached.filter((m: any) => m.is_active) : cached; } throw error; }
     }
     async createMedication(data: any): Promise<any> { return this.request('/health/medications/', { method: 'POST', body: JSON.stringify(data) }); }
     async deleteMedication(id: number): Promise<any> { return this.request(`/health/medications/${id}`, { method: 'DELETE' }); }
@@ -286,8 +461,9 @@ class ApiClient {
 
     // Health - Growth
     async getGrowthRecords(babyId: number): Promise<any[]> {
+        if (!isOnline()) { return await getCachedGrowthRecords(babyId); }
         try { const records = await this.request(`/health/growth/?baby_id=${babyId}`); if (records) await cacheGrowthRecords(babyId, records); return records; }
-        catch (error) { if (!isOnline()) { return await getCachedGrowthRecords(babyId); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedGrowthRecords(babyId); } throw error; }
     }
     async createGrowthRecord(data: any): Promise<any> { return this.request('/health/growth/', { method: 'POST', body: JSON.stringify(data) }); }
     async deleteGrowthRecord(id: number): Promise<any> { return this.request(`/health/growth/${id}`, { method: 'DELETE' }); }
@@ -295,8 +471,9 @@ class ApiClient {
 
     // Activities - Potty
     async getPottyLogs(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { return await getCachedActivities(babyId, 'potty'); }
         try { const pottyLogs = await this.request(`/activities/potty?baby_id=${babyId}&limit=${limit}`); if (pottyLogs) await cacheActivities(babyId, 'potty', pottyLogs); return pottyLogs; }
-        catch (error) { if (!isOnline()) { return await getCachedActivities(babyId, 'potty'); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedActivities(babyId, 'potty'); } throw error; }
     }
     async createPottyLog(data: any): Promise<any> {
         try { return await this.request('/activities/potty', { method: 'POST', body: JSON.stringify(data) }); }
@@ -307,8 +484,9 @@ class ApiClient {
 
     // Activities - Tummy Time
     async getTummyTimes(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { return await getCachedActivities(babyId, 'tummy_time'); }
         try { const tummyTimes = await this.request(`/activities/tummy-time?baby_id=${babyId}&limit=${limit}`); if (tummyTimes) await cacheActivities(babyId, 'tummy_time', tummyTimes); return tummyTimes; }
-        catch (error) { if (!isOnline()) { return await getCachedActivities(babyId, 'tummy_time'); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedActivities(babyId, 'tummy_time'); } throw error; }
     }
     async createTummyTime(data: any): Promise<any> {
         try { return await this.request('/activities/tummy-time', { method: 'POST', body: JSON.stringify(data) }); }
@@ -319,8 +497,9 @@ class ApiClient {
 
     // Activities - Bath
     async getBaths(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { return await getCachedActivities(babyId, 'bath'); }
         try { const baths = await this.request(`/activities/baths?baby_id=${babyId}&limit=${limit}`); if (baths) await cacheActivities(babyId, 'bath', baths); return baths; }
-        catch (error) { if (!isOnline()) { return await getCachedActivities(babyId, 'bath'); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedActivities(babyId, 'bath'); } throw error; }
     }
     async createBath(data: any): Promise<any> {
         try { return await this.request('/activities/baths', { method: 'POST', body: JSON.stringify(data) }); }
@@ -331,27 +510,36 @@ class ApiClient {
 
     // Rest Planner
     async getRestPlan(babyId: number, days: number = 7): Promise<any> {
-        const tzOffset = new Date().getTimezoneOffset();
-        return this.request(`/rest-planner/${babyId}?days=${days}&tz_offset=${tzOffset}`);
+        if (!isOnline()) return null;
+        try {
+            const tzOffset = new Date().getTimezoneOffset();
+            return await this.request(`/rest-planner/${babyId}?days=${days}&tz_offset=${tzOffset}`);
+        } catch (error) {
+            if (shouldUseFallback(error)) return null;
+            throw error;
+        }
     }
 
     // Analytics
     async getAnalytics(babyId: number, days: number = 7): Promise<any> {
+        if (!isOnline()) { return { feeding: { total: 0, avg_per_day: 0 }, diaper: { total: 0, avg_per_day: 0 }, sleep: { total_hours: 0, avg_per_day: 0 } }; }
         const tzOffset = new Date().getTimezoneOffset();
         try { return await this.request(`/analytics/${babyId}?days=${days}&tz_offset=${tzOffset}`); }
-        catch (error) { if (!isOnline()) { return { feeding: { total: 0, avg_per_day: 0 }, diaper: { total: 0, avg_per_day: 0 }, sleep: { total_hours: 0, avg_per_day: 0 } }; } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return { feeding: { total: 0, avg_per_day: 0 }, diaper: { total: 0, avg_per_day: 0 }, sleep: { total_hours: 0, avg_per_day: 0 } }; } throw error; }
     }
 
     // Subscription
     async getSubscriptionStatus(): Promise<any> {
+        if (!isOnline()) { return { premium: localStorage.getItem('isPremium') === 'true' }; }
         try { return await this.request('/subscription/status'); }
-        catch (error) { if (!isOnline()) { return { premium: false }; } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return { premium: localStorage.getItem('isPremium') === 'true' }; } throw error; }
     }
 
     // Activities - Supplements
     async getSupplements(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { return await getCachedActivities(babyId, 'supplement'); }
         try { const supplements = await this.request(`/activities/supplements?baby_id=${babyId}&limit=${limit}`); if (supplements) await cacheActivities(babyId, 'supplement', supplements); return supplements; }
-        catch (error) { if (!isOnline()) { return await getCachedActivities(babyId, 'supplement'); } throw error; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedActivities(babyId, 'supplement'); } throw error; }
     }
     async createSupplement(data: any): Promise<any> {
         try { return await this.request('/activities/supplements', { method: 'POST', body: JSON.stringify(data) }); }
@@ -402,28 +590,47 @@ class ApiClient {
     }
 
     // Teeth
-    async getTeeth(babyId: number): Promise<any> { return this.request(`/health/teeth/?baby_id=${babyId}`); }
+    async getTeeth(babyId: number): Promise<any> {
+        if (!isOnline()) return [];
+        try { return await this.request(`/health/teeth/?baby_id=${babyId}`); }
+        catch (error) { if (shouldUseFallback(error)) return []; throw error; }
+    }
     async createTooth(data: any): Promise<any> { return this.request('/health/teeth/', { method: 'POST', body: JSON.stringify(data) }); }
     async updateTooth(id: number, data: any): Promise<any> { return this.request(`/health/teeth/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async deleteTooth(id: number): Promise<any> { return this.request(`/health/teeth/${id}`, { method: 'DELETE' }); }
 
     // Sick Days
-    async getSickDays(babyId: number): Promise<any> { return this.request(`/health/sick-days/?baby_id=${babyId}`); }
+    async getSickDays(babyId: number): Promise<any> {
+        if (!isOnline()) return [];
+        try { return await this.request(`/health/sick-days/?baby_id=${babyId}`); }
+        catch (error) { if (shouldUseFallback(error)) return []; throw error; }
+    }
     async createSickDay(data: any): Promise<any> { return this.request('/health/sick-days/', { method: 'POST', body: JSON.stringify(data) }); }
     async updateSickDay(id: number, data: any): Promise<any> { return this.request(`/health/sick-days/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async deleteSickDay(id: number): Promise<any> { return this.request(`/health/sick-days/${id}`, { method: 'DELETE' }); }
 
     // Allergies
-    async getAllergies(babyId: number): Promise<any> { return this.request(`/health/allergies/?baby_id=${babyId}`); }
+    async getAllergies(babyId: number): Promise<any> {
+        if (!isOnline()) return [];
+        try { return await this.request(`/health/allergies/?baby_id=${babyId}`); }
+        catch (error) { if (shouldUseFallback(error)) return []; throw error; }
+    }
     async createAllergy(data: any): Promise<any> { return this.request('/health/allergies/', { method: 'POST', body: JSON.stringify(data) }); }
     async updateAllergy(id: number, data: any): Promise<any> { return this.request(`/health/allergies/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async deleteAllergy(id: number): Promise<any> { return this.request(`/health/allergies/${id}`, { method: 'DELETE' }); }
 
     // Upcoming
-    async getUpcoming(babyId: number): Promise<any> { return this.request(`/health/upcoming/?baby_id=${babyId}`); }
+    async getUpcoming(babyId: number): Promise<any> {
+        if (!isOnline()) return { upcoming: [] };
+        try { return await this.request(`/health/upcoming/?baby_id=${babyId}`); }
+        catch (error) { if (shouldUseFallback(error)) return { upcoming: [] }; throw error; }
+    }
 
     // User / Onboarding
-    async getUserInfo(): Promise<any> { return this.request('/users/me'); }
+    async getUserInfo(): Promise<any> {
+        if (!isOnline()) throw new Error('Offline');
+        return this.request('/users/me');
+    }
     async completeOnboarding(): Promise<any> { return this.request('/users/me/onboarding', { method: 'POST' }); }
     async completeTour(): Promise<any> { return this.request('/users/me/tour', { method: 'POST' }); }
     async deleteAccount(): Promise<any> { return this.request('/users/me', { method: 'DELETE' }); }
