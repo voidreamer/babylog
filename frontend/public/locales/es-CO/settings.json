@@ -91,6 +91,13 @@
     "termsOfService": "Condiciones de uso",
     "replayOnboarding": "Repetir Tour de Bienvenida",
     "replayOnboardingDesc": "Ver la introducción de la app de nuevo",
+    "deleteAccount": "Eliminar Cuenta",
+    "deleteAccountDesc": "Eliminar permanentemente todos tus datos",
+    "deleteAccountConfirmTitle": "¿Eliminar tu Cuenta?",
+    "deleteAccountConfirmDesc": "Esto eliminará permanentemente tu cuenta, todos los perfiles de bebé y todos los datos de seguimiento. Esta acción no se puede deshacer.",
+    "deleteAccountConfirm": "Eliminar Todo",
+    "deletingAccount": "Eliminando...",
+    "deleteAccountFailed": "Error al eliminar la cuenta. Intenta de nuevo.",
     "signOut": "Cerrar sesión"
   },
   "units": {

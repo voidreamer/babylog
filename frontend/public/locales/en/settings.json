@@ -91,6 +91,13 @@
     "termsOfService": "Terms of Service",
     "replayOnboarding": "Replay Welcome Tour",
     "replayOnboardingDesc": "See the app introduction again",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDesc": "Permanently delete all your data",
+    "deleteAccountConfirmTitle": "Delete Your Account?",
+    "deleteAccountConfirmDesc": "This will permanently delete your account, all baby profiles, and all tracking data. This action cannot be undone.",
+    "deleteAccountConfirm": "Delete Everything",
+    "deletingAccount": "Deleting...",
+    "deleteAccountFailed": "Failed to delete account. Please try again.",
     "signOut": "Sign Out"
   },
   "units": {

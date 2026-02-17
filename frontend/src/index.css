@@ -2018,7 +2018,11 @@ h4 {
 
 .btn-danger {
   background: var(--danger);
-  color: var(--text);
+  color: white;
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
 }
 
 .btn-lg {
@@ -7940,4 +7944,56 @@ a.settings-row {
 
 .tour-next-btn:hover {
   opacity: 0.9;
+}
+
+/* ============================================================================
+   Delete Account Modal
+   ============================================================================ */
+
+.delete-account-modal {
+  text-align: center;
+  max-width: 360px;
+  padding: var(--space-xl);
+}
+
+.delete-account-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+  color: var(--danger);
+}
+
+.delete-account-title {
+  font-family: var(--font-family-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+}
+
+.delete-account-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: var(--space-xl);
+}
+
+.delete-account-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.delete-account-actions .btn {
+  flex: 1;
+}
+
+.delete-account-actions .btn-secondary {
+  background: var(--surface-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
 }

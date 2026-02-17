@@ -426,6 +426,7 @@ class ApiClient {
     async getUserInfo(): Promise<any> { return this.request('/users/me'); }
     async completeOnboarding(): Promise<any> { return this.request('/users/me/onboarding', { method: 'POST' }); }
     async completeTour(): Promise<any> { return this.request('/users/me/tour', { method: 'POST' }); }
+    async deleteAccount(): Promise<any> { return this.request('/users/me', { method: 'DELETE' }); }
 
     // Billing
     async createCheckoutSession(priceId: string, successUrl: string, cancelUrl: string): Promise<any> {

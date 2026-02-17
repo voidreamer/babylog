@@ -25,7 +25,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell, Baby, TrendingUp, Mail } from 'lucide-react';
+import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell, Baby, TrendingUp, Mail, Trash2, AlertTriangle } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
 import CaregiverModal from './components/CaregiverModal';
@@ -41,6 +41,8 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
     const [showShareModal, setShowShareModal] = useState(false);
     const [showBabyProfile, setShowBabyProfile] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const currentBaby = babies?.[0];
 
@@ -386,6 +388,21 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </button>
+                <button
+                    className="settings-row settings-row-danger"
+                    onClick={() => setShowDeleteConfirm(true)}
+                >
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box danger">
+                            <Trash2 size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:support.deleteAccount', { defaultValue: 'Delete Account' })}</div>
+                            <div className="settings-row-desc">{t('settings:support.deleteAccountDesc', { defaultValue: 'Permanently delete all your data' })}</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
+                </button>
             </div>
 
             <p className="settings-version">{t('app.version', { version: __APP_VERSION__ })}</p>
@@ -396,6 +413,48 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     onClose={() => setShowShareModal(false)}
                     onShare={() => onRefreshBabies()}
                 />
+            )}
+
+            {showDeleteConfirm && (
+                <div className="modal-overlay" onClick={() => !deleteLoading && setShowDeleteConfirm(false)}>
+                    <div className="modal-content delete-account-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="delete-account-icon">
+                            <AlertTriangle size={32} />
+                        </div>
+                        <h3 className="delete-account-title">{t('settings:support.deleteAccountConfirmTitle', { defaultValue: 'Delete Your Account?' })}</h3>
+                        <p className="delete-account-desc">
+                            {t('settings:support.deleteAccountConfirmDesc', { defaultValue: 'This will permanently delete your account, all baby profiles, and all tracking data. This action cannot be undone.' })}
+                        </p>
+                        <div className="delete-account-actions">
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => setShowDeleteConfirm(false)}
+                                disabled={deleteLoading}
+                            >
+                                {t('common:cancel')}
+                            </button>
+                            <button
+                                className="btn btn-danger"
+                                disabled={deleteLoading}
+                                onClick={async () => {
+                                    setDeleteLoading(true);
+                                    try {
+                                        await api.deleteAccount();
+                                        localStorage.clear();
+                                        logout();
+                                    } catch (error) {
+                                        toast.error(t('settings:support.deleteAccountFailed', { defaultValue: 'Failed to delete account. Please try again.' }));
+                                        setDeleteLoading(false);
+                                    }
+                                }}
+                            >
+                                {deleteLoading
+                                    ? t('settings:support.deletingAccount', { defaultValue: 'Deleting...' })
+                                    : t('settings:support.deleteAccountConfirm', { defaultValue: 'Delete Everything' })}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

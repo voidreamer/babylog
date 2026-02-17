@@ -91,6 +91,13 @@
     "termsOfService": "सेवा की शर्तें",
     "replayOnboarding": "स्वागत टूर फिर से देखें",
     "replayOnboardingDesc": "ऐप का परिचय फिर से देखें",
+    "deleteAccount": "खाता हटाएं",
+    "deleteAccountDesc": "अपना सारा डेटा स्थायी रूप से हटाएं",
+    "deleteAccountConfirmTitle": "अपना खाता हटाएं?",
+    "deleteAccountConfirmDesc": "इससे आपका खाता, सभी शिशु प्रोफाइल और सभी ट्रैकिंग डेटा स्थायी रूप से हटा दिया जाएगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+    "deleteAccountConfirm": "सब कुछ हटाएं",
+    "deletingAccount": "हटा रहे हैं...",
+    "deleteAccountFailed": "खाता हटाने में विफल। कृपया पुनः प्रयास करें।",
     "signOut": "साइन आउट करें"
   },
   "units": {
