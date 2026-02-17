@@ -34,8 +34,8 @@ import BabyAvatar from './components/BabyAvatar';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; onRefreshBabies: () => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl, onRefreshBabies }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; onRefreshBabies: () => void; onReplayOnboarding: () => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl, onRefreshBabies, onReplayOnboarding }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
     const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings);
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
@@ -357,6 +357,21 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     </div>
                     <ChevronRight size={18} className="settings-arrow" />
                 </a>
+                <button
+                    className="settings-row"
+                    onClick={onReplayOnboarding}
+                >
+                    <div className="settings-row-left">
+                        <div className="settings-icon-box butter">
+                            <Sparkles size={16} />
+                        </div>
+                        <div>
+                            <div className="settings-row-label">{t('settings:support.replayOnboarding', { defaultValue: 'Replay Welcome Tour' })}</div>
+                            <div className="settings-row-desc">{t('settings:support.replayOnboardingDesc', { defaultValue: 'See the app introduction again' })}</div>
+                        </div>
+                    </div>
+                    <ChevronRight size={18} className="settings-arrow" />
+                </button>
                 <button
                     className="settings-row settings-row-danger"
                     onClick={logout}
@@ -733,6 +748,10 @@ function MainApp() {
                         setActiveTab={setActiveTab}
                         hubUrl={buildHubUrl(session, theme)}
                         onRefreshBabies={refresh}
+                        onReplayOnboarding={() => {
+                            setShowTour(true);
+                            setActiveTab('home');
+                        }}
                     />
                 )}
             </main>

@@ -89,6 +89,8 @@
     "contactUs": "Contact Us",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
+    "replayOnboarding": "Replay Welcome Tour",
+    "replayOnboardingDesc": "See the app introduction again",
     "signOut": "Sign Out"
   },
   "units": {

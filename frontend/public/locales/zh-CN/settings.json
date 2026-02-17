@@ -89,6 +89,8 @@
     "contactUs": "联系我们",
     "privacyPolicy": "隐私政策",
     "termsOfService": "服务条款",
+    "replayOnboarding": "重播欢迎导览",
+    "replayOnboardingDesc": "再次查看应用介绍",
     "signOut": "退出登录"
   },
   "units": {

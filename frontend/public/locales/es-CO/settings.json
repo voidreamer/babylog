@@ -89,6 +89,8 @@
     "contactUs": "Póngase en contacto con nosotros",
     "privacyPolicy": "Política de privacidad",
     "termsOfService": "Condiciones de uso",
+    "replayOnboarding": "Repetir Tour de Bienvenida",
+    "replayOnboardingDesc": "Ver la introducción de la app de nuevo",
     "signOut": "Cerrar sesión"
   },
   "units": {
