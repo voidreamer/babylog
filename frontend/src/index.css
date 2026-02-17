@@ -7791,26 +7791,28 @@ a.settings-row {
   position: fixed;
   inset: 0;
   z-index: 10000;
+  overflow: hidden;
 }
 
 .spotlight-overlay {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
+  display: block;
 }
 
 .tour-tooltip {
+  position: fixed;
   background: var(--surface);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   border: 1px solid var(--border-light, var(--border));
   text-align: center;
   z-index: 10001;
-  width: 340px;
-  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
 }
 
 .tour-tooltip-icon {

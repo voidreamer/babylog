@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,7 +20,7 @@ const TOUR_STEPS: TourStep[] = [
         position: 'bottom',
     },
     {
-        selector: '.widgets-grid > :first-child',
+        selector: '.widgets-grid',
         titleKey: 'tour.widgetsTitle',
         descKey: 'tour.widgetsDesc',
         icon: '/icons/activity.png',
@@ -51,11 +51,12 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
     const [resolvedSteps, setResolvedSteps] = useState<TourStep[]>([]);
+    const tooltipRef = useRef<HTMLDivElement>(null);
 
     // Resolve which steps are actually visible
     useEffect(() => {
         const steps = TOUR_STEPS.filter((s) => {
-            if (!s.selector) return true; // final step always included
+            if (!s.selector) return true;
             return document.querySelector(s.selector) !== null;
         });
         setResolvedSteps(steps);
@@ -77,7 +78,11 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
     useEffect(() => {
         measureTarget();
         window.addEventListener('resize', measureTarget);
-        return () => window.removeEventListener('resize', measureTarget);
+        window.addEventListener('scroll', measureTarget, true);
+        return () => {
+            window.removeEventListener('resize', measureTarget);
+            window.removeEventListener('scroll', measureTarget, true);
+        };
     }, [measureTarget]);
 
     const finish = useCallback(() => {
@@ -98,48 +103,75 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
 
     const step = resolvedSteps[currentStep];
     const isCenter = step.position === 'center' || !targetRect;
-    const padding = 8;
+    const spotPadding = 8;
+    const tooltipGap = 12;
+    const screenMargin = 16;
 
-    // Calculate tooltip position
     const getTooltipStyle = (): React.CSSProperties => {
         if (isCenter) {
             return {
                 position: 'fixed',
                 top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
+                left: screenMargin,
+                right: screenMargin,
+                transform: 'translateY(-50%)',
+                maxWidth: 340,
+                margin: '0 auto',
             };
         }
 
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const tooltipWidth = Math.min(340, vw - screenMargin * 2);
+        const tooltipLeft = Math.max(screenMargin, (vw - tooltipWidth) / 2);
+
         const style: React.CSSProperties = {
             position: 'fixed',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            maxWidth: 'min(340px, calc(100vw - 32px))',
+            left: tooltipLeft,
+            width: tooltipWidth,
         };
 
         if (step.position === 'bottom' && targetRect) {
-            style.top = targetRect.bottom + padding + 12;
+            const spaceBelow = vh - targetRect.bottom - spotPadding - tooltipGap;
+            // If not enough room below (~180px for tooltip), flip to above
+            if (spaceBelow < 180 && targetRect.top > 200) {
+                style.bottom = vh - targetRect.top + spotPadding + tooltipGap;
+            } else {
+                style.top = targetRect.bottom + spotPadding + tooltipGap;
+            }
         } else if (step.position === 'top' && targetRect) {
-            style.bottom = window.innerHeight - targetRect.top + padding + 12;
+            const spaceAbove = targetRect.top - spotPadding - tooltipGap;
+            if (spaceAbove < 180) {
+                style.top = targetRect.bottom + spotPadding + tooltipGap;
+            } else {
+                style.bottom = vh - targetRect.top + spotPadding + tooltipGap;
+            }
         }
 
         return style;
     };
 
+    // Cutout rect values (clamped to viewport)
+    const cutout = targetRect ? {
+        x: Math.max(0, targetRect.left - spotPadding),
+        y: Math.max(0, targetRect.top - spotPadding),
+        w: targetRect.width + spotPadding * 2,
+        h: targetRect.height + spotPadding * 2,
+    } : null;
+
     return (
         <div className="spotlight-tour" onClick={(e) => { if (e.target === e.currentTarget) handleNext(); }}>
             {/* SVG overlay with mask cutout */}
-            <svg className="spotlight-overlay" width="100%" height="100%">
+            <svg className="spotlight-overlay" viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`} preserveAspectRatio="none">
                 <defs>
                     <mask id="spotlight-mask">
-                        <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                        {targetRect && (
+                        <rect x="0" y="0" width={window.innerWidth} height={window.innerHeight} fill="white" />
+                        {cutout && (
                             <rect
-                                x={targetRect.left - padding}
-                                y={targetRect.top - padding}
-                                width={targetRect.width + padding * 2}
-                                height={targetRect.height + padding * 2}
+                                x={cutout.x}
+                                y={cutout.y}
+                                width={cutout.w}
+                                height={cutout.h}
                                 rx="12"
                                 fill="black"
                             />
@@ -147,7 +179,9 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
                     </mask>
                 </defs>
                 <rect
-                    x="0" y="0" width="100%" height="100%"
+                    x="0" y="0"
+                    width={window.innerWidth}
+                    height={window.innerHeight}
                     fill="rgba(0,0,0,0.6)"
                     mask="url(#spotlight-mask)"
                 />
@@ -157,11 +191,12 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentStep}
+                    ref={tooltipRef}
                     className="tour-tooltip"
                     style={getTooltipStyle()}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
                 >
                     <img src={step.icon} alt="" className="tour-tooltip-icon" />
