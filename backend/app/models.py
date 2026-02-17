@@ -33,6 +33,8 @@ class User(Base):
     premium_expires_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utc_now)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+    onboarding_completed_at = Column(DateTime, nullable=True)
+    tour_completed_at = Column(DateTime, nullable=True)
 
 
 class Baby(Base):

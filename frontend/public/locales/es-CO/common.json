@@ -94,5 +94,18 @@
     "syncingChanges": "Sincronizar los cambios...",
     "changesToSync": "{{count}} cambiar{{s}} a sync",
     "syncNow": "Sincronizar ahora"
+  },
+  "tour": {
+    "quickActionsTitle": "Acciones Rápidas",
+    "quickActionsDesc": "Toca para registrar rápidamente alimentaciones, pañales, sueño y extracción.",
+    "widgetsTitle": "Tu Panel",
+    "widgetsDesc": "Los widgets muestran la actividad de hoy de un vistazo. Toca cualquiera para ver detalles o registrar más.",
+    "navTitle": "Navegación",
+    "navDesc": "Cambia entre Panel, Cronología, Salud, Estadísticas y Configuración.",
+    "doneTitle": "¡Todo Listo!",
+    "doneDesc": "Comienza a registrar el día de tu bebé. ¡Tú puedes!",
+    "next": "Siguiente",
+    "skip": "Omitir",
+    "finish": "¡Vamos!"
   }
 }

@@ -12,6 +12,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 import TimelineCalendar from './components/TimelineCalendar';
 import Onboarding from './components/Onboarding';
+import SpotlightTour from './components/SpotlightTour';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -423,10 +424,16 @@ function MainApp() {
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [showTour, setShowTour] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [showMedQuickLog, setShowMedQuickLog] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
+    const [onboardingState, setOnboardingState] = useState({
+        loaded: false,
+        onboardingCompleted: localStorage.getItem('heybub-onboarding-completed') === 'true',
+        tourCompleted: localStorage.getItem('heybub-tour-completed') === 'true',
+    });
 
     const [isPremium, setIsPremium] = useState(() => {
         return localStorage.getItem('isPremium') === 'true';
@@ -512,11 +519,35 @@ function MainApp() {
         checkPremiumStatus();
     }, [user, online]);
 
+    // Fetch onboarding/tour state from backend
     useEffect(() => {
-        if (!babiesLoading && babies.length === 0 && online) {
+        const fetchOnboardingState = async () => {
+            if (!user || !online) {
+                setOnboardingState(prev => ({ ...prev, loaded: true }));
+                return;
+            }
+            try {
+                const info = await api.getUserInfo();
+                const state = {
+                    loaded: true,
+                    onboardingCompleted: info.onboarding_completed,
+                    tourCompleted: info.tour_completed,
+                };
+                setOnboardingState(state);
+                if (info.onboarding_completed) localStorage.setItem('heybub-onboarding-completed', 'true');
+                if (info.tour_completed) localStorage.setItem('heybub-tour-completed', 'true');
+            } catch {
+                setOnboardingState(prev => ({ ...prev, loaded: true }));
+            }
+        };
+        fetchOnboardingState();
+    }, [user, online]);
+
+    useEffect(() => {
+        if (!babiesLoading && babies.length === 0 && !onboardingState.onboardingCompleted && online) {
             setShowOnboarding(true);
         }
-    }, [babies, babiesLoading, online]);
+    }, [babies, babiesLoading, online, onboardingState.onboardingCompleted]);
 
     // Reschedule notifications on app launch and language change
     useEffect(() => {
@@ -597,7 +628,14 @@ function MainApp() {
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
         return (
             <Onboarding
-                onComplete={() => setShowOnboarding(false)}
+                onComplete={() => {
+                    setShowOnboarding(false);
+                    setOnboardingState(prev => ({ ...prev, onboardingCompleted: true }));
+                    // Give Dashboard time to mount before starting tour
+                    if (!onboardingState.tourCompleted) {
+                        setTimeout(() => setShowTour(true), 600);
+                    }
+                }}
             />
         );
     }
@@ -700,6 +738,7 @@ function MainApp() {
             </main>
 
             {showUpgradeDialog && <UpgradeDialog onClose={() => setShowUpgradeDialog(false)} />}
+            {showTour && <SpotlightTour onComplete={() => setShowTour(false)} />}
 
             {/* Bottom Navigation */}
             <nav className="bottom-nav">

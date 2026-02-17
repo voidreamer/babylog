@@ -422,6 +422,11 @@ class ApiClient {
     // Upcoming
     async getUpcoming(babyId: number): Promise<any> { return this.request(`/health/upcoming/?baby_id=${babyId}`); }
 
+    // User / Onboarding
+    async getUserInfo(): Promise<any> { return this.request('/users/me'); }
+    async completeOnboarding(): Promise<any> { return this.request('/users/me/onboarding', { method: 'POST' }); }
+    async completeTour(): Promise<any> { return this.request('/users/me/tour', { method: 'POST' }); }
+
     // Billing
     async createCheckoutSession(priceId: string, successUrl: string, cancelUrl: string): Promise<any> {
         return this.request('/billing/create-checkout-session', {

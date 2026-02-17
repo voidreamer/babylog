@@ -88,6 +88,19 @@
     "weightKg": "Weight (kg)",
     "heightCm": "Height (cm)"
   },
+  "tour": {
+    "quickActionsTitle": "Quick Actions",
+    "quickActionsDesc": "Tap to quickly log feedings, diapers, sleep, and pumping.",
+    "widgetsTitle": "Your Dashboard",
+    "widgetsDesc": "Widgets show today's activity at a glance. Tap any widget to see details or log more.",
+    "navTitle": "Navigation",
+    "navDesc": "Switch between Dashboard, Timeline, Health, Insights, and Settings.",
+    "doneTitle": "You're All Set!",
+    "doneDesc": "Start tracking your baby's day. You've got this!",
+    "next": "Next",
+    "skip": "Skip",
+    "finish": "Let's Go!"
+  },
   "permissionDenied": "View-only access",
   "permissionDeniedDesc": "Ask the baby's owner to upgrade your permissions.",
   "offlineIndicator": {

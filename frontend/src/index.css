@@ -3340,10 +3340,56 @@ h4 {
 .onboarding-container {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--space-xl));
   background: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+.onboarding-progress {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  width: 24px;
+  background: var(--primary);
+}
+
+.progress-dot.completed {
+  background: var(--primary);
+}
+
+.onboarding-back {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + var(--space-md));
+  left: var(--space-md);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  z-index: 10;
+  transition: var(--transition);
+}
+
+.onboarding-back:hover {
+  background: var(--surface-hover);
 }
 
 .onboarding-card {
@@ -3361,21 +3407,20 @@ h4 {
   text-align: left;
 }
 
-.onboarding-icon {
+.onboarding-brand-icon {
   width: 96px;
   height: 96px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--potty) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--space-lg);
-  color: var(--text);
-  box-shadow: var(--shadow-sm);
+  margin: 0 auto var(--space-md);
+  filter: drop-shadow(0 4px 12px rgba(212, 132, 156, 0.25));
+  animation: float 2s ease-in-out infinite;
 }
 
-.onboarding-icon.success {
-  background: linear-gradient(135deg, var(--diaper-light) 0%, var(--diaper) 100%);
+.onboarding-brand-title {
+  font-family: var(--font-family-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: var(--space-xs);
+  color: var(--primary);
 }
 
 .onboarding-title {
@@ -3398,6 +3443,129 @@ h4 {
   font-weight: 600;
   margin-bottom: var(--space-lg);
   text-align: center;
+}
+
+.onboarding-footer {
+  margin-top: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.onboarding-email {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Feature pills on welcome step */
+.onboarding-feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xl);
+}
+
+.onboarding-feature-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-light, var(--border));
+}
+
+.onboarding-feature-pill-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Language grid */
+.language-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+}
+
+.language-option:hover {
+  border-color: var(--primary-light);
+}
+
+.language-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(212, 132, 156, 0.2);
+}
+
+.language-flag {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.language-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Units selector */
+.units-selector {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+}
+
+.units-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 120px;
+}
+
+.units-option:hover {
+  border-color: var(--primary-light);
+}
+
+.units-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(212, 132, 156, 0.2);
+}
+
+.units-label {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.units-values {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .onboarding-section-label {
@@ -4977,10 +5145,6 @@ h4 {
   color: var(--text-muted);
 }
 
-.onboarding-theme-card {
-  max-width: 420px;
-}
-
 /* Form row for measurements */
 .form-row {
   display: grid;
@@ -4994,25 +5158,6 @@ h4 {
 
 .form-actions .btn-lg {
   width: 100%;
-}
-
-/* Onboarding section label */
-.onboarding-section-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin: var(--space-lg) 0 var(--space-md);
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.onboarding-section-label::before,
-.onboarding-section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
 }
 
 /* Gender selector */
@@ -7634,4 +7779,109 @@ a.settings-row {
 .baby-profile-save {
   width: 100%;
   margin-top: var(--space-md);
+}
+
+/* ============================================================================
+   Spotlight Tour
+   ============================================================================ */
+
+.spotlight-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+.spotlight-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tour-tooltip {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light, var(--border));
+  text-align: center;
+  z-index: 10001;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+}
+
+.tour-tooltip-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--space-sm);
+}
+
+.tour-tooltip-title {
+  font-family: var(--font-family-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-xs);
+}
+
+.tour-tooltip-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+}
+
+.tour-tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tour-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.tour-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s;
+}
+
+.tour-dot.active {
+  background: var(--primary);
+}
+
+.tour-actions {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.tour-skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.tour-next-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tour-next-btn:hover {
+  opacity: 0.9;
 }
