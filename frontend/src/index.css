@@ -3344,7 +3344,7 @@ h4 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: var(--space-md);
   padding-top: calc(env(safe-area-inset-top, 0px) + var(--space-lg));
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-md));
@@ -3352,6 +3352,20 @@ h4 {
   position: relative;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Auto-margin centers the card vertically when there's room,
+   but lets it scroll naturally when there isn't */
+.onboarding-container > * {
+  flex-shrink: 0;
+}
+
+.onboarding-container > :first-child {
+  margin-top: auto;
+}
+
+.onboarding-container > :last-child {
+  margin-bottom: auto;
 }
 
 .onboarding-progress {
