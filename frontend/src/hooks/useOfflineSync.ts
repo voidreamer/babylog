@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Network } from '@capacitor/network';
 import { api } from '../api/client';
 import {
     isOnline,
+    setNetworkOnline,
     cacheBabies, getCachedBabies,
     cacheFeedings, getCachedFeedings,
     cacheSleeps, getCachedSleeps,
@@ -95,18 +98,42 @@ export function useOfflineSync(): UseOfflineSyncReturn {
     }, [updatePendingCount]);
 
     useEffect(() => {
-        const handleOnline = () => { setOnline(true); syncPendingChanges(); };
-        const handleOffline = () => { setOnline(false); };
-
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
         updatePendingCount();
         cleanupCache().catch(e => { if (isDev) console.error('Cache cleanup failed:', e); });
 
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-        };
+        if (Capacitor.isNativePlatform()) {
+            // On iOS/Android, window online/offline events don't fire reliably in WKWebView.
+            // Use @capacitor/network for accurate native connectivity status.
+            let listenerHandle: { remove: () => void } | null = null;
+
+            Network.getStatus().then(status => {
+                setNetworkOnline(status.connected);
+                setOnline(status.connected);
+                if (status.connected) syncPendingChanges();
+            }).catch(() => {});
+
+            Network.addListener('networkStatusChange', status => {
+                setNetworkOnline(status.connected);
+                setOnline(status.connected);
+                if (status.connected) syncPendingChanges();
+            }).then(handle => {
+                listenerHandle = handle;
+            }).catch(() => {});
+
+            return () => { listenerHandle?.remove(); };
+        } else {
+            // Web: window events are reliable
+            const handleOnline = () => { setNetworkOnline(true); setOnline(true); syncPendingChanges(); };
+            const handleOffline = () => { setNetworkOnline(false); setOnline(false); };
+
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+
+            return () => {
+                window.removeEventListener('online', handleOnline);
+                window.removeEventListener('offline', handleOffline);
+            };
+        }
     }, [syncPendingChanges, updatePendingCount]);
 
     const executeAction = async (action: any) => {

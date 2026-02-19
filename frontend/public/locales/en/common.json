@@ -89,10 +89,10 @@
     "heightCm": "Height (cm)"
   },
   "tour": {
-    "quickActionsTitle": "Quick Actions",
-    "quickActionsDesc": "Tap to quickly log feedings, diapers, sleep, and pumping.",
-    "widgetsTitle": "Your Dashboard",
-    "widgetsDesc": "Widgets show today's activity at a glance. Tap any widget to see details or log more.",
+    "quickActionsTitle": "Quick Buttons",
+    "quickActionsDesc": "Tap any button to instantly log a feeding, diaper change, sleep, and more.",
+    "widgetsTitle": "Activity Widgets",
+    "widgetsDesc": "These cards show today's activity at a glance. Tap any card to log more or view details.",
     "navTitle": "Navigation",
     "navDesc": "Switch between Dashboard, Timeline, Health, Insights, and Settings.",
     "doneTitle": "You're All Set!",

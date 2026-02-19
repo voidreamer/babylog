@@ -96,10 +96,10 @@
     "syncNow": "今すぐ同期"
   },
   "tour": {
-    "quickActionsTitle": "クイックアクション",
-    "quickActionsDesc": "タップして授乳、おむつ、睡眠、搾乳をすばやく記録。",
-    "widgetsTitle": "ダッシュボード",
-    "widgetsDesc": "ウィジェットで今日の活動を一目で確認。タップして詳細を見たり記録を追加。",
+    "quickActionsTitle": "クイックボタン",
+    "quickActionsDesc": "ボタンをタップして授乳、おむつ、睡眠などをすぐに記録できます。",
+    "widgetsTitle": "アクティビティカード",
+    "widgetsDesc": "これらのカードで今日の活動を一目で確認。タップして詳細を見たり記録を追加できます。",
     "navTitle": "ナビゲーション",
     "navDesc": "ホーム、タイムライン、健康、統計、設定を切り替え。",
     "doneTitle": "準備完了！",

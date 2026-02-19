@@ -100,8 +100,16 @@ async function getDB() {
     return dbPromise;
 }
 
+// Cached network state — updated by native @capacitor/network listener on iOS/Android,
+// falls back to navigator.onLine on web.
+let _networkOnline: boolean = typeof navigator !== 'undefined' ? navigator.onLine : true;
+
 export function isOnline(): boolean {
-    return navigator.onLine;
+    return _networkOnline;
+}
+
+export function setNetworkOnline(online: boolean): void {
+    _networkOnline = online;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -477,6 +485,7 @@ export async function getCacheStats(): Promise<Record<string, number>> {
 
 export default {
     isOnline,
+    setNetworkOnline,
     cacheBabies, getCachedBabies,
     cacheFeedings, getCachedFeedings, addCachedFeeding,
     cacheSleeps, getCachedSleeps, addCachedSleep,

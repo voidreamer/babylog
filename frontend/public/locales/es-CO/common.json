@@ -96,10 +96,10 @@
     "syncNow": "Sincronizar ahora"
   },
   "tour": {
-    "quickActionsTitle": "Acciones Rápidas",
-    "quickActionsDesc": "Toca para registrar rápidamente alimentaciones, pañales, sueño y extracción.",
-    "widgetsTitle": "Tu Panel",
-    "widgetsDesc": "Los widgets muestran la actividad de hoy de un vistazo. Toca cualquiera para ver detalles o registrar más.",
+    "quickActionsTitle": "Botones Rápidos",
+    "quickActionsDesc": "Toca cualquier botón para registrar al instante una alimentación, pañal, sueño y más.",
+    "widgetsTitle": "Tarjetas de Actividad",
+    "widgetsDesc": "Estas tarjetas muestran la actividad del día de un vistazo. Toca cualquiera para registrar más o ver detalles.",
     "navTitle": "Navegación",
     "navDesc": "Cambia entre Panel, Cronología, Salud, Estadísticas y Configuración.",
     "doneTitle": "¡Todo Listo!",

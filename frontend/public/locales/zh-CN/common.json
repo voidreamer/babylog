@@ -96,10 +96,10 @@
     "syncNow": "立即同步"
   },
   "tour": {
-    "quickActionsTitle": "快捷操作",
-    "quickActionsDesc": "点击快速记录喂养、换尿布、睡眠和吸奶。",
-    "widgetsTitle": "您的仪表盘",
-    "widgetsDesc": "小组件一目了然地显示今天的活动。点击查看详情或记录更多。",
+    "quickActionsTitle": "快捷按钮",
+    "quickActionsDesc": "点击任意按钮可立即记录喂养、换尿布、睡眠等。",
+    "widgetsTitle": "活动卡片",
+    "widgetsDesc": "这些卡片一目了然地显示今天的活动。点击任意卡片可记录更多或查看详情。",
     "navTitle": "导航",
     "navDesc": "在主页、时间线、健康、统计和设置之间切换。",
     "doneTitle": "一切就绪！",

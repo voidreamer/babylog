@@ -13,17 +13,17 @@ interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
     {
-        selector: '.quick-actions',
-        titleKey: 'tour.quickActionsTitle',
-        descKey: 'tour.quickActionsDesc',
-        icon: '/icons/feeding.png',
-        position: 'bottom',
-    },
-    {
         selector: '.widgets-grid',
         titleKey: 'tour.widgetsTitle',
         descKey: 'tour.widgetsDesc',
         icon: '/icons/activity.png',
+        position: 'bottom',
+    },
+    {
+        selector: '.quick-actions',
+        titleKey: 'tour.quickActionsTitle',
+        descKey: 'tour.quickActionsDesc',
+        icon: '/icons/feeding.png',
         position: 'bottom',
     },
     {
