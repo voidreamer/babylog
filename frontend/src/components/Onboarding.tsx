@@ -4,7 +4,7 @@ import { useBaby } from '../hooks/useBaby';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';
 import AddBabyForm from './AddBabyForm';
-import { ArrowRight, ArrowLeft, LogOut, Sun, Moon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LogOut, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../i18n/languages';
@@ -127,30 +127,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </div>
     );
 
-    // Small circular prev/next buttons shown on steps 2-5
+    // Simple continue button for wizard steps (no arrows — those are for tour tooltips only)
     const renderStepNav = (canGoBack: boolean, onNext: () => void) => (
         <div className="onboarding-step-nav">
-            <button
-                className="onboarding-nav-btn"
-                onClick={() => goTo(step - 1)}
-                disabled={!canGoBack}
-            >
-                <ChevronLeft size={18} />
-            </button>
+            {canGoBack && (
+                <button
+                    className="btn btn-ghost"
+                    onClick={() => goTo(step - 1)}
+                >
+                    <ArrowLeft size={18} /> {t('auth:onboarding.back', { defaultValue: 'Back' })}
+                </button>
+            )}
             <button
                 className="btn btn-primary btn-lg"
                 onClick={onNext}
                 style={{ flex: 1, maxWidth: 220 }}
             >
                 {t('auth:onboarding.continue')} <ArrowRight size={18} />
-            </button>
-            <button
-                className="onboarding-nav-btn"
-                onClick={onNext}
-                disabled={step >= 5}
-                style={step >= 5 ? { opacity: 0, pointerEvents: 'none' } : undefined}
-            >
-                <ChevronRight size={18} />
             </button>
         </div>
     );

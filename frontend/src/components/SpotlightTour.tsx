@@ -20,9 +20,9 @@ const TOUR_STEPS: TourStep[] = [
         position: 'bottom',
     },
     {
-        selector: '.widgets-grid',
-        titleKey: 'tour.widgetsTitle',
-        descKey: 'tour.widgetsDesc',
+        selector: '.widget-add-icon',
+        titleKey: 'tour.logButtonTitle',
+        descKey: 'tour.logButtonDesc',
         icon: '/icons/activity.png',
         position: 'bottom',
     },

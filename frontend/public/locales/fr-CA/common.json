@@ -98,14 +98,14 @@
   "tour": {
     "quickActionsTitle": "Actions Rapides",
     "quickActionsDesc": "Touchez pour enregistrer rapidement les boires, couches, dodos et tirages.",
-    "widgetsTitle": "Votre Tableau de Bord",
-    "widgetsDesc": "Les widgets montrent l'activité du jour en un coup d'œil. Touchez pour voir les détails ou ajouter.",
     "navTitle": "Navigation",
     "navDesc": "Naviguez entre Accueil, Chronologie, Santé, Aperçus et Paramètres.",
     "doneTitle": "Tout est Prêt!",
     "doneDesc": "Commencez à suivre la journée de bébé. Vous êtes capable!",
     "next": "Suivant",
     "skip": "Passer",
-    "finish": "C'est Parti!"
+    "finish": "C'est Parti!",
+    "logButtonTitle": "Boutons de saisie",
+    "logButtonDesc": "Chaque widget a un bouton + pour enregistrer rapidement une entrée avec tous les détails."
   }
 }
