@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp, ChevronRight, X } from 'lucide-react';
+import { Stethoscope, Syringe, Pill, Plus, Trash2, ChevronDown, ChevronUp, ChevronRight, X, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { showApiError } from '../../utils/errorHandling';
@@ -111,11 +111,13 @@ export default function RecordsSection({ baby, visits, vaccinations, medications
 
 function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]; onDataChanged?: () => void }) {
     const { t } = useTranslation('health');
-    const { formatWeight, formatLength, parseWeight, parseLength, weightUnit, lengthUnit } = useUnits();
+    const { formatWeight, formatLength, parseWeight, parseLength, convertWeight, convertLength, weightUnit, lengthUnit } = useUnits();
     const [isAdding, setIsAdding] = useState(false);
+    const [editingId, setEditingId] = useState<number | null>(null);
     const [saving, setSaving] = useState(false);
     const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
-    const [formData, setFormData] = useState({
+
+    const emptyForm = {
         visit_date: new Date().toISOString().split('T')[0],
         visit_type: 'checkup',
         doctor_name: '',
@@ -124,7 +126,30 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
         head_cm: '',
         next_visit_date: '',
         notes: '',
-    });
+    };
+
+    const [formData, setFormData] = useState(emptyForm);
+
+    const startEdit = (visit: any) => {
+        setEditingId(visit.id);
+        setIsAdding(true);
+        setFormData({
+            visit_date: visit.visit_date || '',
+            visit_type: visit.visit_type || 'checkup',
+            doctor_name: visit.doctor_name || '',
+            weight_kg: visit.weight_kg ? String(convertWeight(visit.weight_kg).toFixed(2)) : '',
+            height_cm: visit.height_cm ? String(convertLength(visit.height_cm).toFixed(1)) : '',
+            head_cm: visit.head_cm ? String(convertLength(visit.head_cm).toFixed(1)) : '',
+            next_visit_date: visit.next_visit_date || '',
+            notes: visit.notes || '',
+        });
+    };
+
+    const cancelForm = () => {
+        setIsAdding(false);
+        setEditingId(null);
+        setFormData(emptyForm);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -143,19 +168,14 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                 notes: formData.notes || null,
             };
 
-            await api.createDoctorVisit(data);
-            toast.success(t('toast_visitRecorded'));
-            setFormData({
-                visit_date: new Date().toISOString().split('T')[0],
-                visit_type: 'checkup',
-                doctor_name: '',
-                weight_kg: '',
-                height_cm: '',
-                head_cm: '',
-                next_visit_date: '',
-                notes: '',
-            });
-            setIsAdding(false);
+            if (editingId) {
+                await api.updateDoctorVisit(editingId, data);
+                toast.success(t('toast_visitUpdated'));
+            } else {
+                await api.createDoctorVisit(data);
+                toast.success(t('toast_visitRecorded'));
+            }
+            cancelForm();
             if (onDataChanged) onDataChanged();
         } catch (error) {
             showApiError(error, t('failedToSave'), t);
@@ -168,6 +188,7 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
         try {
             await api.deleteDoctorVisit(id);
             toast.success(t('toast_visitDeleted'));
+            if (editingId === id) cancelForm();
             if (onDataChanged) onDataChanged();
         } catch (error) {
             showApiError(error, t('failedToDelete'), t);
@@ -180,10 +201,17 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
             {visits?.length > 0 ? (
                 <div className="records-list">
                     {visits.map((visit) => (
-                        <div key={visit.id} className="record-item">
+                        <div key={visit.id} className={`record-item${editingId === visit.id ? ' record-item-editing' : ''}`}>
                             <div className="record-header">
                                 <span className="record-date">{formatDate(visit.visit_date)}</span>
                                 <span className="record-type">{t(`records.visitTypes.${visit.visit_type}`)}</span>
+                                <button
+                                    className="record-edit"
+                                    onClick={() => startEdit(visit)}
+                                    aria-label={t('records.editVisit')}
+                                >
+                                    <Pencil size={14} />
+                                </button>
                                 <button
                                     className="record-delete"
                                     onClick={() => setConfirmDeleteId(visit.id)}
@@ -215,6 +243,12 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
 
             {isAdding ? (
                 <form onSubmit={handleSubmit} className="record-form">
+                    {editingId && (
+                        <div className="record-form-edit-banner">
+                            <Pencil size={14} />
+                            {t('records.editingVisit')}
+                        </div>
+                    )}
                     <div className="record-form-row">
                         <input
                             type="date"
@@ -283,12 +317,12 @@ function VisitsPanel({ baby, visits, onDataChanged }: { baby: any; visits: any[]
                     />
                     <div className="record-form-actions">
                         <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
-                            {saving ? t('common:saving') : t('records.saveVisit')}
+                            {saving ? t('common:saving') : editingId ? t('records.updateVisit') : t('records.saveVisit')}
                         </button>
                         <button
                             type="button"
                             className="btn btn-ghost btn-sm"
-                            onClick={() => setIsAdding(false)}
+                            onClick={cancelForm}
                         >
                             {t('common:cancel')}
                         </button>
