@@ -12,7 +12,7 @@
     "chart": "ग्रोथ चार्ट",
     "weightKg": "वज़न (kg)",
     "heightCm": "लंबाई (cm)",
-    "percentile": "पर्सेंटाइल",
+    "percentile": "{{value}}वाँ पर्सेंटाइल",
     "hideChart": "चार्ट छिपाएं",
     "fullChart": "पूरा चार्ट",
     "logMeasurement": "माप दर्ज करें",
@@ -31,7 +31,9 @@
     "refPercentile": "50वाँ पर्सेंटाइल: {{value}} {{unit}}",
     "month": "महीना",
     "months": "महीने",
-    "current": "वर्तमान"
+    "current": "वर्तमान",
+    "median": "मध्यिका: {{value}}{{unit}}",
+    "range": "सामान्य सीमा: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
     "title": "दाँत निकलना",

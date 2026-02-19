@@ -12,7 +12,7 @@
     "chart": "生长曲线",
     "weightKg": "体重 (kg)",
     "heightCm": "身高 (cm)",
-    "percentile": "百分位",
+    "percentile": "第{{value}}百分位",
     "hideChart": "隐藏曲线",
     "fullChart": "完整曲线",
     "logMeasurement": "记录测量",
@@ -31,7 +31,9 @@
     "refPercentile": "第50百分位：{{value}} {{unit}}",
     "month": "月",
     "months": "个月",
-    "current": "当前"
+    "current": "当前",
+    "median": "中位数: {{value}}{{unit}}",
+    "range": "正常范围: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
     "title": "出牙",

@@ -12,7 +12,7 @@
     "chart": "Tabla de crecimiento",
     "weightKg": "Peso (kg)",
     "heightCm": "Altura (cm)",
-    "percentile": "percentil",
+    "percentile": "Percentil {{value}}",
     "hideChart": "Ocultar gráfico",
     "fullChart": "Gráfico completo",
     "logMeasurement": "Registrar medición",
@@ -31,7 +31,9 @@
     "refPercentile": "Percentil 50: {{value}} {{unit}}",
     "month": "Mes",
     "months": "meses",
-    "current": "actual"
+    "current": "actual",
+    "median": "Mediana: {{value}}{{unit}}",
+    "range": "Rango normal: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
     "title": "Dentición",
