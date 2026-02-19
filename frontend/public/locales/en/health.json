@@ -12,7 +12,7 @@
     "chart": "Growth Chart",
     "weightKg": "Weight (kg)",
     "heightCm": "Height (cm)",
-    "percentile": "percentile",
+    "percentile": "{{value}}th percentile",
     "hideChart": "Hide Chart",
     "fullChart": "Full Chart",
     "logMeasurement": "Log Measurement",
@@ -32,7 +32,9 @@
     "month": "Month",
     "months": "months",
     "current": "current",
-    "birthDateRequired": "Please set baby's birth date first"
+    "birthDateRequired": "Please set baby's birth date first",
+    "median": "Median: {{value}}{{unit}}",
+    "range": "Normal range: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
     "title": "Teething",

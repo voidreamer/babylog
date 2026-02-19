@@ -12,7 +12,7 @@
     "chart": "成長チャート",
     "weightKg": "体重 (kg)",
     "heightCm": "身長 (cm)",
-    "percentile": "パーセンタイル",
+    "percentile": "{{value}}パーセンタイル",
     "hideChart": "チャートを非表示",
     "fullChart": "詳細チャート",
     "logMeasurement": "測定値を記録",
@@ -31,7 +31,9 @@
     "refPercentile": "50パーセンタイル：{{value}} {{unit}}",
     "month": "月",
     "months": "ヶ月",
-    "current": "現在"
+    "current": "現在",
+    "median": "中央値: {{value}}{{unit}}",
+    "range": "正常範囲: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
     "title": "歯の成長",

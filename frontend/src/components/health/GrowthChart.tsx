@@ -15,27 +15,58 @@ import { differenceInMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
-// Parse a date string safely, handling both "YYYY-MM-DD" and full ISO timestamps
+// Consistent chart colors — use CSS custom properties for theme awareness
+const CHART_COLORS = {
+    percentileLine: 'var(--growth-percentile, #8b7ec8)',
+    percentileLineLight: 'var(--growth-percentile-light, rgba(139, 126, 200, 0.3))',
+    percentileArea: 'var(--growth-percentile-area, rgba(139, 126, 200, 0.1))',
+    baby: 'var(--primary)',
+};
+
 function toLocalDate(dateStr: string): Date {
     const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
     return new Date(datePart + 'T12:00:00');
 }
 
-// Calculate age in whole months from birth date to measurement date
 function getAgeMonths(birthDate: string, measurementDate: string): number {
     return differenceInMonths(toLocalDate(measurementDate), toLocalDate(birthDate));
+}
+
+/** Calculate which percentile a value falls at, given the WHO band values */
+function calculatePercentile(value: number, whoRow: { p3: number; p15: number; p50: number; p85: number; p97: number } | undefined): number | null {
+    if (!whoRow) return null;
+    const bands: [number, number][] = [
+        [whoRow.p3, 3],
+        [whoRow.p15, 15],
+        [whoRow.p50, 50],
+        [whoRow.p85, 85],
+        [whoRow.p97, 97],
+    ];
+
+    if (value <= bands[0][0]) return Math.max(1, Math.round(3 * (value / bands[0][0])));
+    if (value >= bands[bands.length - 1][0]) return Math.min(99, 97 + Math.round(2 * ((value - bands[bands.length - 1][0]) / bands[bands.length - 1][0])));
+
+    // Linear interpolation between bands
+    for (let i = 0; i < bands.length - 1; i++) {
+        const [lowVal, lowP] = bands[i];
+        const [highVal, highP] = bands[i + 1];
+        if (value >= lowVal && value <= highVal) {
+            const ratio = (value - lowVal) / (highVal - lowVal);
+            return Math.round(lowP + ratio * (highP - lowP));
+        }
+    }
+    return 50;
 }
 
 interface HealthGrowthChartProps { baby: any; growthRecords: any[]; }
 export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartProps) {
     const { t } = useTranslation('health');
-    const { convertWeight, convertLength, weightUnit, lengthUnit, isImperial } = useUnits();
-    const [metric, setMetric] = useState('weight'); // 'weight' or 'height'
+    const { convertWeight, convertLength, weightUnit, lengthUnit } = useUnits();
+    const [metric, setMetric] = useState('weight');
 
     const birthDate = baby?.birth_date;
     const gender = baby?.gender || 'boy';
 
-    // Get appropriate WHO data based on metric and gender
     const whoData = useMemo(() => {
         if (metric === 'weight') {
             return gender === 'girl' ? WHO_WEIGHT_GIRLS : WHO_WEIGHT_BOYS;
@@ -43,7 +74,6 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
         return gender === 'girl' ? WHO_HEIGHT_GIRLS : WHO_HEIGHT_BOYS;
     }, [metric, gender]);
 
-    // Process baby's data points
     const babyData = useMemo(() => {
         if (!growthRecords || !birthDate) return [];
 
@@ -57,7 +87,6 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
             .filter(r => r.ageMonths >= 0 && r.ageMonths <= 24)
             .sort((a, b) => a.ageMonths - b.ageMonths);
 
-        // Keep only the latest entry per month
         const byMonth = new Map<number, typeof points[0]>();
         for (const p of points) {
             byMonth.set(p.ageMonths, p);
@@ -67,9 +96,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
 
     const conv = metric === 'weight' ? convertWeight : convertLength;
 
-    // Combine WHO data with baby's data for charting
     const chartData = useMemo(() => {
-        // Start with WHO data (convert to display units)
         const data: any[] = whoData.map(row => ({
             ageMonths: row.months,
             p3: row.p3 != null ? conv(row.p3) : null,
@@ -78,21 +105,24 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
             p85: row.p85 != null ? conv(row.p85) : null,
             p97: row.p97 != null ? conv(row.p97) : null,
             babyValue: null,
+            // Keep raw WHO values for percentile calculation
+            _whoRaw: row,
+            _babyRaw: null as number | null,
         }));
 
-        // Add baby's data points (convert to display units)
         babyData.forEach(point => {
             const displayValue = conv(point.value);
             const existing = data.find(d => d.ageMonths === point.ageMonths);
             if (existing) {
                 existing.babyValue = displayValue;
+                existing._babyRaw = point.value;
             } else {
-                // Insert at right position
                 const insertIdx = data.findIndex(d => d.ageMonths > point.ageMonths);
+                const newPoint = { ageMonths: point.ageMonths, babyValue: displayValue, _babyRaw: point.value };
                 if (insertIdx === -1) {
-                    data.push({ ageMonths: point.ageMonths, babyValue: displayValue });
+                    data.push(newPoint);
                 } else {
-                    data.splice(insertIdx, 0, { ageMonths: point.ageMonths, babyValue: displayValue });
+                    data.splice(insertIdx, 0, newPoint);
                 }
             }
         });
@@ -101,25 +131,46 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     }, [whoData, babyData, conv]);
 
     const unit = metric === 'weight' ? weightUnit : lengthUnit;
-    const label = metric === 'weight' ? t('growth.weight') : t('growth.height');
 
-    // Custom tooltip
     const CustomTooltip = ({ active, payload }: any) => {
         if (!active || !payload || !payload.length) return null;
         const data = payload[0]?.payload;
         if (!data) return null;
 
+        // Calculate percentile if baby data exists at this point
+        let percentile: number | null = null;
+        if (data._babyRaw && data._whoRaw) {
+            percentile = calculatePercentile(data._babyRaw, data._whoRaw);
+        }
+
         return (
             <div className="growth-chart-tooltip">
-                <div className="growth-chart-tooltip-title">{data.ageMonths} {t('growth.months')}</div>
-                {data.babyValue && (
+                <div className="growth-chart-tooltip-title">
+                    {data.ageMonths} {t('growth.months')}
+                </div>
+                {data.babyValue != null && (
                     <div className="growth-chart-tooltip-baby">
                         {t('growth.baby', { value: data.babyValue, unit })}
+                        {percentile != null && (
+                            <span className="growth-chart-tooltip-percentile">
+                                {' '}— {t('growth.percentile', { value: percentile, defaultValue: '{{value}}th percentile' })}
+                            </span>
+                        )}
                     </div>
                 )}
-                {data.p50 && (
+                {data.p50 != null && (
                     <div className="growth-chart-tooltip-ref">
-                        {t('growth.refPercentile', { value: data.p50?.toFixed(1), unit })}
+                        {t('growth.median', { value: data.p50?.toFixed(1), unit, defaultValue: 'Median: {{value}}{{unit}}' })}
+                    </div>
+                )}
+                {data.p3 != null && data.p97 != null && (
+                    <div className="growth-chart-tooltip-ref">
+                        {t('growth.range', {
+                            low: data.p3?.toFixed(1),
+                            high: data.p97?.toFixed(1),
+                            unit,
+                            defaultValue: 'Normal range: {{low}}–{{high}}{{unit}}'
+                        })}
                     </div>
                 )}
             </div>
@@ -188,7 +239,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                             <Area
                                 dataKey="p97"
                                 stroke="none"
-                                fill="rgba(139, 92, 246, 0.1)"
+                                fill={CHART_COLORS.percentileArea}
                                 fillOpacity={1}
                             />
                             <Area
@@ -201,32 +252,36 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                             {/* Percentile lines */}
                             <Line
                                 dataKey="p3"
-                                stroke="rgba(139, 92, 246, 0.3)"
+                                stroke={CHART_COLORS.percentileLineLight}
                                 strokeWidth={1}
                                 dot={false}
                                 strokeDasharray="4 4"
+                                name="3rd"
                             />
                             <Line
                                 dataKey="p50"
-                                stroke="rgba(139, 92, 246, 0.6)"
+                                stroke={CHART_COLORS.percentileLine}
                                 strokeWidth={2}
                                 dot={false}
+                                name="50th"
                             />
                             <Line
                                 dataKey="p97"
-                                stroke="rgba(139, 92, 246, 0.3)"
+                                stroke={CHART_COLORS.percentileLineLight}
                                 strokeWidth={1}
                                 dot={false}
                                 strokeDasharray="4 4"
+                                name="97th"
                             />
 
-                            {/* Baby's data line and points */}
+                            {/* Baby's data */}
                             <Line
                                 dataKey="babyValue"
-                                stroke="var(--primary)"
+                                stroke={CHART_COLORS.baby}
                                 strokeWidth={2}
                                 dot={{ fill: 'var(--primary)', strokeWidth: 2, r: 5 }}
                                 connectNulls={true}
+                                name="Baby"
                             />
                         </ComposedChart>
                     </ResponsiveContainer>
