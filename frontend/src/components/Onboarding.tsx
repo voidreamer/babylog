@@ -130,21 +130,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     // Simple continue button for wizard steps (no arrows — those are for tour tooltips only)
     const renderStepNav = (canGoBack: boolean, onNext: () => void) => (
         <div className="onboarding-step-nav">
-            {canGoBack && (
-                <button
-                    className="btn btn-ghost"
-                    onClick={() => goTo(step - 1)}
-                >
-                    <ArrowLeft size={18} /> {t('auth:onboarding.back', { defaultValue: 'Back' })}
-                </button>
-            )}
+            <div className="onboarding-step-nav-slot">
+                {canGoBack && (
+                    <button
+                        className="onboarding-back-btn"
+                        onClick={() => goTo(step - 1)}
+                    >
+                        <ArrowLeft size={16} /> {t('auth:onboarding.back', { defaultValue: 'Back' })}
+                    </button>
+                )}
+            </div>
             <button
                 className="btn btn-primary btn-lg"
                 onClick={onNext}
-                style={{ flex: 1, maxWidth: 220 }}
             >
                 {t('auth:onboarding.continue')} <ArrowRight size={18} />
             </button>
+            <div className="onboarding-step-nav-slot" />
         </div>
     );
 

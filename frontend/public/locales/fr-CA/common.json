@@ -106,6 +106,10 @@
     "skip": "Passer",
     "finish": "C'est Parti!",
     "logButtonTitle": "Boutons de saisie",
-    "logButtonDesc": "Chaque widget a un bouton + pour enregistrer rapidement une entrée avec tous les détails."
+    "logButtonDesc": "Chaque widget a un bouton + pour enregistrer rapidement une entrée avec tous les détails.",
+    "timelineTitle": "Chronologie",
+    "timelineDesc": "Consultez toutes vos activités enregistrées sur un calendrier visuel. Touchez un jour pour voir les détails.",
+    "healthTitle": "Santé et croissance",
+    "healthDesc": "Suivez les courbes de croissance, vaccinations, médicaments et jalons au même endroit."
   }
 }

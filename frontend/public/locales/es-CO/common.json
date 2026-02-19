@@ -106,6 +106,10 @@
     "skip": "Omitir",
     "finish": "¡Vamos!",
     "logButtonTitle": "Botones de registro",
-    "logButtonDesc": "Cada widget tiene un botón + para registrar una entrada rápidamente con todos los detalles."
+    "logButtonDesc": "Cada widget tiene un botón + para registrar una entrada rápidamente con todos los detalles.",
+    "timelineTitle": "Línea de tiempo",
+    "timelineDesc": "Mira todas tus actividades registradas en un calendario visual. Toca cualquier día para ver los detalles.",
+    "healthTitle": "Salud y crecimiento",
+    "healthDesc": "Sigue las curvas de crecimiento, vacunas, medicamentos e hitos en un solo lugar."
   }
 }

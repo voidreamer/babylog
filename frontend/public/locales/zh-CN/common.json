@@ -106,6 +106,10 @@
     "skip": "跳过",
     "finish": "开始吧！",
     "logButtonTitle": "记录按钮",
-    "logButtonDesc": "每个小组件都有一个+按钮，可以快速记录详细信息。"
+    "logButtonDesc": "每个小组件都有一个+按钮，可以快速记录详细信息。",
+    "timelineTitle": "时间线",
+    "timelineDesc": "在可视化日历上查看所有记录的活动。点击任意一天查看详情。",
+    "healthTitle": "健康与成长",
+    "healthDesc": "在一个地方跟踪成长曲线、疫苗接种、药物和里程碑。"
   }
 }

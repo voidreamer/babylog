@@ -3490,29 +3490,35 @@ h4 {
   margin-top: var(--space-lg);
 }
 
-.onboarding-nav-btn {
+.onboarding-step-nav-slot {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.onboarding-step-nav-slot:last-child {
+  justify-content: flex-end;
+}
+
+.onboarding-back-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+  gap: 4px;
+  padding: 8px 12px;
+  border: none;
+  background: none;
   color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
+  border-radius: var(--radius-md);
   transition: var(--transition);
-  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.onboarding-nav-btn:hover {
-  border-color: var(--primary-light);
-  color: var(--primary);
-}
-
-.onboarding-nav-btn:disabled {
-  opacity: 0;
-  pointer-events: none;
+.onboarding-back-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
 }
 
 /* Feature pills on welcome step */

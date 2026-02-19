@@ -99,7 +99,11 @@
     "skip": "Skip",
     "finish": "Let's Go!",
     "logButtonTitle": "Log Buttons",
-    "logButtonDesc": "Each widget has a + button to quickly log an entry with full details."
+    "logButtonDesc": "Each widget has a + button to quickly log an entry with full details.",
+    "timelineTitle": "Timeline",
+    "timelineDesc": "See all your logged activities on a visual calendar. Tap any day to view details.",
+    "healthTitle": "Health & Growth",
+    "healthDesc": "Track growth charts, vaccinations, medications, and milestones all in one place."
   },
   "permissionDenied": "View-only access",
   "permissionDeniedDesc": "Ask the baby's owner to upgrade your permissions.",
