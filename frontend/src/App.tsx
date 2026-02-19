@@ -816,7 +816,7 @@ function MainApp() {
             </main>
 
             {showUpgradeDialog && <UpgradeDialog onClose={() => setShowUpgradeDialog(false)} />}
-            {showTour && <SpotlightTour onComplete={() => setShowTour(false)} />}
+            {showTour && <SpotlightTour onComplete={() => setShowTour(false)} onNavigateTab={setActiveTab} />}
 
             {/* Bottom Navigation */}
             <nav className="bottom-nav">

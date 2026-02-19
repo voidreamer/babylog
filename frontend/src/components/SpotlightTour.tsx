@@ -9,9 +9,12 @@ interface TourStep {
     descKey: string;
     icon: string;
     position: 'top' | 'bottom' | 'center';
+    /** Optional: navigate to this tab before showing the step */
+    tab?: string;
 }
 
 const TOUR_STEPS: TourStep[] = [
+    // Dashboard steps
     {
         selector: '.quick-actions',
         titleKey: 'tour.quickActionsTitle',
@@ -20,19 +23,40 @@ const TOUR_STEPS: TourStep[] = [
         position: 'bottom',
     },
     {
-        selector: '.widgets-grid',
-        titleKey: 'tour.widgetsTitle',
-        descKey: 'tour.widgetsDesc',
+        selector: '.widget-add-icon',
+        titleKey: 'tour.logButtonTitle',
+        descKey: 'tour.logButtonDesc',
         icon: '/icons/activity.png',
         position: 'bottom',
     },
+    // Timeline step
+    {
+        selector: '.timeline-calendar',
+        titleKey: 'tour.timelineTitle',
+        descKey: 'tour.timelineDesc',
+        icon: '/icons/sleep.png',
+        position: 'bottom',
+        tab: 'timeline',
+    },
+    // Health step
+    {
+        selector: '.health-section-primary',
+        titleKey: 'tour.healthTitle',
+        descKey: 'tour.healthDesc',
+        icon: '/icons/growth.png',
+        position: 'bottom',
+        tab: 'health',
+    },
+    // Navigation bar
     {
         selector: 'nav.bottom-nav',
         titleKey: 'tour.navTitle',
         descKey: 'tour.navDesc',
         icon: '/icons/logo.png',
         position: 'top',
+        tab: 'home',
     },
+    // Done
     {
         selector: null,
         titleKey: 'tour.doneTitle',
@@ -44,26 +68,40 @@ const TOUR_STEPS: TourStep[] = [
 
 interface SpotlightTourProps {
     onComplete: () => void;
+    onNavigateTab?: (tab: string) => void;
 }
 
-export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
+export default function SpotlightTour({ onComplete, onNavigateTab }: SpotlightTourProps) {
     const { t } = useTranslation('common');
     const [currentStep, setCurrentStep] = useState(0);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
     const [resolvedSteps, setResolvedSteps] = useState<TourStep[]>([]);
+    const [ready, setReady] = useState(true);
     const tooltipRef = useRef<HTMLDivElement>(null);
 
-    // Resolve which steps are actually visible
+    // Resolve which steps are actually visible (initial pass)
     useEffect(() => {
-        const steps = TOUR_STEPS.filter((s) => {
-            if (!s.selector) return true;
-            return document.querySelector(s.selector) !== null;
-        });
-        setResolvedSteps(steps);
+        // Include all steps — we'll navigate to tabs as needed
+        setResolvedSteps(TOUR_STEPS);
     }, []);
 
-    const measureTarget = useCallback(() => {
+    // Handle tab navigation when step changes
+    useEffect(() => {
         if (resolvedSteps.length === 0) return;
+        const step = resolvedSteps[currentStep];
+        if (step?.tab && onNavigateTab) {
+            setReady(false);
+            onNavigateTab(step.tab);
+            // Wait for tab content to render
+            const timer = setTimeout(() => setReady(true), 300);
+            return () => clearTimeout(timer);
+        } else {
+            setReady(true);
+        }
+    }, [currentStep, resolvedSteps, onNavigateTab]);
+
+    const measureTarget = useCallback(() => {
+        if (resolvedSteps.length === 0 || !ready) return;
         const step = resolvedSteps[currentStep];
         if (step?.selector) {
             const el = document.querySelector(step.selector);
@@ -73,7 +111,7 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
             }
         }
         setTargetRect(null);
-    }, [currentStep, resolvedSteps]);
+    }, [currentStep, resolvedSteps, ready]);
 
     useEffect(() => {
         measureTarget();
@@ -88,8 +126,10 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
     const finish = useCallback(() => {
         localStorage.setItem('heybub-tour-completed', 'true');
         try { api.completeTour(); } catch { /* fire-and-forget */ }
+        // Navigate back to home before completing
+        if (onNavigateTab) onNavigateTab('home');
         onComplete();
-    }, [onComplete]);
+    }, [onComplete, onNavigateTab]);
 
     const handleNext = () => {
         if (currentStep >= resolvedSteps.length - 1) {
@@ -99,7 +139,7 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
         }
     };
 
-    if (resolvedSteps.length === 0) return null;
+    if (resolvedSteps.length === 0 || !ready) return null;
 
     const step = resolvedSteps[currentStep];
     const isCenter = step.position === 'center' || !targetRect;
@@ -133,7 +173,6 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
 
         if (step.position === 'bottom' && targetRect) {
             const spaceBelow = vh - targetRect.bottom - spotPadding - tooltipGap;
-            // If not enough room below (~180px for tooltip), flip to above
             if (spaceBelow < 180 && targetRect.top > 200) {
                 style.bottom = vh - targetRect.top + spotPadding + tooltipGap;
             } else {
@@ -151,7 +190,6 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
         return style;
     };
 
-    // Cutout rect values (clamped to viewport)
     const cutout = targetRect ? {
         x: Math.max(0, targetRect.left - spotPadding),
         y: Math.max(0, targetRect.top - spotPadding),
@@ -161,7 +199,6 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
 
     return (
         <div className="spotlight-tour" onClick={(e) => { if (e.target === e.currentTarget) handleNext(); }}>
-            {/* SVG overlay with mask cutout */}
             <svg className="spotlight-overlay" viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`} preserveAspectRatio="none">
                 <defs>
                     <mask id="spotlight-mask">
@@ -187,7 +224,6 @@ export default function SpotlightTour({ onComplete }: SpotlightTourProps) {
                 />
             </svg>
 
-            {/* Tooltip */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentStep}
