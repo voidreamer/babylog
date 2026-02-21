@@ -12,7 +12,7 @@
     "chart": "Growth Chart",
     "weightKg": "Weight (kg)",
     "heightCm": "Height (cm)",
-    "percentile": "{{value}}th percentile",
+    "percentile": "percentile",
     "hideChart": "Hide Chart",
     "fullChart": "Full Chart",
     "logMeasurement": "Log Measurement",

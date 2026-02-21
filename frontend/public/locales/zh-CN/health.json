@@ -12,7 +12,7 @@
     "chart": "生长曲线",
     "weightKg": "体重 (kg)",
     "heightCm": "身高 (cm)",
-    "percentile": "第{{value}}百分位",
+    "percentile": "百分位",
     "hideChart": "隐藏曲线",
     "fullChart": "完整曲线",
     "logMeasurement": "记录测量",

@@ -12,7 +12,7 @@
     "chart": "成長チャート",
     "weightKg": "体重 (kg)",
     "heightCm": "身長 (cm)",
-    "percentile": "{{value}}パーセンタイル",
+    "percentile": "パーセンタイル",
     "hideChart": "チャートを非表示",
     "fullChart": "詳細チャート",
     "logMeasurement": "測定値を記録",

@@ -12,7 +12,7 @@
     "chart": "График роста",
     "weightKg": "Вес (kg)",
     "heightCm": "Рост (cm)",
-    "percentile": "{{value}}-й перцентиль",
+    "percentile": "перцентиль",
     "hideChart": "Скрыть график",
     "fullChart": "Полный график",
     "logMeasurement": "Записать измерение",

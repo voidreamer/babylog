@@ -12,7 +12,7 @@
     "chart": "Tabla de crecimiento",
     "weightKg": "Peso (kg)",
     "heightCm": "Altura (cm)",
-    "percentile": "Percentil {{value}}",
+    "percentile": "percentil",
     "hideChart": "Ocultar gráfico",
     "fullChart": "Gráfico completo",
     "logMeasurement": "Registrar medición",

@@ -8,11 +8,23 @@ import { calculateAgeInMonths } from '../../utils/ageUtils';
 // Lazy load the GrowthChart component - only loads when user clicks "Full Chart"
 const GrowthChart = lazy(() => import('./GrowthChart'));
 
-// Calculate percentile position (0-100) based on WHO data
-function getPercentilePosition(value: number | null, p3: number | null, p97: number | null): number | null {
-    if (!value || !p3 || !p97) return null;
-    const position = ((value - p3) / (p97 - p3)) * 100;
-    return Math.max(0, Math.min(100, position));
+// Calculate percentile position (0-100) based on WHO data — 5-band interpolation
+function getPercentilePosition(value: number | null, whoRow: { p3: number; p15: number; p50: number; p85: number; p97: number } | null): number | null {
+    if (!value || !whoRow) return null;
+    const bands: [number, number][] = [
+        [whoRow.p3, 3], [whoRow.p15, 15], [whoRow.p50, 50], [whoRow.p85, 85], [whoRow.p97, 97],
+    ];
+    if (value <= bands[0][0]) return Math.max(1, Math.round(3 * (value / bands[0][0])));
+    if (value >= bands[bands.length - 1][0]) return Math.min(99, 97 + Math.round(2 * ((value - bands[bands.length - 1][0]) / bands[bands.length - 1][0])));
+    for (let i = 0; i < bands.length - 1; i++) {
+        const [lowVal, lowP] = bands[i];
+        const [highVal, highP] = bands[i + 1];
+        if (value >= lowVal && value <= highVal) {
+            const ratio = (value - lowVal) / (highVal - lowVal);
+            return Math.round(lowP + ratio * (highP - lowP));
+        }
+    }
+    return 50;
 }
 
 // Get status color based on percentile
@@ -66,12 +78,12 @@ export default function GrowthCard({ baby, growthRecords, onRecordAdded, whoData
         babyAgeMonths
     ) : null;
 
-    // Calculate percentile positions
+    // Calculate percentile positions (5-band interpolation matching chart)
     const weightPosition = latestRecord?.weight_kg && weightWho
-        ? getPercentilePosition(parseFloat(latestRecord.weight_kg), weightWho.p3, weightWho.p97)
+        ? getPercentilePosition(parseFloat(latestRecord.weight_kg), weightWho)
         : null;
     const heightPosition = latestRecord?.height_cm && heightWho
-        ? getPercentilePosition(parseFloat(latestRecord.height_cm), heightWho.p3, heightWho.p97)
+        ? getPercentilePosition(parseFloat(latestRecord.height_cm), heightWho)
         : null;
 
     return (

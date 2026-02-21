@@ -12,7 +12,7 @@
     "chart": "ग्रोथ चार्ट",
     "weightKg": "वज़न (kg)",
     "heightCm": "लंबाई (cm)",
-    "percentile": "{{value}}वाँ पर्सेंटाइल",
+    "percentile": "पर्सेंटाइल",
     "hideChart": "चार्ट छिपाएं",
     "fullChart": "पूरा चार्ट",
     "logMeasurement": "माप दर्ज करें",
