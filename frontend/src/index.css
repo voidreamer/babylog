@@ -6096,8 +6096,20 @@ h4 {
   text-transform: capitalize;
 }
 
-.record-delete {
+.record-edit {
   margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+}
+
+.record-edit:hover {
+  color: var(--primary);
+}
+
+.record-delete {
   background: none;
   border: none;
   color: var(--text-muted);
@@ -6107,6 +6119,23 @@ h4 {
 
 .record-delete:hover {
   color: var(--danger);
+}
+
+.record-item-editing {
+  border-color: var(--primary);
+  background: var(--primary-alpha-5, rgba(var(--primary-rgb, 99, 102, 241), 0.05));
+}
+
+.record-form-edit-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--primary-alpha-5, rgba(var(--primary-rgb, 99, 102, 241), 0.05));
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .record-doctor,
