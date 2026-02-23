@@ -753,14 +753,16 @@ function MainApp() {
 
     return (
         <div className="app-container">
-            {/* Floating dark mode toggle — top right, subtle */}
-            <button
-                className="theme-toggle-float"
-                onClick={toggleTheme}
-                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-                {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
+            {/* Floating dark mode toggle — dashboard only */}
+            {activeTab === 'home' && (
+                <button
+                    className="theme-toggle-float"
+                    onClick={toggleTheme}
+                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                    {theme === 'dark' ? '☀️' : '🌙'}
+                </button>
+            )}
             <OfflineIndicator
                 online={online}
                 syncing={syncing}
