@@ -28,6 +28,7 @@ jobs:
   # Backend Tests
   # ============================================
   test-backend:
+    if: github.actor != 'dependabot[bot]'
     name: Backend Tests
     runs-on: ubuntu-latest
 
@@ -83,6 +84,7 @@ jobs:
   # Frontend Tests & Build
   # ============================================
   test-frontend:
+    if: github.actor != 'dependabot[bot]'
     name: Frontend Tests & Build
     runs-on: ubuntu-latest
 

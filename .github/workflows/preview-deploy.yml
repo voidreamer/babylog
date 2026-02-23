@@ -32,6 +32,7 @@ env:
 
 jobs:
   deploy-preview:
+    if: github.actor != 'dependabot[bot]'
     name: Deploy Preview
     runs-on: ubuntu-latest
     timeout-minutes: 10

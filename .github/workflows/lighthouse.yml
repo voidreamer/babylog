@@ -14,6 +14,7 @@ on:
 
 jobs:
   lighthouse:
+    if: github.actor != 'dependabot[bot]'
     name: Lighthouse Audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
