@@ -238,23 +238,11 @@ body {
 
 #root {
   height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-main {
-  flex: 1;
-  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-/* Timeline tab: main shouldn't scroll — timeline handles its own inner scroll */
-main:has(.timeline-calendar) {
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: none;
 }
 
 /* ============================================================================
