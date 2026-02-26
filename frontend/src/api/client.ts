@@ -44,6 +44,14 @@ function shouldUseFallback(error: unknown): boolean {
     return !isOnline() || (error as Error)?.name === 'AbortError';
 }
 
+/** Detect network errors (fetch failed, timeout, connection refused) */
+function isNetworkError(error: unknown): boolean {
+    if (!isOnline()) return true;
+    if (error instanceof TypeError) return true; // fetch() throws TypeError on network failure
+    const msg = (error as Error)?.message?.toLowerCase() || '';
+    return msg.includes('fetch') || msg.includes('network') || msg.includes('timeout') || msg.includes('aborted');
+}
+
 /**
  * Build a dashboard-shaped response from IDB cache.
  * Used offline so widgets and DailySummary show real data.
@@ -294,15 +302,17 @@ class ApiClient {
     }
 
     async createFeeding(data: any): Promise<any> {
+        const queueOffline = async () => {
+            await queueForSync({ type: 'CREATE_FEEDING', endpoint: '/feedings/', method: 'POST', data });
+            const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            await addCachedFeeding(optimisticEntry);
+            return optimisticEntry;
+        };
+        if (!isOnline()) return queueOffline();
         try {
             return await this.request('/feedings/', { method: 'POST', body: JSON.stringify(data) });
         } catch (error) {
-            if (!isOnline()) {
-                await queueForSync({ type: 'CREATE_FEEDING', endpoint: '/feedings/', method: 'POST', data });
-                const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
-                await addCachedFeeding(optimisticEntry);
-                return optimisticEntry;
-            }
+            if (isNetworkError(error)) return queueOffline();
             throw error;
         }
     }
@@ -324,10 +334,16 @@ class ApiClient {
     }
 
     async createDiaper(data: any): Promise<any> {
+        if (!isOnline()) {
+            await queueForSync({ type: 'CREATE_DIAPER', endpoint: '/diapers/', method: 'POST', data });
+            const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            await addCachedDiaper(optimisticEntry);
+            return optimisticEntry;
+        }
         try {
             return await this.request('/diapers/', { method: 'POST', body: JSON.stringify(data) });
         } catch (error) {
-            if (!isOnline()) {
+            if (isNetworkError(error)) {
                 await queueForSync({ type: 'CREATE_DIAPER', endpoint: '/diapers/', method: 'POST', data });
                 const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
                 await addCachedDiaper(optimisticEntry);
@@ -356,10 +372,16 @@ class ApiClient {
     async getCurrentSleep(babyId: number): Promise<any> { return this.request(`/sleeps/current?baby_id=${babyId}`); }
 
     async createSleep(data: any): Promise<any> {
+        if (!isOnline()) {
+            await queueForSync({ type: 'CREATE_SLEEP', endpoint: '/sleeps/', method: 'POST', data });
+            const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            await addCachedSleep(optimisticEntry);
+            return optimisticEntry;
+        }
         try {
             return await this.request('/sleeps/', { method: 'POST', body: JSON.stringify(data) });
         } catch (error) {
-            if (!isOnline()) {
+            if (isNetworkError(error)) {
                 await queueForSync({ type: 'CREATE_SLEEP', endpoint: '/sleeps/', method: 'POST', data });
                 const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
                 await addCachedSleep(optimisticEntry);
@@ -387,10 +409,16 @@ class ApiClient {
     }
 
     async createPumping(data: any): Promise<any> {
+        if (!isOnline()) {
+            await queueForSync({ type: 'CREATE_PUMPING', endpoint: '/pumpings/', method: 'POST', data });
+            const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
+            await addCachedPumping(optimisticEntry);
+            return optimisticEntry;
+        }
         try {
             return await this.request('/pumpings/', { method: 'POST', body: JSON.stringify(data) });
         } catch (error) {
-            if (!isOnline()) {
+            if (isNetworkError(error)) {
                 await queueForSync({ type: 'CREATE_PUMPING', endpoint: '/pumpings/', method: 'POST', data });
                 const optimisticEntry = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() };
                 await addCachedPumping(optimisticEntry);
@@ -434,7 +462,11 @@ class ApiClient {
         try { const visits = await this.request(`/health/doctor-visits/?baby_id=${babyId}`); if (visits) await cacheDoctorVisits(babyId, visits); return visits; }
         catch (error) { if (shouldUseFallback(error)) { return await getCachedDoctorVisits(babyId); } throw error; }
     }
-    async createDoctorVisit(data: any): Promise<any> { return this.request('/health/doctor-visits/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createDoctorVisit(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_DOCTOR_VISIT', endpoint: '/health/doctor-visits/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/doctor-visits/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_DOCTOR_VISIT', endpoint: '/health/doctor-visits/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async deleteDoctorVisit(id: number): Promise<any> { return this.request(`/health/doctor-visits/${id}`, { method: 'DELETE' }); }
     async updateDoctorVisit(id: number, data: any): Promise<any> { return this.request(`/health/doctor-visits/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
@@ -444,7 +476,11 @@ class ApiClient {
         try { const vaccinations = await this.request(`/health/vaccinations/?baby_id=${babyId}`); if (vaccinations) await cacheVaccinations(babyId, vaccinations); return vaccinations; }
         catch (error) { if (shouldUseFallback(error)) { return await getCachedVaccinations(babyId); } throw error; }
     }
-    async createVaccination(data: any): Promise<any> { return this.request('/health/vaccinations/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createVaccination(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_VACCINATION', endpoint: '/health/vaccinations/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/vaccinations/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_VACCINATION', endpoint: '/health/vaccinations/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async deleteVaccination(id: number): Promise<any> { return this.request(`/health/vaccinations/${id}`, { method: 'DELETE' }); }
     async updateVaccination(id: number, data: any): Promise<any> { return this.request(`/health/vaccinations/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
@@ -454,7 +490,11 @@ class ApiClient {
         try { const medications = await this.request(`/health/medications/?baby_id=${babyId}&active_only=${activeOnly}`); if (medications) await cacheMedications(babyId, medications); return medications; }
         catch (error) { if (shouldUseFallback(error)) { const cached = await getCachedMedications(babyId); return activeOnly ? cached.filter((m: any) => m.is_active) : cached; } throw error; }
     }
-    async createMedication(data: any): Promise<any> { return this.request('/health/medications/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createMedication(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_MEDICATION', endpoint: '/health/medications/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/medications/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_MEDICATION', endpoint: '/health/medications/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async deleteMedication(id: number): Promise<any> { return this.request(`/health/medications/${id}`, { method: 'DELETE' }); }
     async updateMedication(id: number, data: any): Promise<any> { return this.request(`/health/medications/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async toggleMedicationActive(id: number): Promise<any> { return this.request(`/health/medications/${id}/toggle`, { method: 'PATCH' }); }
@@ -465,7 +505,11 @@ class ApiClient {
         try { const records = await this.request(`/health/growth/?baby_id=${babyId}`); if (records) await cacheGrowthRecords(babyId, records); return records; }
         catch (error) { if (shouldUseFallback(error)) { return await getCachedGrowthRecords(babyId); } throw error; }
     }
-    async createGrowthRecord(data: any): Promise<any> { return this.request('/health/growth/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createGrowthRecord(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_GROWTH', endpoint: '/health/growth/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/growth/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_GROWTH', endpoint: '/health/growth/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async deleteGrowthRecord(id: number): Promise<any> { return this.request(`/health/growth/${id}`, { method: 'DELETE' }); }
     async updateGrowthRecord(id: number, data: any): Promise<any> { return this.request(`/health/growth/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
@@ -477,7 +521,7 @@ class ApiClient {
     }
     async createPottyLog(data: any): Promise<any> {
         try { return await this.request('/activities/potty', { method: 'POST', body: JSON.stringify(data) }); }
-        catch (error) { if (!isOnline()) { await queueForSync({ type: 'CREATE_POTTY', endpoint: '/activities/potty', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'potty'); return o; } throw error; }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_POTTY', endpoint: '/activities/potty', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'potty'); return o; } throw error; }
     }
     async deletePottyLog(id: number): Promise<any> { return this.request(`/activities/potty/${id}`, { method: 'DELETE' }); }
     async updatePottyLog(id: number, data: any): Promise<any> { return this.request(`/activities/potty/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
@@ -490,7 +534,7 @@ class ApiClient {
     }
     async createTummyTime(data: any): Promise<any> {
         try { return await this.request('/activities/tummy-time', { method: 'POST', body: JSON.stringify(data) }); }
-        catch (error) { if (!isOnline()) { await queueForSync({ type: 'CREATE_TUMMY_TIME', endpoint: '/activities/tummy-time', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'tummy_time'); return o; } throw error; }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_TUMMY_TIME', endpoint: '/activities/tummy-time', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'tummy_time'); return o; } throw error; }
     }
     async deleteTummyTime(id: number): Promise<any> { return this.request(`/activities/tummy-time/${id}`, { method: 'DELETE' }); }
     async updateTummyTime(id: number, data: any): Promise<any> { return this.request(`/activities/tummy-time/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
@@ -503,7 +547,7 @@ class ApiClient {
     }
     async createBath(data: any): Promise<any> {
         try { return await this.request('/activities/baths', { method: 'POST', body: JSON.stringify(data) }); }
-        catch (error) { if (!isOnline()) { await queueForSync({ type: 'CREATE_BATH', endpoint: '/activities/baths', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'bath'); return o; } throw error; }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_BATH', endpoint: '/activities/baths', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'bath'); return o; } throw error; }
     }
     async deleteBath(id: number): Promise<any> { return this.request(`/activities/baths/${id}`, { method: 'DELETE' }); }
     async updateBath(id: number, data: any): Promise<any> { return this.request(`/activities/baths/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
@@ -543,7 +587,7 @@ class ApiClient {
     }
     async createSupplement(data: any): Promise<any> {
         try { return await this.request('/activities/supplements', { method: 'POST', body: JSON.stringify(data) }); }
-        catch (error) { if (!isOnline()) { await queueForSync({ type: 'CREATE_SUPPLEMENT', endpoint: '/activities/supplements', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'supplement'); return o; } throw error; }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_SUPPLEMENT', endpoint: '/activities/supplements', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'supplement'); return o; } throw error; }
     }
     async deleteSupplement(id: number): Promise<any> { return this.request(`/activities/supplements/${id}`, { method: 'DELETE' }); }
     async updateSupplement(id: number, data: any): Promise<any> { return this.request(`/activities/supplements/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
@@ -595,7 +639,11 @@ class ApiClient {
         try { return await this.request(`/health/teeth/?baby_id=${babyId}`); }
         catch (error) { if (shouldUseFallback(error)) return []; throw error; }
     }
-    async createTooth(data: any): Promise<any> { return this.request('/health/teeth/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createTooth(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_TOOTH', endpoint: '/health/teeth/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/teeth/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_TOOTH', endpoint: '/health/teeth/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async updateTooth(id: number, data: any): Promise<any> { return this.request(`/health/teeth/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async deleteTooth(id: number): Promise<any> { return this.request(`/health/teeth/${id}`, { method: 'DELETE' }); }
 
@@ -605,7 +653,11 @@ class ApiClient {
         try { return await this.request(`/health/sick-days/?baby_id=${babyId}`); }
         catch (error) { if (shouldUseFallback(error)) return []; throw error; }
     }
-    async createSickDay(data: any): Promise<any> { return this.request('/health/sick-days/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createSickDay(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_SICK_DAY', endpoint: '/health/sick-days/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/sick-days/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_SICK_DAY', endpoint: '/health/sick-days/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async updateSickDay(id: number, data: any): Promise<any> { return this.request(`/health/sick-days/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async deleteSickDay(id: number): Promise<any> { return this.request(`/health/sick-days/${id}`, { method: 'DELETE' }); }
 
@@ -615,7 +667,11 @@ class ApiClient {
         try { return await this.request(`/health/allergies/?baby_id=${babyId}`); }
         catch (error) { if (shouldUseFallback(error)) return []; throw error; }
     }
-    async createAllergy(data: any): Promise<any> { return this.request('/health/allergies/', { method: 'POST', body: JSON.stringify(data) }); }
+    async createAllergy(data: any): Promise<any> {
+        if (!isOnline()) { await queueForSync({ type: 'CREATE_ALLERGY', endpoint: '/health/allergies/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; }
+        try { return await this.request('/health/allergies/', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_ALLERGY', endpoint: '/health/allergies/', method: 'POST', data }); return { ...data, id: `temp_${Date.now()}` }; } throw error; }
+    }
     async updateAllergy(id: number, data: any): Promise<any> { return this.request(`/health/allergies/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
     async deleteAllergy(id: number): Promise<any> { return this.request(`/health/allergies/${id}`, { method: 'DELETE' }); }
 
