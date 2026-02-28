@@ -1,5 +1,5 @@
-# Huckle CI/CD Pipeline
-# Runs tests, then deploys infrastructure and code to AWS
+# HeyBub CI/CD Pipeline
+# Runs tests, then deploys backend to OCI VM and frontend to AWS S3+CloudFront
 # - main branch -> production environment
 
 name: CI/CD Pipeline
@@ -140,7 +140,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # ----- Terraform Infrastructure -----
+      # ----- Terraform (frontend infra only) -----
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -155,10 +155,6 @@ jobs:
         working-directory: infra
         env:
           TF_VAR_environment: prod
-          TF_VAR_database_url: ${{ secrets.DATABASE_URL }}
-          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
-          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS }}
-          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
           TF_VAR_custom_domain: app.heybub.app
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
@@ -169,10 +165,6 @@ jobs:
         working-directory: infra
         env:
           TF_VAR_environment: prod
-          TF_VAR_database_url: ${{ secrets.DATABASE_URL }}
-          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
-          TF_VAR_cors_origins: ${{ secrets.CORS_ORIGINS }}
-          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
           TF_VAR_custom_domain: app.heybub.app
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
@@ -183,48 +175,54 @@ jobs:
         id: tf-outputs
         working-directory: infra
         run: |
-          echo "lambda_name=$(terraform output -raw lambda_function_name)" >> $GITHUB_OUTPUT
           echo "s3_bucket=$(terraform output -raw s3_bucket_name)" >> $GITHUB_OUTPUT
           echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
-          echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
           echo "preview_cf_id=$(terraform output -raw preview_cloudfront_id 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
           echo "preview_cf_domain=$(terraform output -raw preview_cloudfront_domain 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
 
-      # ----- Backend Deploy -----
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Package backend
+      # ----- Backend Deploy to OCI VM -----
+      - name: Set up SSH key
         run: |
-          cd backend
-          pip install -r requirements.txt -t package/
-          cp -r app package/
-          cp -r alembic package/
-          cp alembic.ini package/
-          cd package && zip -r ../lambda.zip . -q
+          mkdir -p ~/.ssh
+          echo "${{ secrets.OCI_SSH_PRIVATE_KEY }}" > ~/.ssh/oci_deploy
+          chmod 600 ~/.ssh/oci_deploy
+          ssh-keyscan -H ${{ secrets.OCI_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy backend to OCI VM
+        run: |
+          SSH_CMD="ssh -i ~/.ssh/oci_deploy -o StrictHostKeyChecking=no ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}"
+          RSYNC_CMD="rsync -avz --delete -e 'ssh -i ~/.ssh/oci_deploy -o StrictHostKeyChecking=no'"
+
+          # Sync backend code, docker-compose, and Caddyfile
+          $RSYNC_CMD backend/ ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/opt/heybub/backend/
+          $RSYNC_CMD docker-compose.prod.yml ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/opt/heybub/docker-compose.prod.yml
+          $RSYNC_CMD Caddyfile ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/opt/heybub/Caddyfile
+
+          # Build and restart
+          $SSH_CMD "cd /opt/heybub && docker compose -f docker-compose.prod.yml build --no-cache api"
+          $SSH_CMD "cd /opt/heybub && docker compose -f docker-compose.prod.yml up -d"
+
+      - name: Health check (API)
+        run: |
+          echo "Waiting for API to become healthy..."
+          for i in $(seq 1 30); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://api.heybub.app/api/health 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "API health check passed (attempt $i)"
+              break
+            fi
+            echo "Attempt $i: HTTP $HTTP_CODE - retrying in 2s..."
+            sleep 2
+          done
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "API health check failed after 30 attempts"
+            exit 1
+          fi
 
       - name: Run database migrations
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL secret not set - skipping migrations"
-            exit 0
-          fi
-          cd backend
-          pip install -r requirements.txt -q
-          alembic upgrade head
-
-      - name: Deploy backend to Lambda
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
-            --zip-file fileb://backend/lambda.zip \
-            --no-cli-pager
-          aws lambda wait function-updated \
-            --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
+          SSH_CMD="ssh -i ~/.ssh/oci_deploy -o StrictHostKeyChecking=no ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}"
+          $SSH_CMD "cd /opt/heybub && docker compose -f docker-compose.prod.yml exec -T api alembic upgrade head"
 
       # ----- Frontend Deploy -----
       - name: Set up Node.js
@@ -236,7 +234,7 @@ jobs:
 
       - name: Build frontend
         env:
-          VITE_API_URL: ${{ steps.tf-outputs.outputs.api_url }}
+          VITE_API_URL: https://api.heybub.app
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
@@ -264,16 +262,15 @@ jobs:
           sleep 30
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://app.heybub.app)
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "❌ Health check failed! HTTP $HTTP_CODE"
-            echo "🔄 Triggering rollback..."
+            echo "Frontend health check failed! HTTP $HTTP_CODE"
             exit 1
           fi
-          echo "✅ Frontend health check passed (HTTP $HTTP_CODE)"
+          echo "Frontend health check passed (HTTP $HTTP_CODE)"
 
-      - name: Health check (API)
-        run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.tf-outputs.outputs.api_url }}/health 2>/dev/null || echo "000")
-          echo "API health check: HTTP $HTTP_CODE"
+      # ----- Cleanup -----
+      - name: Clean up SSH key
+        if: always()
+        run: rm -f ~/.ssh/oci_deploy
 
       # ----- Notifications -----
       - name: Notify deploy success
@@ -282,7 +279,7 @@ jobs:
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
             -d parse_mode=HTML \
-            -d text="🚀 <b>HeyBub Tracker</b> deployed to <b>PRODUCTION</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A📝 ${{ github.event.head_commit.message }}%0A🔗 https://app.heybub.app" \
+            -d text="<b>HeyBub Tracker</b> deployed to <b>PRODUCTION</b>%0A%0A<code>${{ github.sha }}</code>%0A${{ github.actor }}%0A${{ github.event.head_commit.message }}%0Ahttps://app.heybub.app" \
             --no-progress-meter > /dev/null || true
 
       - name: Notify deploy failure
@@ -291,16 +288,16 @@ jobs:
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
             -d parse_mode=HTML \
-            -d text="🔥 <b>HeyBub Tracker</b> PRODUCTION deploy <b>FAILED</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -d text="<b>HeyBub Tracker</b> PRODUCTION deploy <b>FAILED</b>%0A%0A<code>${{ github.sha }}</code>%0A${{ github.actor }}%0Ahttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             --no-progress-meter > /dev/null || true
 
       - name: Output deployment info
         run: |
           echo "## Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** https://api.heybub.app (OCI VM)" >> $GITHUB_STEP_SUMMARY
           echo "**Frontend:** https://app.heybub.app" >> $GITHUB_STEP_SUMMARY
-          echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**API:** https://api.heybub.app/api" >> $GITHUB_STEP_SUMMARY
           if [ -n "${{ steps.tf-outputs.outputs.preview_cf_id }}" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### Preview Infrastructure" >> $GITHUB_STEP_SUMMARY

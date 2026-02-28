@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from mangum import Mangum
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -16,7 +15,7 @@ Base.metadata.create_all(bind=engine)
 settings = get_settings()
 
 # Rate limiter - uses client IP for identification
-# In production behind API Gateway, use X-Forwarded-For header
+# In production behind Caddy, use X-Forwarded-For header
 def get_real_client_ip(request: Request) -> str:
     """Extract real client IP, accounting for proxies."""
     forwarded = request.headers.get("X-Forwarded-For")
@@ -102,7 +101,3 @@ def health_check():
 def root():
     """Root endpoint."""
     return {"message": "HeyBub Baby Tracker API", "docs": "/docs"}
-
-
-# Lambda handler
-handler = Mangum(app, lifespan="off")

@@ -24,62 +24,6 @@ resource "aws_sns_topic_subscription" "email" {
 }
 
 # ----------------------------------------------------------------------------
-# Lambda Alarms
-# ----------------------------------------------------------------------------
-
-resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  alarm_name          = "${var.project_name}-lambda-errors-${var.environment}"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "Errors"
-  namespace           = "AWS/Lambda"
-  period              = 300 # 5 minutes
-  statistic           = "Sum"
-  threshold           = 5
-  alarm_description   = "Lambda errors > 5 in 5 minutes"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
-
-  dimensions = {
-    FunctionName = aws_lambda_function.api.function_name
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
-  alarm_name          = "${var.project_name}-lambda-duration-${var.environment}"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 2
-  metric_name         = "Duration"
-  namespace           = "AWS/Lambda"
-  period              = 300
-  statistic           = "Average"
-  threshold           = 10000 # 10 seconds
-  alarm_description   = "Lambda avg duration > 10s for 10 minutes"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-
-  dimensions = {
-    FunctionName = aws_lambda_function.api.function_name
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
-  alarm_name          = "${var.project_name}-lambda-throttles-${var.environment}"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "Throttles"
-  namespace           = "AWS/Lambda"
-  period              = 300
-  statistic           = "Sum"
-  threshold           = 1
-  alarm_description   = "Lambda throttled"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-
-  dimensions = {
-    FunctionName = aws_lambda_function.api.function_name
-  }
-}
-
-# ----------------------------------------------------------------------------
 # CloudFront Alarms
 # ----------------------------------------------------------------------------
 

@@ -7,27 +7,9 @@ output "frontend_url" {
   value       = "https://${aws_cloudfront_distribution.frontend.domain_name}"
 }
 
-output "api_url" {
-  description = "API Gateway URL"
-  value       = aws_apigatewayv2_api.api.api_endpoint
-}
-
 # ============================================================================
 # Deploy Commands
 # ============================================================================
-
-output "deploy_backend_command" {
-  description = "Command to deploy backend to Lambda"
-  value       = <<-EOT
-    # From the backend directory:
-    pip install -r requirements.txt -t package/
-    cp -r app package/
-    cd package && zip -r ../lambda.zip . && cd ..
-    aws lambda update-function-code \
-      --function-name ${aws_lambda_function.api.function_name} \
-      --zip-file fileb://lambda.zip
-  EOT
-}
 
 output "deploy_frontend_command" {
   description = "Command to deploy frontend to S3"
@@ -53,9 +35,4 @@ output "s3_bucket_name" {
 output "cloudfront_distribution_id" {
   description = "CloudFront distribution ID"
   value       = aws_cloudfront_distribution.frontend.id
-}
-
-output "lambda_function_name" {
-  description = "Lambda function name"
-  value       = aws_lambda_function.api.function_name
 }

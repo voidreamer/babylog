@@ -15,6 +15,7 @@ infra/backups/
 .env
 .env.local
 .env.production
+.env.prod
 *.tfvars
 !*.tfvars.example
 

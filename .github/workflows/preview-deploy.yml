@@ -1,6 +1,7 @@
 # Preview Deployments
 # Deploys frontend to a unique URL for each pull request
 # Preview URL: https://previews.heybub.app/pr-{number}/
+# Backend: uses production API (no staging Lambda)
 
 name: Preview Deploy
 
@@ -23,12 +24,10 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  PYTHON_VERSION: "3.11"
   AWS_REGION: ca-central-1
   PREVIEW_BUCKET: heybub-previews
   PREVIEW_CF_ID: ${{ secrets.PREVIEW_CLOUDFRONT_ID }}
   PREVIEW_DOMAIN: previews.heybub.app
-  STAGING_LAMBDA: simplebaby-api-staging
 
 jobs:
   deploy-preview:
@@ -43,7 +42,6 @@ jobs:
         run: |
           if [ -z "$PREVIEW_CF_ID" ]; then
             echo "PREVIEW_CLOUDFRONT_ID secret not set — preview infra not provisioned yet."
-            echo "This is expected on the first PR before terraform apply creates the preview resources."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
@@ -69,47 +67,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # ----- Backend Deploy to Staging -----
-      - name: Set up Python
-        if: steps.check-infra.outputs.skip != 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Package backend
-        if: steps.check-infra.outputs.skip != 'true'
-        run: |
-          cd backend
-          pip install -r requirements.txt -t package/
-          cp -r app package/
-          cp -r alembic package/
-          cp alembic.ini package/
-          cd package && zip -r ../lambda.zip . -q
-
-      - name: Run database migrations
-        if: steps.check-infra.outputs.skip != 'true'
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL secret not set - skipping migrations"
-            exit 0
-          fi
-          cd backend
-          pip install -r requirements.txt -q
-          alembic upgrade head
-
-      - name: Deploy backend to staging Lambda
-        if: steps.check-infra.outputs.skip != 'true'
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ env.STAGING_LAMBDA }} \
-            --zip-file fileb://backend/lambda.zip \
-            --no-cli-pager
-          aws lambda wait function-updated \
-            --function-name ${{ env.STAGING_LAMBDA }}
-          echo "Staging Lambda updated"
-
       # ----- Frontend Deploy -----
       - name: Install dependencies
         if: steps.check-infra.outputs.skip != 'true'
@@ -120,7 +77,7 @@ jobs:
         if: steps.check-infra.outputs.skip != 'true'
         working-directory: frontend
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING }}
+          VITE_API_URL: https://api.heybub.app
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
@@ -161,7 +118,7 @@ jobs:
               `| **URL** | [${previewUrl}](${previewUrl}) |`,
               `| **Branch** | \`${context.payload.pull_request.head.ref}\` |`,
               `| **Commit** | \`${context.sha.slice(0, 7)}\` |`,
-              `| **Backend** | Staging API |`,
+              `| **Backend** | Production API |`,
               ``,
               `> Preview will be removed when this PR is closed.`,
             ].join('\n');
