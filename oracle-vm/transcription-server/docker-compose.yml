@@ -1,0 +1,14 @@
+services:
+  transcription:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - TRANSCRIPTION_SECRET=${TRANSCRIPTION_SECRET:-dev-secret}
+      - WHISPER_MODEL=base
+      - COMPUTE_TYPE=int8
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
