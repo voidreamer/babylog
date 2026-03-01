@@ -309,6 +309,83 @@ final class DashboardViewModel {
         }
     }
 
+    // MARK: - Recent Activities
+
+    func recentActivities(theme: ResolvedTheme) -> [RecentActivity] {
+        guard let data = dashboardData else { return [] }
+        var activities: [RecentActivity] = []
+
+        if let feeding = data.lastFeeding, let date = parseISO8601(feeding.time) {
+            var detail = feeding.type.rawValue.capitalized
+            if let ml = feeding.amountMl, ml > 0 { detail += " · \(Int(ml)) ml" }
+            if let dur = feeding.durationMinutes, dur > 0 { detail += " · \(Int(dur)) min" }
+            activities.append(RecentActivity(
+                id: UUID(), type: "feeding", icon: "fork.knife",
+                title: "Feeding", detail: detail, time: date, colors: theme.feeding
+            ))
+        }
+
+        if let diaper = data.lastDiaper, let date = parseISO8601(diaper.time) {
+            activities.append(RecentActivity(
+                id: UUID(), type: "diaper", icon: "circle.dotted",
+                title: "Diaper", detail: diaper.type.rawValue.capitalized, time: date, colors: theme.diaper
+            ))
+        }
+
+        if let sleep = data.lastSleep, let date = parseISO8601(sleep.startTime) {
+            let detail: String? = sleep.durationMinutes.map { "\(Int($0)) min" }
+            activities.append(RecentActivity(
+                id: UUID(), type: "sleep", icon: "moon.zzz.fill",
+                title: "Sleep", detail: detail, time: date, colors: theme.sleep
+            ))
+        }
+
+        if let pumping = data.lastPumping, let date = parseISO8601(pumping.time) {
+            var detail: String? = nil
+            if let ml = pumping.amountMl, ml > 0 { detail = "\(Int(ml)) ml" }
+            activities.append(RecentActivity(
+                id: UUID(), type: "pumping", icon: "drop.fill",
+                title: "Pumping", detail: detail, time: date, colors: theme.pumping
+            ))
+        }
+
+        if let potty = data.lastPotty, let date = parseISO8601(potty.time) {
+            activities.append(RecentActivity(
+                id: UUID(), type: "potty", icon: "toilet.fill",
+                title: "Potty", detail: potty.result.rawValue.capitalized, time: date, colors: theme.potty
+            ))
+        }
+
+        if let tummy = data.lastTummy, let date = parseISO8601(tummy.startTime) {
+            let detail: String? = tummy.durationMinutes.map { "\(Int($0)) min" }
+            activities.append(RecentActivity(
+                id: UUID(), type: "tummy", icon: "figure.play",
+                title: "Tummy Time", detail: detail, time: date, colors: theme.tummy
+            ))
+        }
+
+        if let bath = data.lastBath, let date = parseISO8601(bath.time) {
+            activities.append(RecentActivity(
+                id: UUID(), type: "bath", icon: "bathtub.fill",
+                title: "Bath", detail: nil, time: date, colors: theme.bath
+            ))
+        }
+
+        if let supp = data.lastSupplement, let date = parseISO8601(supp.time) {
+            activities.append(RecentActivity(
+                id: UUID(), type: "supplement", icon: "pill.fill",
+                title: supp.name, detail: supp.dosage, time: date,
+                colors: ActivityColorSet(
+                    main: AppColors.Light.supplementAction,
+                    bg: AppColors.Light.feedingBg,
+                    text: AppColors.Light.feedingText
+                )
+            ))
+        }
+
+        return activities.sorted { $0.time > $1.time }
+    }
+
     // MARK: - Private Helpers
 
     private func performQuickLog(babyId: Int, toast: String, action: () async throws -> Void) async {
@@ -317,14 +394,26 @@ final class DashboardViewModel {
             try await action()
             HapticFeedback.success()
             quickLogSuccess = toast
+
+            // Dismiss toast after delay (non-blocking)
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
+                self.quickLogSuccess = nil
+            }
+
+            // Small delay so backend commits before we reload
+            try? await Task.sleep(for: .milliseconds(300))
+
+            // Reload data sequentially
             await loadDashboard(babyId: babyId)
-            try? await Task.sleep(for: .seconds(2))
-            quickLogSuccess = nil
+            await loadAnalytics(babyId: babyId)
         } catch {
             HapticFeedback.error()
             quickLogSuccess = "Failed to log"
-            try? await Task.sleep(for: .seconds(2))
-            quickLogSuccess = nil
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
+                self.quickLogSuccess = nil
+            }
         }
         isQuickLogging = false
     }

@@ -28,11 +28,11 @@ struct ContentView: View {
 struct MainTabView: View {
     @Environment(AppState.self) private var appState
     @Environment(NetworkMonitor.self) private var networkMonitor
-    @State private var selectedTab = 0
 
     var body: some View {
+        @Bindable var appState = appState
         ZStack(alignment: .top) {
-            TabView(selection: $selectedTab) {
+            TabView(selection: $appState.selectedTab) {
                 NavigationStack {
                     DashboardView()
                 }

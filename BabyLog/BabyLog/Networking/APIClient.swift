@@ -202,6 +202,7 @@ final class APIClient {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.timeoutInterval = 15
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // Bearer auth

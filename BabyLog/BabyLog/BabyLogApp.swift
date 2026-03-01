@@ -92,6 +92,7 @@ final class AppState {
     var apiClient = APIClient()
     var babies: [Baby] = []
     var selectedBaby: Baby?
+    var selectedTab: Int = 0
     var isLoading = false
     var error: String?
 
