@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var viewModel = DashboardViewModel()
 
@@ -127,8 +128,10 @@ struct DashboardView: View {
             viewModel = DashboardViewModel(apiClient: appState.apiClient)
             await refreshData()
         }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            Task { await refreshData() }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task { await refreshData() }
+            }
         }
     }
 

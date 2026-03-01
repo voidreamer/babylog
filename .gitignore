@@ -25,6 +25,10 @@ infra/backups/
 *.swo
 *~
 
+# Xcode user data
+xcuserdata/
+*.xcuserdatad
+
 # OS
 .DS_Store
 Thumbs.db
@@ -55,6 +59,9 @@ CURSOR.md
 # Internal docs (not for public repos)
 docs/INFRASTRUCTURE.md
 docs/HEALTH_REDESIGN_PLAN.md
+
+# One-off helper scripts
+BabyLog/*.rb
 
 staticdesign
 encrypted
