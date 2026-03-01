@@ -1,0 +1,125 @@
+/* BabyLog - English Localizable Strings */
+
+// MARK: - Common
+
+"common.save" = "Save";
+"common.cancel" = "Cancel";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.add" = "Add";
+"common.done" = "Done";
+"common.loading" = "Loading…";
+"common.error" = "Error";
+"common.retry" = "Retry";
+"common.confirm" = "Confirm";
+"common.yes" = "Yes";
+"common.no" = "No";
+"common.ok" = "OK";
+"common.close" = "Close";
+"common.back" = "Back";
+"common.next" = "Next";
+"common.notes" = "Notes";
+"common.time" = "Time";
+"common.date" = "Date";
+"common.today" = "Today";
+"common.yesterday" = "Yesterday";
+"common.noData" = "No data";
+"common.offline" = "Offline";
+"common.minutes" = "minutes";
+"common.hours" = "hours";
+
+// Activity names
+"common.feeding" = "Feeding";
+"common.diaper" = "Diaper";
+"common.sleep" = "Sleep";
+"common.pumping" = "Pumping";
+"common.potty" = "Potty";
+"common.tummyTime" = "Tummy Time";
+"common.bath" = "Bath";
+"common.supplement" = "Supplement";
+
+// Feeding types
+"common.breast" = "Breast";
+"common.bottle" = "Bottle";
+"common.formula" = "Formula";
+"common.breastmilkBottle" = "Breastmilk Bottle";
+"common.solid" = "Solid";
+
+// Diaper types
+"common.pee" = "Pee";
+"common.poo" = "Poo";
+"common.mixed" = "Mixed";
+
+// MARK: - Dashboard
+
+"dashboard.title" = "Dashboard";
+"dashboard.goodMorning" = "Good Morning";
+"dashboard.goodAfternoon" = "Good Afternoon";
+"dashboard.goodEvening" = "Good Evening";
+"dashboard.dailySummary" = "Daily Summary";
+"dashboard.lastFed" = "Last Fed";
+"dashboard.lastDiaper" = "Last Diaper";
+"dashboard.lastSleep" = "Last Sleep";
+"dashboard.sleeping" = "Sleeping";
+"dashboard.comingUp" = "Coming Up";
+"dashboard.widgetSettings" = "Widget Settings";
+"dashboard.noActivities" = "No activities yet";
+
+// MARK: - Health
+
+"health.title" = "Health";
+"health.growth" = "Growth";
+"health.vaccinations" = "Vaccinations";
+"health.medications" = "Medications";
+"health.teeth" = "Teeth";
+"health.allergies" = "Allergies";
+"health.sickDays" = "Sick Days";
+"health.doctorVisits" = "Doctor Visits";
+"health.weight" = "Weight";
+"health.height" = "Height";
+"health.headCircumference" = "Head Circumference";
+"health.addRecord" = "Add Record";
+
+// MARK: - Settings
+
+"settings.title" = "Settings";
+"settings.babyProfile" = "Baby Profile";
+"settings.caregivers" = "Caregivers";
+"settings.notifications" = "Notifications";
+"settings.appearance" = "Appearance";
+"settings.theme" = "Theme";
+"settings.language" = "Language";
+"settings.units" = "Units";
+"settings.metric" = "Metric";
+"settings.imperial" = "Imperial";
+"settings.account" = "Account";
+"settings.signOut" = "Sign Out";
+"settings.deleteAccount" = "Delete Account";
+"settings.exportData" = "Export Data";
+"settings.premium" = "Premium";
+"settings.about" = "About";
+"settings.version" = "Version";
+
+// MARK: - Auth
+
+"auth.signIn" = "Sign In";
+"auth.signInWithGoogle" = "Sign in with Google";
+"auth.signingIn" = "Signing in…";
+"auth.welcome" = "Welcome";
+"auth.tagline" = "Track your baby's day with ease";
+
+// MARK: - Insights
+
+"insights.title" = "Insights";
+"insights.predictions" = "Predictions";
+"insights.patterns" = "Patterns";
+"insights.trends" = "Trends";
+"insights.benchmarks" = "Benchmarks";
+"insights.todayVsAverage" = "Today vs Average";
+"insights.restPlanner" = "Rest Planner";
+"insights.notEnoughData" = "Not enough data";
+
+// MARK: - Timeline
+
+"timeline.title" = "Timeline";
+"timeline.noEvents" = "No events";
