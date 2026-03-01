@@ -35,6 +35,8 @@
 	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0Z3NsZmdsc2tmbXpha2Vpem9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzMTQwNzcsImV4cCI6MjA1MDg5MDA3N30.p21YkseLo7vioFZLQBe0BBPegeJBWhxWqjruQVe9bIw</string>
 	<key>SUPABASE_URL</key>
 	<string>https://ztgslfglskfmzakeizoq.supabase.co</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

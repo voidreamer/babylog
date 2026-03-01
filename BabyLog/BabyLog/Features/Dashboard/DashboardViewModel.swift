@@ -1,3 +1,4 @@
+import ActivityKit
 import Foundation
 import Observation
 
@@ -91,6 +92,7 @@ private struct QuickBathRequest: Encodable {
 @MainActor
 final class DashboardViewModel {
     var dashboardData: DashboardData?
+    var analyticsData: AnalyticsData?
     var upcomingItems: [UpcomingItem] = []
     var isLoading = false
     var error: String?
@@ -130,8 +132,27 @@ final class DashboardViewModel {
                 localDate: localDate,
                 tzOffset: tzOffset
             )
+
+            // Write snapshot to shared defaults for widgets/intents
+            SharedDefaults.dashboardSnapshot = dashboardData
+            SharedDefaults.selectedBabyId = babyId
+            SharedDefaults.lastSyncDate = Date()
         } catch {
             self.error = error.localizedDescription
+        }
+    }
+
+    func loadAnalytics(babyId: Int) async {
+        do {
+            let tzOffset = TimeZone.current.secondsFromGMT() / 60
+            analyticsData = try await apiClient.request(
+                Endpoints.Analytics.data(babyId: babyId, days: 7, tzOffset: tzOffset)
+            )
+
+            // Write predictions to shared defaults for widgets
+            SharedDefaults.analyticsSnapshot = analyticsData?.predictions
+        } catch {
+            // Non-critical, silently fail
         }
     }
 
@@ -194,18 +215,26 @@ final class DashboardViewModel {
         }
     }
 
-    func quickLogStartSleep(babyId: Int) async {
+    func quickLogStartSleep(babyId: Int, babyName: String? = nil) async {
+        let now = isoNow()
         let request = QuickSleepRequest(
             babyId: babyId,
-            startTime: isoNow()
+            startTime: now
         )
 
         await performQuickLog(babyId: babyId, toast: "Sleep started") {
-            let _: SleepRecord = try await self.apiClient.request(
+            let sleep: SleepRecord = try await self.apiClient.request(
                 Endpoints.Sleeps.base,
                 method: "POST",
                 body: request
             )
+
+            // Start Live Activity
+            if let sleepIdInt = sleep.id.intValue {
+                let name = babyName ?? SharedDefaults.selectedBabyName ?? "Baby"
+                let startDate = self.parseISO8601(now) ?? Date()
+                SleepActivityManager.startActivity(babyName: name, startTime: startDate, sleepId: sleepIdInt)
+            }
         }
     }
 
@@ -214,6 +243,7 @@ final class DashboardViewModel {
 
         await performQuickLog(babyId: babyId, toast: "Sleep ended") {
             let _: SleepRecord = try await self.apiClient.endSleep(id: sleepId)
+            SleepActivityManager.endActivity()
         }
     }
 
@@ -303,5 +333,13 @@ final class DashboardViewModel {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter.string(from: Date())
+    }
+
+    private func parseISO8601(_ string: String) -> Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = formatter.date(from: string) { return date }
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter.date(from: string)
     }
 }

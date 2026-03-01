@@ -63,6 +63,16 @@ struct DashboardView: View {
                         DailySummaryView(summary: summary)
                     }
 
+                    // Sleep Advisor Card
+                    if let predictions = viewModel.analyticsData?.predictions,
+                       viewModel.analyticsData?.hasEnoughData == true {
+                        SleepAdvisorCard(
+                            predictions: predictions,
+                            isSleeping: viewModel.dashboardData?.currentSleep != nil
+                        )
+                        .padding(.horizontal, Spacing.lg)
+                    }
+
                     // Active Sleep Banner
                     if let currentSleep = viewModel.dashboardData?.currentSleep {
                         activeSleepBanner(currentSleep)
@@ -331,8 +341,8 @@ struct DashboardView: View {
                 }
             } else {
                 quickActionButton("Start Sleep", icon: "moon.zzz", color: colors.main, disabled: disabled) {
-                    guard let babyId = appState.selectedBaby?.id else { return }
-                    Task { await viewModel.quickLogStartSleep(babyId: babyId) }
+                    guard let baby = appState.selectedBaby else { return }
+                    Task { await viewModel.quickLogStartSleep(babyId: baby.id, babyName: baby.name) }
                 }
             }
 
@@ -578,7 +588,8 @@ struct DashboardView: View {
         guard let baby = appState.selectedBaby else { return }
         async let dashboard: () = viewModel.loadDashboard(babyId: baby.id)
         async let upcoming: () = viewModel.loadUpcoming(babyId: baby.id)
-        _ = await (dashboard, upcoming)
+        async let analytics: () = viewModel.loadAnalytics(babyId: baby.id)
+        _ = await (dashboard, upcoming, analytics)
     }
 
     // MARK: - Time Formatting

@@ -1,3 +1,4 @@
+import ActivityKit
 import SwiftUI
 import SwiftData
 
@@ -32,10 +33,12 @@ struct BabyLogApp: App {
                         wireAPIClient()
                         Task {
                             await appState.loadBabies()
+                            restoreLiveActivityIfNeeded()
                         }
                     } else {
                         appState.babies = []
                         appState.selectedBaby = nil
+                        SleepActivityManager.endAllActivities()
                     }
                 }
         }
@@ -58,6 +61,26 @@ struct BabyLogApp: App {
         appState.apiClient.onUnauthorized = { [weak authManager] in
             await authManager?.signOut()
         }
+    }
+
+    private func restoreLiveActivityIfNeeded() {
+        guard !SleepActivityManager.hasRunningActivity,
+              let baby = appState.selectedBaby,
+              let dashboard = SharedDefaults.dashboardSnapshot,
+              let currentSleep = dashboard.currentSleep,
+              let sleepId = currentSleep.id.intValue else { return }
+
+        // Parse the start time and restore the Live Activity
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        var startDate = formatter.date(from: currentSleep.startTime)
+        if startDate == nil {
+            formatter.formatOptions = [.withInternetDateTime]
+            startDate = formatter.date(from: currentSleep.startTime)
+        }
+        guard let start = startDate else { return }
+
+        SleepActivityManager.startActivity(babyName: baby.name, startTime: start, sleepId: sleepId)
     }
 }
 
@@ -97,5 +120,7 @@ final class AppState {
     func selectBaby(_ baby: Baby) {
         selectedBaby = baby
         selectedBabyId = baby.id
+        SharedDefaults.selectedBabyId = baby.id
+        SharedDefaults.selectedBabyName = baby.name
     }
 }
