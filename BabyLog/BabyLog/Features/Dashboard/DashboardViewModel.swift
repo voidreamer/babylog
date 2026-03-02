@@ -122,7 +122,7 @@ final class DashboardViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            let tzOffset = TimeZone.current.secondsFromGMT() / 60
+            let tzOffset = -(TimeZone.current.secondsFromGMT() / 60)
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd"
             let localDate = dateFormatter.string(from: Date())
@@ -144,7 +144,7 @@ final class DashboardViewModel {
 
     func loadAnalytics(babyId: Int) async {
         do {
-            let tzOffset = TimeZone.current.secondsFromGMT() / 60
+            let tzOffset = -(TimeZone.current.secondsFromGMT() / 60)
             analyticsData = try await apiClient.request(
                 Endpoints.Analytics.data(babyId: babyId, days: 7, tzOffset: tzOffset)
             )

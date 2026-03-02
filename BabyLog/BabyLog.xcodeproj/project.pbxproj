@@ -94,6 +94,7 @@
 		A06EA11FF8C46D05FC98E015 /* ErrorBoundaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483C7FA0E11EFAD8976591BB /* ErrorBoundaryView.swift */; };
 		A09D0C58EDDB45F25B215BCD /* QuickBathIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E899F03B4F50D5C23D26B0DB /* QuickBathIntent.swift */; };
 		A1B2C3D4E5F60718F9101112 /* TimelineBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718F9101113 /* TimelineBlockView.swift */; };
+		E1E1E1E1E1E1E1E1E1E10001 /* EventEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E1E1E1E1E1E1E1E1E10002 /* EventEditView.swift */; };
 		A1FB6A6EBB1E7A01E2561374 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0056120F61AE66CB5234BEA /* SharedDefaults.swift */; };
 		A280C455D21EEFDBD65CBF29 /* BabyAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0956373EADE9E3CB6526E0 /* BabyAvatar.swift */; };
 		A88C857E72DB3C1ED1FC95B9 /* TeethingCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BA19199F1C445FF0151515 /* TeethingCardView.swift */; };
@@ -253,6 +254,7 @@
 		9C3B0B4DBC057A58890CDFE0 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		9CBC8C54106DFA1F2A051DE6 /* MedicationQuickLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationQuickLogView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718F9101113 /* TimelineBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineBlockView.swift; sourceTree = "<group>"; };
+		E1E1E1E1E1E1E1E1E1E10002 /* EventEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditView.swift; sourceTree = "<group>"; };
 		A1C873B96CA1571E963349D9 /* EndSleepLiveActivityIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EndSleepLiveActivityIntent.swift; sourceTree = "<group>"; };
 		A1E85FB7A2AE4511623ABB65 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		A215734213197B6D6C1CE8B7 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
@@ -463,6 +465,7 @@
 		8E0358AAA277CB2A798DBD7D /* Timeline */ = {
 			isa = PBXGroup;
 			children = (
+				E1E1E1E1E1E1E1E1E1E10002 /* EventEditView.swift */,
 				A1B2C3D4E5F60718F9101113 /* TimelineBlockView.swift */,
 				D568697F6FA682AC763D00D4 /* TimelineCalendarView.swift */,
 				3BBDE45E95040CCD58FCA993 /* TimelineEventRow.swift */,
@@ -838,6 +841,7 @@
 				39DF432A77247306BDBC1B7C /* TimelineEventRow.swift in Sources */,
 				2F264B14DCD116B00F94409E /* TimelineView.swift in Sources */,
 				A1B2C3D4E5F60718F9101112 /* TimelineBlockView.swift in Sources */,
+				E1E1E1E1E1E1E1E1E1E10001 /* EventEditView.swift in Sources */,
 				0C6E8885E1860BA6CF116FBE /* TimelineViewModel.swift in Sources */,
 				ACF60BF61C3DFDD416B73A53 /* TodayVsAverageView.swift in Sources */,
 				3EFFDB405E7653D4312A6C61 /* TrendsSectionView.swift in Sources */,

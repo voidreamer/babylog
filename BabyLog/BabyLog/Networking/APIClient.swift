@@ -599,14 +599,14 @@ final class APIClient {
     // MARK: - Rest Planner
 
     func getRestPlan(babyId: Int, days: Int = 7) async throws -> RestPlanData? {
-        let tzOffset = TimeZone.current.secondsFromGMT() / 60
+        let tzOffset = -(TimeZone.current.secondsFromGMT() / 60)
         return try await request(Endpoints.RestPlanner.plan(babyId: babyId, days: days, tzOffset: tzOffset))
     }
 
     // MARK: - Analytics
 
     func getAnalytics(babyId: Int, days: Int = 7) async throws -> AnalyticsData {
-        let tzOffset = TimeZone.current.secondsFromGMT() / 60
+        let tzOffset = -(TimeZone.current.secondsFromGMT() / 60)
         return try await request(Endpoints.Analytics.data(babyId: babyId, days: days, tzOffset: tzOffset))
     }
 

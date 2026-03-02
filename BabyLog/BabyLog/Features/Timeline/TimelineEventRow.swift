@@ -142,7 +142,7 @@ struct TimelineEventRow: View {
         case "sleep":       return "Sleep"
         case "pumping":     return "Pumping"
         case "potty":       return "Potty"
-        case "tummy_time":  return "Tummy Time"
+        case "tummy", "tummy_time":  return "Tummy Time"
         case "bath":        return "Bath"
         case "supplement":  return "Supplement"
         default:            return eventType.capitalized
@@ -156,7 +156,7 @@ struct TimelineEventRow: View {
         case "sleep":       return "moon.zzz"
         case "pumping":     return "drop"
         case "potty":       return "toilet"
-        case "tummy_time":  return "figure.play"
+        case "tummy", "tummy_time":  return "figure.play"
         case "bath":        return "bathtub"
         case "supplement":  return "pill"
         default:            return "circle"
@@ -170,7 +170,7 @@ struct TimelineEventRow: View {
         case "sleep":       return theme.sleep
         case "pumping":     return theme.pumping
         case "potty":       return theme.potty
-        case "tummy_time":  return theme.tummy
+        case "tummy", "tummy_time":  return theme.tummy
         case "bath":        return theme.bath
         case "supplement":
             return ActivityColorSet(
@@ -232,7 +232,7 @@ struct TimelineEventRow: View {
             return pumpingSummary
         case "potty":
             return pottySummary
-        case "tummy_time":
+        case "tummy", "tummy_time":
             return tummySummary
         case "bath":
             return nil // Bath typically has no key detail
@@ -378,7 +378,7 @@ struct TimelineEventRow: View {
                 items.append(DetailItem(label: "Type", value: pottyType.capitalized))
             }
 
-        case "tummy_time":
+        case "tummy", "tummy_time":
             if let duration = numberDetail("duration_minutes") {
                 items.append(DetailItem(label: "Duration", value: "\(Int(duration)) min"))
             }

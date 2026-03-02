@@ -5,6 +5,9 @@ struct TimelineView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var viewModel = TimelineViewModel()
+    @State private var eventToDelete: TimelineEvent?
+    @State private var eventToEdit: TimelineEvent?
+    @State private var showDeleteAlert = false
 
     private var theme: ResolvedTheme {
         AppTheme.resolved(for: colorScheme)
@@ -12,7 +15,6 @@ struct TimelineView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Horizontal date picker
             TimelineCalendarView(
                 selectedDate: viewModel.selectedDate,
                 onDateSelected: { date in
@@ -24,7 +26,6 @@ struct TimelineView: View {
             )
             .padding(.bottom, Spacing.sm)
 
-            // Content
             if viewModel.isLoading && viewModel.events.isEmpty {
                 LoadingView(message: "Loading timeline...")
             } else if viewModel.events.isEmpty {
@@ -36,7 +37,14 @@ struct TimelineView: View {
             } else {
                 TimelineBlockView(
                     events: viewModel.events,
-                    selectedDate: viewModel.selectedDate
+                    selectedDate: viewModel.selectedDate,
+                    onEdit: { event in
+                        eventToEdit = event
+                    },
+                    onDelete: { event in
+                        eventToDelete = event
+                        showDeleteAlert = true
+                    }
                 )
                 .refreshable {
                     guard let babyId = appState.selectedBaby?.id else { return }
@@ -49,6 +57,7 @@ struct TimelineView: View {
         .navigationBarTitleDisplayMode(.large)
         .task(id: appState.selectedBaby?.id) {
             guard let babyId = appState.selectedBaby?.id else { return }
+            viewModel = TimelineViewModel(apiClient: appState.apiClient)
             await viewModel.loadTimeline(babyId: babyId)
         }
         .onChange(of: viewModel.selectedDate) {
@@ -56,6 +65,51 @@ struct TimelineView: View {
             Task {
                 await viewModel.loadTimeline(babyId: babyId)
             }
+        }
+        .sheet(item: $eventToEdit) { event in
+            if let babyId = appState.selectedBaby?.id {
+                EventEditView(
+                    event: event,
+                    babyId: babyId,
+                    apiClient: appState.apiClient,
+                    onSave: {
+                        Task {
+                            await viewModel.loadTimeline(babyId: babyId)
+                        }
+                    }
+                )
+            }
+        }
+        .alert("Delete Event", isPresented: $showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                guard let event = eventToDelete,
+                      let babyId = appState.selectedBaby?.id else { return }
+                Task {
+                    await viewModel.deleteEvent(event)
+                    await viewModel.loadTimeline(babyId: babyId)
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                eventToDelete = nil
+            }
+        } message: {
+            if let event = eventToDelete {
+                Text("Are you sure you want to delete this \(eventDisplayName(event.eventType).lowercased()) entry?")
+            }
+        }
+    }
+
+    private func eventDisplayName(_ type: String) -> String {
+        switch type {
+        case "feeding":     return "Feeding"
+        case "diaper":      return "Diaper"
+        case "sleep":       return "Sleep"
+        case "pumping":     return "Pumping"
+        case "potty":       return "Potty"
+        case "tummy", "tummy_time": return "Tummy Time"
+        case "bath":        return "Bath"
+        case "supplement":  return "Supplement"
+        default:            return type.capitalized
         }
     }
 }

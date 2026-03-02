@@ -86,7 +86,7 @@ enum IntentAPIClient {
     // MARK: - Dashboard
 
     static func getDashboard(babyId: Int) async throws -> DashboardData {
-        let tzOffset = TimeZone.current.secondsFromGMT() / 60
+        let tzOffset = -(TimeZone.current.secondsFromGMT() / 60)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let localDate = dateFormatter.string(from: Date())
