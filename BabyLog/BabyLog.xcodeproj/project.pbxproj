@@ -84,6 +84,7 @@
 		91851C486B136117B49C9D42 /* IntOrString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92598BC16335496FCCA030DD /* IntOrString.swift */; };
 		92F9E570FC8A9941BF795ABF /* SleepAdvisorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2A5DD4711C2A532F0AECB6 /* SleepAdvisorCard.swift */; };
 		931FC71FC8F78228FFCD104C /* StatusHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF6E9B593909767E7C8B75E /* StatusHeroCard.swift */; };
+		5C8E1A3F7D2B49060F3E8A17 /* PredictionCardsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A7B2E81F3C6D9A0E5B7C42 /* PredictionCardsRow.swift */; };
 		9660C32A2C606968023DCF8D /* Dashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E82CE37589F2A05A0FE5711 /* Dashboard.swift */; };
 		96ABF9611890B9BD874F8CCC /* IntentAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6375DD005DF3A6A01C66D4 /* IntentAPIClient.swift */; };
 		9752395087412FB6519C430D /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6DC057CFEA34A7C3E9BBCD /* AppTheme.swift */; };
@@ -280,6 +281,7 @@
 		D74EA801D9CC88549C61EB19 /* BabyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyProfileView.swift; sourceTree = "<group>"; };
 		D7D5F661268D45B5E154420D /* BabyAppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyAppShortcuts.swift; sourceTree = "<group>"; };
 		DB785924B0955A6A464F724F /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		D4A7B2E81F3C6D9A0E5B7C42 /* PredictionCardsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PredictionCardsRow.swift; sourceTree = "<group>"; };
 		E3D7C87121793A3935B8A38F /* QuickActionsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickActionsRow.swift; sourceTree = "<group>"; };
 		E455F7E93A040F6CAAE15D6E /* AddBabyFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBabyFormView.swift; sourceTree = "<group>"; };
 		E899F03B4F50D5C23D26B0DB /* QuickBathIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickBathIntent.swift; sourceTree = "<group>"; };
@@ -522,6 +524,7 @@
 				3F8A5C9C2C58E0DF060E8728 /* WidgetSettingsView.swift */,
 				3B2A5DD4711C2A532F0AECB6 /* SleepAdvisorCard.swift */,
 				7EF6E9B593909767E7C8B75E /* StatusHeroCard.swift */,
+				D4A7B2E81F3C6D9A0E5B7C42 /* PredictionCardsRow.swift */,
 				E3D7C87121793A3935B8A38F /* QuickActionsRow.swift */,
 				9B1780C1262F172DD191CB9B /* TodayAtAGlanceView.swift */,
 				ADF7244B951EED42CD82B2AA /* RecentActivityView.swift */,
@@ -866,6 +869,7 @@
 				0FDD5962AA644C691A50551C /* CheckBabyStatusIntent.swift in Sources */,
 				92F9E570FC8A9941BF795ABF /* SleepAdvisorCard.swift in Sources */,
 				931FC71FC8F78228FFCD104C /* StatusHeroCard.swift in Sources */,
+				5C8E1A3F7D2B49060F3E8A17 /* PredictionCardsRow.swift in Sources */,
 				F9F05E4903099291620740DA /* QuickActionsRow.swift in Sources */,
 				B8861EDA9360857EE7DE619A /* TodayAtAGlanceView.swift in Sources */,
 				6D2550203EBCE16359DAC3C2 /* RecentActivityView.swift in Sources */,

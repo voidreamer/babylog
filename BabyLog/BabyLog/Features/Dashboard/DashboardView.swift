@@ -11,13 +11,47 @@ struct DashboardView: View {
         AppTheme.resolved(for: colorScheme)
     }
 
+    // MARK: - Greeting
+
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12:  return "Good morning"
+        case 12..<17: return "Good afternoon"
+        case 17..<21: return "Good evening"
+        default:      return "Good night"
+        }
+    }
+
+    private var greetingIcon: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12:  return "sun.max.fill"
+        case 12..<17: return "sun.min.fill"
+        case 17..<21: return "sunset.fill"
+        default:      return "moon.stars.fill"
+        }
+    }
+
+    private var todayDateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d"
+        return formatter.string(from: Date())
+    }
+
     // MARK: - Body
 
     var body: some View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: Spacing.lg) {
-                    // Status Hero Card
+                    // 1. Greeting Header
+                    if let baby = appState.selectedBaby {
+                        greetingHeader(baby: baby)
+                            .padding(.horizontal, Spacing.lg)
+                    }
+
+                    // 2. Status Hero Card
                     if let baby = appState.selectedBaby {
                         StatusHeroCard(
                             baby: baby,
@@ -26,7 +60,7 @@ struct DashboardView: View {
                             lastSleep: viewModel.dashboardData?.lastSleep,
                             hasEnoughData: viewModel.analyticsData?.hasEnoughData ?? false,
                             onTapInsights: {
-                                appState.selectedTab = 3 // Insights tab
+                                appState.selectedTab = 3
                             },
                             onEndSleep: {
                                 guard let babyId = appState.selectedBaby?.id else { return }
@@ -36,7 +70,7 @@ struct DashboardView: View {
                         .padding(.horizontal, Spacing.lg)
                     }
 
-                    // Quick Actions Row
+                    // 3. Quick Actions Row
                     if let baby = appState.selectedBaby {
                         QuickActionsRow(
                             isSleeping: viewModel.dashboardData?.currentSleep != nil,
@@ -72,23 +106,24 @@ struct DashboardView: View {
                         .padding(.horizontal, Spacing.lg)
                     }
 
-                    // Today at a Glance
+                    // 4. AI Prediction Cards
+                    PredictionCardsRow(
+                        predictions: viewModel.analyticsData?.predictions,
+                        hasEnoughData: viewModel.analyticsData?.hasEnoughData ?? false,
+                        onTapInsights: {
+                            appState.selectedTab = 3
+                        }
+                    )
+                    .padding(.horizontal, Spacing.lg)
+
+                    // 5. Today at a Glance
                     TodayAtAGlanceView(
                         summary: viewModel.dashboardData?.dailySummary,
                         benchmarks: viewModel.analyticsData?.benchmarks
                     )
                     .padding(.horizontal, Spacing.lg)
 
-                    // Recent Activity
-                    RecentActivityView(
-                        activities: viewModel.recentActivities(theme: theme),
-                        onSeeAll: {
-                            appState.selectedTab = 1 // Timeline tab
-                        }
-                    )
-                    .padding(.horizontal, Spacing.lg)
-
-                    // Coming Up
+                    // 6. Coming Up
                     if !viewModel.upcomingItems.isEmpty {
                         ComingUpView(items: viewModel.upcomingItems)
                             .padding(.horizontal, Spacing.lg)
@@ -111,8 +146,7 @@ struct DashboardView: View {
             }
         }
         .background(theme.background.ignoresSafeArea())
-        .navigationTitle("Dashboard")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 babySelectorMenu
@@ -120,7 +154,7 @@ struct DashboardView: View {
         }
         .overlay {
             if viewModel.isLoading && viewModel.dashboardData == nil {
-                LoadingView(message: "Loading dashboard...")
+                LoadingView(message: "Loading...")
             }
         }
         .task(id: appState.selectedBaby?.id) {
@@ -133,6 +167,64 @@ struct DashboardView: View {
                 Task { await refreshData() }
             }
         }
+    }
+
+    // MARK: - Greeting Header
+
+    private func greetingHeader(baby: Baby) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xxs) {
+            HStack {
+                HStack(spacing: Spacing.xs) {
+                    Image(systemName: greetingIcon)
+                        .font(.system(size: 14))
+                        .foregroundStyle(theme.primary)
+                    Text(greeting)
+                        .font(.appBody(size: 14, weight: .medium))
+                        .foregroundStyle(theme.textSecondary)
+                }
+
+                Spacer()
+
+                Text(todayDateString)
+                    .font(.appBody(size: 13))
+                    .foregroundStyle(theme.textMuted)
+            }
+
+            Text(baby.name)
+                .font(.appHeading(size: 28, weight: .bold))
+                .foregroundStyle(theme.text)
+
+            if let age = ageText(for: baby) {
+                Text(age)
+                    .font(.appBody(size: 13, weight: .medium))
+                    .foregroundStyle(theme.textMuted)
+            }
+        }
+    }
+
+    // MARK: - Age Text
+
+    private func ageText(for baby: Baby) -> String? {
+        guard let birthDateString = baby.birthDate else { return nil }
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        df.locale = Locale(identifier: "en_US_POSIX")
+        df.timeZone = TimeZone(secondsFromGMT: 0)
+        guard let birthDate = df.date(from: birthDateString) else { return nil }
+
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: birthDate, to: Date())
+        let years = components.year ?? 0
+        let months = components.month ?? 0
+        let days = components.day ?? 0
+
+        if years > 0 {
+            return months > 0 ? "\(years) yr \(months) mo old" : "\(years) yr old"
+        } else if months > 0 {
+            return days > 0 ? "\(months) mo \(days) d old" : "\(months) mo old"
+        } else if days > 0 {
+            return "\(days) day\(days == 1 ? "" : "s") old"
+        }
+        return "Born today"
     }
 
     // MARK: - Toast View

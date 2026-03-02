@@ -25,27 +25,15 @@ struct StatusHeroCard: View {
             pressureRing
                 .frame(width: 68, height: 68)
 
-            // Right: baby info + status
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                Text(baby.name)
-                    .font(.appHeading(size: 18, weight: .bold))
-                    .foregroundStyle(theme.text)
-
-                if let age = ageText {
-                    Text(age)
-                        .font(.appBody(size: 12, weight: .medium))
-                        .foregroundStyle(theme.textMuted)
-                }
-
-                Spacer().frame(height: Spacing.xxs)
-
+            // Right: status info
+            VStack(alignment: .leading, spacing: Spacing.xs) {
                 // Status text
                 Text(statusText)
-                    .font(.appBody(size: 13, weight: .medium))
-                    .foregroundStyle(isSleeping ? theme.sleep.main : theme.textSecondary)
+                    .font(.appBody(size: 15, weight: .semibold))
+                    .foregroundStyle(isSleeping ? theme.sleep.main : theme.text)
                     .lineLimit(2)
 
-                // SP badge when we have data
+                // SP badge + confidence when we have data
                 if let score = predictions?.sleepPressure?.score, hasEnoughData {
                     HStack(spacing: Spacing.xs) {
                         Text("SP \(Int(score))")
@@ -136,7 +124,6 @@ struct StatusHeroCard: View {
                         )
                         .rotationEffect(.degrees(-90))
                 } else if isSleeping {
-                    // Sleeping but no analytics: show partial ring
                     Circle()
                         .trim(from: 0, to: 0.75)
                         .stroke(
@@ -261,40 +248,6 @@ struct StatusHeroCard: View {
         case "fair": return Color(hex: "#f59e0b")
         default: return theme.textMuted
         }
-    }
-
-    // MARK: - Age Calculation
-
-    private var ageText: String? {
-        guard let birthDateString = baby.birthDate,
-              let birthDate = parseDateString(birthDateString) else {
-            return nil
-        }
-
-        let now = Date()
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day], from: birthDate, to: now)
-
-        let years = components.year ?? 0
-        let months = components.month ?? 0
-        let days = components.day ?? 0
-
-        if years > 0 {
-            return months > 0 ? "\(years) yr \(months) mo old" : "\(years) yr old"
-        } else if months > 0 {
-            return days > 0 ? "\(months) mo \(days) d old" : "\(months) mo old"
-        } else if days > 0 {
-            return "\(days) day\(days == 1 ? "" : "s") old"
-        }
-        return "Born today"
-    }
-
-    private func parseDateString(_ string: String) -> Date? {
-        let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd"
-        df.locale = Locale(identifier: "en_US_POSIX")
-        df.timeZone = TimeZone(secondsFromGMT: 0)
-        return df.date(from: string)
     }
 
     private func parseISO8601(_ string: String) -> Date? {
