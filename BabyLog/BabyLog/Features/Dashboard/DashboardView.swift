@@ -13,30 +13,24 @@ struct DashboardView: View {
 
     // MARK: - Greeting
 
-    private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        switch hour {
-        case 5..<12:  return "Good morning"
-        case 12..<17: return "Good afternoon"
-        case 17..<21: return "Good evening"
-        default:      return "Good night"
-        }
-    }
+    private static let dayDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "EEEE, MMM d"
+        return f
+    }()
 
-    private var greetingIcon: String {
+    private var timeOfDay: (greeting: String, icon: String) {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 5..<12:  return "sun.max.fill"
-        case 12..<17: return "sun.min.fill"
-        case 17..<21: return "sunset.fill"
-        default:      return "moon.stars.fill"
+        case 5..<12:  return ("Good morning", "sun.max.fill")
+        case 12..<17: return ("Good afternoon", "sun.min.fill")
+        case 17..<21: return ("Good evening", "sunset.fill")
+        default:      return ("Good night", "moon.stars.fill")
         }
     }
 
     private var todayDateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMM d"
-        return formatter.string(from: Date())
+        Self.dayDateFormatter.string(from: Date())
     }
 
     // MARK: - Body
@@ -175,10 +169,10 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: Spacing.xxs) {
             HStack {
                 HStack(spacing: Spacing.xs) {
-                    Image(systemName: greetingIcon)
+                    Image(systemName: timeOfDay.icon)
                         .font(.system(size: 14))
                         .foregroundStyle(theme.primary)
-                    Text(greeting)
+                    Text(timeOfDay.greeting)
                         .font(.appBody(size: 14, weight: .medium))
                         .foregroundStyle(theme.textSecondary)
                 }
@@ -205,12 +199,8 @@ struct DashboardView: View {
     // MARK: - Age Text
 
     private func ageText(for baby: Baby) -> String? {
-        guard let birthDateString = baby.birthDate else { return nil }
-        let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd"
-        df.locale = Locale(identifier: "en_US_POSIX")
-        df.timeZone = TimeZone(secondsFromGMT: 0)
-        guard let birthDate = df.date(from: birthDateString) else { return nil }
+        guard let birthDateString = baby.birthDate,
+              let birthDate = FormatUtils.parseDate(birthDateString) else { return nil }
 
         let components = Calendar.current.dateComponents([.year, .month, .day], from: birthDate, to: Date())
         let years = components.year ?? 0

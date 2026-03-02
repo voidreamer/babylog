@@ -251,11 +251,7 @@ struct StatusHeroCard: View {
     }
 
     private func parseISO8601(_ string: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: string) { return date }
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: string)
+        FormatUtils.parseDate(string)
     }
 }
 

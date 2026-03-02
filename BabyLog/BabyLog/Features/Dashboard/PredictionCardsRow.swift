@@ -111,7 +111,9 @@ struct PredictionCardsRow: View {
     // MARK: - Nap Card
 
     private func napCard(_ nap: NapPrediction) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
+        let isNapDue = nap.pastDue == true || (nap.inMinutes ?? 0) <= 0
+
+        return VStack(alignment: .leading, spacing: Spacing.sm) {
             HStack(spacing: Spacing.xs) {
                 Image(systemName: "moon.zzz")
                     .font(.system(size: 12, weight: .semibold))
@@ -121,7 +123,7 @@ struct PredictionCardsRow: View {
                     .foregroundStyle(theme.textSecondary)
             }
 
-            if nap.pastDue == true || (nap.inMinutes ?? 0) <= 0 {
+            if isNapDue {
                 Text("Now")
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .foregroundStyle(theme.sleep.main)
@@ -143,17 +145,11 @@ struct PredictionCardsRow: View {
         .padding(Spacing.md)
         .background(
             RoundedRectangle(cornerRadius: Radii.md, style: .continuous)
-                .fill(
-                    (nap.pastDue == true || (nap.inMinutes ?? 1) <= 0)
-                        ? theme.sleep.bg.opacity(0.4)
-                        : theme.surface
-                )
+                .fill(isNapDue ? theme.sleep.bg.opacity(0.4) : theme.surface)
                 .overlay(
                     RoundedRectangle(cornerRadius: Radii.md, style: .continuous)
                         .stroke(
-                            (nap.pastDue == true || (nap.inMinutes ?? 1) <= 0)
-                                ? theme.sleep.main.opacity(0.2)
-                                : theme.borderLight,
+                            isNapDue ? theme.sleep.main.opacity(0.2) : theme.borderLight,
                             lineWidth: 0.5
                         )
                 )

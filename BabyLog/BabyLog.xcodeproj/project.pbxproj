@@ -121,7 +121,7 @@
 		D83EB285473EEDC92C88E923 /* GrowthCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78813080A74DB1E8209F146C /* GrowthCardView.swift */; };
 		D8CF28C7D15C0228912474AC /* PottyFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED999405045D29056C9A00B4 /* PottyFormView.swift */; };
 		DC21F3E893CEC7836A97D1BC /* QuickSleepIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CF631BAF93168241C9004C5 /* QuickSleepIntent.swift */; };
-		E0961C290BA3955195C1FF11 /* BabyGreetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376B416F3FBA467C8C7F9301 /* BabyGreetingView.swift */; };
+
 		E1E40572D459A7E80138CDCC /* TimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F975F5276E77AE15792381F9 /* TimePicker.swift */; };
 		E583D77F1BD9CDE18DD0DB49 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1B29BAEF5DF3CADC8D2174 /* DashboardView.swift */; };
 		E79224982FC252237B5748DC /* HealthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC6ECAC0E97CE8294A134F3 /* HealthViewModel.swift */; };
@@ -199,7 +199,7 @@
 		2C68A1186CB9B7BD363A34A0 /* LocalizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationManager.swift; sourceTree = "<group>"; };
 		2E82CE37589F2A05A0FE5711 /* Dashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dashboard.swift; sourceTree = "<group>"; };
 		34EA47092884BD8D89572ACD /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
-		376B416F3FBA467C8C7F9301 /* BabyGreetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyGreetingView.swift; sourceTree = "<group>"; };
+
 		39AFAEDA937D52D1BCC0C1B5 /* RecordsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsSectionView.swift; sourceTree = "<group>"; };
 		3A2B832B6832439243371DC7 /* WHOGrowthData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WHOGrowthData.swift; sourceTree = "<group>"; };
 		3B2A5DD4711C2A532F0AECB6 /* SleepAdvisorCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SleepAdvisorCard.swift; sourceTree = "<group>"; };
@@ -516,7 +516,7 @@
 		9DA9B44FEDC076A3784712C5 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
-				376B416F3FBA467C8C7F9301 /* BabyGreetingView.swift */,
+
 				AFB676D1A09BBF76A3741BF0 /* ComingUpView.swift */,
 				810F659579C30120D9C8CCB8 /* DailySummaryView.swift */,
 				9C1B29BAEF5DF3CADC8D2174 /* DashboardView.swift */,
@@ -773,7 +773,7 @@
 				BB1E43BD88B412E19D393BAF /* Baby.swift in Sources */,
 				789D56D4B0A3822537A27668 /* BabyAppShortcuts.swift in Sources */,
 				A280C455D21EEFDBD65CBF29 /* BabyAvatar.swift in Sources */,
-				E0961C290BA3955195C1FF11 /* BabyGreetingView.swift in Sources */,
+
 				E8298E7A28F9354F080A095E /* BabyLogApp.swift in Sources */,
 				32796F31F55DC4EEAFFC704D /* BabyProfileView.swift in Sources */,
 				196C4FE51C2CBE1482D6ABCA /* BabySelector.swift in Sources */,
