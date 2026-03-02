@@ -6,6 +6,7 @@ struct DashboardView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var viewModel = DashboardViewModel()
+    @State private var contentLoaded = false
 
     private var theme: ResolvedTheme {
         AppTheme.resolved(for: colorScheme)
@@ -33,6 +34,21 @@ struct DashboardView: View {
         Self.dayDateFormatter.string(from: Date())
     }
 
+    // MARK: - Encouragement
+
+    private var encouragementMessage: String? {
+        guard let summary = viewModel.dashboardData?.dailySummary else { return nil }
+        let total = summary.totalFeedings + summary.totalDiapers + summary.sleepCount
+            + summary.pumpingCount + summary.pottyCount + summary.tummyCount + summary.bathCount
+        switch total {
+        case 0:       return nil
+        case 1...3:   return "Great start to the day!"
+        case 4...7:   return "You're doing amazing!"
+        case 8...12:  return "Super parent mode!"
+        default:      return "What a dedicated parent!"
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -43,6 +59,7 @@ struct DashboardView: View {
                     if let baby = appState.selectedBaby {
                         greetingHeader(baby: baby)
                             .padding(.horizontal, Spacing.lg)
+                            .staggeredAppear(index: 0)
                     }
 
                     // 2. Status Hero Card
@@ -62,6 +79,7 @@ struct DashboardView: View {
                             }
                         )
                         .padding(.horizontal, Spacing.lg)
+                        .staggeredAppear(index: 1)
                     }
 
                     // 3. Quick Actions Row
@@ -98,6 +116,7 @@ struct DashboardView: View {
                             }
                         )
                         .padding(.horizontal, Spacing.lg)
+                        .staggeredAppear(index: 2)
                     }
 
                     // 4. AI Prediction Cards
@@ -109,18 +128,31 @@ struct DashboardView: View {
                         }
                     )
                     .padding(.horizontal, Spacing.lg)
+                    .staggeredAppear(index: 3)
 
-                    // 5. Today at a Glance
+                    // 5. Rest Planner Widget
+                    RestPlannerWidget(
+                        restPlanData: viewModel.restPlanData,
+                        onTapInsights: {
+                            appState.selectedTab = 3
+                        }
+                    )
+                    .padding(.horizontal, Spacing.lg)
+                    .staggeredAppear(index: 4)
+
+                    // 6. Today at a Glance
                     TodayAtAGlanceView(
                         summary: viewModel.dashboardData?.dailySummary,
                         benchmarks: viewModel.analyticsData?.benchmarks
                     )
                     .padding(.horizontal, Spacing.lg)
+                    .staggeredAppear(index: 5)
 
-                    // 6. Coming Up
+                    // 7. Coming Up
                     if !viewModel.upcomingItems.isEmpty {
                         ComingUpView(items: viewModel.upcomingItems)
                             .padding(.horizontal, Spacing.lg)
+                            .staggeredAppear(index: 6)
                     }
 
                     Spacer(minLength: Spacing.xxxl)
@@ -134,8 +166,11 @@ struct DashboardView: View {
             // Toast overlay
             if let toast = viewModel.quickLogSuccess {
                 toastView(message: toast)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.spring(duration: 0.3), value: viewModel.quickLogSuccess)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .bottom).combined(with: .scale(scale: 0.8)).combined(with: .opacity),
+                        removal: .move(edge: .bottom).combined(with: .opacity)
+                    ))
+                    .animation(.appSnappy, value: viewModel.quickLogSuccess)
                     .padding(.bottom, Spacing.xl)
             }
         }
@@ -148,13 +183,16 @@ struct DashboardView: View {
         }
         .overlay {
             if viewModel.isLoading && viewModel.dashboardData == nil {
-                LoadingView(message: "Loading...")
+                DashboardSkeleton()
+                    .transition(.opacity)
             }
         }
         .task(id: appState.selectedBaby?.id) {
             guard let baby = appState.selectedBaby else { return }
             viewModel = DashboardViewModel(apiClient: appState.apiClient)
+            contentLoaded = false
             await refreshData()
+            withAnimation(.appGentle) { contentLoaded = true }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
@@ -188,10 +226,19 @@ struct DashboardView: View {
                 .font(.appHeading(size: 28, weight: .bold))
                 .foregroundStyle(theme.text)
 
-            if let age = ageText(for: baby) {
-                Text(age)
-                    .font(.appBody(size: 13, weight: .medium))
-                    .foregroundStyle(theme.textMuted)
+            HStack(spacing: Spacing.sm) {
+                if let age = ageText(for: baby) {
+                    Text(age)
+                        .font(.appBody(size: 13, weight: .medium))
+                        .foregroundStyle(theme.textMuted)
+                }
+
+                if let encouragement = encouragementMessage {
+                    Text(encouragement)
+                        .font(.appBody(size: 13, weight: .medium))
+                        .foregroundStyle(theme.primary)
+                        .transition(.opacity)
+                }
             }
         }
     }
@@ -220,19 +267,27 @@ struct DashboardView: View {
     // MARK: - Toast View
 
     private func toastView(message: String) -> some View {
-        HStack(spacing: Spacing.sm) {
-            Image(systemName: message.contains("Failed") ? "xmark.circle.fill" : "checkmark.circle.fill")
-                .foregroundStyle(message.contains("Failed") ? theme.danger : theme.success)
+        let isError = message.contains("Failed")
+
+        return HStack(spacing: Spacing.sm) {
+            Image(systemName: isError ? "xmark.circle.fill" : "checkmark.circle.fill")
+                .font(.system(size: 18))
+                .foregroundStyle(isError ? theme.danger : theme.success)
+
             Text(message)
                 .font(.appBody(size: 14, weight: .medium))
                 .foregroundStyle(theme.text)
         }
-        .padding(.horizontal, Spacing.lg)
+        .padding(.horizontal, Spacing.xl)
         .padding(.vertical, Spacing.md)
         .background(
             Capsule()
                 .fill(theme.surface)
-                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
+        )
+        .overlay(
+            Capsule()
+                .stroke(isError ? theme.danger.opacity(0.2) : theme.success.opacity(0.2), lineWidth: 1)
         )
     }
 
@@ -283,7 +338,8 @@ struct DashboardView: View {
         async let dashboard: () = viewModel.loadDashboard(babyId: baby.id)
         async let upcoming: () = viewModel.loadUpcoming(babyId: baby.id)
         async let analytics: () = viewModel.loadAnalytics(babyId: baby.id)
-        _ = await (dashboard, upcoming, analytics)
+        async let restPlan: () = viewModel.loadRestPlan(babyId: baby.id)
+        _ = await (dashboard, upcoming, analytics, restPlan)
     }
 }
 

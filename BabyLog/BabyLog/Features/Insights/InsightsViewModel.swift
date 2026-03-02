@@ -10,7 +10,7 @@ final class InsightsViewModel {
     // MARK: Published State
 
     var analyticsData: AnalyticsData?
-    var restPlanData: RestPlanData?
+    var restPlanData: RestPlanResponse?
     var isLoading = false
     var isLoadingRestPlan = false
     var error: String?
@@ -50,17 +50,15 @@ final class InsightsViewModel {
         }
     }
 
-    // MARK: - Load Rest Plan (Premium)
+    // MARK: - Load Rest Plan
 
     func loadRestPlan(babyId: Int, days: Int = 7) async {
-        guard isPremium else { return }
         isLoadingRestPlan = true
         defer { isLoadingRestPlan = false }
 
         do {
             restPlanData = try await apiClient.getRestPlan(babyId: babyId, days: days)
         } catch {
-            // Non-critical; rest plan is optional
             restPlanData = nil
         }
     }

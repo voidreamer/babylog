@@ -43,14 +43,10 @@ struct InsightsView: View {
                         subtitle: "Select a baby to view insights."
                     )
                 } else if viewModel.isLoading && viewModel.analyticsData == nil {
-                    LoadingView(message: "Loading insights...")
+                    InsightsSkeleton()
+                        .transition(.opacity)
                 } else if let error = viewModel.error, viewModel.analyticsData == nil {
-                    EmptyStateView(
-                        icon: "exclamationmark.triangle",
-                        title: "Unable to Load",
-                        subtitle: error,
-                        actionLabel: "Retry"
-                    ) {
+                    ErrorStateView(message: error) {
                         Task {
                             if let babyId { await viewModel.refreshAll(babyId: babyId) }
                         }
@@ -86,10 +82,13 @@ struct InsightsView: View {
     // MARK: - Period Picker
 
     private var periodPicker: some View {
-        Menu {
+        let theme = AppTheme.resolved(for: colorScheme)
+        return Menu {
             ForEach(InsightsPeriod.allCases) { period in
                 Button {
-                    selectedPeriod = period
+                    withAnimation(.appSnappy) {
+                        selectedPeriod = period
+                    }
                 } label: {
                     HStack {
                         Text(period.label)
@@ -103,12 +102,14 @@ struct InsightsView: View {
             HStack(spacing: 4) {
                 Text(selectedPeriod.label)
                     .font(.appBody(size: 14, weight: .medium))
+                    .contentTransition(.numericText())
                 Image(systemName: "chevron.down")
                     .font(.system(size: 10, weight: .semibold))
             }
+            .foregroundStyle(theme.accent)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(Color(.secondarySystemBackground))
+            .background(theme.accent.opacity(0.1))
             .clipShape(Capsule())
         }
     }
@@ -118,8 +119,9 @@ struct InsightsView: View {
     private func notEnoughDataView(theme: ResolvedTheme) -> some View {
         EmptyStateView(
             icon: "chart.bar.doc.horizontal",
-            title: "Not Enough Data",
-            subtitle: "Keep logging activities for a few days and insights will appear here automatically."
+            title: "Not Enough Data Yet",
+            subtitle: "Keep logging activities for a few days and insights will appear here automatically.",
+            accentColor: theme.accent
         )
     }
 
@@ -131,26 +133,31 @@ struct InsightsView: View {
                 // Predictions
                 if let predictions = viewModel.analyticsData?.predictions {
                     PredictionsSectionView(predictions: predictions)
+                        .staggeredAppear(index: 0)
                 }
 
                 // Patterns
                 if let patterns = viewModel.analyticsData?.patterns {
                     PatternsSectionView(patterns: patterns)
+                        .staggeredAppear(index: 1)
                 }
 
                 // Today vs Average
                 if let todayVsAverage = viewModel.analyticsData?.todayVsAverage {
                     TodayVsAverageView(todayVsAverage: todayVsAverage)
+                        .staggeredAppear(index: 2)
                 }
 
                 // Trends
                 if let trends = viewModel.analyticsData?.trends {
                     TrendsSectionView(trends: trends)
+                        .staggeredAppear(index: 3)
                 }
 
                 // Benchmarks
                 if let benchmarks = viewModel.analyticsData?.benchmarks {
                     BenchmarksSectionView(benchmarks: benchmarks)
+                        .staggeredAppear(index: 4)
                 }
 
                 // Rest Planner
@@ -160,6 +167,7 @@ struct InsightsView: View {
                     restPlanData: viewModel.restPlanData,
                     isLoading: viewModel.isLoadingRestPlan
                 )
+                .staggeredAppear(index: 5)
             }
             .padding(.horizontal, Spacing.lg)
             .padding(.vertical, Spacing.md)

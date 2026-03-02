@@ -60,24 +60,26 @@ struct PumpingFormView: View {
 
                 // Duration
                 Section("Duration") {
-                    HStack {
-                        Text("\(Int(durationMinutes)) min")
-                            .monospacedDigit()
-                        Spacer()
-                        Stepper("", value: $durationMinutes, in: 1...120, step: 1)
-                            .labelsHidden()
-                    }
+                    QuantityStepper(
+                        label: "Duration",
+                        unit: "min",
+                        value: $durationMinutes,
+                        range: 1...120,
+                        step: 1,
+                        accentColor: theme.pumping.main
+                    )
                 }
 
                 // Amount
                 Section("Amount") {
-                    HStack {
-                        Text("\(Int(amountMl)) ml")
-                            .monospacedDigit()
-                        Spacer()
-                        Stepper("", value: $amountMl, in: 0...500, step: 5)
-                            .labelsHidden()
-                    }
+                    QuantityStepper(
+                        label: "Amount",
+                        unit: "ml",
+                        value: $amountMl,
+                        range: 0...500,
+                        step: 5,
+                        accentColor: theme.pumping.main
+                    )
                 }
 
                 // Notes
@@ -97,21 +99,13 @@ struct PumpingFormView: View {
 
                 // Save
                 Section {
-                    Button {
+                    FormSaveButton(
+                        label: isEditing ? "Update" : "Save Pumping",
+                        accentColor: theme.pumping.main,
+                        isLoading: isSaving
+                    ) {
                         Task { await save() }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if isSaving {
-                                ProgressView()
-                            } else {
-                                Text(isEditing ? "Update" : "Save")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
                     }
-                    .disabled(isSaving)
                 }
 
                 // Delete (edit mode only)

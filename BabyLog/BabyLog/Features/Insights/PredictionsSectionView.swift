@@ -7,6 +7,7 @@ struct PredictionsSectionView: View {
     let predictions: AnalyticsPredictions
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var gaugeAppeared = false
 
     var body: some View {
         let theme = AppTheme.resolved(for: colorScheme)
@@ -181,10 +182,17 @@ struct PredictionsSectionView: View {
                     // Fill
                     RoundedRectangle(cornerRadius: 4)
                         .fill(zoneColor(pressure.zone, theme: theme))
-                        .frame(width: geometry.size.width * min(pressure.score / 100.0, 1.0), height: 8)
+                        .frame(
+                            width: gaugeAppeared
+                                ? geometry.size.width * min(pressure.score / 100.0, 1.0)
+                                : 0,
+                            height: 8
+                        )
+                        .animation(.appGentle.delay(0.2), value: gaugeAppeared)
                 }
             }
             .frame(height: 8)
+            .onAppear { gaugeAppeared = true }
 
             // Zone indicators
             HStack {

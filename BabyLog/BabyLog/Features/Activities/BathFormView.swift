@@ -68,22 +68,12 @@ struct BathFormView: View {
                 }
 
                 // Save
-                Section {
-                    Button {
-                        Task { await save() }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if isSaving {
-                                ProgressView()
-                            } else {
-                                Text(isEditing ? "Update" : "Save")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .disabled(isSaving)
+                FormSaveButton(
+                    label: isEditing ? "Update" : "Save Bath",
+                    accentColor: theme.bath.main,
+                    isLoading: isSaving
+                ) {
+                    Task { await save() }
                 }
 
                 // Delete (edit mode only)
@@ -158,10 +148,11 @@ struct BathFormView: View {
             } else {
                 _ = try await api.createBath(body)
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
 
@@ -175,10 +166,11 @@ struct BathFormView: View {
         isSaving = true
         do {
             try await api.deleteBath(id: id)
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
         isSaving = false

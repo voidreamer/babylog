@@ -27,13 +27,16 @@ struct TimelineView: View {
             .padding(.bottom, Spacing.sm)
 
             if viewModel.isLoading && viewModel.events.isEmpty {
-                LoadingView(message: "Loading timeline...")
+                TimelineSkeleton()
+                    .transition(.opacity)
             } else if viewModel.events.isEmpty {
                 EmptyStateView(
                     icon: "clock",
-                    title: "No events",
-                    subtitle: "No activities recorded for this date. Start logging from the Dashboard."
+                    title: "No events yet",
+                    subtitle: "No activities recorded for this date.\nStart logging from the Dashboard!",
+                    actionLabel: nil
                 )
+                .transition(.opacity)
             } else {
                 TimelineBlockView(
                     events: viewModel.events,

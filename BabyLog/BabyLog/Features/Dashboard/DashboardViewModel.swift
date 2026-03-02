@@ -93,6 +93,7 @@ private struct QuickBathRequest: Encodable {
 final class DashboardViewModel {
     var dashboardData: DashboardData?
     var analyticsData: AnalyticsData?
+    var restPlanData: RestPlanResponse?
     var upcomingItems: [UpcomingItem] = []
     var isLoading = false
     var error: String?
@@ -160,6 +161,14 @@ final class DashboardViewModel {
         do {
             let response = try await apiClient.getUpcoming(babyId: babyId)
             upcomingItems = response.upcoming
+        } catch {
+            // Non-critical, silently fail
+        }
+    }
+
+    func loadRestPlan(babyId: Int) async {
+        do {
+            restPlanData = try await apiClient.getRestPlan(babyId: babyId)
         } catch {
             // Non-critical, silently fail
         }

@@ -28,6 +28,7 @@
 		24F0DAF324DB15FD4C382024 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 211073154F9A3990BF935003 /* KeychainHelper.swift */; };
 		2750248A1BC8865B19F51E73 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3B0B4DBC057A58890CDFE0 /* AccountSettingsView.swift */; };
 		2B4119A70C6354C67C6D2096 /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134D250A8D220EEB58089F22 /* ViewModifiers.swift */; };
+		DB9BC96E6A554E37B3662C2A /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6172AC2ADCD247C29CD4A757 /* Animations.swift */; };
 		2F264B14DCD116B00F94409E /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C5CA275603815F2952D054 /* TimelineView.swift */; };
 		32796F31F55DC4EEAFFC704D /* BabyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74EA801D9CC88549C61EB19 /* BabyProfileView.swift */; };
 		32F0A29AB5248FABF922E3A9 /* FormatUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C3B65CC8F883496238539A5 /* FormatUtils.swift */; };
@@ -85,6 +86,7 @@
 		92F9E570FC8A9941BF795ABF /* SleepAdvisorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2A5DD4711C2A532F0AECB6 /* SleepAdvisorCard.swift */; };
 		931FC71FC8F78228FFCD104C /* StatusHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF6E9B593909767E7C8B75E /* StatusHeroCard.swift */; };
 		5C8E1A3F7D2B49060F3E8A17 /* PredictionCardsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A7B2E81F3C6D9A0E5B7C42 /* PredictionCardsRow.swift */; };
+		B7E4F2A19D3C80E5F1A62D47 /* RestPlannerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F3A1B28E4D71F6A2B53E18 /* RestPlannerWidget.swift */; };
 		9660C32A2C606968023DCF8D /* Dashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E82CE37589F2A05A0FE5711 /* Dashboard.swift */; };
 		96ABF9611890B9BD874F8CCC /* IntentAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6375DD005DF3A6A01C66D4 /* IntentAPIClient.swift */; };
 		9752395087412FB6519C430D /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6DC057CFEA34A7C3E9BBCD /* AppTheme.swift */; };
@@ -110,6 +112,7 @@
 		BB1E43BD88B412E19D393BAF /* Baby.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59366E40F00E7E3CB42ABA4A /* Baby.swift */; };
 		BEE8E0DB39D3CD80A94FAE8A /* CallbackHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22FACE5867FEC49012647B33 /* CallbackHandler.swift */; };
 		C1EEC5EFBF8511AD69CF5879 /* WidgetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D282685A46132AC1C098F5 /* WidgetCard.swift */; };
+		89CA6748FFB94D8F94A3D902 /* FormComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03422A587664E3699148F43 /* FormComponents.swift */; };
 		C5196D8813FA614FFF642382 /* OfflineIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257D7517A21A7A46F4A4D392 /* OfflineIndicator.swift */; };
 		C5E821EAF44AF32A8F01A47B /* IntentAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6375DD005DF3A6A01C66D4 /* IntentAPIClient.swift */; };
 		C617EAAD4A7EED1D1FBF8CAE /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CAE98D3DC939D408220C3F /* NotificationSettingsView.swift */; };
@@ -131,6 +134,7 @@
 		EAB24D74A6887EC098BAA8A1 /* UnitConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86B8ABFF77DE332E1DED703 /* UnitConversion.swift */; };
 		EBC54F571449BC16A7768A0A /* OfflineModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781A1463AA25C49530351864 /* OfflineModels.swift */; };
 		EDF1D01B43EFA481703449ED /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 447A4B314DCE06471FACD4AF /* LoadingView.swift */; };
+		C17679E241AA4E52B9DA9103 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB72923D67DD4D3B8A14D466 /* SkeletonView.swift */; };
 		F23CB5A98F1DD70DDCDB8B93 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995600080C5B2F1D62700E28 /* Analytics.swift */; };
 		F2F968AAAC780909105A19A2 /* DateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1990CE238BCC72DD38D042BC /* DateFormatting.swift */; };
 		F37994235420075A2742507A /* SleepActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC2BB4A8E8CFC7ABD2BD475 /* SleepActivityAttributes.swift */; };
@@ -179,8 +183,10 @@
 		10804756B6451F2F76AC05CF /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		11B55DB304CF724EC76F8564 /* PumpingFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpingFormView.swift; sourceTree = "<group>"; };
 		134D250A8D220EEB58089F22 /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
+		6172AC2ADCD247C29CD4A757 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		1417A4A8366AE9D59A0AD7CB /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
 		16D282685A46132AC1C098F5 /* WidgetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetCard.swift; sourceTree = "<group>"; };
+		C03422A587664E3699148F43 /* FormComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormComponents.swift; sourceTree = "<group>"; };
 		1990CE238BCC72DD38D042BC /* DateFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatting.swift; sourceTree = "<group>"; };
 		1B8E04D86363321FE26B8AEE /* PredictionsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredictionsSectionView.swift; sourceTree = "<group>"; };
 		1C3B65CC8F883496238539A5 /* FormatUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatUtils.swift; sourceTree = "<group>"; };
@@ -208,6 +214,7 @@
 		3F8A5C9C2C58E0DF060E8728 /* WidgetSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettingsView.swift; sourceTree = "<group>"; };
 		429477281DBC362071C4EB6F /* TodayVsAverageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayVsAverageView.swift; sourceTree = "<group>"; };
 		447A4B314DCE06471FACD4AF /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		FB72923D67DD4D3B8A14D466 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 		46114B3CE3E66A59662D346A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		46B52669EAED0AB8DD637B95 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
 		4704DB5973F077201DA01B2D /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
@@ -282,6 +289,7 @@
 		D7D5F661268D45B5E154420D /* BabyAppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyAppShortcuts.swift; sourceTree = "<group>"; };
 		DB785924B0955A6A464F724F /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		D4A7B2E81F3C6D9A0E5B7C42 /* PredictionCardsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PredictionCardsRow.swift; sourceTree = "<group>"; };
+		C9F3A1B28E4D71F6A2B53E18 /* RestPlannerWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestPlannerWidget.swift; sourceTree = "<group>"; };
 		E3D7C87121793A3935B8A38F /* QuickActionsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickActionsRow.swift; sourceTree = "<group>"; };
 		E455F7E93A040F6CAAE15D6E /* AddBabyFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBabyFormView.swift; sourceTree = "<group>"; };
 		E899F03B4F50D5C23D26B0DB /* QuickBathIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickBathIntent.swift; sourceTree = "<group>"; };
@@ -403,6 +411,7 @@
 				8D9DC8AC9EEA15CBC16C7295 /* ThemeManager.swift */,
 				574229625C680BFF2FB293B5 /* Typography.swift */,
 				134D250A8D220EEB58089F22 /* ViewModifiers.swift */,
+				6172AC2ADCD247C29CD4A757 /* Animations.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -454,10 +463,12 @@
 				483C7FA0E11EFAD8976591BB /* ErrorBoundaryView.swift */,
 				1C3B65CC8F883496238539A5 /* FormatUtils.swift */,
 				447A4B314DCE06471FACD4AF /* LoadingView.swift */,
+				FB72923D67DD4D3B8A14D466 /* SkeletonView.swift */,
 				B4BFF575907848CD88EB1BD2 /* ModalSheet.swift */,
 				257D7517A21A7A46F4A4D392 /* OfflineIndicator.swift */,
 				F975F5276E77AE15792381F9 /* TimePicker.swift */,
 				16D282685A46132AC1C098F5 /* WidgetCard.swift */,
+				C03422A587664E3699148F43 /* FormComponents.swift */,
 				B0056120F61AE66CB5234BEA /* SharedDefaults.swift */,
 				6B6375DD005DF3A6A01C66D4 /* IntentAPIClient.swift */,
 			);
@@ -525,6 +536,7 @@
 				3B2A5DD4711C2A532F0AECB6 /* SleepAdvisorCard.swift */,
 				7EF6E9B593909767E7C8B75E /* StatusHeroCard.swift */,
 				D4A7B2E81F3C6D9A0E5B7C42 /* PredictionCardsRow.swift */,
+				C9F3A1B28E4D71F6A2B53E18 /* RestPlannerWidget.swift */,
 				E3D7C87121793A3935B8A38F /* QuickActionsRow.swift */,
 				9B1780C1262F172DD191CB9B /* TodayAtAGlanceView.swift */,
 				ADF7244B951EED42CD82B2AA /* RecentActivityView.swift */,
@@ -809,6 +821,7 @@
 				91851C486B136117B49C9D42 /* IntOrString.swift in Sources */,
 				24F0DAF324DB15FD4C382024 /* KeychainHelper.swift in Sources */,
 				EDF1D01B43EFA481703449ED /* LoadingView.swift in Sources */,
+				C17679E241AA4E52B9DA9103 /* SkeletonView.swift in Sources */,
 				98EB1077D80EF7B0848095E2 /* LocalizationManager.swift in Sources */,
 				F9263FBAB6E4B2DB5D50186A /* LoginView.swift in Sources */,
 				817315CCA62AD1BBAA4997B1 /* MedicationQuickLogView.swift in Sources */,
@@ -854,8 +867,10 @@
 				D522C10DAC6F6965F63A0129 /* User.swift in Sources */,
 				4098C35CAA5DB7E6A231A0D8 /* VaccinationScheduleView.swift in Sources */,
 				2B4119A70C6354C67C6D2096 /* ViewModifiers.swift in Sources */,
+				DB9BC96E6A554E37B3662C2A /* Animations.swift in Sources */,
 				B801FCA32E94BD3B9E5B6632 /* WHOGrowthData.swift in Sources */,
 				C1EEC5EFBF8511AD69CF5879 /* WidgetCard.swift in Sources */,
+				89CA6748FFB94D8F94A3D902 /* FormComponents.swift in Sources */,
 				456720477F9DCA565F43D1BA /* WidgetSettingsView.swift in Sources */,
 				05F067EEC3A158DAFD224436 /* SharedDefaults.swift in Sources */,
 				C5E821EAF44AF32A8F01A47B /* IntentAPIClient.swift in Sources */,
@@ -870,6 +885,7 @@
 				92F9E570FC8A9941BF795ABF /* SleepAdvisorCard.swift in Sources */,
 				931FC71FC8F78228FFCD104C /* StatusHeroCard.swift in Sources */,
 				5C8E1A3F7D2B49060F3E8A17 /* PredictionCardsRow.swift in Sources */,
+				B7E4F2A19D3C80E5F1A62D47 /* RestPlannerWidget.swift in Sources */,
 				F9F05E4903099291620740DA /* QuickActionsRow.swift in Sources */,
 				B8861EDA9360857EE7DE619A /* TodayAtAGlanceView.swift in Sources */,
 				6D2550203EBCE16359DAC3C2 /* RecentActivityView.swift in Sources */,

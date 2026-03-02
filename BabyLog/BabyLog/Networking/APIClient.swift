@@ -52,13 +52,135 @@ struct UpcomingResponse: Codable, Sendable {
     let upcoming: [UpcomingItem]
 }
 
-struct RestPlanData: Codable, Sendable {
+// MARK: - Rest Planner Response
+
+struct RestPlanResponse: Codable, Sendable {
     let babyId: Int?
-    let plan: [String: AnyCodable]?
+    let generatedAt: String?
+    let currentState: RestCurrentState?
+    let restWindows: [RestWindow]
+    let summary: RestSummary?
+    let patternsUsed: RestPatternsUsed?
 
     enum CodingKeys: String, CodingKey {
         case babyId = "baby_id"
-        case plan
+        case generatedAt = "generated_at"
+        case currentState = "current_state"
+        case restWindows = "rest_windows"
+        case summary
+        case patternsUsed = "patterns_used"
+    }
+}
+
+struct RestCurrentState: Codable, Sendable {
+    let isSleeping: Bool
+    let minutesAwake: Double
+    let sleepPressure: Double?
+    let lastFeedMinutesAgo: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case isSleeping = "is_sleeping"
+        case minutesAwake = "minutes_awake"
+        case sleepPressure = "sleep_pressure"
+        case lastFeedMinutesAgo = "last_feed_minutes_ago"
+    }
+}
+
+struct RestWindow: Sendable, Identifiable {
+    var id: String { "\(label)-\(start)" }
+
+    let start: String
+    let end: String
+    let durationMinutes: Int
+    let label: String
+    let isCurrent: Bool
+    let hasFeedingOverlap: Bool
+    let notes: [String]?
+    let startRange: RestTimeRange?
+    let confidenceScore: Int?
+    let confidence: String
+    let quality: String
+    let sleepPressureAtStart: Double?
+    let signals: [String: RestSignal]?
+
+    enum CodingKeys: String, CodingKey {
+        case start, end
+        case durationMinutes = "duration_minutes"
+        case label
+        case isCurrent = "is_current"
+        case hasFeedingOverlap = "has_feeding_overlap"
+        case notes
+        case startRange = "start_range"
+        case confidenceScore = "confidence_score"
+        case confidence, quality
+        case sleepPressureAtStart = "sleep_pressure_at_start"
+        case signals
+    }
+}
+
+extension RestWindow: Codable {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        start = try c.decode(String.self, forKey: .start)
+        end = try c.decode(String.self, forKey: .end)
+        // Backend round() can emit int or float — accept both
+        if let i = try? c.decode(Int.self, forKey: .durationMinutes) {
+            durationMinutes = i
+        } else {
+            durationMinutes = Int(try c.decode(Double.self, forKey: .durationMinutes))
+        }
+        label = try c.decode(String.self, forKey: .label)
+        isCurrent = try c.decodeIfPresent(Bool.self, forKey: .isCurrent) ?? false
+        hasFeedingOverlap = try c.decodeIfPresent(Bool.self, forKey: .hasFeedingOverlap) ?? false
+        notes = try c.decodeIfPresent([String].self, forKey: .notes)
+        startRange = try c.decodeIfPresent(RestTimeRange.self, forKey: .startRange)
+        confidenceScore = try c.decodeIfPresent(Int.self, forKey: .confidenceScore)
+        confidence = try c.decodeIfPresent(String.self, forKey: .confidence) ?? "low"
+        quality = try c.decodeIfPresent(String.self, forKey: .quality) ?? "fair"
+        sleepPressureAtStart = try c.decodeIfPresent(Double.self, forKey: .sleepPressureAtStart)
+        signals = try c.decodeIfPresent([String: RestSignal].self, forKey: .signals)
+    }
+}
+
+struct RestTimeRange: Codable, Sendable {
+    let earliest: String
+    let latest: String
+}
+
+struct RestSignal: Codable, Sendable {
+    let time: String
+    let weight: Double
+}
+
+struct RestSummary: Codable, Sendable {
+    let totalRestMinutesRemaining: Int
+    let nextRestInMinutes: Int?
+    let restWindowsCount: Int
+    let messageKey: String
+
+    enum CodingKeys: String, CodingKey {
+        case totalRestMinutesRemaining = "total_rest_minutes_remaining"
+        case nextRestInMinutes = "next_rest_in_minutes"
+        case restWindowsCount = "rest_windows_count"
+        case messageKey = "message_key"
+    }
+}
+
+struct RestPatternsUsed: Codable, Sendable {
+    let avgNapDuration: Int?
+    let avgWakeWindow: Double?
+    let avgFeedingInterval: Int?
+    let dataDays: Int
+    let hasEnoughData: Bool
+    let signalsUsed: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case avgNapDuration = "avg_nap_duration"
+        case avgWakeWindow = "avg_wake_window"
+        case avgFeedingInterval = "avg_feeding_interval"
+        case dataDays = "data_days"
+        case hasEnoughData = "has_enough_data"
+        case signalsUsed = "signals_used"
     }
 }
 
@@ -598,7 +720,7 @@ final class APIClient {
 
     // MARK: - Rest Planner
 
-    func getRestPlan(babyId: Int, days: Int = 7) async throws -> RestPlanData? {
+    func getRestPlan(babyId: Int, days: Int = 7) async throws -> RestPlanResponse? {
         let tzOffset = -(TimeZone.current.secondsFromGMT() / 60)
         return try await request(Endpoints.RestPlanner.plan(babyId: babyId, days: days, tzOffset: tzOffset))
     }

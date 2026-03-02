@@ -56,14 +56,15 @@ struct TummyTimeFormView: View {
                 }
 
                 // Duration
-                Section("Duration") {
-                    HStack {
-                        Text("\(Int(durationMinutes)) min")
-                            .monospacedDigit()
-                        Spacer()
-                        Stepper("", value: $durationMinutes, in: 1...120, step: 1)
-                            .labelsHidden()
-                    }
+                Section {
+                    QuantityStepper(
+                        label: "Duration",
+                        unit: "min",
+                        value: $durationMinutes,
+                        range: 1...120,
+                        step: 1,
+                        accentColor: theme.tummy.main
+                    )
                 }
 
                 // Notes
@@ -82,22 +83,12 @@ struct TummyTimeFormView: View {
                 }
 
                 // Save
-                Section {
-                    Button {
-                        Task { await save() }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if isSaving {
-                                ProgressView()
-                            } else {
-                                Text(isEditing ? "Update" : "Save")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .disabled(isSaving)
+                FormSaveButton(
+                    label: isEditing ? "Update" : "Save Tummy Time",
+                    accentColor: theme.tummy.main,
+                    isLoading: isSaving
+                ) {
+                    Task { await save() }
                 }
 
                 // Delete (edit mode only)
@@ -174,10 +165,11 @@ struct TummyTimeFormView: View {
             } else {
                 _ = try await api.createTummyTime(body)
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
 
@@ -191,10 +183,11 @@ struct TummyTimeFormView: View {
         isSaving = true
         do {
             try await api.deleteTummyTime(id: id)
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
         isSaving = false

@@ -7,6 +7,7 @@ struct BenchmarksSectionView: View {
     let benchmarks: AnalyticsBenchmarks
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var rangeAppeared = false
 
     var body: some View {
         let theme = AppTheme.resolved(for: colorScheme)
@@ -133,6 +134,8 @@ struct BenchmarksSectionView: View {
                     .font(.appMono(size: 12))
                     .foregroundStyle(theme.textSecondary)
             }
+            .opacity(rangeAppeared ? 1 : 0)
+            .animation(.appGentle.delay(0.1), value: rangeAppeared)
 
             // Bar visualization
             GeometryReader { geometry in
@@ -151,23 +154,29 @@ struct BenchmarksSectionView: View {
 
                     RoundedRectangle(cornerRadius: 4)
                         .fill(iconColor.opacity(0.3))
-                        .frame(width: rangeWidth, height: 12)
-                        .offset(x: rangeStart)
+                        .frame(width: rangeAppeared ? rangeWidth : 0, height: 12)
+                        .offset(x: rangeAppeared ? rangeStart : width / 2)
+                        .animation(.appGentle.delay(0.2), value: rangeAppeared)
 
                     // Min marker
                     RoundedRectangle(cornerRadius: 1)
                         .fill(iconColor)
                         .frame(width: 3, height: 16)
-                        .offset(x: rangeStart)
+                        .offset(x: rangeAppeared ? rangeStart : width / 2)
+                        .opacity(rangeAppeared ? 1 : 0)
+                        .animation(.appGentle.delay(0.3), value: rangeAppeared)
 
                     // Max marker
                     RoundedRectangle(cornerRadius: 1)
                         .fill(iconColor)
                         .frame(width: 3, height: 16)
-                        .offset(x: rangeEnd - 3)
+                        .offset(x: rangeAppeared ? rangeEnd - 3 : width / 2)
+                        .opacity(rangeAppeared ? 1 : 0)
+                        .animation(.appGentle.delay(0.3), value: rangeAppeared)
                 }
             }
             .frame(height: 16)
+            .onAppear { rangeAppeared = true }
         }
         .padding(.leading, 20 + Spacing.sm)
     }

@@ -135,11 +135,23 @@ struct QuickActionsRow: View {
                 Circle()
                     .fill(isActive ? colors.main : colors.bg)
                     .frame(width: 48, height: 48)
+                    .shadow(
+                        color: isActive ? colors.main.opacity(0.3) : .clear,
+                        radius: isActive ? 6 : 0,
+                        y: isActive ? 2 : 0
+                    )
 
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(isActive ? .white : colors.main)
+                if isQuickLogging {
+                    ProgressView()
+                        .tint(isActive ? .white : colors.main)
+                        .scaleEffect(0.8)
+                } else {
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(isActive ? .white : colors.main)
+                }
             }
+            .animation(.appSnappy, value: isActive)
 
             Text(label)
                 .font(.appBody(size: 10, weight: .medium))

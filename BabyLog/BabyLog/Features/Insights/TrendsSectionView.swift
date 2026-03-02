@@ -7,6 +7,7 @@ struct TrendsSectionView: View {
     let trends: AnalyticsTrends
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var barsAppeared = false
 
     var body: some View {
         let theme = AppTheme.resolved(for: colorScheme)
@@ -148,10 +149,20 @@ struct TrendsSectionView: View {
             ForEach(0..<5, id: \.self) { index in
                 RoundedRectangle(cornerRadius: 2)
                     .fill(color.opacity(barOpacity(for: index, trend: trend)))
-                    .frame(width: 20, height: barHeight(for: index, trend: trend))
+                    .frame(
+                        width: 20,
+                        height: barsAppeared ? barHeight(for: index, trend: trend) : 2
+                    )
+                    .animation(
+                        .appBouncy.delay(0.05 * Double(index)),
+                        value: barsAppeared
+                    )
             }
         }
         .frame(height: 16, alignment: .bottom)
+        .onAppear {
+            barsAppeared = true
+        }
     }
 
     private func barHeight(for index: Int, trend: String) -> CGFloat {

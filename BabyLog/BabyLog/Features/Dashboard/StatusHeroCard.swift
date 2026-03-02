@@ -10,6 +10,7 @@ struct StatusHeroCard: View {
     var onEndSleep: (() -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var ringAppeared = false
 
     private var theme: ResolvedTheme {
         AppTheme.resolved(for: colorScheme)
@@ -114,23 +115,25 @@ struct StatusHeroCard: View {
                 Circle()
                     .stroke(ringBackgroundColor.opacity(0.3), style: StrokeStyle(lineWidth: 6, lineCap: .round))
 
-                // Filled ring
+                // Filled ring (animated on appear)
                 if let score = predictions?.sleepPressure?.score, hasEnoughData {
                     Circle()
-                        .trim(from: 0, to: min(score / 100, 1.0))
+                        .trim(from: 0, to: ringAppeared ? min(score / 100, 1.0) : 0)
                         .stroke(
                             ringGradient(score: score),
                             style: StrokeStyle(lineWidth: 6, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
+                        .animation(.appGentle, value: ringAppeared)
                 } else if isSleeping {
                     Circle()
-                        .trim(from: 0, to: 0.75)
+                        .trim(from: 0, to: ringAppeared ? 0.75 : 0)
                         .stroke(
                             theme.sleep.main,
                             style: StrokeStyle(lineWidth: 6, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
+                        .animation(.appGentle, value: ringAppeared)
                 }
 
                 // Center: elapsed time
@@ -139,10 +142,16 @@ struct StatusHeroCard: View {
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(isSleeping ? theme.sleep.main : theme.text)
                         .monospacedDigit()
+                        .contentTransition(.numericText())
 
                     Text(isSleeping ? "asleep" : "awake")
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(theme.textMuted)
+                }
+                .onAppear {
+                    withAnimation(.appGentle.delay(0.2)) {
+                        ringAppeared = true
+                    }
                 }
 
                 // Pulsing dot when sleeping

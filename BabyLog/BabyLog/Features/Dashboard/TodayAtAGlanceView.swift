@@ -47,7 +47,8 @@ struct TodayAtAGlanceView: View {
                     label: "Feeds",
                     current: Double(summary?.totalFeedings ?? 0),
                     target: feedingTarget,
-                    colors: theme.feeding
+                    colors: theme.feeding,
+                    index: 0
                 )
 
                 glanceCard(
@@ -55,7 +56,8 @@ struct TodayAtAGlanceView: View {
                     label: "Diapers",
                     current: Double(summary?.totalDiapers ?? 0),
                     target: diaperTarget,
-                    colors: theme.diaper
+                    colors: theme.diaper,
+                    index: 1
                 )
 
                 glanceCard(
@@ -64,7 +66,8 @@ struct TodayAtAGlanceView: View {
                     current: (summary?.totalSleepMinutes ?? 0) / 60,
                     target: sleepTargetHours,
                     colors: theme.sleep,
-                    formatAsHours: true
+                    formatAsHours: true,
+                    index: 2
                 )
             }
         }
@@ -78,7 +81,8 @@ struct TodayAtAGlanceView: View {
         current: Double,
         target: Double,
         colors: ActivityColorSet,
-        formatAsHours: Bool = false
+        formatAsHours: Bool = false,
+        index: Int
     ) -> some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             HStack(spacing: Spacing.xs) {
@@ -98,26 +102,21 @@ struct TodayAtAGlanceView: View {
                 Text(hours > 0 ? "\(hours)h \(mins)m" : "\(mins)m")
                     .font(.appBody(size: 16, weight: .bold))
                     .foregroundStyle(theme.text)
+                    .contentTransition(.numericText())
             } else {
                 Text("\(Int(current))/\(Int(target))")
                     .font(.appBody(size: 16, weight: .bold))
                     .foregroundStyle(theme.text)
+                    .contentTransition(.numericText())
             }
 
-            // Progress bar
+            // Animated progress bar
             let progress = target > 0 ? min(current / target, 1.0) : 0
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(colors.bg)
-                        .frame(height: 6)
-
-                    Capsule()
-                        .fill(colors.main)
-                        .frame(width: max(0, geo.size.width * progress), height: 6)
-                }
-            }
-            .frame(height: 6)
+            AnimatedProgressBar(
+                progress: progress,
+                fillColor: colors.main,
+                bgColor: colors.bg
+            )
         }
         .padding(Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -127,5 +126,40 @@ struct TodayAtAGlanceView: View {
             RoundedRectangle(cornerRadius: Radii.md, style: .continuous)
                 .stroke(theme.borderLight, lineWidth: 0.5)
         )
+    }
+}
+
+// MARK: - Animated Progress Bar
+
+private struct AnimatedProgressBar: View {
+    let progress: Double
+    let fillColor: Color
+    let bgColor: Color
+
+    @State private var animatedProgress: Double = 0
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(bgColor)
+                    .frame(height: 6)
+
+                Capsule()
+                    .fill(fillColor)
+                    .frame(width: max(0, geo.size.width * animatedProgress), height: 6)
+            }
+        }
+        .frame(height: 6)
+        .onAppear {
+            withAnimation(.appGentle.delay(0.3)) {
+                animatedProgress = progress
+            }
+        }
+        .onChange(of: progress) { _, newValue in
+            withAnimation(.appGentle) {
+                animatedProgress = newValue
+            }
+        }
     }
 }

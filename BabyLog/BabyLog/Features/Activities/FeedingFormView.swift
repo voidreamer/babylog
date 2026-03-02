@@ -40,6 +40,7 @@ struct FeedingFormView: View {
     @State private var isSaving = false
     @State private var showDeleteConfirm = false
     @State private var errorMessage: String?
+    @State private var showSuccess = false
 
     private var isEditing: Bool { existing != nil }
 
@@ -64,16 +65,19 @@ struct FeedingFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // Type picker
+                // Type picker — custom pills
                 Section {
-                    Picker("Type", selection: $feedingType) {
-                        Text("Breast").tag(FeedingType.breast)
-                        Text("Bottle").tag(FeedingType.bottle)
-                        Text("Formula").tag(FeedingType.formula)
-                        Text("BM Bottle").tag(FeedingType.breastmilkBottle)
-                        Text("Solid").tag(FeedingType.solid)
-                    }
-                    .pickerStyle(.segmented)
+                    ActivityPillPicker(
+                        options: [
+                            (value: FeedingType.breast, label: "Breast", icon: "hand.raised.fill"),
+                            (value: FeedingType.bottle, label: "Bottle", icon: "cup.and.saucer.fill"),
+                            (value: FeedingType.formula, label: "Formula", icon: "flask.fill"),
+                            (value: FeedingType.breastmilkBottle, label: "BM Bottle", icon: "drop.fill"),
+                            (value: FeedingType.solid, label: "Solid", icon: "carrot.fill"),
+                        ],
+                        selection: $feedingType,
+                        colorSet: theme.feeding
+                    )
                 }
 
                 // Time
@@ -84,27 +88,31 @@ struct FeedingFormView: View {
                 // Duration (breast only)
                 if showDuration {
                     Section("Duration") {
-                        HStack {
-                            Text("\(Int(durationMinutes)) min")
-                                .monospacedDigit()
-                            Spacer()
-                            Stepper("", value: $durationMinutes, in: 1...120, step: 1)
-                                .labelsHidden()
-                        }
+                        QuantityStepper(
+                            label: "Duration",
+                            unit: "min",
+                            value: $durationMinutes,
+                            range: 1...120,
+                            step: 1,
+                            accentColor: theme.feeding.main
+                        )
                     }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
 
                 // Amount (bottle/formula/breastmilk bottle)
                 if showAmount {
                     Section("Amount") {
-                        HStack {
-                            Text("\(Int(amountMl)) ml")
-                                .monospacedDigit()
-                            Spacer()
-                            Stepper("", value: $amountMl, in: 0...500, step: 5)
-                                .labelsHidden()
-                        }
+                        QuantityStepper(
+                            label: "Amount",
+                            unit: "ml",
+                            value: $amountMl,
+                            range: 0...500,
+                            step: 5,
+                            accentColor: theme.feeding.main
+                        )
                     }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
 
                 // Notes
@@ -118,27 +126,19 @@ struct FeedingFormView: View {
                     Section {
                         Text(errorMessage)
                             .foregroundStyle(.red)
-                            .font(.footnote)
+                            .font(.appBody(size: 14))
                     }
                 }
 
                 // Save
                 Section {
-                    Button {
+                    FormSaveButton(
+                        label: isEditing ? "Update" : "Save Feeding",
+                        accentColor: theme.feeding.main,
+                        isLoading: isSaving
+                    ) {
                         Task { await save() }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if isSaving {
-                                ProgressView()
-                            } else {
-                                Text(isEditing ? "Update" : "Save")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
                     }
-                    .disabled(isSaving)
                 }
 
                 // Delete (edit mode only)
@@ -157,6 +157,7 @@ struct FeedingFormView: View {
                     }
                 }
             }
+            .animation(.appSnappy, value: feedingType)
             .navigationTitle(isEditing ? "Edit Feeding" : "Log Feeding")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -219,10 +220,11 @@ struct FeedingFormView: View {
             } else {
                 _ = try await api.createFeeding(body)
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
 
@@ -236,7 +238,7 @@ struct FeedingFormView: View {
         isSaving = true
         do {
             try await api.deleteFeeding(id: id)
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {

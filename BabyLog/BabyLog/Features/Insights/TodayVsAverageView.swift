@@ -7,6 +7,7 @@ struct TodayVsAverageView: View {
     let todayVsAverage: TodayVsAverage
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var barsAppeared = false
 
     var body: some View {
         let theme = AppTheme.resolved(for: colorScheme)
@@ -121,6 +122,7 @@ struct TodayVsAverageView: View {
                     Text(formatValue(today, isDecimal: isDecimal) + unit)
                         .font(.appMono(size: 20, weight: .bold))
                         .foregroundStyle(theme.text)
+                        .contentTransition(.numericText())
                 }
 
                 // Average value
@@ -131,6 +133,7 @@ struct TodayVsAverageView: View {
                     Text(formatValue(average, isDecimal: isDecimal) + unit)
                         .font(.appMono(size: 20, weight: .medium))
                         .foregroundStyle(theme.textSecondary)
+                        .contentTransition(.numericText())
                 }
 
                 Spacer()
@@ -168,7 +171,11 @@ struct TodayVsAverageView: View {
                 GeometryReader { geometry in
                     RoundedRectangle(cornerRadius: 3)
                         .fill(statusColor)
-                        .frame(width: barWidth(value: today, maxValue: maxValue, totalWidth: geometry.size.width))
+                        .frame(width: barsAppeared
+                            ? barWidth(value: today, maxValue: maxValue, totalWidth: geometry.size.width)
+                            : 4
+                        )
+                        .animation(.appGentle.delay(0.2), value: barsAppeared)
                 }
                 .frame(height: 8)
             }
@@ -183,10 +190,17 @@ struct TodayVsAverageView: View {
                 GeometryReader { geometry in
                     RoundedRectangle(cornerRadius: 3)
                         .fill(color.opacity(0.35))
-                        .frame(width: barWidth(value: average, maxValue: maxValue, totalWidth: geometry.size.width))
+                        .frame(width: barsAppeared
+                            ? barWidth(value: average, maxValue: maxValue, totalWidth: geometry.size.width)
+                            : 4
+                        )
+                        .animation(.appGentle.delay(0.3), value: barsAppeared)
                 }
                 .frame(height: 8)
             }
+        }
+        .onAppear {
+            barsAppeared = true
         }
     }
 

@@ -83,14 +83,17 @@ struct DiaperFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // Type picker
+                // Type picker — custom pills
                 Section {
-                    Picker("Type", selection: $diaperType) {
-                        Text("Pee").tag(DiaperType.pee)
-                        Text("Poo").tag(DiaperType.poo)
-                        Text("Mixed").tag(DiaperType.mixed)
-                    }
-                    .pickerStyle(.segmented)
+                    ActivityPillPicker(
+                        options: [
+                            (value: DiaperType.pee, label: "Pee", icon: "drop.fill"),
+                            (value: DiaperType.poo, label: "Poo", icon: "leaf.fill"),
+                            (value: DiaperType.mixed, label: "Mixed", icon: "circle.dotted"),
+                        ],
+                        selection: $diaperType,
+                        colorSet: theme.diaper
+                    )
                 }
 
                 // Time
@@ -138,21 +141,13 @@ struct DiaperFormView: View {
 
                 // Save
                 Section {
-                    Button {
+                    FormSaveButton(
+                        label: isEditing ? "Update" : "Save Diaper",
+                        accentColor: theme.diaper.main,
+                        isLoading: isSaving
+                    ) {
                         Task { await save() }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if isSaving {
-                                ProgressView()
-                            } else {
-                                Text(isEditing ? "Update" : "Save")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
                     }
-                    .disabled(isSaving)
                 }
 
                 // Delete (edit mode only)

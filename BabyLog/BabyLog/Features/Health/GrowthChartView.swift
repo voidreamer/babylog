@@ -43,6 +43,7 @@ struct GrowthChartView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedMetric: GrowthMetric = .weight
     @State private var whoData: WHOData?
+    @State private var chartAppeared = false
 
     private var theme: ResolvedTheme {
         AppTheme.resolved(for: colorScheme)
@@ -68,6 +69,10 @@ struct GrowthChartView: View {
             if let chartData = chartDataPoints, !chartData.isEmpty {
                 chartView(data: chartData)
                     .padding(16)
+                    .opacity(chartAppeared ? 1 : 0)
+                    .offset(y: chartAppeared ? 0 : 16)
+                    .animation(.appGentle.delay(0.15), value: chartAppeared)
+                    .onAppear { chartAppeared = true }
             } else {
                 EmptyStateView(
                     icon: selectedMetric.icon,
@@ -79,6 +84,8 @@ struct GrowthChartView: View {
             // Data table
             if !filteredRecords.isEmpty {
                 dataTable
+                    .opacity(chartAppeared ? 1 : 0)
+                    .animation(.appGentle.delay(0.3), value: chartAppeared)
             }
 
             Spacer(minLength: 0)

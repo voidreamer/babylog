@@ -6,6 +6,8 @@ struct WidgetCard<Content: View>: View {
     let accentColor: Color
     let content: () -> Content
 
+    @Environment(\.colorScheme) private var colorScheme
+
     init(title: String, icon: String, accentColor: Color, @ViewBuilder content: @escaping () -> Content) {
         self.title = title
         self.icon = icon
@@ -14,21 +16,32 @@ struct WidgetCard<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
+        let theme = AppTheme.resolved(for: colorScheme)
+
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            HStack(spacing: Spacing.sm) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(accentColor)
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .font(.appBody(size: 14, weight: .semibold))
+                    .foregroundStyle(theme.textSecondary)
                 Spacer()
             }
             content()
         }
-        .padding(16)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+        .padding(Spacing.lg)
+        .background(theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: Radii.md, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: Radii.md, style: .continuous)
+                .stroke(theme.borderLight, lineWidth: 0.5)
+        )
+        .shadow(
+            color: AppShadow.card.color,
+            radius: AppShadow.card.radius,
+            x: AppShadow.card.x,
+            y: AppShadow.card.y
+        )
     }
 }

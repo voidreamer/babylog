@@ -7,6 +7,7 @@ struct PatternsSectionView: View {
     let patterns: AnalyticsPatterns
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var rowsAppeared = false
 
     var body: some View {
         let theme = AppTheme.resolved(for: colorScheme)
@@ -31,7 +32,8 @@ struct PatternsSectionView: View {
                         label: "Usual Wake Time",
                         value: wakeTime,
                         theme: theme,
-                        showDivider: true
+                        showDivider: true,
+                        rowIndex: 0
                     )
                 }
 
@@ -42,7 +44,8 @@ struct PatternsSectionView: View {
                         label: "Usual Bedtime",
                         value: bedtime,
                         theme: theme,
-                        showDivider: true
+                        showDivider: true,
+                        rowIndex: 1
                     )
                 }
 
@@ -53,7 +56,8 @@ struct PatternsSectionView: View {
                         label: "Avg Feeding Interval",
                         value: formatHoursDecimal(feedingInterval),
                         theme: theme,
-                        showDivider: true
+                        showDivider: true,
+                        rowIndex: 2
                     )
                 }
 
@@ -64,7 +68,8 @@ struct PatternsSectionView: View {
                         label: "Avg Nap Duration",
                         value: formatMinutesValue(napDuration),
                         theme: theme,
-                        showDivider: true
+                        showDivider: true,
+                        rowIndex: 3
                     )
                 }
 
@@ -75,7 +80,8 @@ struct PatternsSectionView: View {
                         label: "Wake Interval",
                         value: formatHoursDecimal(wakeInterval),
                         theme: theme,
-                        showDivider: false
+                        showDivider: false,
+                        rowIndex: 4
                     )
                 }
             }
@@ -103,15 +109,20 @@ struct PatternsSectionView: View {
         label: String,
         value: String,
         theme: ResolvedTheme,
-        showDivider: Bool
+        showDivider: Bool,
+        rowIndex: Int = 0
     ) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: Spacing.md) {
                 // Icon
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(iconColor)
-                    .frame(width: 24, height: 24)
+                ZStack {
+                    Circle()
+                        .fill(iconColor.opacity(0.12))
+                        .frame(width: 28, height: 28)
+                    Image(systemName: icon)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(iconColor)
+                }
 
                 // Label
                 Text(label)
@@ -120,16 +131,28 @@ struct PatternsSectionView: View {
 
                 Spacer()
 
-                // Value
+                // Value badge
                 Text(value)
                     .font(.appBody(size: 15, weight: .semibold))
-                    .foregroundStyle(theme.text)
+                    .foregroundStyle(iconColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(iconColor.opacity(0.1))
+                    )
             }
             .padding(.vertical, Spacing.md)
+            .opacity(rowsAppeared ? 1 : 0)
+            .offset(x: rowsAppeared ? 0 : 20)
+            .animation(.appGentle.delay(0.05 * Double(rowIndex)), value: rowsAppeared)
 
             if showDivider {
                 ThemedDivider()
             }
+        }
+        .onAppear {
+            rowsAppeared = true
         }
     }
 

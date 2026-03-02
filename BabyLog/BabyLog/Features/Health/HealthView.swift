@@ -74,7 +74,8 @@ struct HealthView: View {
     @ViewBuilder
     private func content(baby: Baby) -> some View {
         if viewModel.isLoading && viewModel.growthRecords.isEmpty {
-            LoadingView(message: "Loading health data...")
+            HealthSkeleton()
+                .transition(.opacity)
         } else {
             ScrollView {
                 VStack(spacing: 16) {
@@ -87,6 +88,7 @@ struct HealthView: View {
                         GrowthCardView(latestRecord: viewModel.latestGrowth)
                     }
                     .buttonStyle(.plain)
+                    .staggeredAppear(index: 0)
 
                     NavigationLink {
                         VaccinationScheduleView(
@@ -99,24 +101,28 @@ struct HealthView: View {
                         vaccinationSummaryCard
                     }
                     .buttonStyle(.plain)
+                    .staggeredAppear(index: 1)
 
                     TeethingCardView(
                         teeth: viewModel.teeth,
                         viewModel: viewModel,
                         babyId: baby.id
                     )
+                    .staggeredAppear(index: 2)
 
                     AllergiesCardView(
                         allergies: viewModel.allergies,
                         viewModel: viewModel,
                         babyId: baby.id
                     )
+                    .staggeredAppear(index: 3)
 
                     SickDaysCardView(
                         sickDays: viewModel.sickDays,
                         viewModel: viewModel,
                         babyId: baby.id
                     )
+                    .staggeredAppear(index: 4)
 
                     RecordsSectionView(
                         doctorVisits: viewModel.doctorVisits,
@@ -124,6 +130,7 @@ struct HealthView: View {
                         babyId: baby.id,
                         onAdd: { activeSheet = .doctorVisit }
                     )
+                    .staggeredAppear(index: 5)
 
                     MedicationQuickLogView(
                         medications: viewModel.medications,
@@ -131,6 +138,7 @@ struct HealthView: View {
                         babyId: baby.id,
                         onAdd: { activeSheet = .medication }
                     )
+                    .staggeredAppear(index: 6)
                 }
                 .padding(16)
             }

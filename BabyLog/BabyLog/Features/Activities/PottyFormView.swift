@@ -89,22 +89,12 @@ struct PottyFormView: View {
                 }
 
                 // Save
-                Section {
-                    Button {
-                        Task { await save() }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if isSaving {
-                                ProgressView()
-                            } else {
-                                Text(isEditing ? "Update" : "Save")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .disabled(isSaving)
+                FormSaveButton(
+                    label: isEditing ? "Update" : "Save Potty",
+                    accentColor: theme.potty.main,
+                    isLoading: isSaving
+                ) {
+                    Task { await save() }
                 }
 
                 // Delete (edit mode only)
@@ -183,10 +173,11 @@ struct PottyFormView: View {
             } else {
                 _ = try await api.createPottyLog(body)
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
 
@@ -200,10 +191,11 @@ struct PottyFormView: View {
         isSaving = true
         do {
             try await api.deletePottyLog(id: id)
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            HapticFeedback.success()
             onSaved?()
             dismiss()
         } catch {
+            HapticFeedback.error()
             errorMessage = error.localizedDescription
         }
         isSaving = false

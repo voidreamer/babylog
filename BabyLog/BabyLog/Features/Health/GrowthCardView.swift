@@ -5,38 +5,43 @@ import SwiftUI
 struct GrowthCardView: View {
     let latestRecord: GrowthRecord?
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
+        let theme = AppTheme.resolved(for: colorScheme)
+
         WidgetCard(
             title: "Growth",
             icon: "chart.line.uptrend.xyaxis",
-            accentColor: AppColors.Light.primary
+            accentColor: theme.accent
         ) {
             if let record = latestRecord {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: Spacing.md) {
                     // Date header
                     HStack {
                         Text("Latest: \(FormatUtils.formatDisplayDate(record.recordedDate))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.appBody(size: 12))
+                            .foregroundStyle(theme.textSecondary)
                         Spacer()
-                        HStack(spacing: 4) {
+                        HStack(spacing: Spacing.xs) {
                             Text("View Chart")
-                                .font(.caption)
-                                .foregroundStyle(AppColors.Light.primary)
+                                .font(.appBody(size: 12, weight: .medium))
+                                .foregroundStyle(theme.accent)
                             Image(systemName: "chevron.right")
-                                .font(.caption2)
-                                .foregroundStyle(AppColors.Light.primary)
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(theme.accent)
                         }
                     }
 
                     // Measurements row
-                    HStack(spacing: 16) {
+                    HStack(spacing: Spacing.lg) {
                         if let weight = record.weightKg {
                             measurementItem(
                                 label: "Weight",
                                 value: FormatUtils.formatWeight(kg: weight, useLbs: false),
                                 icon: "scalemass",
-                                color: .blue
+                                color: .blue,
+                                theme: theme
                             )
                         }
 
@@ -45,7 +50,8 @@ struct GrowthCardView: View {
                                 label: "Height",
                                 value: FormatUtils.formatHeight(cm: height, useIn: false),
                                 icon: "ruler",
-                                color: .green
+                                color: .green,
+                                theme: theme
                             )
                         }
 
@@ -54,7 +60,8 @@ struct GrowthCardView: View {
                                 label: "Head",
                                 value: FormatUtils.formatHeight(cm: head, useIn: false),
                                 icon: "circle.dashed",
-                                color: .orange
+                                color: .orange,
+                                theme: theme
                             )
                         }
                     }
@@ -62,16 +69,16 @@ struct GrowthCardView: View {
             } else {
                 HStack {
                     Text("No growth records yet")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.appBody(size: 14))
+                        .foregroundStyle(theme.textSecondary)
                     Spacer()
-                    HStack(spacing: 4) {
+                    HStack(spacing: Spacing.xs) {
                         Text("View Chart")
-                            .font(.caption)
-                            .foregroundStyle(AppColors.Light.primary)
+                            .font(.appBody(size: 12, weight: .medium))
+                            .foregroundStyle(theme.accent)
                         Image(systemName: "chevron.right")
-                            .font(.caption2)
-                            .foregroundStyle(AppColors.Light.primary)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(theme.accent)
                     }
                 }
             }
@@ -80,19 +87,20 @@ struct GrowthCardView: View {
 
     // MARK: - Measurement Item
 
-    private func measurementItem(label: String, value: String, icon: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
+    private func measurementItem(label: String, value: String, icon: String, color: Color, theme: ResolvedTheme) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            HStack(spacing: Spacing.xs) {
                 Image(systemName: icon)
                     .font(.system(size: 10))
                     .foregroundStyle(color)
                 Text(label)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(.appBody(size: 11))
+                    .foregroundStyle(theme.textMuted)
             }
             Text(value)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.primary)
+                .font(.appMono(size: 16, weight: .semibold))
+                .foregroundStyle(theme.text)
+                .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

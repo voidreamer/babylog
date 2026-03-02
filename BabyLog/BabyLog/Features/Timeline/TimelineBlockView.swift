@@ -120,18 +120,19 @@ struct TimelineBlockView: View {
     // MARK: - Current Time Indicator
 
     private var currentTimeIndicator: some View {
-        let now = Date()
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: now)
-        let minute = calendar.component(.minute, from: now)
-        let y = yPosition(hour: hour, minute: minute)
+        SwiftUI.TimelineView(.periodic(from: .now, by: 60)) { context in
+            let calendar = Calendar.current
+            let hour = calendar.component(.hour, from: context.date)
+            let minute = calendar.component(.minute, from: context.date)
+            let y = yPosition(hour: hour, minute: minute)
 
-        return HStack(spacing: 0) {
-            Spacer().frame(width: timeColumnWidth - 4)
-            Circle().fill(Color.red).frame(width: 8, height: 8)
-            Rectangle().fill(Color.red).frame(height: 1.5)
+            HStack(spacing: 0) {
+                Spacer().frame(width: timeColumnWidth - 4)
+                PulsingDot()
+                Rectangle().fill(Color.red).frame(height: 1.5)
+            }
+            .offset(y: y - 4)
         }
-        .offset(y: y - 4)
     }
 
     // MARK: - Unified Layout Events with Column Algorithm
@@ -282,6 +283,7 @@ struct TimelineBlockView: View {
         }
         .frame(width: max(colWidth, 28), height: height, alignment: .topLeading)
         .background(blockBackground(item: item))
+        .clipShape(RoundedRectangle(cornerRadius: Radii.sm, style: .continuous))
         .contentShape(Rectangle())
         .contextMenu {
             Button {
@@ -545,5 +547,30 @@ private struct DashedLine: Shape {
         path.move(to: CGPoint(x: 0, y: rect.midY))
         path.addLine(to: CGPoint(x: rect.width, y: rect.midY))
         return path
+    }
+}
+
+// MARK: - Pulsing Dot
+
+private struct PulsingDot: View {
+    @State private var isPulsing = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.red.opacity(0.3))
+                .frame(width: 14, height: 14)
+                .scaleEffect(isPulsing ? 1.3 : 0.8)
+                .opacity(isPulsing ? 0 : 0.5)
+
+            Circle()
+                .fill(Color.red)
+                .frame(width: 8, height: 8)
+        }
+        .animation(
+            .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
+            value: isPulsing
+        )
+        .onAppear { isPulsing = true }
     }
 }
