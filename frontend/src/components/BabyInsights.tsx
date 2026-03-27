@@ -14,6 +14,12 @@ import {
 } from './insights/InsightsSections';
 import RestPlannerSection from './insights/RestPlannerSection';
 
+const TIME_RANGE_OPTIONS = [
+    { value: 7, labelKey: 'insights.range7d' },
+    { value: 14, labelKey: 'insights.range14d' },
+    { value: 30, labelKey: 'insights.range1m' },
+];
+
 interface BabyInsightsProps { isPremium?: boolean; }
 export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     const { t } = useTranslation('dashboard');
@@ -22,6 +28,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     const [restPlan, setRestPlan] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [days, setDays] = useState(7);
 
     useEffect(() => {
         if (!selectedBaby) {
@@ -34,8 +41,8 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
                 setLoading(true);
                 setError(null);
                 const [data, plan] = await Promise.all([
-                    api.getAnalytics(selectedBaby.id, 7),
-                    api.getRestPlan(selectedBaby.id, 7).catch(() => null),
+                    api.getAnalytics(selectedBaby.id, days),
+                    api.getRestPlan(selectedBaby.id, days).catch(() => null),
                 ]);
                 setAnalytics(data);
                 setRestPlan(plan);
@@ -51,7 +58,7 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
         };
 
         fetchAnalytics();
-    }, [selectedBaby]);
+    }, [selectedBaby, days]);
 
     if (!selectedBaby) {
         return (
@@ -105,6 +112,17 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
 
     return (
         <div className="insights-container">
+            <div className="insights-time-range">
+                {TIME_RANGE_OPTIONS.map(opt => (
+                    <button
+                        key={opt.value}
+                        className={`time-range-btn ${days === opt.value ? 'active' : ''}`}
+                        onClick={() => setDays(opt.value)}
+                    >
+                        {t(opt.labelKey, { defaultValue: opt.value === 30 ? '1 month' : `${opt.value} days` })}
+                    </button>
+                ))}
+            </div>
             <PredictionsSection predictions={predictions} isPremium={isPremium} />
             <PatternsSection patterns={patterns} isPremium={isPremium} />
             <TrendsSection trends={trends} isPremium={isPremium} />

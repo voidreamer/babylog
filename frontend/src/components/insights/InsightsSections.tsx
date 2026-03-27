@@ -201,9 +201,87 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
     );
 }
 
+function PatternCard({ icon, color, label, value, detail }: { icon: React.ReactNode; color: string; label: string; value: string; detail?: string }) {
+    return (
+        <div className="pattern-card">
+            <div className="pattern-card-icon" style={{ color }}>{icon}</div>
+            <div className="pattern-card-body">
+                <span className="pattern-card-label">{label}</span>
+                <span className="pattern-card-value">{value}</span>
+                {detail && <span className="pattern-card-detail">{detail}</span>}
+            </div>
+        </div>
+    );
+}
+
 interface PatternsSectionProps { patterns: any; isPremium: boolean; }
 export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
     const { t } = useTranslation('dashboard');
+
+    const patternItems: { icon: React.ReactNode; color: string; label: string; value: string; detail?: string }[] = [];
+
+    // Sleep patterns
+    if (patterns?.wake_interval_hours) {
+        patternItems.push({
+            icon: <Moon size={20} />,
+            color: 'var(--sleep)',
+            label: t('insights.wakesUp'),
+            value: t('insights.everyHours', { hours: patterns.wake_interval_hours }),
+            detail: t('insights.newbornWakePattern', { defaultValue: 'Typical for newborns — sleep cycles are short' }),
+        });
+    } else {
+        if (patterns?.usual_wake_time) {
+            patternItems.push({
+                icon: <Clock size={20} />,
+                color: 'var(--sleep)',
+                label: t('insights.usuallyWakesUp'),
+                value: formatTime24to12(patterns.usual_wake_time) || '',
+                detail: t('insights.morningRoutine', { defaultValue: 'Average morning wake-up time' }),
+            });
+        }
+        if (patterns?.usual_bedtime) {
+            patternItems.push({
+                icon: <Moon size={20} />,
+                color: 'var(--sleep)',
+                label: t('insights.usualBedtime'),
+                value: formatTime24to12(patterns.usual_bedtime) || '',
+                detail: t('insights.nightRoutine', { defaultValue: 'Average evening bedtime' }),
+            });
+        }
+    }
+
+    // Feeding patterns
+    if (patterns?.avg_feeding_interval_hours) {
+        const hours = patterns.avg_feeding_interval_hours;
+        const feedsPerDay = Math.round(24 / hours * 10) / 10;
+        patternItems.push({
+            icon: <Baby size={20} />,
+            color: 'var(--feeding)',
+            label: t('insights.feedsEvery'),
+            value: t('insights.hours', { hours }),
+            detail: t('insights.feedsPerDayEst', { defaultValue: '~{{count}} feeds/day', count: feedsPerDay }),
+        });
+    }
+
+    // Nap patterns
+    if (patterns?.avg_nap_duration_minutes) {
+        const mins = patterns.avg_nap_duration_minutes;
+        const napLabel = mins >= 60
+            ? `${Math.floor(mins / 60)}h ${mins % 60 > 0 ? `${mins % 60}m` : ''}`
+            : `${mins}m`;
+        patternItems.push({
+            icon: <Clock size={20} />,
+            color: 'var(--sleep)',
+            label: t('insights.avgNapLength'),
+            value: napLabel,
+            detail: mins < 45
+                ? t('insights.shortNaps', { defaultValue: 'Short naps are normal for younger babies' })
+                : mins >= 90
+                    ? t('insights.longNaps', { defaultValue: 'Great — longer naps mean deeper restorative sleep' })
+                    : t('insights.normalNaps', { defaultValue: 'Healthy nap duration' }),
+        });
+    }
+
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -212,39 +290,12 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
                 {!isPremium && <Lock size={14} className="premium-lock" />}
             </h2>
 
-            <div className={`insights-patterns ${!isPremium ? 'premium-blur' : ''}`}>
-                {patterns?.wake_interval_hours ? (
-                    <div className="pattern-item">
-                        <span className="pattern-label">{t('insights.wakesUp')}</span>
-                        <span className="pattern-value">{t('insights.everyHours', { hours: patterns.wake_interval_hours })}</span>
-                    </div>
-                ) : (
-                    <>
-                        {patterns?.usual_wake_time && (
-                            <div className="pattern-item">
-                                <span className="pattern-label">{t('insights.usuallyWakesUp')}</span>
-                                <span className="pattern-value">{formatTime24to12(patterns.usual_wake_time)}</span>
-                            </div>
-                        )}
-                        {patterns?.usual_bedtime && (
-                            <div className="pattern-item">
-                                <span className="pattern-label">{t('insights.usualBedtime')}</span>
-                                <span className="pattern-value">{formatTime24to12(patterns.usual_bedtime)}</span>
-                            </div>
-                        )}
-                    </>
-                )}
-                {patterns?.avg_feeding_interval_hours && (
-                    <div className="pattern-item">
-                        <span className="pattern-label">{t('insights.feedsEvery')}</span>
-                        <span className="pattern-value">{t('insights.hours', { hours: patterns.avg_feeding_interval_hours })}</span>
-                    </div>
-                )}
-                {patterns?.avg_nap_duration_minutes && (
-                    <div className="pattern-item">
-                        <span className="pattern-label">{t('insights.avgNapLength')}</span>
-                        <span className="pattern-value">{t('insights.minutes', { minutes: patterns.avg_nap_duration_minutes })}</span>
-                    </div>
+            <div className={`insights-patterns-grid ${!isPremium ? 'premium-blur' : ''}`}>
+                {patternItems.map((item, i) => (
+                    <PatternCard key={i} {...item} />
+                ))}
+                {patternItems.length === 0 && (
+                    <p className="pattern-empty">{t('insights.noPatternsYet', { defaultValue: 'Not enough data to detect patterns yet' })}</p>
                 )}
             </div>
 
@@ -258,12 +309,23 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
     );
 }
 
+function getTrendSummary(trend: string, t: any): string {
+    if (trend === 'improving') return t('insights.trendImprovingTip', { defaultValue: 'Keep up the good work — things are moving in the right direction' });
+    if (trend === 'declining') return t('insights.trendDecliningTip', { defaultValue: 'This is worth monitoring — consider whether anything has changed recently' });
+    return t('insights.trendStableTip', { defaultValue: 'Consistent patterns are a sign of a well-established routine' });
+}
+
 interface TrendsSectionProps { trends: any; isPremium: boolean; }
 export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
     const { t } = useTranslation('dashboard');
     if (!trends || (trends.sleep?.trend === 'insufficient_data' && trends.feeding?.trend === 'insufficient_data')) {
         return null;
     }
+
+    const trendItems = [
+        { key: 'sleep', data: trends.sleep, icon: <Moon size={18} />, color: 'var(--sleep)', label: t('insights.sleep') },
+        { key: 'feeding', data: trends.feeding, icon: <Baby size={18} />, color: 'var(--feeding)', label: t('insights.feeding') },
+    ].filter(item => item.data && item.data.trend !== 'insufficient_data');
 
     return (
         <section className="insights-section">
@@ -274,27 +336,18 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
             </h2>
 
             <div className={`insights-trends ${!isPremium ? 'premium-blur' : ''}`}>
-                {trends.sleep && trends.sleep.trend !== 'insufficient_data' && (
-                    <div className={`trend-item trend-${trends.sleep.trend}`}>
-                        <TrendIcon trend={trends.sleep.trend} />
-                        <div className="trend-content">
-                            <span className="trend-label">{t('insights.sleep')}</span>
-                            <span className="trend-value">{trends.sleep.trend_label}</span>
+                {trendItems.map(item => (
+                    <div key={item.key} className={`trend-card trend-${item.data.trend}`}>
+                        <div className="trend-card-header">
+                            <span style={{ color: item.color }}>{item.icon}</span>
+                            <span className="trend-card-label">{item.label}</span>
+                            <TrendIcon trend={item.data.trend} />
                         </div>
-                        <span className="trend-description">{trends.sleep.description}</span>
+                        <div className="trend-card-value">{item.data.trend_label}</div>
+                        <p className="trend-card-desc">{item.data.description}</p>
+                        <p className="trend-card-tip">{getTrendSummary(item.data.trend, t)}</p>
                     </div>
-                )}
-
-                {trends.feeding && trends.feeding.trend !== 'insufficient_data' && (
-                    <div className={`trend-item trend-${trends.feeding.trend}`}>
-                        <TrendIcon trend={trends.feeding.trend} />
-                        <div className="trend-content">
-                            <span className="trend-label">{t('insights.feeding')}</span>
-                            <span className="trend-value">{trends.feeding.trend_label}</span>
-                        </div>
-                        <span className="trend-description">{trends.feeding.description}</span>
-                    </div>
-                )}
+                ))}
             </div>
 
             {!isPremium && (
@@ -307,9 +360,74 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
     );
 }
 
+function BenchmarkProgressBar({ actual, min, max, color }: { actual: number; min: number; max: number; color: string }) {
+    // Show where 'actual' falls relative to the expected range
+    const rangeSpan = max - min;
+    const visualMin = Math.max(0, min - rangeSpan * 0.3);
+    const visualMax = max + rangeSpan * 0.3;
+    const totalSpan = visualMax - visualMin;
+    const leftPct = ((min - visualMin) / totalSpan) * 100;
+    const widthPct = ((max - min) / totalSpan) * 100;
+    const markerPct = Math.max(0, Math.min(100, ((actual - visualMin) / totalSpan) * 100));
+    const inRange = actual >= min && actual <= max;
+
+    return (
+        <div className="benchmark-progress">
+            <div className="benchmark-progress-track">
+                <div
+                    className="benchmark-progress-range"
+                    style={{ left: `${leftPct}%`, width: `${widthPct}%`, background: color }}
+                />
+                <div
+                    className={`benchmark-progress-marker ${inRange ? 'in-range' : 'out-range'}`}
+                    style={{ left: `${markerPct}%` }}
+                />
+            </div>
+            <div className="benchmark-progress-labels">
+                <span>{min}</span>
+                <span className="benchmark-progress-actual" style={{ color: inRange ? 'var(--success)' : 'var(--danger)' }}>
+                    {actual} {inRange ? '✓' : '!'}
+                </span>
+                <span>{max}</span>
+            </div>
+        </div>
+    );
+}
+
 interface BenchmarksSectionProps { benchmarks: any; today_vs_average: any; }
 export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSectionProps) {
     const { t } = useTranslation('dashboard');
+
+    const items = [
+        {
+            icon: <Droplets size={20} />,
+            color: 'var(--diaper)',
+            label: t('insights.diapersToday'),
+            actual: today_vs_average?.diapers?.wet_today || 0,
+            benchmark: benchmarks?.diapers?.expected_wet_diapers,
+            unit: t('insights.wet'),
+            note: benchmarks?.diapers?.notes,
+        },
+        {
+            icon: <Moon size={20} />,
+            color: 'var(--sleep)',
+            label: t('insights.sleepToday'),
+            actual: today_vs_average?.sleep_hours?.today || 0,
+            benchmark: benchmarks?.sleep?.expected_total_sleep_hours,
+            unit: t('insights.hours_label'),
+            note: benchmarks?.sleep?.notes,
+        },
+        {
+            icon: <Baby size={20} />,
+            color: 'var(--feeding)',
+            label: t('insights.feedingsToday'),
+            actual: today_vs_average?.feedings?.today || 0,
+            benchmark: benchmarks?.feeding?.expected_feeds_per_day,
+            unit: t('insights.feeds'),
+            note: benchmarks?.feeding?.notes,
+        },
+    ];
+
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -319,89 +437,29 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
             </h2>
 
             <div className="insights-benchmarks">
-                {/* Diapers */}
-                <div className="benchmark-card">
-                    <div className="benchmark-header">
-                        <Droplets size={20} style={{ color: 'var(--diaper)' }} />
-                        <span>{t('insights.diapersToday')}</span>
-                    </div>
-                    <div className="benchmark-comparison">
-                        <div className="benchmark-actual">
-                            <span className="benchmark-number">{today_vs_average?.diapers?.wet_today || 0}</span>
-                            <span className="benchmark-label">{t('insights.wet')}</span>
+                {items.map((item, i) => {
+                    const status = getStatus(item.actual, item.benchmark);
+                    return (
+                        <div key={i} className={`benchmark-card benchmark-${status}`}>
+                            <div className="benchmark-header">
+                                <span style={{ color: item.color }}>{item.icon}</span>
+                                <span>{item.label}</span>
+                                <div className={`benchmark-status ${status}`}>
+                                    {status === 'good' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                                </div>
+                            </div>
+                            {item.benchmark && (
+                                <BenchmarkProgressBar
+                                    actual={item.actual}
+                                    min={item.benchmark.min}
+                                    max={item.benchmark.max}
+                                    color={item.color}
+                                />
+                            )}
+                            {item.note && <p className="benchmark-note">{item.note}</p>}
                         </div>
-                        <div className="benchmark-expected">
-                            <span className="benchmark-range">
-                                {benchmarks?.diapers?.expected_wet_diapers?.min}-
-                                {benchmarks?.diapers?.expected_wet_diapers?.max}
-                            </span>
-                            <span className="benchmark-label">{t('insights.expected')}</span>
-                        </div>
-                        <div className={`benchmark-status ${getStatus(
-                            today_vs_average?.diapers?.wet_today || 0,
-                            benchmarks?.diapers?.expected_wet_diapers
-                        )}`}>
-                            {getStatus(
-                                today_vs_average?.diapers?.wet_today || 0,
-                                benchmarks?.diapers?.expected_wet_diapers
-                            ) === 'good' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                        </div>
-                    </div>
-                    <p className="benchmark-note">{benchmarks?.diapers?.notes}</p>
-                </div>
-
-                {/* Sleep */}
-                <div className="benchmark-card">
-                    <div className="benchmark-header">
-                        <Moon size={20} style={{ color: 'var(--sleep)' }} />
-                        <span>{t('insights.sleepToday')}</span>
-                    </div>
-                    <div className="benchmark-comparison">
-                        <div className="benchmark-actual">
-                            <span className="benchmark-number">{today_vs_average?.sleep_hours?.today || 0}</span>
-                            <span className="benchmark-label">{t('insights.hours_label')}</span>
-                        </div>
-                        <div className="benchmark-expected">
-                            <span className="benchmark-range">
-                                {benchmarks?.sleep?.expected_total_sleep_hours?.min}-
-                                {benchmarks?.sleep?.expected_total_sleep_hours?.max}
-                            </span>
-                            <span className="benchmark-label">expected</span>
-                        </div>
-                    </div>
-                    <p className="benchmark-note">{benchmarks?.sleep?.notes}</p>
-                </div>
-
-                {/* Feedings */}
-                <div className="benchmark-card">
-                    <div className="benchmark-header">
-                        <Baby size={20} style={{ color: 'var(--feeding)' }} />
-                        <span>{t('insights.feedingsToday')}</span>
-                    </div>
-                    <div className="benchmark-comparison">
-                        <div className="benchmark-actual">
-                            <span className="benchmark-number">{today_vs_average?.feedings?.today || 0}</span>
-                            <span className="benchmark-label">{t('insights.feeds')}</span>
-                        </div>
-                        <div className="benchmark-expected">
-                            <span className="benchmark-range">
-                                {benchmarks?.feeding?.expected_feeds_per_day?.min}-
-                                {benchmarks?.feeding?.expected_feeds_per_day?.max}
-                            </span>
-                            <span className="benchmark-label">{t('insights.expected')}</span>
-                        </div>
-                        <div className={`benchmark-status ${getStatus(
-                            today_vs_average?.feedings?.today || 0,
-                            benchmarks?.feeding?.expected_feeds_per_day
-                        )}`}>
-                            {getStatus(
-                                today_vs_average?.feedings?.today || 0,
-                                benchmarks?.feeding?.expected_feeds_per_day
-                            ) === 'good' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                        </div>
-                    </div>
-                    <p className="benchmark-note">{benchmarks?.feeding?.notes}</p>
-                </div>
+                    );
+                })}
             </div>
         </section>
     );
@@ -410,6 +468,34 @@ export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSe
 interface TodayVsAverageSectionProps { today_vs_average: any; }
 export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectionProps) {
     const { t } = useTranslation('dashboard');
+
+    const items = [
+        {
+            icon: <Baby size={18} />,
+            label: t('insights.feedings'),
+            today: today_vs_average?.feedings?.today || 0,
+            avg: today_vs_average?.feedings?.daily_avg || 0,
+            color: 'var(--feeding)',
+            unit: '',
+        },
+        {
+            icon: <Droplets size={18} />,
+            label: t('insights.diapers'),
+            today: today_vs_average?.diapers?.today || 0,
+            avg: today_vs_average?.diapers?.daily_avg || 0,
+            color: 'var(--diaper)',
+            unit: '',
+        },
+        {
+            icon: <Moon size={18} />,
+            label: t('insights.sleep'),
+            today: today_vs_average?.sleep_hours?.today || 0,
+            avg: today_vs_average?.sleep_hours?.daily_avg || 0,
+            color: 'var(--sleep)',
+            unit: 'h',
+        },
+    ];
+
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -417,31 +503,50 @@ export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectio
                 <span>{t('insights.todayVsAverage')}</span>
             </h2>
 
-            <div className="insights-comparison-grid">
-                <div className="comparison-item">
-                    <span className="comparison-label">{t('insights.feedings')}</span>
-                    <div className="comparison-values">
-                        <span className="comparison-today">{today_vs_average?.feedings?.today}</span>
-                        <span className="comparison-vs">{t('insights.vs')}</span>
-                        <span className="comparison-avg">{today_vs_average?.feedings?.daily_avg}/day</span>
-                    </div>
-                </div>
-                <div className="comparison-item">
-                    <span className="comparison-label">{t('insights.diapers')}</span>
-                    <div className="comparison-values">
-                        <span className="comparison-today">{today_vs_average?.diapers?.today}</span>
-                        <span className="comparison-vs">{t('insights.vs')}</span>
-                        <span className="comparison-avg">{t('insights.perDay', { value: today_vs_average?.diapers?.daily_avg })}</span>
-                    </div>
-                </div>
-                <div className="comparison-item">
-                    <span className="comparison-label">{t('insights.sleep')}</span>
-                    <div className="comparison-values">
-                        <span className="comparison-today">{today_vs_average?.sleep_hours?.today}h</span>
-                        <span className="comparison-vs">{t('insights.vs')}</span>
-                        <span className="comparison-avg">{today_vs_average?.sleep_hours?.daily_avg}h/day</span>
-                    </div>
-                </div>
+            <div className="insights-comparison-list">
+                {items.map((item, i) => {
+                    const diff = item.today - item.avg;
+                    const diffLabel = diff > 0 ? `+${Math.abs(diff).toFixed(1)}` : diff < 0 ? `${diff.toFixed(1)}` : '0';
+
+                    return (
+                        <div key={i} className="comparison-card">
+                            <div className="comparison-card-header">
+                                <span style={{ color: item.color }}>{item.icon}</span>
+                                <span className="comparison-card-label">{item.label}</span>
+                                <span className={`comparison-diff ${diff >= 0 ? 'positive' : 'negative'}`}>{diffLabel}</span>
+                            </div>
+                            <div className="comparison-bars">
+                                <div className="comparison-bar-row">
+                                    <span className="comparison-bar-label">{t('insights.todayLabel', { defaultValue: 'Today' })}</span>
+                                    <div className="comparison-bar-track">
+                                        <div
+                                            className="comparison-bar-fill"
+                                            style={{
+                                                width: `${Math.max(item.today, item.avg, 1) > 0 ? (item.today / Math.max(item.today, item.avg, 1)) * 100 : 0}%`,
+                                                background: item.color,
+                                            }}
+                                        />
+                                    </div>
+                                    <span className="comparison-bar-val">{item.today}{item.unit}</span>
+                                </div>
+                                <div className="comparison-bar-row">
+                                    <span className="comparison-bar-label">{t('insights.avgLabel', { defaultValue: 'Avg' })}</span>
+                                    <div className="comparison-bar-track">
+                                        <div
+                                            className="comparison-bar-fill avg"
+                                            style={{
+                                                width: `${Math.max(item.today, item.avg, 1) > 0 ? (item.avg / Math.max(item.today, item.avg, 1)) * 100 : 0}%`,
+                                                background: item.color,
+                                                opacity: 0.4,
+                                            }}
+                                        />
+                                    </div>
+                                    <span className="comparison-bar-val">{item.avg}{item.unit}/d</span>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </section>
     );

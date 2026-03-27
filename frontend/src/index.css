@@ -2948,6 +2948,35 @@ h4 {
   font-weight: 600;
 }
 
+/* Selected point percentile badge */
+.growth-chart-selected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  margin-top: var(--space-xs);
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+}
+
+.growth-chart-selected-age {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.growth-chart-selected-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.growth-chart-selected-percentile {
+  font-weight: 700;
+  color: var(--primary);
+}
+
 .growth-chart-empty {
   text-align: center;
   padding: var(--space-xl);
@@ -4613,6 +4642,40 @@ h4 {
   gap: var(--space-lg);
 }
 
+/* Time range selector */
+.insights-time-range {
+  display: flex;
+  gap: var(--space-xs);
+  background: var(--surface);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  border: 1px solid var(--border);
+  align-self: center;
+}
+
+.time-range-btn {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.time-range-btn.active {
+  background: var(--primary);
+  color: var(--text-on-color);
+  font-weight: 600;
+}
+
+.time-range-btn:not(.active):hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
 .insights-section {
   position: relative;
 }
@@ -4686,7 +4749,61 @@ h4 {
   font-weight: 500;
 }
 
-/* Patterns Section */
+/* Patterns Section — card grid */
+.insights-patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.pattern-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+
+.pattern-card-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pattern-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pattern-card-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pattern-card-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pattern-card-detail {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.pattern-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: var(--space-md);
+}
+
+/* Legacy pattern-item kept for backwards compat */
 .insights-patterns {
   background: var(--surface);
   border-radius: var(--radius-lg);
@@ -4818,13 +4935,62 @@ h4 {
   border-color: var(--sleep);
 }
 
-/* Trends Section */
+/* Trends Section — expanded cards */
 .insights-trends {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
+.trend-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  padding: var(--space-md);
+}
+
+.trend-card.trend-improving { border-left-color: var(--success); }
+.trend-card.trend-stable { border-left-color: var(--text-secondary); }
+.trend-card.trend-declining { border-left-color: var(--danger); }
+
+.trend-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.trend-card-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.trend-card-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-2xs);
+}
+
+.trend-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-xs) 0;
+  line-height: 1.4;
+}
+
+.trend-card-tip {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border);
+}
+
+/* Legacy trend-item kept */
 .trend-item {
   display: flex;
   align-items: center;
@@ -4958,13 +5124,165 @@ h4 {
   color: var(--text-muted);
 }
 
+/* Benchmark progress bar */
+.benchmark-progress {
+  margin: var(--space-sm) 0;
+}
+
+.benchmark-progress-track {
+  position: relative;
+  height: 8px;
+  background: var(--surface-hover);
+  border-radius: var(--radius-full);
+  overflow: visible;
+}
+
+.benchmark-progress-range {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: var(--radius-full);
+  opacity: 0.3;
+}
+
+.benchmark-progress-marker {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.benchmark-progress-marker.in-range {
+  background: var(--success);
+}
+
+.benchmark-progress-marker.out-range {
+  background: var(--danger);
+}
+
+.benchmark-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.benchmark-progress-actual {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.benchmark-card.benchmark-good {
+  border-color: var(--success);
+  border-left-width: 3px;
+}
+
+.benchmark-card.benchmark-low,
+.benchmark-card.benchmark-high {
+  border-color: var(--danger);
+  border-left-width: 3px;
+}
+
 .benchmark-note {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-style: italic;
 }
 
-/* Comparison Grid */
+/* Today vs Average — comparison bars */
+.insights-comparison-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.comparison-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+}
+
+.comparison-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.comparison-card-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.comparison-diff {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.comparison-diff.positive {
+  color: var(--success);
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.comparison-diff.negative {
+  color: var(--danger);
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.comparison-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.comparison-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.comparison-bar-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.comparison-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface-hover);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.comparison-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+.comparison-bar-val {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Legacy comparison grid kept */
 .insights-comparison-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -8128,7 +8446,7 @@ a.settings-row {
   z-index: var(--z-nav, 100);
   width: 32px;
   height: 32px;
-  border: none;
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
@@ -8136,8 +8454,8 @@ a.settings-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  opacity: 0.6;
+  color: var(--text-secondary);
+  opacity: 0.7;
   transition: var(--transition);
   -webkit-tap-highlight-color: transparent;
 }
