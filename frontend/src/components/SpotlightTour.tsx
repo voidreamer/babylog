@@ -14,20 +14,21 @@ interface TourStep {
 }
 
 const TOUR_STEPS: TourStep[] = [
-    // Dashboard steps
+    // Dashboard widgets overview
     {
-        selector: '.quick-actions',
+        selector: '.widgets-grid',
         titleKey: 'tour.quickActionsTitle',
         descKey: 'tour.quickActionsDesc',
         icon: '/icons/feeding.png',
         position: 'bottom',
     },
+    // Quick actions at the bottom
     {
-        selector: '.widget-add-icon',
+        selector: '.quick-actions',
         titleKey: 'tour.logButtonTitle',
         descKey: 'tour.logButtonDesc',
         icon: '/icons/activity.png',
-        position: 'bottom',
+        position: 'top',
     },
     // Timeline step
     {
@@ -164,6 +165,7 @@ export default function SpotlightTour({ onComplete, onNavigateTab }: SpotlightTo
         const vh = window.innerHeight;
         const tooltipWidth = Math.min(340, vw - screenMargin * 2);
         const tooltipLeft = Math.max(screenMargin, (vw - tooltipWidth) / 2);
+        const tooltipHeight = 200; // estimated max tooltip height
 
         const style: React.CSSProperties = {
             position: 'fixed',
@@ -171,19 +173,27 @@ export default function SpotlightTour({ onComplete, onNavigateTab }: SpotlightTo
             width: tooltipWidth,
         };
 
-        if (step.position === 'bottom' && targetRect) {
+        if (targetRect) {
             const spaceBelow = vh - targetRect.bottom - spotPadding - tooltipGap;
-            if (spaceBelow < 180 && targetRect.top > 200) {
-                style.bottom = vh - targetRect.top + spotPadding + tooltipGap;
-            } else {
-                style.top = targetRect.bottom + spotPadding + tooltipGap;
-            }
-        } else if (step.position === 'top' && targetRect) {
             const spaceAbove = targetRect.top - spotPadding - tooltipGap;
-            if (spaceAbove < 180) {
-                style.top = targetRect.bottom + spotPadding + tooltipGap;
+
+            // Decide placement: prefer the requested position, but flip if not enough space
+            const preferBelow = step.position === 'bottom';
+            const canGoBelow = spaceBelow >= tooltipHeight;
+            const canGoAbove = spaceAbove >= tooltipHeight;
+
+            if (preferBelow && canGoBelow) {
+                style.top = Math.min(targetRect.bottom + spotPadding + tooltipGap, vh - tooltipHeight - screenMargin);
+            } else if (!preferBelow && canGoAbove) {
+                style.bottom = Math.max(vh - targetRect.top + spotPadding + tooltipGap, screenMargin);
+            } else if (canGoAbove) {
+                style.bottom = Math.max(vh - targetRect.top + spotPadding + tooltipGap, screenMargin);
+            } else if (canGoBelow) {
+                style.top = Math.min(targetRect.bottom + spotPadding + tooltipGap, vh - tooltipHeight - screenMargin);
             } else {
-                style.bottom = vh - targetRect.top + spotPadding + tooltipGap;
+                // Neither fits well — center vertically
+                style.top = '50%';
+                style.transform = 'translateY(-50%)';
             }
         }
 

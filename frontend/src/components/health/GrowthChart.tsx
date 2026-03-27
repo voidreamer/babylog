@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import {
     ResponsiveContainer,
     ComposedChart,
@@ -9,9 +9,10 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
+    ReferenceLine,
 } from 'recharts';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../../data/whoGrowthData';
-import { differenceInMonths } from 'date-fns';
+import { differenceInMonths, differenceInDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
 
@@ -63,9 +64,18 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     const { t } = useTranslation('health');
     const { convertWeight, convertLength, weightUnit, lengthUnit } = useUnits();
     const [metric, setMetric] = useState('weight');
+    const [selectedPoint, setSelectedPoint] = useState<{ ageMonths: number; value: number; percentile: number | null } | null>(null);
 
     const birthDate = baby?.birth_date;
     const gender = baby?.gender || 'boy';
+
+    // Calculate current age in fractional months for the reference line
+    const currentAgeMonths = useMemo(() => {
+        if (!birthDate) return null;
+        const days = differenceInDays(new Date(), toLocalDate(birthDate));
+        const months = days / 30.44; // average days per month
+        return months >= 0 && months <= 24 ? Math.round(months * 10) / 10 : null;
+    }, [birthDate]);
 
     const whoData = useMemo(() => {
         if (metric === 'weight') {
@@ -131,6 +141,20 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     }, [whoData, babyData, conv]);
 
     const unit = metric === 'weight' ? weightUnit : lengthUnit;
+
+    const handleChartClick = useCallback((data: any) => {
+        if (!data?.activePayload?.[0]) {
+            setSelectedPoint(null);
+            return;
+        }
+        const point = data.activePayload[0].payload;
+        if (point.babyValue != null && point._babyRaw && point._whoRaw) {
+            const percentile = calculatePercentile(point._babyRaw, point._whoRaw);
+            setSelectedPoint({ ageMonths: point.ageMonths, value: point.babyValue, percentile });
+        } else {
+            setSelectedPoint(null);
+        }
+    }, []);
 
     const CustomTooltip = ({ active, payload }: any) => {
         if (!active || !payload || !payload.length) return null;
@@ -216,7 +240,7 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
             ) : (
                 <>
                     <ResponsiveContainer width="100%" height={280}>
-                        <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }} onClick={handleChartClick}>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
 
                             <XAxis
@@ -274,17 +298,52 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
                                 name="97th"
                             />
 
+                            {/* Current age indicator line */}
+                            {currentAgeMonths != null && (
+                                <ReferenceLine
+                                    x={currentAgeMonths}
+                                    stroke="var(--primary)"
+                                    strokeDasharray="4 4"
+                                    strokeWidth={1.5}
+                                    label={{
+                                        value: t('growth.now', { defaultValue: 'Now' }),
+                                        position: 'top',
+                                        fill: 'var(--primary)',
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                    }}
+                                />
+                            )}
+
                             {/* Baby's data */}
                             <Line
                                 dataKey="babyValue"
                                 stroke={CHART_COLORS.baby}
                                 strokeWidth={2}
                                 dot={{ fill: 'var(--primary)', strokeWidth: 2, r: 5 }}
+                                activeDot={{ fill: 'var(--primary)', strokeWidth: 2, r: 7, cursor: 'pointer' }}
                                 connectNulls={true}
                                 name="Baby"
                             />
                         </ComposedChart>
                     </ResponsiveContainer>
+
+                    {/* Selected point percentile display */}
+                    {selectedPoint && (
+                        <div className="growth-chart-selected">
+                            <span className="growth-chart-selected-age">
+                                {selectedPoint.ageMonths} {t('growth.months')}
+                            </span>
+                            <span className="growth-chart-selected-value">
+                                {selectedPoint.value} {unit}
+                            </span>
+                            {selectedPoint.percentile != null && (
+                                <span className="growth-chart-selected-percentile">
+                                    {t('growth.percentile', { value: selectedPoint.percentile, defaultValue: '{{value}}th percentile' })}
+                                </span>
+                            )}
+                        </div>
+                    )}
 
                     <div className="growth-chart-legend">
                         <span className="growth-chart-legend-item">
