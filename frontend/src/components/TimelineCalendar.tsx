@@ -11,11 +11,19 @@ import PottyModal from './PottyModal';
 import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
-import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X } from 'lucide-react';
+import SolidModal from './SolidModal';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X, UtensilsCrossed } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from './ConfirmModal';
 
+
+const REACTION_EMOJI: Record<string, string> = {
+    liked: '😋',
+    neutral: '😐',
+    disliked: '🙁',
+    allergic: '⚠️',
+};
 
 // Parse UTC time string to local Date
 const parseUTCTime = (timeStr: any): Date => {
@@ -37,6 +45,7 @@ export default function TimelineCalendar() {
         tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: t('tummyTime.title') },
         bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: t('bath.title') },
         supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: t('supplement.title') },
+        solid: { icon: UtensilsCrossed, color: 'var(--solid)', bg: 'var(--solid-bg)', label: t('solid.title', { defaultValue: 'Solids' }) },
     };
     const { selectedBaby } = useBaby();
     const [events, setEvents] = useState<any[]>([]);
@@ -131,6 +140,9 @@ export default function TimelineCalendar() {
                     break;
                 case 'supplement':
                     await api.deleteSupplement(event.id);
+                    break;
+                case 'solid':
+                    await api.deleteSolid(event.id);
                     break;
             }
             toast.success(t('toast_deletedSuccessfully'));
@@ -318,6 +330,12 @@ export default function TimelineCalendar() {
                 const supName = details.name ? details.name.replace('_', ' ') : t('supplement.title');
                 const supNameFormatted = supName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 return details.dosage ? `${supNameFormatted} • ${details.dosage}` : supNameFormatted;
+            case 'solid':
+                const solidParts = [];
+                if (details.food_name) solidParts.push(details.food_name);
+                if (details.amount) solidParts.push(details.amount);
+                if (details.reaction) solidParts.push(REACTION_EMOJI[details.reaction] || details.reaction);
+                return solidParts.join(' • ') || t('solid.title', { defaultValue: 'Solids' });
             default:
                 return '';
         }
@@ -529,6 +547,14 @@ export default function TimelineCalendar() {
 
             {editingEvent?.event_type === 'supplement' && (
                 <SupplementModal
+                    editEvent={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={handleEditComplete}
+                />
+            )}
+
+            {editingEvent?.event_type === 'solid' && (
+                <SolidModal
                     editEvent={editingEvent}
                     onClose={() => setEditingEvent(null)}
                     onSave={handleEditComplete}
