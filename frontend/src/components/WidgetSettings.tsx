@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import {
     Settings, X, Baby, Droplets, Moon, Heart,
-    Toilet, Timer, Bath as BathIcon, Check, Plus, Pill, Zap
+    Toilet, Timer, Bath as BathIcon, Check, Plus, Pill, Zap, UtensilsCrossed
 } from 'lucide-react';
 import { useBaby } from '../hooks/useBaby';
 import { calculateAgeInMonths } from '../utils/ageUtils';
@@ -18,6 +18,7 @@ const ALL_WIDGETS = [
     { id: 'tummy', labelKey: 'tummyTime.title', icon: Timer, color: 'var(--tummy)', ageHint: '0\u201312m' },
     { id: 'bath', labelKey: 'bath.title', icon: BathIcon, color: 'var(--bath)', ageHint: null },
     { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: '#16a34a', ageHint: '0\u201312m' },
+    { id: 'solid', labelKey: 'solid.title', icon: UtensilsCrossed, color: 'var(--solid)', ageHint: '4m+' },
 ];
 
 interface WidgetSettingsProps { visibleWidgets: string[]; onToggle: (id: string) => void; quickActionsEnabled: boolean; onToggleQuickActions: () => void; }

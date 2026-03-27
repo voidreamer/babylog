@@ -69,6 +69,11 @@
   --bath-bg: #e3f2fd;
   --bath-text: #2a5a78;
 
+  --solid: #d89848;
+  --solid-light: #f0d8a8;
+  --solid-bg: #fff8e8;
+  --solid-text: #7a5820;
+
   --background: #fefdfb;
   --bg: #fefdfb;
   --surface: #fff9f5;
@@ -156,6 +161,11 @@
   --bath-light: #a8c8e8;
   --bath-bg: #2d3d4a;
   --bath-text: #88b8d8;
+
+  --solid: #d8a858;
+  --solid-light: #e8c888;
+  --solid-bg: #4a3d28;
+  --solid-text: #d8a858;
 
   --background: #1a1614;
   --bg: #1a1614;

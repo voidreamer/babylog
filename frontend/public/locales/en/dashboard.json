@@ -177,6 +177,30 @@
     "multivitamin": "Multivitamin",
     "other": "Other"
   },
+  "solid": {
+    "title": "Solids",
+    "foodName": "Food",
+    "foodPlaceholder": "e.g., avocado, banana, rice cereal",
+    "amount": "Amount",
+    "amount_taste": "Taste",
+    "amount_small": "Small",
+    "amount_medium": "Medium",
+    "amount_large": "Large",
+    "reaction": "Reaction",
+    "reaction_liked": "Liked",
+    "reaction_neutral": "Neutral",
+    "reaction_disliked": "Disliked",
+    "reaction_allergic": "Allergic",
+    "notesPlaceholder": "Any reactions, preferences...",
+    "foodNameRequired": "Please enter a food name",
+    "failedToLog": "Failed to log solid food",
+    "logged": "Solid food logged",
+    "noSolidsYet": "No solids yet",
+    "logWithDetails": "Log with details",
+    "cereal": "Cereal",
+    "fruit": "Fruit",
+    "veggie": "Veggie"
+  },
   "summary": {
     "feedings": "feedings",
     "diapers": "diapers",
@@ -188,7 +212,9 @@
     "supplements": "Supplements",
     "naps": "{{count}} naps",
     "successCount": "{{count}} success",
-    "bath": "bath"
+    "bath": "bath",
+    "solidMeal": "solid meal",
+    "solidMeals": "solid meals"
   },
   "dailySummarySection": {
     "title": "Daily Summary",

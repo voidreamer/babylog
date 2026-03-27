@@ -15,6 +15,11 @@ export default function Timeline({ events, onRefresh }: TimelineProps) {
         diaper: { label: t('diaper.title') },
         sleep: { label: t('sleep.title') },
         pumping: { label: t('pumping.title') },
+        potty: { label: t('potty.title', { defaultValue: 'Potty' }) },
+        tummy: { label: t('tummy.title', { defaultValue: 'Tummy Time' }) },
+        bath: { label: t('bath.title', { defaultValue: 'Bath' }) },
+        supplement: { label: t('supplement.title', { defaultValue: 'Supplement' }) },
+        solid: { label: t('solid.title', { defaultValue: 'Solids' }) },
     };
     if (!events || events.length === 0) {
         return (
@@ -53,6 +58,18 @@ export default function Timeline({ events, onRefresh }: TimelineProps) {
                 return event.details.amount_ml
                     ? `${config.label} - ${event.details.amount_ml}ml`
                     : config.label;
+            case 'solid':
+                return event.details.food_name
+                    ? `${config.label} - ${event.details.food_name}`
+                    : config.label;
+            case 'potty':
+                return event.details.success
+                    ? `${config.label} - ${t('timeline.success', { defaultValue: 'Success' })}`
+                    : config.label;
+            case 'tummy':
+                return event.details.duration_minutes
+                    ? `${config.label} - ${event.details.duration_minutes}min`
+                    : config.label;
             default:
                 return config.label;
         }
@@ -79,8 +96,14 @@ export default function Timeline({ events, onRefresh }: TimelineProps) {
                 if (event.details.duration_minutes) pumpParts.push(`${event.details.duration_minutes}min`);
                 if (event.details.notes) pumpParts.push(event.details.notes);
                 return pumpParts.join(' • ') || null;
+            case 'solid':
+                const solidParts = [];
+                if (event.details.amount) solidParts.push(event.details.amount);
+                if (event.details.reaction) solidParts.push(event.details.reaction);
+                if (event.details.notes) solidParts.push(event.details.notes);
+                return solidParts.join(' • ') || null;
             default:
-                return null;
+                return event.details?.notes || null;
         }
     };
 

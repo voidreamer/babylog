@@ -72,6 +72,7 @@ class Baby(Base):
     tummy_times = relationship("TummyTime", back_populates="baby", cascade="all, delete-orphan")
     baths = relationship("Bath", back_populates="baby", cascade="all, delete-orphan")
     supplements = relationship("Supplement", back_populates="baby", cascade="all, delete-orphan")
+    solids = relationship("Solid", back_populates="baby", cascade="all, delete-orphan")
 
 
 class Feeding(Base):
@@ -309,6 +310,22 @@ class Bath(Base):
     created_at = Column(DateTime, default=utc_now)
     
     baby = relationship("Baby", back_populates="baths")
+
+
+class Solid(Base):
+    """Track solid food introductions and meals."""
+    __tablename__ = "solids"
+
+    id = Column(Integer, primary_key=True, index=True)
+    baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
+    time = Column(DateTime, nullable=False)
+    food_name = Column(String, nullable=False)  # e.g., "avocado", "banana", "rice cereal"
+    amount = Column(String, nullable=True)  # "small", "medium", "large" or free text
+    reaction = Column(String, nullable=True)  # "liked", "disliked", "allergic", "neutral"
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=utc_now)
+
+    baby = relationship("Baby", back_populates="solids")
 
 
 class Supplement(Base):
