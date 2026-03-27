@@ -4,11 +4,11 @@ from sqlalchemy import or_, and_, func
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from ..database import get_db
-from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement
+from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement, Solid
 from ..schemas import (
     TimelineEvent, DashboardStats, DailySummary,
     FeedingResponse, DiaperResponse, SleepResponse, PumpingResponse,
-    PottyResponse, TummyTimeResponse, BathResponse, SupplementResponse
+    PottyResponse, TummyTimeResponse, BathResponse, SupplementResponse, SolidResponse
 )
 from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access
@@ -211,7 +211,27 @@ def get_timeline(
                 "notes": sup.notes
             }
         ))
-    
+
+    # Solids
+    solids = db.query(Solid).filter(
+        Solid.baby_id == baby_id,
+        Solid.time >= start_of_day_utc,
+        Solid.time < end_of_day_utc
+    ).all()
+
+    for sol in solids:
+        events.append(TimelineEvent(
+            id=sol.id,
+            event_type="solid",
+            time=sol.time,
+            details={
+                "food_name": sol.food_name,
+                "amount": sol.amount,
+                "reaction": sol.reaction,
+                "notes": sol.notes
+            }
+        ))
+
     # Sort by time descending
     events.sort(key=lambda x: x.time, reverse=True)
     
@@ -330,7 +350,14 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         Supplement.time >= start_of_day,
         Supplement.time < end_of_day
     ).all()
-    
+
+    # Solids
+    solid_meals = db.query(Solid).filter(
+        Solid.baby_id == baby_id,
+        Solid.time >= start_of_day,
+        Solid.time < end_of_day
+    ).all()
+
     return DailySummary(
         date=local_midnight.strftime("%Y-%m-%d"),
         total_feedings=len(feedings),
@@ -352,7 +379,8 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
         tummy_count=len(tummy_times),
         tummy_minutes=tummy_minutes,
         bath_count=len(baths),
-        supplement_count=len(supplements)
+        supplement_count=len(supplements),
+        solid_meal_count=len(solid_meals)
     )
 
 
@@ -420,6 +448,11 @@ def get_dashboard(
     last_supplement = db.query(Supplement).filter(
         Supplement.baby_id == baby_id
     ).order_by(Supplement.time.desc()).first()
+
+    # Last solid food
+    last_solid = db.query(Solid).filter(
+        Solid.baby_id == baby_id
+    ).order_by(Solid.time.desc()).first()
     
     # Parse local date for daily summary (YYYY-MM-DD format)
     if local_date:
@@ -442,6 +475,7 @@ def get_dashboard(
         last_tummy=TummyTimeResponse.model_validate(last_tummy) if last_tummy else None,
         last_bath=BathResponse.model_validate(last_bath) if last_bath else None,
         last_supplement=SupplementResponse.model_validate(last_supplement) if last_supplement else None,
+        last_solid=SolidResponse.model_validate(last_solid) if last_solid else None,
         current_sleep=SleepResponse.model_validate(current_sleep) if current_sleep else None,
         daily_summary=daily_summary
     )

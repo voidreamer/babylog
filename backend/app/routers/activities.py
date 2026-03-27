@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
-from ..models import Potty, TummyTime, Bath, Baby, Supplement
+from ..models import Potty, TummyTime, Bath, Baby, Supplement, Solid
 from ..schemas import (
     PottyCreate, PottyResponse,
     TummyTimeCreate, TummyTimeResponse,
     BathCreate, BathResponse,
-    SupplementCreate, SupplementResponse
+    SupplementCreate, SupplementResponse,
+    SolidCreate, SolidResponse,
 )
 from ..auth import get_current_user, get_user_email
 from .utils import verify_baby_access, require_write_access, baby_access_filter
@@ -423,3 +424,109 @@ def update_supplement(
     db.commit()
     db.refresh(supplement)
     return supplement
+
+
+# ============================================================================
+# Solid Foods
+# ============================================================================
+
+@router.get("/solids", response_model=List[SolidResponse])
+def get_solids(
+    baby_id: int,
+    skip: int = 0,
+    limit: int = 50,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Get all solid food logs for a baby."""
+    user_id = user.get("sub")
+    baby, role = verify_baby_access(db, baby_id, user_id, user_email)
+
+    return db.query(Solid).filter(
+        Solid.baby_id == baby_id
+    ).order_by(Solid.time.desc()).offset(skip).limit(limit).all()
+
+
+@router.post("/solids", response_model=SolidResponse, status_code=status.HTTP_201_CREATED)
+def create_solid(
+    solid_data: SolidCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Log a solid food meal."""
+    user_id = user.get("sub")
+    baby, role = verify_baby_access(db, solid_data.baby_id, user_id, user_email)
+    require_write_access(role)
+
+    solid = Solid(
+        baby_id=solid_data.baby_id,
+        time=solid_data.time,
+        food_name=solid_data.food_name,
+        amount=solid_data.amount,
+        reaction=solid_data.reaction,
+        notes=solid_data.notes,
+    )
+    db.add(solid)
+    db.commit()
+    db.refresh(solid)
+    return solid
+
+
+@router.delete("/solids/{solid_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_solid(
+    solid_id: int,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Delete a solid food log."""
+    user_id = user.get("sub")
+
+    solid = db.query(Solid).join(Baby).filter(
+        Solid.id == solid_id,
+        baby_access_filter(user_id, user_email)
+    ).first()
+
+    if not solid:
+        raise HTTPException(status_code=404, detail="Solid food log not found")
+
+    _, role = verify_baby_access(db, solid.baby_id, user_id, user_email)
+    require_write_access(role)
+
+    db.delete(solid)
+    db.commit()
+    return None
+
+
+@router.put("/solids/{solid_id}", response_model=SolidResponse)
+def update_solid(
+    solid_id: int,
+    solid_data: SolidCreate,
+    user: dict = Depends(get_current_user),
+    user_email: str = Depends(get_user_email),
+    db: Session = Depends(get_db)
+):
+    """Update a solid food log."""
+    user_id = user.get("sub")
+
+    solid = db.query(Solid).join(Baby).filter(
+        Solid.id == solid_id,
+        baby_access_filter(user_id, user_email)
+    ).first()
+
+    if not solid:
+        raise HTTPException(status_code=404, detail="Solid food log not found")
+
+    _, role = verify_baby_access(db, solid.baby_id, user_id, user_email)
+    require_write_access(role)
+
+    solid.time = solid_data.time
+    solid.food_name = solid_data.food_name
+    solid.amount = solid_data.amount
+    solid.reaction = solid_data.reaction
+    solid.notes = solid_data.notes
+    db.commit()
+    db.refresh(solid)
+    return solid

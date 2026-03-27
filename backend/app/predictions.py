@@ -360,20 +360,28 @@ def detect_trend(
             description = f"{metric_name.title()} varies but no clear trend"
     elif relative_slope > 0:
         trend = "improving"
-        trend_label = "Improving"
         change_per_week = slope * 7
         if metric_name == "sleep":
-            description = f"Gaining ~{abs(change_per_week):.1f} hrs/week"
+            trend_label = "More sleep"
+            description = f"Gaining ~{abs(change_per_week):.1f} hrs/week (avg {avg_value:.1f} hrs/day)"
+        elif metric_name == "feeding":
+            trend_label = "More feeds"
+            description = f"Up ~{abs(change_per_week):.1f} feeds/week (avg {avg_value:.1f}/day)"
         else:
-            description = f"Increasing over time"
+            trend_label = "Increasing"
+            description = f"Up ~{abs(change_per_week):.1f}/week"
     else:
         trend = "declining"
-        trend_label = "Declining"
         change_per_week = slope * 7
         if metric_name == "sleep":
-            description = f"Losing ~{abs(change_per_week):.1f} hrs/week"
+            trend_label = "Less sleep"
+            description = f"Down ~{abs(change_per_week):.1f} hrs/week (avg {avg_value:.1f} hrs/day)"
+        elif metric_name == "feeding":
+            trend_label = "Fewer feeds"
+            description = f"Down ~{abs(change_per_week):.1f} feeds/week (avg {avg_value:.1f}/day)"
         else:
-            description = f"Decreasing - may need attention"
+            trend_label = "Decreasing"
+            description = f"Down ~{abs(change_per_week):.1f}/week"
 
     return {
         "trend": trend,

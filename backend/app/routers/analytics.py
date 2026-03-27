@@ -42,18 +42,36 @@ def make_aware(dt: Optional[datetime]) -> Optional[datetime]:
     return dt
 
 
-def calculate_average_time_of_day(timestamps: List[datetime]) -> Optional[str]:
-    """Calculate average time of day from list of timestamps."""
+def calculate_average_time_of_day(timestamps: List[datetime], reference_hour: int = 0) -> Optional[str]:
+    """Calculate average time of day from list of timestamps using circular averaging.
+
+    Uses circular mean to handle midnight wraparound correctly.
+    reference_hour shifts the circle so the target times cluster together
+    (e.g., use 12 for bedtimes that span 10pm-2am).
+    """
     if not timestamps:
         return None
-    
-    # Convert to minutes since midnight
-    minutes_list = []
+
+    import math
+    # Convert to radians on a 24h circle, shifted by reference
+    angles = []
     for ts in timestamps:
         ts = make_aware(ts)
-        minutes_list.append(ts.hour * 60 + ts.minute)
-    
-    avg_minutes = sum(minutes_list) / len(minutes_list)
+        minutes = ts.hour * 60 + ts.minute
+        # Shift so reference_hour maps to 0
+        shifted = (minutes - reference_hour * 60) % 1440
+        angle = shifted / 1440 * 2 * math.pi
+        angles.append(angle)
+
+    # Circular mean
+    sin_sum = sum(math.sin(a) for a in angles)
+    cos_sum = sum(math.cos(a) for a in angles)
+    avg_angle = math.atan2(sin_sum, cos_sum)
+    if avg_angle < 0:
+        avg_angle += 2 * math.pi
+
+    # Convert back to minutes, un-shift
+    avg_minutes = (avg_angle / (2 * math.pi) * 1440 + reference_hour * 60) % 1440
     hours = int(avg_minutes // 60)
     mins = int(avg_minutes % 60)
     return f"{hours:02d}:{mins:02d}"
@@ -198,6 +216,32 @@ async def get_baby_analytics(
         usual_wake_time = None
         usual_bedtime = None
         wake_interval_hours = None
+        longest_sleep_block_hours = None
+        night_sleep_avg_hours = None
+        day_sleep_avg_hours = None
+
+        # Classify sleep blocks into night vs day
+        night_durations = []  # minutes
+        day_durations = []  # minutes
+        for s in sleeps:
+            if not s.duration_minutes:
+                continue
+            st = make_aware(s.start_time)
+            # Night sleep: starts between 6pm and 6am
+            if st.hour >= 18 or st.hour < 6:
+                night_durations.append(s.duration_minutes)
+            else:
+                day_durations.append(s.duration_minutes)
+
+        if night_durations:
+            night_sleep_avg_hours = round(sum(night_durations) / len(night_durations) / 60, 1)
+        if day_durations:
+            day_sleep_avg_hours = round(sum(day_durations) / len(day_durations) / 60, 1)
+
+        # Longest sleep block
+        all_durations = [s.duration_minutes for s in sleeps if s.duration_minutes]
+        if all_durations:
+            longest_sleep_block_hours = round(max(all_durations) / 60, 1)
 
         if age_weeks < 12:
             # Newborn pattern: calculate average interval between wake times
@@ -211,16 +255,23 @@ async def get_baby_analytics(
                 if wake_intervals:
                     wake_interval_hours = round(sum(wake_intervals) / len(wake_intervals), 1)
         else:
-            # Older baby: use specific times if sleep is consolidated
-            usual_wake_time = calculate_average_time_of_day(wake_times)
+            # Older baby: separate morning wakes from nap wakes
+            # Morning wake = wake times between 4am and 10am
+            morning_wakes = [wt for wt in wake_times
+                            if 4 <= make_aware(wt).hour < 10]
+            if morning_wakes:
+                usual_wake_time = calculate_average_time_of_day(morning_wakes, reference_hour=6)
 
-            # Bedtimes (start of overnight sleep - after 6pm)
+            # Bedtimes: start of sleep between 6pm and 3am (overnight sleep)
             bedtimes = []
             for s in sleeps:
                 st = make_aware(s.start_time)
                 if st.hour >= 18 or st.hour <= 3:
-                    bedtimes.append(st)
-            usual_bedtime = calculate_average_time_of_day(bedtimes)
+                    # Only count if the sleep is longer than 60 minutes (not a catnap)
+                    if s.duration_minutes and s.duration_minutes > 60:
+                        bedtimes.append(st)
+            if bedtimes:
+                usual_bedtime = calculate_average_time_of_day(bedtimes, reference_hour=21)
 
         # Nap durations (daytime sleep)
         nap_durations = []
@@ -339,6 +390,9 @@ async def get_baby_analytics(
                 "usual_wake_time": usual_wake_time,
                 "usual_bedtime": usual_bedtime,
                 "wake_interval_hours": wake_interval_hours,  # For newborns
+                "night_sleep_avg_hours": night_sleep_avg_hours,
+                "day_sleep_avg_hours": day_sleep_avg_hours,
+                "longest_sleep_block_hours": longest_sleep_block_hours,
                 "age_weeks": age_weeks,  # Include age for frontend logic
             } if has_enough_data else None,
             

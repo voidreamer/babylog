@@ -262,6 +262,7 @@ class DailySummary(BaseModel):
     tummy_minutes: int = 0
     bath_count: int = 0
     supplement_count: int = 0
+    solid_meal_count: int = 0
 
 
 class DashboardStats(BaseModel):
@@ -273,6 +274,7 @@ class DashboardStats(BaseModel):
     last_tummy: Optional['TummyTimeResponse'] = None
     last_bath: Optional['BathResponse'] = None
     last_supplement: Optional['SupplementResponse'] = None
+    last_solid: Optional['SolidResponse'] = None
     current_sleep: Optional[SleepResponse] = None
     daily_summary: Optional[DailySummary] = None
 
@@ -521,6 +523,44 @@ class BathResponse(BathBase):
 # ============================================================================
 # Supplement Schemas (Daily vitamins like Vitamin D, Iron, etc.)
 # ============================================================================
+
+# ============================================================================
+# Solid Food Schemas
+# ============================================================================
+
+SolidReactionEnum = Literal["liked", "disliked", "allergic", "neutral"]
+SolidAmountEnum = Literal["taste", "small", "medium", "large"]
+
+class SolidBase(BaseModel):
+    time: datetime
+    food_name: str = Field(..., max_length=200)
+    amount: Optional[str] = None
+    reaction: Optional[SolidReactionEnum] = None
+    notes: Optional[str] = Field(None, max_length=2000)
+
+
+class SolidCreate(SolidBase):
+    baby_id: int
+
+
+class SolidUpdate(BaseModel):
+    time: Optional[datetime] = None
+    food_name: Optional[str] = None
+    amount: Optional[str] = None
+    reaction: Optional[SolidReactionEnum] = None
+    notes: Optional[str] = Field(None, max_length=2000)
+
+
+class SolidResponse(SolidBase):
+    id: int
+    baby_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: serialize_datetime}
+    )
+
 
 SupplementNameEnum = Literal["vitamin_d", "iron", "dha", "probiotic", "multivitamin", "other"]
 

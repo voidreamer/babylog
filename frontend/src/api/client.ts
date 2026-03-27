@@ -59,10 +59,11 @@ function isNetworkError(error: unknown): boolean {
 async function buildOfflineDashboard(babyId: number, localDate: string | null): Promise<any> {
     const today = localDate || toLocalDateStr(new Date().toISOString());
 
-    const [feedings, diapers, sleeps, pumpings, potty, tummy, baths, supplements] = await Promise.all([
+    const [feedings, diapers, sleeps, pumpings, potty, tummy, baths, supplements, solids] = await Promise.all([
         getCachedFeedings(babyId), getCachedDiapers(babyId), getCachedSleeps(babyId), getCachedPumpings(babyId),
         getCachedActivities(babyId, 'potty'), getCachedActivities(babyId, 'tummy_time'),
         getCachedActivities(babyId, 'bath'), getCachedActivities(babyId, 'supplement'),
+        getCachedActivities(babyId, 'solid'),
     ]);
 
     feedings.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
@@ -73,6 +74,7 @@ async function buildOfflineDashboard(babyId: number, localDate: string | null): 
     tummy.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
     baths.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
     supplements.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
+    solids.sort((a: any, b: any) => new Date(b.time || '').getTime() - new Date(a.time || '').getTime());
 
     const currentSleep = sleeps.find((s: any) => !s.end_time) || null;
     const lastSleep = sleeps.find((s: any) => s.end_time) || sleeps[0] || null;
@@ -101,6 +103,7 @@ async function buildOfflineDashboard(babyId: number, localDate: string | null): 
         last_tummy:     tummy[0] || null,
         last_bath:      baths[0] || null,
         last_supplement: supplements[0] || null,
+        last_solid: solids[0] || null,
         daily_summary: {
             total_feedings:     feedToday.length,
             total_ml:           feedToday.reduce((acc: number, f: any) => acc + (f.amount_ml || 0), 0),
@@ -117,6 +120,7 @@ async function buildOfflineDashboard(babyId: number, localDate: string | null): 
             tummy_count:        tummyToday.length,
             tummy_minutes:      tummyToday.reduce((acc: number, t: any) => acc + (t.duration_minutes || 0), 0),
             bath_count:         bathToday.length,
+            solid_meal_count:   solids.filter((s: any) => isOnLocalDate(s.time, today)).length,
         },
     };
 }
@@ -128,10 +132,11 @@ async function buildOfflineDashboard(babyId: number, localDate: string | null): 
 async function buildOfflineTimeline(babyId: number, date: string | null): Promise<any[]> {
     const targetDate = date || toLocalDateStr(new Date().toISOString());
 
-    const [feedings, diapers, sleeps, pumpings, potty, tummy, baths, supplements] = await Promise.all([
+    const [feedings, diapers, sleeps, pumpings, potty, tummy, baths, supplements, solids] = await Promise.all([
         getCachedFeedings(babyId), getCachedDiapers(babyId), getCachedSleeps(babyId), getCachedPumpings(babyId),
         getCachedActivities(babyId, 'potty'), getCachedActivities(babyId, 'tummy_time'),
         getCachedActivities(babyId, 'bath'), getCachedActivities(babyId, 'supplement'),
+        getCachedActivities(babyId, 'solid'),
     ]);
 
     const events: any[] = [
@@ -171,6 +176,10 @@ async function buildOfflineTimeline(babyId: number, date: string | null): Promis
         ...supplements.filter((s: any) => isOnLocalDate(s.time, targetDate)).map((s: any) => ({
             ...s, event_type: 'supplement', time: s.time,
             details: { name: s.name, dosage: s.dosage },
+        })),
+        ...solids.filter((s: any) => isOnLocalDate(s.time, targetDate)).map((s: any) => ({
+            ...s, event_type: 'solid', time: s.time,
+            details: { food_name: s.food_name, amount: s.amount, reaction: s.reaction },
         })),
     ];
 
@@ -551,6 +560,19 @@ class ApiClient {
     }
     async deleteBath(id: number): Promise<any> { return this.request(`/activities/baths/${id}`, { method: 'DELETE' }); }
     async updateBath(id: number, data: any): Promise<any> { return this.request(`/activities/baths/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
+
+    // Solids
+    async getSolids(babyId: number, limit: number = 50): Promise<any[]> {
+        if (!isOnline()) { return await getCachedActivities(babyId, 'solid'); }
+        try { const solids = await this.request(`/activities/solids?baby_id=${babyId}&limit=${limit}`); if (solids) await cacheActivities(babyId, 'solid', solids); return solids; }
+        catch (error) { if (shouldUseFallback(error)) { return await getCachedActivities(babyId, 'solid'); } throw error; }
+    }
+    async createSolid(data: any): Promise<any> {
+        try { return await this.request('/activities/solids', { method: 'POST', body: JSON.stringify(data) }); }
+        catch (error) { if (isNetworkError(error)) { await queueForSync({ type: 'CREATE_SOLID', endpoint: '/activities/solids', method: 'POST', data }); const o = { ...data, id: `temp_${Date.now()}`, created_at: new Date().toISOString() }; await addCachedActivity(o, 'solid'); return o; } throw error; }
+    }
+    async deleteSolid(id: number): Promise<any> { return this.request(`/activities/solids/${id}`, { method: 'DELETE' }); }
+    async updateSolid(id: number, data: any): Promise<any> { return this.request(`/activities/solids/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
     // Rest Planner
     async getRestPlan(babyId: number, days: number = 7): Promise<any> {

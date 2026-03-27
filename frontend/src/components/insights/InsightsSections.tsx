@@ -263,6 +263,28 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
         });
     }
 
+    // Night vs day sleep blocks
+    if (patterns?.night_sleep_avg_hours) {
+        patternItems.push({
+            icon: <Moon size={20} />,
+            color: 'var(--sleep)',
+            label: t('insights.nightSleepBlock', { defaultValue: 'Night sleep block' }),
+            value: `~${patterns.night_sleep_avg_hours}h`,
+            detail: patterns.longest_sleep_block_hours
+                ? t('insights.longestStretch', { defaultValue: 'Longest stretch: {{hours}}h', hours: patterns.longest_sleep_block_hours })
+                : undefined,
+        });
+    }
+    if (patterns?.day_sleep_avg_hours) {
+        patternItems.push({
+            icon: <Clock size={20} />,
+            color: 'var(--sleep)',
+            label: t('insights.daySleepBlock', { defaultValue: 'Day nap avg' }),
+            value: `~${patterns.day_sleep_avg_hours}h`,
+            detail: undefined,
+        });
+    }
+
     // Nap patterns
     if (patterns?.avg_nap_duration_minutes) {
         const mins = patterns.avg_nap_duration_minutes;

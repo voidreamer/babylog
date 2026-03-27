@@ -155,7 +155,7 @@ FEEDING_BENCHMARKS = {
         "feeds": (4, 6),
         "amount_ml": (180, 240),
         "interval_hours": (3, 4),
-        "notes": "Solids starting, milk still primary",
+        "notes": "Milk feeds may space out as stomach capacity grows",
     },
     52: {
         "feeds": (3, 5),

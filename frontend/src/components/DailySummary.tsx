@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
-import { Baby, Droplets, Moon, Heart, BarChart3, Toilet, Timer, Bath as BathIcon } from 'lucide-react';
+import { Baby, Droplets, Moon, Heart, BarChart3, Toilet, Timer, Bath as BathIcon, UtensilsCrossed } from 'lucide-react';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
 import { format, subDays } from 'date-fns';
@@ -109,6 +109,14 @@ export default function DailySummary({ summary, visibleWidgets = ['feeding', 'di
                 value: data.bath_count,
                 label: data.bath_count === 1 ? t('summary.bath') : t('summary.baths'),
                 color: 'var(--bath)',
+                extra: null
+            }] : []),
+            ...(data.solid_meal_count > 0 ? [{
+                id: 'solid',
+                icon: UtensilsCrossed,
+                value: data.solid_meal_count,
+                label: data.solid_meal_count === 1 ? t('summary.solidMeal', { defaultValue: 'Solid meal' }) : t('summary.solidMeals', { defaultValue: 'Solid meals' }),
+                color: 'var(--solid, var(--tummy))',
                 extra: null
             }] : [])
         ];

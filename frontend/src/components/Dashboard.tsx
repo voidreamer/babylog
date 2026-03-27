@@ -12,6 +12,7 @@ import TummyTimeWidget from './TummyTimeWidget';
 import BathWidget from './BathWidget';
 import SupplementWidget from './SupplementWidget';
 import PottyWidget from './PottyWidget';
+import SolidWidget from './SolidWidget';
 import WidgetSettings from './WidgetSettings';
 import FeedingModal from './FeedingModal';
 import DiaperModal from './DiaperModal';
@@ -21,6 +22,7 @@ import PottyModal from './PottyModal';
 import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
+import SolidModal from './SolidModal';
 import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import ComingUp from './ComingUp';
@@ -29,12 +31,15 @@ import { Baby } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { calculateAgeInMonths } from '../utils/ageUtils';
 
-type ModalType = 'feeding'|'diaper'|'sleep'|'pumping'|'potty'|'tummy'|'bath'|'supplement'|null;
+type ModalType = 'feeding'|'diaper'|'sleep'|'pumping'|'potty'|'tummy'|'bath'|'supplement'|'solid'|null;
 
 function getDefaultWidgets(ageMonths: number | null): string[] {
     const widgets = ['feeding', 'diaper', 'sleep'];
     if (ageMonths === null || ageMonths <= 12) {
         widgets.push('pumping', 'tummy', 'supplement');
+    }
+    if (ageMonths !== null && ageMonths >= 4) {
+        widgets.push('solid');
     }
     if (ageMonths !== null && ageMonths >= 18) {
         widgets.push('potty');
@@ -62,6 +67,7 @@ function warmOfflineCache(babyId: number): void {
         api.getTummyTimes(babyId),
         api.getBaths(babyId),
         api.getSupplements(babyId),
+        api.getSolids(babyId),
     ]).catch(() => {}); // fire-and-forget; errors are silently ignored
 }
 
@@ -277,6 +283,15 @@ export default function Dashboard() {
                     />
                 )}
 
+                {visibleWidgets.includes('solid') && (
+                    <SolidWidget
+                        lastSolid={dashboard?.last_solid}
+                        onSolidChange={loadData}
+                        onOpenModal={() => setActiveModal('solid')}
+                        quickActionsEnabled={quickActionsEnabled}
+                    />
+                )}
+
                 {/* Widget Settings Button */}
                 <WidgetSettings
                     visibleWidgets={visibleWidgets}
@@ -347,6 +362,13 @@ export default function Dashboard() {
 
             {activeModal === 'supplement' && (
                 <SupplementModal
+                    onClose={() => setActiveModal(null)}
+                    onSave={handleEventLogged}
+                />
+            )}
+
+            {activeModal === 'solid' && (
+                <SolidModal
                     onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
