@@ -12,17 +12,17 @@ import TummyTimeModal from './TummyTimeModal';
 import BathModal from './BathModal';
 import SupplementModal from './SupplementModal';
 import SolidModal from './SolidModal';
-import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X, UtensilsCrossed } from 'lucide-react';
+import { Baby, Droplets, Moon, Milk, Pencil, Trash2, CircleDot, Sun, ShowerHead, Pill, Calendar, X, UtensilsCrossed, ThumbsUp, Minus, ThumbsDown, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from './ConfirmModal';
 
 
-const REACTION_EMOJI: Record<string, string> = {
-    liked: '😋',
-    neutral: '😐',
-    disliked: '🙁',
-    allergic: '⚠️',
+const REACTION_LABELS: Record<string, string> = {
+    liked: 'Liked',
+    neutral: 'Neutral',
+    disliked: 'Disliked',
+    allergic: 'Allergic',
 };
 
 // Parse UTC time string to local Date
@@ -334,7 +334,7 @@ export default function TimelineCalendar() {
                 const solidParts = [];
                 if (details.food_name) solidParts.push(details.food_name);
                 if (details.amount) solidParts.push(details.amount);
-                if (details.reaction) solidParts.push(REACTION_EMOJI[details.reaction] || details.reaction);
+                if (details.reaction) solidParts.push(REACTION_LABELS[details.reaction] || details.reaction);
                 return solidParts.join(' • ') || t('solid.title', { defaultValue: 'Solids' });
             default:
                 return '';

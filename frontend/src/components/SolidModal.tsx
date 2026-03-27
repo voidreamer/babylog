@@ -5,7 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
-import { UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, ThumbsUp, Minus, ThumbsDown, AlertTriangle } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { hapticNotification } from '../utils/haptics';
@@ -13,11 +13,11 @@ import { hapticNotification } from '../utils/haptics';
 const AMOUNT_OPTIONS = ['taste', 'small', 'medium', 'large'];
 const REACTION_OPTIONS = ['liked', 'neutral', 'disliked', 'allergic'];
 
-const REACTION_EMOJI: Record<string, string> = {
-    liked: '😋',
-    neutral: '😐',
-    disliked: '🙁',
-    allergic: '⚠️',
+const REACTION_ICONS: Record<string, any> = {
+    liked: ThumbsUp,
+    neutral: Minus,
+    disliked: ThumbsDown,
+    allergic: AlertTriangle,
 };
 
 interface SolidModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
@@ -138,7 +138,8 @@ export default function SolidModal({ editEvent, onClose, onSave }: SolidModalPro
                                         className={`btn-group-item ${reaction === opt ? 'active' : ''}`}
                                         onClick={() => setReaction(opt)}
                                     >
-                                        {REACTION_EMOJI[opt]} {t(`solid.reaction_${opt}`, { defaultValue: opt })}
+                                        {(() => { const Icon = REACTION_ICONS[opt]; return Icon ? <Icon size={14} style={{ marginRight: 4 }} /> : null; })()}
+                                        {t(`solid.reaction_${opt}`, { defaultValue: opt })}
                                     </button>
                                 ))}
                             </div>
