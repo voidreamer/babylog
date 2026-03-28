@@ -37,6 +37,8 @@ export default defineConfig({
                 ]
             },
             workbox: {
+                // Enable navigation preload: while SW serves cached shell, start API fetch in parallel
+                navigationPreload: true,
                 // Cache strategies
                 runtimeCaching: [
                     {
@@ -99,16 +101,30 @@ export default defineConfig({
                         }
                     },
                     {
-                        // Dashboard data — NetworkFirst with 1 min timeout
+                        // Dashboard data — StaleWhileRevalidate: serve cached instantly, refresh in background
                         urlPattern: /\/api\/events\/dashboard.*/i,
-                        handler: 'NetworkFirst',
+                        handler: 'StaleWhileRevalidate',
                         options: {
                             cacheName: 'api-dashboard-cache',
                             expiration: {
                                 maxEntries: 10,
-                                maxAgeSeconds: 60 // 1 minute
+                                maxAgeSeconds: 300 // 5 minutes
                             },
-                            networkTimeoutSeconds: 5,
+                            cacheableResponse: {
+                                statuses: [0, 200]
+                            }
+                        }
+                    },
+                    {
+                        // Babies data — StaleWhileRevalidate for instant app start
+                        urlPattern: /\/api\/babies\/?$/i,
+                        handler: 'StaleWhileRevalidate',
+                        options: {
+                            cacheName: 'api-babies-list-cache',
+                            expiration: {
+                                maxEntries: 5,
+                                maxAgeSeconds: 300 // 5 minutes
+                            },
                             cacheableResponse: {
                                 statuses: [0, 200]
                             }
@@ -147,6 +163,24 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
-        sourcemap: false
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Heavy charting library — only used in Insights page, not on Dashboard
+                    'recharts': ['recharts'],
+                    // Animation library — keep separate so core bundle parses faster
+                    'framer': ['framer-motion'],
+                    // Date utilities
+                    'date-fns': ['date-fns'],
+                    // Supabase auth — loaded async after initial render
+                    'supabase': ['@supabase/supabase-js'],
+                    // i18n runtime
+                    'i18n': ['i18next', 'react-i18next'],
+                    // React core (shared, cached aggressively)
+                    'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+                }
+            }
+        }
     }
 })

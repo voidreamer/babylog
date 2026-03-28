@@ -142,53 +142,46 @@ export function PredictionsSection({ predictions, isPremium }: PredictionsSectio
                     </motion.div>
                 )}
 
-                {predictions?.sleep_pressure && (
-                    <motion.div
-                        className={`insight-card pressure-card pressure-${predictions.sleep_pressure.zone}`}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                    >
-                        <div className="pressure-gauge">
-                            <svg viewBox="0 0 100 100" className="pressure-ring">
-                                <circle
-                                    cx="50"
-                                    cy="50"
-                                    r="45"
-                                    fill="none"
-                                    stroke="var(--border)"
-                                    strokeWidth="8"
-                                />
-                                <circle
-                                    cx="50"
-                                    cy="50"
-                                    r="45"
-                                    fill="none"
-                                    stroke={getPressureColor(predictions.sleep_pressure.score)}
-                                    strokeWidth="8"
-                                    strokeLinecap="round"
-                                    strokeDasharray={`${predictions.sleep_pressure.score * 2.83} 283`}
-                                    transform="rotate(-90 50 50)"
-                                />
-                            </svg>
-                            <div className="pressure-score">
-                                {predictions.sleep_pressure.score}
+                {predictions?.sleep_pressure && (() => {
+                    const sp = predictions.sleep_pressure;
+                    const color = getPressureColor(sp.score);
+                    return (
+                        <motion.div
+                            className={`pressure-banner pressure-${sp.zone}`}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <div className="pressure-banner-top">
+                                <div className="pressure-banner-label">
+                                    <Moon size={16} style={{ color }} />
+                                    <span>{t('insights.sleepPressure')}</span>
+                                </div>
+                                <span className="pressure-banner-status" style={{ color }}>
+                                    {sp.label}
+                                </span>
                             </div>
-                        </div>
-                        <div className="insight-card-content">
-                            <span className="insight-card-label">{t('insights.sleepPressure')}</span>
-                            <span className="insight-card-value">
-                                {predictions.sleep_pressure.label}
-                            </span>
-                            <span className="pressure-detail">
-                                {t('insights.minutesAwake', { count: predictions.sleep_pressure.minutes_awake })}
-                            </span>
-                            <span className="pressure-recommendation">
-                                {predictions.sleep_pressure.recommendation}
-                            </span>
-                        </div>
-                    </motion.div>
-                )}
+                            <div className="pressure-banner-bar-track">
+                                <div
+                                    className="pressure-banner-bar-fill"
+                                    style={{ width: `${sp.score}%`, backgroundColor: color }}
+                                />
+                                <div
+                                    className="pressure-banner-bar-thumb"
+                                    style={{ left: `${sp.score}%`, borderColor: color }}
+                                />
+                            </div>
+                            <div className="pressure-banner-meta">
+                                <span className="pressure-banner-awake">
+                                    {t('insights.minutesAwake', { count: sp.minutes_awake })}
+                                </span>
+                                <span className="pressure-banner-rec">
+                                    {sp.recommendation}
+                                </span>
+                            </div>
+                        </motion.div>
+                    );
+                })()}
             </div>
 
             {!isPremium && (

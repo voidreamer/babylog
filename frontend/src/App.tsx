@@ -742,7 +742,7 @@ function MainApp() {
         );
     }
 
-    if (babiesLoading) {
+    if (babiesLoading && babies.length === 0) {
         return (
             <div className="loading" style={{ minHeight: '100vh' }}>
                 <img src="/icons/loading.png" alt="" className="loading-logo" />
