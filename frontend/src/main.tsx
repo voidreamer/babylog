@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import './i18n';
+// Self-hosted fonts — eliminates render-blocking Google Fonts network request
+import '@fontsource-variable/nunito';
+import '@fontsource-variable/quicksand';
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'

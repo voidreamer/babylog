@@ -22,10 +22,34 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+// Check if Supabase has a cached session in localStorage (synchronous, instant).
+// This lets us skip the loading screen for returning users while getSession() validates async.
+function getCachedSupabaseSession(): { user: SupabaseUser; session: Session } | null {
+    try {
+        // Supabase stores session under a key like sb-<ref>-auth-token
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+                const raw = localStorage.getItem(key);
+                if (!raw) continue;
+                const parsed = JSON.parse(raw);
+                // Supabase v2 stores { access_token, refresh_token, user, ... } or nested
+                const sess = parsed?.currentSession || parsed;
+                if (sess?.access_token && sess?.user) {
+                    return { user: sess.user, session: sess as Session };
+                }
+            }
+        }
+    } catch { /* ignore parse errors */ }
+    return null;
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
-    const [user, setUser] = useState<SupabaseUser | null>(null);
-    const [session, setSession] = useState<Session | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Instant hydration: use cached Supabase session to skip loading for returning users
+    const cached = getCachedSupabaseSession();
+    const [user, setUser] = useState<SupabaseUser | null>(cached?.user ?? null);
+    const [session, setSession] = useState<Session | null>(cached?.session ?? null);
+    const [loading, setLoading] = useState(!cached);
 
     useEffect(() => {
         // Check for auth relay params from cross-app navigation

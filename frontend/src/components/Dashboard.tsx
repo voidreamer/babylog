@@ -74,10 +74,20 @@ function warmOfflineCache(babyId: number): void {
 export default function Dashboard() {
     const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
-    const [dashboard, setDashboard] = useState<any>(null);
-    const [latestGrowth, setLatestGrowth] = useState<any>(null);
-    const [upcoming, setUpcoming] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    // Instant render: hydrate from localStorage cache synchronously (no flash)
+    const cacheKey = selectedBaby ? `heybub_dashboard_${selectedBaby.id}` : '';
+    const [dashboard, setDashboard] = useState<any>(() => {
+        if (!cacheKey) return null;
+        try { const raw = localStorage.getItem(cacheKey); return raw ? JSON.parse(raw) : null; } catch { return null; }
+    });
+    const [latestGrowth, setLatestGrowth] = useState<any>(() => {
+        try { const raw = localStorage.getItem('heybub_latest_growth'); return raw ? JSON.parse(raw) : null; } catch { return null; }
+    });
+    const [upcoming, setUpcoming] = useState<any[]>(() => {
+        try { const raw = localStorage.getItem('heybub_upcoming'); return raw ? JSON.parse(raw) : []; } catch { return []; }
+    });
+    // If we have cached data, skip the loading skeleton entirely
+    const [loading, setLoading] = useState(!dashboard);
 
     // Single modal state
     const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -145,10 +155,16 @@ export default function Dashboard() {
                 api.getUpcoming(selectedBaby.id).catch(() => ({ upcoming: [] })),
             ]);
             setDashboard(dashboardData);
+            // Persist to localStorage for instant render on next app open
+            try { localStorage.setItem(cacheKey, JSON.stringify(dashboardData)); } catch { /* quota */ }
             if (growthRecords?.length > 0) {
-                setLatestGrowth(growthRecords[growthRecords.length - 1]);
+                const latest = growthRecords[growthRecords.length - 1];
+                setLatestGrowth(latest);
+                try { localStorage.setItem('heybub_latest_growth', JSON.stringify(latest)); } catch { /* quota */ }
             }
-            setUpcoming(upcomingData?.upcoming || []);
+            const upcomingItems = upcomingData?.upcoming || [];
+            setUpcoming(upcomingItems);
+            try { localStorage.setItem('heybub_upcoming', JSON.stringify(upcomingItems)); } catch { /* quota */ }
             // Keep IDB warm so all event types are available offline
             warmOfflineCache(selectedBaby.id);
         } catch (error) {

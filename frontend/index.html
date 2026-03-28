@@ -10,11 +10,7 @@
   <meta name="theme-color" content="#d4849c" />
   <title>HeyBub - Baby Tracker</title>
   <meta name="description" content="Track your baby's sleep, feeding, and diaper changes with ease" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap"
-    rel="stylesheet">
+  <!-- Fonts are self-hosted via @fontsource-variable (imported in main.tsx) for instant loading -->
 </head>
 
 <body>
@@ -22,7 +18,7 @@
     <!-- Inline splash shown while JS loads, replaced by React -->
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;background:#faf5f7;">
       <img src="/icons/loading.png" alt="" style="width:80px;height:80px;animation:_f 2s ease-in-out infinite;filter:drop-shadow(0 4px 12px rgba(212,132,156,.3));">
-      <span style="font-family:Quicksand,sans-serif;font-weight:600;font-size:1.1rem;color:#8b7e85;opacity:0;animation:_i .8s ease-out .3s forwards;">Getting things ready...</span>
+      <span style="font-family:system-ui,sans-serif;font-weight:600;font-size:1.1rem;color:#8b7e85;opacity:0;animation:_i .8s ease-out .3s forwards;">Getting things ready...</span>
     </div>
     <style>@keyframes _f{0%,100%{transform:translateY(0) scale(1);opacity:.85}50%{transform:translateY(-8px) scale(1.05);opacity:1}}@keyframes _i{to{opacity:1}}</style>
   </div>

@@ -37,9 +37,24 @@ interface BabyProviderProps {
 }
 
 export function BabyProvider({ children }: BabyProviderProps) {
-    const [babies, setBabies] = useState<Baby[]>([]);
-    const [selectedBaby, setSelectedBaby] = useState<Baby | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Instant hydration: restore babies from localStorage synchronously so Dashboard can render immediately
+    const [babies, setBabies] = useState<Baby[]>(() => {
+        try { const raw = localStorage.getItem('heybub_babies'); return raw ? JSON.parse(raw) : []; } catch { return []; }
+    });
+    const [selectedBaby, setSelectedBaby] = useState<Baby | null>(() => {
+        try {
+            const raw = localStorage.getItem('heybub_babies');
+            if (!raw) return null;
+            const cached: Baby[] = JSON.parse(raw);
+            if (cached.length === 0) return null;
+            const savedId = localStorage.getItem('selected_baby_id');
+            return cached.find(b => b.id === parseInt(savedId || '0')) || cached[0];
+        } catch { return null; }
+    });
+    // If we have cached babies, skip loading state entirely (stale-while-revalidate)
+    const [loading, setLoading] = useState(() => {
+        try { const raw = localStorage.getItem('heybub_babies'); return !raw || JSON.parse(raw).length === 0; } catch { return true; }
+    });
     const [error, setError] = useState<string | null>(null);
 
     const loadBabies = async () => {
@@ -47,6 +62,8 @@ export function BabyProvider({ children }: BabyProviderProps) {
             setError(null);
             const data = await api.getBabies();
             setBabies(data);
+            // Persist for instant hydration on next app open
+            try { localStorage.setItem('heybub_babies', JSON.stringify(data)); } catch { /* quota */ }
 
             if (data.length > 0) {
                 if (selectedBaby) {
