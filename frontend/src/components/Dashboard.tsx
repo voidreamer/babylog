@@ -27,7 +27,7 @@ import DailySummary from './DailySummary';
 import BabyGreeting from './BabyGreeting';
 import ComingUp from './ComingUp';
 import { motion } from 'framer-motion';
-import { Baby } from 'lucide-react';
+import { Baby, WifiOff, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { calculateAgeInMonths } from '../utils/ageUtils';
 
@@ -88,6 +88,8 @@ export default function Dashboard() {
     });
     // If we have cached data, skip the loading skeleton entirely
     const [loading, setLoading] = useState(!dashboard);
+    const [refreshing, setRefreshing] = useState(false);
+    const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
     // Single modal state
     const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -104,6 +106,15 @@ export default function Dashboard() {
         const saved = localStorage.getItem('quickActionsEnabled');
         return saved !== null ? JSON.parse(saved) : true;
     });
+
+    // Track online/offline status
+    useEffect(() => {
+        const goOnline = () => setIsOffline(false);
+        const goOffline = () => setIsOffline(true);
+        window.addEventListener('online', goOnline);
+        window.addEventListener('offline', goOffline);
+        return () => { window.removeEventListener('online', goOnline); window.removeEventListener('offline', goOffline); };
+    }, []);
 
     // Sync with localStorage changes (from Settings page)
     useEffect(() => {
@@ -146,6 +157,9 @@ export default function Dashboard() {
     const loadData = async () => {
         if (!selectedBaby) return;
 
+        const isInitialLoad = !dashboard;
+        if (!isInitialLoad) setRefreshing(true);
+
         try {
             const localDate = format(new Date(), 'yyyy-MM-dd');
             const tzOffset = new Date().getTimezoneOffset();
@@ -165,15 +179,18 @@ export default function Dashboard() {
             const upcomingItems = upcomingData?.upcoming || [];
             setUpcoming(upcomingItems);
             try { localStorage.setItem('heybub_upcoming', JSON.stringify(upcomingItems)); } catch { /* quota */ }
-            // Keep IDB warm so all event types are available offline
             warmOfflineCache(selectedBaby.id);
         } catch (error) {
             console.error('Failed to load dashboard:', error);
-            toast.error(t('failedToLoadDashboard'), {
-                description: t('failedToLoadDashboardDesc')
-            });
+            // Only toast on initial load when we have no data at all
+            if (isInitialLoad && !dashboard) {
+                toast.error(t('failedToLoadDashboard'), {
+                    description: navigator.onLine ? t('failedToLoadDashboardDesc') : t('offlineDesc')
+                });
+            }
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -220,6 +237,20 @@ export default function Dashboard() {
 
     return (
         <div>
+            {/* Status indicators */}
+            {isOffline && (
+                <div className="dashboard-status offline">
+                    <WifiOff size={14} />
+                    <span>{t('statusOffline')}</span>
+                </div>
+            )}
+            {refreshing && !isOffline && (
+                <div className="dashboard-status fetching">
+                    <RefreshCw size={14} className="spin" />
+                    <span>{t('statusFetching')}</span>
+                </div>
+            )}
+
             <BabyGreeting summary={dashboard?.daily_summary} latestGrowth={latestGrowth} />
 
             {/* Widgets Grid */}

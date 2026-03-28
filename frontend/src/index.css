@@ -805,6 +805,31 @@ h4 {
    Widgets (Dashboard cards)
    ============================================================================ */
 
+/* Dashboard status indicators */
+.dashboard-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: fit-content;
+  margin: 0 auto var(--space-sm);
+}
+.dashboard-status.offline {
+  background: rgba(var(--primary-rgb), 0.12);
+  color: var(--text-secondary);
+}
+.dashboard-status.fetching {
+  background: transparent;
+  color: var(--text-muted);
+}
+.dashboard-status .spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 .widgets-grid {
   display: grid;
   grid-template-columns: 1fr;
