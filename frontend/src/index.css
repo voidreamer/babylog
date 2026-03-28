@@ -4922,6 +4922,150 @@ h4 {
   text-align: right;
 }
 
+/* Today's Snapshot Grid */
+.snapshot-grid {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.snapshot-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.snapshot-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.snapshot-card-icon {
+  display: flex;
+  align-items: center;
+}
+
+.snapshot-card-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.snapshot-diff {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+}
+
+.snapshot-diff.positive {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+}
+
+.snapshot-diff.negative {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.snapshot-card-value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.snapshot-today {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.snapshot-avg {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.snapshot-bar-track {
+  position: relative;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: visible;
+  margin-top: var(--space-xs);
+}
+
+.snapshot-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.snapshot-bar-range {
+  position: absolute;
+  top: -2px;
+  height: 10px;
+  background: var(--border);
+  opacity: 0.4;
+  border-radius: 5px;
+}
+
+.snapshot-bar-avg {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 12px;
+  background: var(--text-muted);
+  border-radius: 1px;
+  transform: translateX(-1px);
+}
+
+.snapshot-range-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Patterns Toggle */
+.patterns-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm);
+  margin-top: var(--space-xs);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.patterns-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.patterns-toggle-icon {
+  transition: transform 0.2s ease;
+}
+
+.patterns-toggle-icon.expanded {
+  transform: rotate(180deg);
+}
+
 /* Prediction Confidence */
 .prediction-confidence {
   display: flex;
@@ -5025,12 +5169,7 @@ h4 {
 }
 
 .trend-card-tip {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-style: italic;
-  margin: 0;
-  padding-top: var(--space-xs);
-  border-top: 1px solid var(--border);
+  display: none;
 }
 
 /* Legacy trend-item kept */
