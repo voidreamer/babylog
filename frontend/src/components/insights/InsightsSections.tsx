@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import {
     TrendingUp, TrendingDown, Clock, Moon, Baby, Droplets,
-    AlertCircle, CheckCircle2, Lock, Calendar, Minus, Activity
+    Lock, Calendar, Minus, Activity,
+    ChevronDown
 } from 'lucide-react';
 
 // ============================================================================
@@ -42,13 +43,6 @@ export const formatNapPrediction = (prediction: any): { text: string; isPastDue?
         return { text: 'sleeping_now', isSleeping: true };
     }
     return formatPrediction(prediction);
-};
-
-export const getStatus = (value: number, benchmark: any): string => {
-    if (!benchmark) return 'neutral';
-    if (value < benchmark.min) return 'low';
-    if (value > benchmark.max) return 'high';
-    return 'good';
 };
 
 export const getPressureColor = (score: number): string => {
@@ -297,6 +291,11 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
         });
     }
 
+    const COLLAPSED_COUNT = 3;
+    const [expanded, setExpanded] = useState(false);
+    const hasMore = patternItems.length > COLLAPSED_COUNT;
+    const visibleItems = expanded ? patternItems : patternItems.slice(0, COLLAPSED_COUNT);
+
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
@@ -306,13 +305,26 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
             </h2>
 
             <div className={`insights-patterns-grid ${!isPremium ? 'premium-blur' : ''}`}>
-                {patternItems.map((item, i) => (
+                {visibleItems.map((item, i) => (
                     <PatternCard key={i} {...item} />
                 ))}
                 {patternItems.length === 0 && (
                     <p className="pattern-empty">{t('insights.noPatternsYet', { defaultValue: 'Not enough data to detect patterns yet' })}</p>
                 )}
             </div>
+
+            {hasMore && isPremium && (
+                <button
+                    className="patterns-toggle"
+                    onClick={() => setExpanded(e => !e)}
+                >
+                    <span>{expanded
+                        ? t('insights.showLess', { defaultValue: 'Show less' })
+                        : t('insights.showAllPatterns', { defaultValue: `Show all ${patternItems.length} patterns` })
+                    }</span>
+                    <ChevronDown size={16} className={`patterns-toggle-icon ${expanded ? 'expanded' : ''}`} />
+                </button>
+            )}
 
             {!isPremium && (
                 <div className="premium-overlay">
@@ -322,12 +334,6 @@ export function PatternsSection({ patterns, isPremium }: PatternsSectionProps) {
             )}
         </section>
     );
-}
-
-function getTrendSummary(trend: string, t: any): string {
-    if (trend === 'improving') return t('insights.trendImprovingTip', { defaultValue: 'Keep up the good work — things are moving in the right direction' });
-    if (trend === 'declining') return t('insights.trendDecliningTip', { defaultValue: 'This is worth monitoring — consider whether anything has changed recently' });
-    return t('insights.trendStableTip', { defaultValue: 'Consistent patterns are a sign of a well-established routine' });
 }
 
 interface TrendsSectionProps { trends: any; isPremium: boolean; }
@@ -360,7 +366,6 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
                         </div>
                         <div className="trend-card-value">{item.data.trend_label}</div>
                         <p className="trend-card-desc">{item.data.description}</p>
-                        <p className="trend-card-tip">{getTrendSummary(item.data.trend, t)}</p>
                     </div>
                 ))}
             </div>
@@ -375,139 +380,37 @@ export function TrendsSection({ trends, isPremium }: TrendsSectionProps) {
     );
 }
 
-function BenchmarkProgressBar({ actual, min, max, color }: { actual: number; min: number; max: number; color: string }) {
-    // Show where 'actual' falls relative to the expected range
-    const rangeSpan = max - min;
-    const visualMin = Math.max(0, min - rangeSpan * 0.3);
-    const visualMax = max + rangeSpan * 0.3;
-    const totalSpan = visualMax - visualMin;
-    const leftPct = ((min - visualMin) / totalSpan) * 100;
-    const widthPct = ((max - min) / totalSpan) * 100;
-    const markerPct = Math.max(0, Math.min(100, ((actual - visualMin) / totalSpan) * 100));
-    const inRange = actual >= min && actual <= max;
-
-    return (
-        <div className="benchmark-progress">
-            <div className="benchmark-progress-track">
-                <div
-                    className="benchmark-progress-range"
-                    style={{ left: `${leftPct}%`, width: `${widthPct}%`, background: color }}
-                />
-                <div
-                    className={`benchmark-progress-marker ${inRange ? 'in-range' : 'out-range'}`}
-                    style={{ left: `${markerPct}%` }}
-                />
-            </div>
-            <div className="benchmark-progress-labels">
-                <span>{min}</span>
-                <span className="benchmark-progress-actual" style={{ color: inRange ? 'var(--success)' : 'var(--danger)' }}>
-                    {actual} {inRange ? '✓' : '!'}
-                </span>
-                <span>{max}</span>
-            </div>
-        </div>
-    );
-}
-
-interface BenchmarksSectionProps { benchmarks: any; today_vs_average: any; }
-export function BenchmarksSection({ benchmarks, today_vs_average }: BenchmarksSectionProps) {
+interface TodaySnapshotSectionProps { benchmarks: any; today_vs_average: any; }
+export function TodaySnapshotSection({ benchmarks, today_vs_average }: TodaySnapshotSectionProps) {
     const { t } = useTranslation('dashboard');
 
     const items = [
         {
-            icon: <Droplets size={20} />,
-            color: 'var(--diaper)',
-            label: t('insights.diapersToday'),
-            actual: today_vs_average?.diapers?.wet_today || 0,
-            benchmark: benchmarks?.diapers?.expected_wet_diapers,
-            unit: t('insights.wet'),
-            note: benchmarks?.diapers?.notes,
+            icon: <Baby size={20} />,
+            color: 'var(--feeding)',
+            label: t('insights.feedings'),
+            today: today_vs_average?.feedings?.today || 0,
+            avg: today_vs_average?.feedings?.daily_avg || 0,
+            benchmark: benchmarks?.feeding?.expected_feeds_per_day,
+            unit: '',
         },
         {
             icon: <Moon size={20} />,
             color: 'var(--sleep)',
-            label: t('insights.sleepToday'),
-            actual: today_vs_average?.sleep_hours?.today || 0,
-            benchmark: benchmarks?.sleep?.expected_total_sleep_hours,
-            unit: t('insights.hours_label'),
-            note: benchmarks?.sleep?.notes,
-        },
-        {
-            icon: <Baby size={20} />,
-            color: 'var(--feeding)',
-            label: t('insights.feedingsToday'),
-            actual: today_vs_average?.feedings?.today || 0,
-            benchmark: benchmarks?.feeding?.expected_feeds_per_day,
-            unit: t('insights.feeds'),
-            note: benchmarks?.feeding?.notes,
-        },
-    ];
-
-    return (
-        <section className="insights-section">
-            <h2 className="insights-section-title">
-                <CheckCircle2 size={18} />
-                <span>{t('insights.ageGuidelines')}</span>
-                <span className="age-badge">{t('insights.weeks', { count: benchmarks?.age_weeks })}</span>
-            </h2>
-
-            <div className="insights-benchmarks">
-                {items.map((item, i) => {
-                    const status = getStatus(item.actual, item.benchmark);
-                    return (
-                        <div key={i} className={`benchmark-card benchmark-${status}`}>
-                            <div className="benchmark-header">
-                                <span style={{ color: item.color }}>{item.icon}</span>
-                                <span>{item.label}</span>
-                                <div className={`benchmark-status ${status}`}>
-                                    {status === 'good' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                                </div>
-                            </div>
-                            {item.benchmark && (
-                                <BenchmarkProgressBar
-                                    actual={item.actual}
-                                    min={item.benchmark.min}
-                                    max={item.benchmark.max}
-                                    color={item.color}
-                                />
-                            )}
-                            {item.note && <p className="benchmark-note">{item.note}</p>}
-                        </div>
-                    );
-                })}
-            </div>
-        </section>
-    );
-}
-
-interface TodayVsAverageSectionProps { today_vs_average: any; }
-export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectionProps) {
-    const { t } = useTranslation('dashboard');
-
-    const items = [
-        {
-            icon: <Baby size={18} />,
-            label: t('insights.feedings'),
-            today: today_vs_average?.feedings?.today || 0,
-            avg: today_vs_average?.feedings?.daily_avg || 0,
-            color: 'var(--feeding)',
-            unit: '',
-        },
-        {
-            icon: <Droplets size={18} />,
-            label: t('insights.diapers'),
-            today: today_vs_average?.diapers?.today || 0,
-            avg: today_vs_average?.diapers?.daily_avg || 0,
-            color: 'var(--diaper)',
-            unit: '',
-        },
-        {
-            icon: <Moon size={18} />,
             label: t('insights.sleep'),
             today: today_vs_average?.sleep_hours?.today || 0,
             avg: today_vs_average?.sleep_hours?.daily_avg || 0,
-            color: 'var(--sleep)',
+            benchmark: benchmarks?.sleep?.expected_total_sleep_hours,
             unit: 'h',
+        },
+        {
+            icon: <Droplets size={20} />,
+            color: 'var(--diaper)',
+            label: t('insights.diapers'),
+            today: today_vs_average?.diapers?.today || 0,
+            avg: today_vs_average?.diapers?.daily_avg || 0,
+            benchmark: benchmarks?.diapers?.expected_wet_diapers,
+            unit: '',
         },
     ];
 
@@ -515,50 +418,54 @@ export function TodayVsAverageSection({ today_vs_average }: TodayVsAverageSectio
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <Calendar size={18} />
-                <span>{t('insights.todayVsAverage')}</span>
+                <span>{t('insights.todaySnapshot', { defaultValue: "Today's Snapshot" })}</span>
+                {benchmarks?.age_weeks && (
+                    <span className="age-badge">{t('insights.weeks', { count: benchmarks.age_weeks })}</span>
+                )}
             </h2>
 
-            <div className="insights-comparison-list">
+            <div className="snapshot-grid">
                 {items.map((item, i) => {
                     const diff = item.today - item.avg;
-                    const diffLabel = diff > 0 ? `+${Math.abs(diff).toFixed(1)}` : diff < 0 ? `${diff.toFixed(1)}` : '0';
+                    const diffLabel = diff > 0 ? `+${diff.toFixed(1)}` : diff < 0 ? `${diff.toFixed(1)}` : '0';
+                    const maxVal = Math.max(item.today, item.avg, item.benchmark?.max || 0, 1);
+                    const todayPct = (item.today / maxVal) * 100;
+                    const rangePct = item.benchmark ? ((item.benchmark.max - item.benchmark.min) / maxVal) * 100 : 0;
+                    const rangeLeftPct = item.benchmark ? ((item.benchmark.min) / maxVal) * 100 : 0;
+                    const avgPct = (item.avg / maxVal) * 100;
 
                     return (
-                        <div key={i} className="comparison-card">
-                            <div className="comparison-card-header">
-                                <span style={{ color: item.color }}>{item.icon}</span>
-                                <span className="comparison-card-label">{item.label}</span>
-                                <span className={`comparison-diff ${diff >= 0 ? 'positive' : 'negative'}`}>{diffLabel}</span>
+                        <div key={i} className="snapshot-card">
+                            <div className="snapshot-card-header">
+                                <span className="snapshot-card-icon" style={{ color: item.color }}>{item.icon}</span>
+                                <span className="snapshot-card-label">{item.label}</span>
+                                <span className={`snapshot-diff ${diff >= 0 ? 'positive' : 'negative'}`}>{diffLabel}</span>
                             </div>
-                            <div className="comparison-bars">
-                                <div className="comparison-bar-row">
-                                    <span className="comparison-bar-label">{t('insights.todayLabel', { defaultValue: 'Today' })}</span>
-                                    <div className="comparison-bar-track">
-                                        <div
-                                            className="comparison-bar-fill"
-                                            style={{
-                                                width: `${Math.max(item.today, item.avg, 1) > 0 ? (item.today / Math.max(item.today, item.avg, 1)) * 100 : 0}%`,
-                                                background: item.color,
-                                            }}
-                                        />
-                                    </div>
-                                    <span className="comparison-bar-val">{item.today}{item.unit}</span>
-                                </div>
-                                <div className="comparison-bar-row">
-                                    <span className="comparison-bar-label">{t('insights.avgLabel', { defaultValue: 'Avg' })}</span>
-                                    <div className="comparison-bar-track">
-                                        <div
-                                            className="comparison-bar-fill avg"
-                                            style={{
-                                                width: `${Math.max(item.today, item.avg, 1) > 0 ? (item.avg / Math.max(item.today, item.avg, 1)) * 100 : 0}%`,
-                                                background: item.color,
-                                                opacity: 0.4,
-                                            }}
-                                        />
-                                    </div>
-                                    <span className="comparison-bar-val">{item.avg}{item.unit}/d</span>
-                                </div>
+                            <div className="snapshot-card-value">
+                                <span className="snapshot-today">{item.today}{item.unit}</span>
+                                <span className="snapshot-avg">avg {item.avg}{item.unit}/d</span>
                             </div>
+                            <div className="snapshot-bar-track">
+                                {item.benchmark && (
+                                    <div
+                                        className="snapshot-bar-range"
+                                        style={{ left: `${rangeLeftPct}%`, width: `${rangePct}%` }}
+                                    />
+                                )}
+                                <div
+                                    className="snapshot-bar-fill"
+                                    style={{ width: `${todayPct}%`, backgroundColor: item.color }}
+                                />
+                                <div
+                                    className="snapshot-bar-avg"
+                                    style={{ left: `${avgPct}%` }}
+                                />
+                            </div>
+                            {item.benchmark && (
+                                <span className="snapshot-range-label">
+                                    {t('insights.expectedRange', { defaultValue: '{{min}}–{{max}} expected', min: item.benchmark.min, max: item.benchmark.max })}
+                                </span>
+                            )}
                         </div>
                     );
                 })}
