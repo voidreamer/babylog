@@ -4848,6 +4848,8 @@ h4 {
   flex-direction: row;
   align-items: center;
   gap: var(--space-md);
+  /* When it's the 3rd card in a 2-col grid, span full width */
+  grid-column: 1 / -1;
 }
 
 .pressure-gauge {
