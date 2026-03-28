@@ -5,7 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
-import { UtensilsCrossed, ThumbsUp, Minus, ThumbsDown, AlertTriangle } from 'lucide-react';
+import { UtensilsCrossed, ThumbsUp, Minus, ThumbsDown, AlertTriangle, X } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { hapticNotification } from '../utils/haptics';
@@ -86,7 +86,7 @@ export default function SolidModal({ editEvent, onClose, onSave }: SolidModalPro
                         <UtensilsCrossed size={20} style={{ marginRight: '8px' }} />
                         {isEditing ? t('modal.edit') : t('modal.log')} {t('solid.title', { defaultValue: 'Solids' })}
                     </h2>
-                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}><X size={18} /></button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

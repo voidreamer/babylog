@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import ConfirmModal from './ConfirmModal';
 import { hapticSelection } from '../utils/haptics';
 import BabyAvatar from './BabyAvatar';
+import { X } from 'lucide-react';
 
 export default function BabySelector(): React.ReactElement | null {
     const { t } = useTranslation('common');
@@ -76,7 +77,7 @@ export default function BabySelector(): React.ReactElement | null {
                         <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
                                 <h2 className="modal-title">{t('babySelector.addYourBaby')}</h2>
-                                <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
+                                <button className="modal-close" onClick={() => setShowAddForm(false)} aria-label="Close"><X size={18} /></button>
                             </div>
                             <div className="modal-body">
                                 <AddBabyForm
@@ -221,7 +222,7 @@ export default function BabySelector(): React.ReactElement | null {
                     <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2 className="modal-title">{t('greeting.addBaby')}</h2>
-                            <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
+                            <button className="modal-close" onClick={() => setShowAddForm(false)} aria-label="Close"><X size={18} /></button>
                         </div>
                         <div className="modal-body">
                             <AddBabyForm

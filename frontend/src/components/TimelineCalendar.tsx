@@ -41,10 +41,10 @@ export default function TimelineCalendar() {
         diaper: { icon: Droplets, color: 'var(--diaper)', bg: 'var(--diaper-bg)', label: t('diaper.title') },
         sleep: { icon: Moon, color: 'var(--sleep)', bg: 'var(--sleep-bg)', label: t('sleep.title') },
         pumping: { icon: Milk, color: 'var(--pumping)', bg: 'var(--pumping-bg)', label: t('pumping.title') },
-        potty: { icon: CircleDot, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', label: t('potty.title') },
-        tummy: { icon: Sun, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', label: t('tummyTime.title') },
-        bath: { icon: ShowerHead, color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.15)', label: t('bath.title') },
-        supplement: { icon: Pill, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)', label: t('supplement.title') },
+        potty: { icon: CircleDot, color: 'var(--potty)', bg: 'var(--potty-bg)', label: t('potty.title') },
+        tummy: { icon: Sun, color: 'var(--tummy)', bg: 'var(--tummy-bg)', label: t('tummyTime.title') },
+        bath: { icon: ShowerHead, color: 'var(--bath)', bg: 'var(--bath-bg)', label: t('bath.title') },
+        supplement: { icon: Pill, color: 'var(--supplement)', bg: 'var(--supplement-bg)', label: t('supplement.title') },
         solid: { icon: UtensilsCrossed, color: 'var(--solid)', bg: 'var(--solid-bg)', label: t('solid.title', { defaultValue: 'Solids' }) },
     };
     const { selectedBaby } = useBaby();

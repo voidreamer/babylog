@@ -5,7 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
-import { ShowerHead } from 'lucide-react';
+import { ShowerHead, X } from 'lucide-react';
 import { parseUTCTime } from '../utils/parseTime';
 import { useTranslation } from 'react-i18next';
 import { hapticNotification } from '../utils/haptics';
@@ -67,7 +67,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><ShowerHead size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('bath.title')}</h2>
-                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}><X size={18} /></button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

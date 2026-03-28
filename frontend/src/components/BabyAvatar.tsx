@@ -47,7 +47,7 @@ export default function BabyAvatar({ name, photoUrl, size = 36, className = '' }
                 justifyContent: 'center',
                 fontWeight: 600,
                 fontSize: size * 0.45,
-                color: '#fff',
+                color: 'var(--text-on-color)',
                 flexShrink: 0,
             }}
         >

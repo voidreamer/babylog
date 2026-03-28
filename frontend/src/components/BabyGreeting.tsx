@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import { api } from '../api/client';
-import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil, Sun, CloudSun, Moon, Baby } from 'lucide-react';
+import { Sparkles, ChevronDown, Plus, Share2, Trash2, Check, Pencil, Sun, CloudSun, Moon, Baby, X } from 'lucide-react';
 import CaregiverModal from './CaregiverModal';
 import AddBabyForm from './AddBabyForm';
 import BabyAvatar, { getAvatarColor } from './BabyAvatar';
@@ -150,7 +150,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
                         <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
                                 <h2 className="modal-title">{t('greeting.addBaby')}</h2>
-                                <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
+                                <button className="modal-close" onClick={() => setShowAddForm(false)} aria-label="Close"><X size={18} /></button>
                             </div>
                             <div className="modal-body">
                                 <AddBabyForm
@@ -300,7 +300,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
                     <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2 className="modal-title">{t('greeting.addBaby')}</h2>
-                            <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
+                            <button className="modal-close" onClick={() => setShowAddForm(false)} aria-label="Close"><X size={18} /></button>
                         </div>
                         <div className="modal-body">
                             <AddBabyForm
@@ -318,7 +318,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
                     <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2 className="modal-title">{t('greeting.editBaby', { name: selectedBaby.name })}</h2>
-                            <button className="modal-close" onClick={() => setShowEditForm(false)}>×</button>
+                            <button className="modal-close" onClick={() => setShowEditForm(false)} aria-label="Close"><X size={18} /></button>
                         </div>
                         <div className="modal-body">
                             <AddBabyForm
