@@ -28,7 +28,7 @@
   "noBabyAdded": "Aún no se ha añadido ningún bebé",
   "addBabyPrompt": "Añade a tu bebé para iniciar el seguimiento",
   "noBabySelected": "Ningún bebé seleccionado",
-  "deleteConfirmTitle": "¿Suprimir este artículo?",
+  "deleteConfirmTitle": "¿Suprimir este elemento?",
   "deleteConfirmMessage": "Esta acción no puede deshacerse.",
   "errorBoundaryTitle": "Algo salió mal",
   "errorBoundaryMessage": "Lo sentimos, pero ha ocurrido algo inesperado. Inténtelo de nuevo.",
@@ -36,7 +36,7 @@
   "errorBoundaryPageMessage": "Vuelve a intentarlo o cambia de pestaña.",
   "errorBoundaryWidgetTitle": "Widget no disponible",
   "refresh": "Actualizar",
-  "tryAgain": "Inténtalo de nuevo",
+  "tryAgain": "Inténtelo de nuevo",
   "now": "Ahora",
   "nav": {
     "home": "Inicio",

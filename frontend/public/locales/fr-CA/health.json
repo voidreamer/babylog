@@ -61,7 +61,7 @@
     "startDate": "Date de début",
     "endDate": "Date de fin",
     "notes": "Notes",
-    "noSickDays": "Aucun congé de maladie n'a été enregistré - parfait !",
+    "noSickDays": "Aucun congé de maladie n'a été enregistré, c'est formidable !",
     "recorded": "{{count}} enregistré",
     "logSickDay": "Enregistrement d'un jour de maladie",
     "symptomLabels": {
@@ -139,7 +139,7 @@
     },
     "given": "Compte tenu de ce qui précède :",
     "nextDueField": "Prochaine échéance :",
-    "startField": "Démarrage :",
+    "startField": "Début :",
     "endField": "Fin :",
     "schedule": "Calendrier"
   },
@@ -175,7 +175,7 @@
   "arialabel_deleteAllergy": "Supprimer l'allergie",
   "placeholder_allergenEgPeanuts": "Allergènes (par exemple, arachides)",
   "placeholder_reactionEgHivesSwelling": "Réaction (par exemple, urticaire, gonflement)",
-  "placeholder_additionalNotes": "Notes complémentaires...",
+  "placeholder_additionalNotes": "Notes supplémentaires...",
   "toast_pleaseEnterAtLeastOneMeasurement": "Veuillez indiquer au moins une mesure",
   "toast_growthRecorded": "Croissance enregistrée !",
   "placeholder_kg": "kg",

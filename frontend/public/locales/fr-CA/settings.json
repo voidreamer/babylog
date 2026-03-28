@@ -94,7 +94,7 @@
     "deleteAccount": "Supprimer le compte",
     "deleteAccountDesc": "Effacer définitivement toutes vos données",
     "deleteAccountConfirmTitle": "Supprimer votre compte ?",
-    "deleteAccountConfirmDesc": "Cette action supprimera définitivement votre compte, tous les profils des bébés et toutes les données de suivi. Cette action ne peut être annulée.",
+    "deleteAccountConfirmDesc": "Cette action supprimera définitivement votre compte, tous les profils des bébés et toutes les données de suivi. Cette action ne peut pas être annulée.",
     "deleteAccountConfirm": "Supprimer tout",
     "deletingAccount": "Suppression...",
     "deleteAccountFailed": "La suppression du compte a échoué. Veuillez réessayer.",

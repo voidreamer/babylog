@@ -89,7 +89,7 @@
     "contactUs": "Свяжитесь с нами",
     "privacyPolicy": "Политика конфиденциальности",
     "termsOfService": "Условия предоставления услуг",
-    "replayOnboarding": "Приветственный тур Replay",
+    "replayOnboarding": "Replay Welcome Tour",
     "replayOnboardingDesc": "Просмотрите введение приложения еще раз",
     "deleteAccount": "Удалить аккаунт",
     "deleteAccountDesc": "Постоянное удаление всех ваших данных",
@@ -117,7 +117,7 @@
       "more": "И еще больше скоро будет..."
     },
     "promoCode": "Промокод",
-    "promoPlaceholder": "Введите промо-код",
+    "promoPlaceholder": "Введите промокод",
     "applyPromo": "Применить",
     "subscribe": "Подписаться",
     "manageSub": "Не удалось открыть управление подписками.",

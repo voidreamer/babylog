@@ -233,7 +233,7 @@
     "noActiveMeds": "无活性药物"
   },
   "schedule": {
-    "progress": "疫苗接种进展",
+    "progress": "疫苗接种进展情况",
     "complete": "完整",
     "done": "已完成",
     "overdue": "逾期",
