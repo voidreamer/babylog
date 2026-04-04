@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
-import { Moon } from 'lucide-react';
+import { Moon, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
@@ -69,7 +69,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('sleep.title')}</h2>
-                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}><X size={18} /></button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

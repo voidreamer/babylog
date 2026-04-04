@@ -17,7 +17,7 @@ const ALL_WIDGETS = [
     { id: 'potty', labelKey: 'potty.title', icon: Toilet, color: 'var(--potty)', ageHint: '18m+' },
     { id: 'tummy', labelKey: 'tummyTime.title', icon: Timer, color: 'var(--tummy)', ageHint: '0\u201312m' },
     { id: 'bath', labelKey: 'bath.title', icon: BathIcon, color: 'var(--bath)', ageHint: null },
-    { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: '#16a34a', ageHint: '0\u201312m' },
+    { id: 'supplement', labelKey: 'supplement.title', icon: Pill, color: 'var(--supplement)', ageHint: '0\u201312m' },
     { id: 'solid', labelKey: 'solid.title', icon: UtensilsCrossed, color: 'var(--solid)', ageHint: '4m+' },
 ];
 

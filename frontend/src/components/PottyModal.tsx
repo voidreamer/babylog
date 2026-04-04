@@ -5,7 +5,7 @@ import { useBaby } from '../hooks/useBaby';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import TimePicker from './TimePicker';
-import { CircleDot } from 'lucide-react';
+import { CircleDot, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { hapticNotification } from '../utils/haptics';
 
@@ -19,7 +19,7 @@ const parseUTCTime = (timeStr: any): Date => {
 // Labels will be filled by component using t()
 const RESULT_VALUES = ['success', 'attempt', 'accident'] as const;
 const RESULT_ICONS = { success: '✓', attempt: '~', accident: '✗' };
-const RESULT_COLORS = { success: '#10b981', attempt: '#f59e0b', accident: '#ef4444' };
+const RESULT_COLORS = { success: 'var(--success)', attempt: 'var(--tummy)', accident: 'var(--danger)' };
 const TYPE_VALUES = ['pee', 'poo', 'both'] as const;
 
 interface PottyModalProps { editEvent?: any; onClose: () => void; onSave: () => void; }
@@ -83,7 +83,7 @@ export default function PottyModal({ editEvent, onClose, onSave }: PottyModalPro
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><CircleDot size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('potty.title')}</h2>
-                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}><X size={18} /></button>
                 </div>
 
                 <form onSubmit={handleSubmit}>

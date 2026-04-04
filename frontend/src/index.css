@@ -21,7 +21,7 @@
   --radius-full: 9999px;
 
   /* Transitions */
-  --transition: all 0.2s ease;
+  --transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
 /* ============================================================================
@@ -73,6 +73,11 @@
   --solid-light: #f0d8a8;
   --solid-bg: #fff8e8;
   --solid-text: #7a5820;
+
+  --supplement: #4a9a6a;
+  --supplement-light: #a8d8b8;
+  --supplement-bg: #e8f5e9;
+  --supplement-text: #2e6b4a;
 
   --background: #fefdfb;
   --bg: #fefdfb;
@@ -166,6 +171,11 @@
   --solid-light: #e8c888;
   --solid-bg: #4a3d28;
   --solid-text: #d8a858;
+
+  --supplement: #68b888;
+  --supplement-light: #98d8b0;
+  --supplement-bg: #2d4038;
+  --supplement-text: #68b888;
 
   --background: #1a1614;
   --bg: #1a1614;
@@ -295,8 +305,8 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -3120,8 +3130,8 @@ h4 {
 }
 
 .modal-close {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: var(--surface-hover);
   border-radius: var(--radius-full);
@@ -7490,7 +7500,12 @@ h4 {
 .widget:focus-visible,
 .health-add-btn:focus-visible,
 .records-add-btn:focus-visible,
-.records-summary-card:focus-visible {
+.records-summary-card:focus-visible,
+.feeding-quick-btn:focus-visible,
+.diaper-quick-btn:focus-visible,
+.sleep-wake-btn:focus-visible,
+.tummy-quick-btn:focus-visible,
+.modal-close:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
@@ -7507,7 +7522,12 @@ h4 {
 .widget:focus:not(:focus-visible),
 .health-add-btn:focus:not(:focus-visible),
 .records-add-btn:focus:not(:focus-visible),
-.records-summary-card:focus:not(:focus-visible) {
+.records-summary-card:focus:not(:focus-visible),
+.feeding-quick-btn:focus:not(:focus-visible),
+.diaper-quick-btn:focus:not(:focus-visible),
+.sleep-wake-btn:focus:not(:focus-visible),
+.tummy-quick-btn:focus:not(:focus-visible),
+.modal-close:focus:not(:focus-visible) {
   outline: none;
   box-shadow: none;
 }
@@ -8674,4 +8694,18 @@ a.settings-row {
 
 .theme-toggle-float:active {
   transform: scale(0.95);
+}
+
+/* ============================================================================
+   Reduced Motion (#14)
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

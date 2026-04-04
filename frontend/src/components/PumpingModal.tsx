@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import TimePicker from './TimePicker';
-import { Milk, Pencil, Timer, Play, Square } from 'lucide-react';
+import { Milk, Pencil, Timer, Play, Square, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { showApiError } from '../utils/errorHandling';
 import { parseUTCTime } from '../utils/parseTime';
@@ -151,7 +151,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('pumping.title')}</h2>
-                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
+                    <button className="modal-close" onClick={onClose} aria-label={t('common:close')}><X size={18} /></button>
                 </div>
 
                 <div className="modal-body">
