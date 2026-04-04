@@ -9,14 +9,18 @@ import csv
 import io
 from datetime import datetime, timezone
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement
+from ..rate_limit import limiter, RATE_EXPORT
 from .utils import verify_baby_access
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/export", tags=["export"])
 
@@ -36,7 +40,9 @@ def format_date(dt: Optional[datetime]) -> str:
 
 
 @router.get("/csv/{baby_id}")
+@limiter.limit(RATE_EXPORT)
 async def export_baby_data_csv(
+    request: Request,
     baby_id: int,
     data_type: str = Query("all", description="Type of data: all, feedings, sleeps, diapers, pumpings, activities"),
     start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
@@ -267,6 +273,7 @@ async def export_baby_data_csv(
     timestamp = datetime.now().strftime("%Y%m%d")
     filename = f"heybub_{baby.name.lower().replace(' ', '_')}_{timestamp}.csv"
 
+    logger.info("Exported CSV", extra={"baby_id": baby_id, "data_type": data_type})
     return StreamingResponse(
         io.BytesIO(full_output.encode('utf-8')),
         media_type="text/csv",
@@ -275,7 +282,9 @@ async def export_baby_data_csv(
 
 
 @router.get("/json/{baby_id}")
+@limiter.limit(RATE_EXPORT)
 async def export_baby_data_json(
+    request: Request,
     baby_id: int,
     start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
@@ -442,4 +451,5 @@ async def export_baby_data_json(
             "notes": s.notes
         })
 
+    logger.info("Exported JSON", extra={"baby_id": baby_id})
     return export_data

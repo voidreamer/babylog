@@ -12,20 +12,21 @@ Uses science-backed models:
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Dict, Tuple
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
-import logging
 import math
 
 from ..database import get_db
+from ..logging_config import get_logger
 from ..auth import get_current_user, get_user_email
 from ..models import Baby, Feeding, Sleep
 from ..benchmarks import calculate_age_weeks, get_wake_window_benchmarks
 from ..predictions import make_aware, calculate_standard_deviation, calculate_sleep_pressure
+from ..rate_limit import limiter, RATE_READ
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/rest-planner", tags=["rest-planner"])
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # =============================================================================
 # Constants
@@ -708,7 +709,9 @@ def score_window(window: dict, nap_clusters: Dict[str, dict]) -> dict:
 # =============================================================================
 
 @router.get("/{baby_id}")
+@limiter.limit(RATE_READ)
 async def get_rest_plan(
+    request: Request,
     baby_id: int,
     days: int = Query(default=7, ge=3, le=14, description="Days of history to analyze"),
     tz_offset: int = Query(default=0, description="Timezone offset in minutes"),

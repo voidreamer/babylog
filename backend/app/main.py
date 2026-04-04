@@ -1,30 +1,27 @@
+import time
+import uuid
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from mangum import Mangum
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from .config import get_settings
+from .logging_config import setup_logging, get_logger
+from .rate_limit import limiter
 from .database import engine, Base
 from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export, billing, rest_planner, users
+
+# Configure structured JSON logging
+setup_logging()
+logger = get_logger(__name__)
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
 settings = get_settings()
-
-# Rate limiter - uses client IP for identification
-# In production behind API Gateway, use X-Forwarded-For header
-def get_real_client_ip(request: Request) -> str:
-    """Extract real client IP, accounting for proxies."""
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return get_remote_address(request)
-
-limiter = Limiter(key_func=get_real_client_ip)
 
 app = FastAPI(
     title="HeyBub Baby Tracker API",
@@ -38,14 +35,13 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - Restrict to allowed origins from settings
-# Parse comma-separated origins from environment
 allowed_origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,  # Can be True now that we have specific origins
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Admin-Key"],
 )
 
 # Include routers (root_path handles /api prefix in production)
@@ -64,6 +60,47 @@ app.include_router(export.router)
 app.include_router(billing.router)
 app.include_router(rest_planner.router)
 app.include_router(users.router)
+
+
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    request_id = request.headers.get("x-request-id", str(uuid.uuid4()))
+    # Extract user_id from Authorization header (JWT sub claim) without full verification
+    user_id = "anonymous"
+    auth = request.headers.get("authorization", "")
+    if auth.startswith("Bearer ") and auth.count(".") == 2:
+        import json as _json
+        import base64
+        try:
+            payload = auth.split(".")[1]
+            # Fix base64 padding
+            payload += "=" * (-len(payload) % 4)
+            claims = _json.loads(base64.urlsafe_b64decode(payload))
+            user_id = claims.get("sub", "anonymous")
+        except Exception:
+            pass
+
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = round((time.perf_counter() - start) * 1000, 1)
+
+    logger.info(
+        "%s %s %s",
+        request.method,
+        request.url.path,
+        response.status_code,
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": duration_ms,
+            "user_id": user_id,
+        },
+    )
+    response.headers["X-Request-Id"] = request_id
+    return response
 
 
 # Cache-Control middleware for performance

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from datetime import datetime, timezone
 from typing import Optional, List, Literal
+import warnings
 
 
 # Custom datetime serialization to ensure UTC 'Z' suffix
@@ -92,6 +93,12 @@ class FeedingBase(BaseModel):
 class FeedingCreate(FeedingBase):
     baby_id: int
 
+    @model_validator(mode="after")
+    def validate_feeding_amount(self):
+        if self.type in ("formula", "bottle") and self.amount_ml is not None and self.amount_ml <= 0:
+            raise ValueError("amount_ml must be greater than 0 for formula/bottle feedings")
+        return self
+
 
 class FeedingUpdate(BaseModel):
     time: Optional[datetime] = None
@@ -133,6 +140,16 @@ class DiaperBase(BaseModel):
 class DiaperCreate(DiaperBase):
     baby_id: int
 
+    @model_validator(mode="after")
+    def validate_poo_color(self):
+        if self.type in ("poo", "mixed") and self.poo_color is None:
+            warnings.warn(
+                "poo_color is recommended when diaper type is 'poo' or 'mixed'",
+                UserWarning,
+                stacklevel=2,
+            )
+        return self
+
 
 class DiaperUpdate(BaseModel):
     time: Optional[datetime] = None
@@ -167,11 +184,23 @@ class SleepBase(BaseModel):
 class SleepCreate(SleepBase):
     baby_id: int
 
+    @model_validator(mode="after")
+    def validate_sleep_times(self):
+        if self.start_time and self.end_time and self.end_time <= self.start_time:
+            raise ValueError("end_time must be after start_time")
+        return self
+
 
 class SleepUpdate(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     notes: Optional[str] = Field(None, max_length=2000)
+
+    @model_validator(mode="after")
+    def validate_sleep_times(self):
+        if self.start_time and self.end_time and self.end_time <= self.start_time:
+            raise ValueError("end_time must be after start_time")
+        return self
 
 
 class SleepResponse(SleepBase):
@@ -298,6 +327,12 @@ class DoctorVisitBase(BaseModel):
 
 class DoctorVisitCreate(DoctorVisitBase):
     baby_id: int
+
+    @model_validator(mode="after")
+    def validate_visit_dates(self):
+        if self.next_visit_date is not None and self.next_visit_date < self.visit_date:
+            raise ValueError("next_visit_date must be on or after visit_date")
+        return self
 
 
 class DoctorVisitResponse(DoctorVisitBase):
@@ -429,6 +464,16 @@ class GrowthRecordBase(BaseModel):
 
 class GrowthRecordCreate(GrowthRecordBase):
     baby_id: int
+
+    @model_validator(mode="after")
+    def validate_measurements(self):
+        if self.weight_kg is not None and self.weight_kg <= 0:
+            raise ValueError("weight_kg must be greater than 0")
+        if self.height_cm is not None and self.height_cm <= 0:
+            raise ValueError("height_cm must be greater than 0")
+        if self.head_cm is not None and self.head_cm <= 0:
+            raise ValueError("head_cm must be greater than 0")
+        return self
 
 
 class GrowthRecordResponse(GrowthRecordBase):

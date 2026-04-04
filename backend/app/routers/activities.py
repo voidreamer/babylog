@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Potty, TummyTime, Bath, Baby, Supplement, Solid
 from ..schemas import (
     PottyCreate, PottyResponse,
@@ -11,7 +12,10 @@ from ..schemas import (
     SolidCreate, SolidResponse,
 )
 from ..auth import get_current_user, get_user_email
+from ..rate_limit import limiter, RATE_READ, RATE_WRITE
 from .utils import verify_baby_access, require_write_access, baby_access_filter
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/activities", tags=["activities"])
 
@@ -21,7 +25,9 @@ router = APIRouter(prefix="/activities", tags=["activities"])
 # ============================================================================
 
 @router.get("/potty", response_model=List[PottyResponse])
+@limiter.limit(RATE_READ)
 def get_potty_logs(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -39,7 +45,9 @@ def get_potty_logs(
 
 
 @router.post("/potty", response_model=PottyResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_potty_log(
+    request: Request,
     potty_data: PottyCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -60,11 +68,14 @@ def create_potty_log(
     db.add(potty)
     db.commit()
     db.refresh(potty)
+    logger.info("Created potty log", extra={"baby_id": potty.baby_id, "potty_id": potty.id})
     return potty
 
 
 @router.delete("/potty/{potty_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_potty_log(
+    request: Request,
     potty_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -79,18 +90,22 @@ def delete_potty_log(
     ).first()
 
     if not potty:
+        logger.warning("Delete potty not found", extra={"potty_id": potty_id})
         raise HTTPException(status_code=404, detail="Potty log not found")
 
     _, role = verify_baby_access(db, potty.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted potty log", extra={"potty_id": potty_id, "baby_id": potty.baby_id})
     db.delete(potty)
     db.commit()
     return None
 
 
 @router.put("/potty/{potty_id}", response_model=PottyResponse)
+@limiter.limit(RATE_WRITE)
 def update_potty_log(
+    request: Request,
     potty_id: int,
     potty_data: PottyCreate,
     user: dict = Depends(get_current_user),
@@ -125,7 +140,9 @@ def update_potty_log(
 # ============================================================================
 
 @router.get("/tummy-time", response_model=List[TummyTimeResponse])
+@limiter.limit(RATE_READ)
 def get_tummy_times(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -143,7 +160,9 @@ def get_tummy_times(
 
 
 @router.post("/tummy-time", response_model=TummyTimeResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_tummy_time(
+    request: Request,
     tummy_data: TummyTimeCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -163,11 +182,14 @@ def create_tummy_time(
     db.add(tummy)
     db.commit()
     db.refresh(tummy)
+    logger.info("Created tummy time", extra={"baby_id": tummy.baby_id, "tummy_id": tummy.id})
     return tummy
 
 
 @router.delete("/tummy-time/{tummy_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_tummy_time(
+    request: Request,
     tummy_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -182,18 +204,22 @@ def delete_tummy_time(
     ).first()
 
     if not tummy:
+        logger.warning("Delete tummy time not found", extra={"tummy_id": tummy_id})
         raise HTTPException(status_code=404, detail="Tummy time not found")
 
     _, role = verify_baby_access(db, tummy.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted tummy time", extra={"tummy_id": tummy_id, "baby_id": tummy.baby_id})
     db.delete(tummy)
     db.commit()
     return None
 
 
 @router.put("/tummy-time/{tummy_id}", response_model=TummyTimeResponse)
+@limiter.limit(RATE_WRITE)
 def update_tummy_time(
+    request: Request,
     tummy_id: int,
     tummy_data: TummyTimeCreate,
     user: dict = Depends(get_current_user),
@@ -227,7 +253,9 @@ def update_tummy_time(
 # ============================================================================
 
 @router.get("/baths", response_model=List[BathResponse])
+@limiter.limit(RATE_READ)
 def get_baths(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -245,7 +273,9 @@ def get_baths(
 
 
 @router.post("/baths", response_model=BathResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_bath(
+    request: Request,
     bath_data: BathCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -264,11 +294,14 @@ def create_bath(
     db.add(bath)
     db.commit()
     db.refresh(bath)
+    logger.info("Created bath", extra={"baby_id": bath.baby_id, "bath_id": bath.id})
     return bath
 
 
 @router.delete("/baths/{bath_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_bath(
+    request: Request,
     bath_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -283,18 +316,22 @@ def delete_bath(
     ).first()
 
     if not bath:
+        logger.warning("Delete bath not found", extra={"bath_id": bath_id})
         raise HTTPException(status_code=404, detail="Bath not found")
 
     _, role = verify_baby_access(db, bath.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted bath", extra={"bath_id": bath_id, "baby_id": bath.baby_id})
     db.delete(bath)
     db.commit()
     return None
 
 
 @router.put("/baths/{bath_id}", response_model=BathResponse)
+@limiter.limit(RATE_WRITE)
 def update_bath(
+    request: Request,
     bath_id: int,
     bath_data: BathCreate,
     user: dict = Depends(get_current_user),
@@ -327,7 +364,9 @@ def update_bath(
 # ============================================================================
 
 @router.get("/supplements", response_model=List[SupplementResponse])
+@limiter.limit(RATE_READ)
 def get_supplements(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -345,7 +384,9 @@ def get_supplements(
 
 
 @router.post("/supplements", response_model=SupplementResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_supplement(
+    request: Request,
     supplement_data: SupplementCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -366,11 +407,14 @@ def create_supplement(
     db.add(supplement)
     db.commit()
     db.refresh(supplement)
+    logger.info("Created supplement", extra={"baby_id": supplement.baby_id, "supplement_id": supplement.id})
     return supplement
 
 
 @router.delete("/supplements/{supplement_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_supplement(
+    request: Request,
     supplement_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -385,18 +429,22 @@ def delete_supplement(
     ).first()
 
     if not supplement:
+        logger.warning("Delete supplement not found", extra={"supplement_id": supplement_id})
         raise HTTPException(status_code=404, detail="Supplement log not found")
 
     _, role = verify_baby_access(db, supplement.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted supplement", extra={"supplement_id": supplement_id, "baby_id": supplement.baby_id})
     db.delete(supplement)
     db.commit()
     return None
 
 
 @router.put("/supplements/{supplement_id}", response_model=SupplementResponse)
+@limiter.limit(RATE_WRITE)
 def update_supplement(
+    request: Request,
     supplement_id: int,
     supplement_data: SupplementCreate,
     user: dict = Depends(get_current_user),
@@ -431,7 +479,9 @@ def update_supplement(
 # ============================================================================
 
 @router.get("/solids", response_model=List[SolidResponse])
+@limiter.limit(RATE_READ)
 def get_solids(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -449,7 +499,9 @@ def get_solids(
 
 
 @router.post("/solids", response_model=SolidResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_solid(
+    request: Request,
     solid_data: SolidCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -471,11 +523,14 @@ def create_solid(
     db.add(solid)
     db.commit()
     db.refresh(solid)
+    logger.info("Created solid food log", extra={"baby_id": solid.baby_id, "solid_id": solid.id})
     return solid
 
 
 @router.delete("/solids/{solid_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_solid(
+    request: Request,
     solid_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -490,18 +545,22 @@ def delete_solid(
     ).first()
 
     if not solid:
+        logger.warning("Delete solid not found", extra={"solid_id": solid_id})
         raise HTTPException(status_code=404, detail="Solid food log not found")
 
     _, role = verify_baby_access(db, solid.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted solid food log", extra={"solid_id": solid_id, "baby_id": solid.baby_id})
     db.delete(solid)
     db.commit()
     return None
 
 
 @router.put("/solids/{solid_id}", response_model=SolidResponse)
+@limiter.limit(RATE_WRITE)
 def update_solid(
+    request: Request,
     solid_id: int,
     solid_data: SolidCreate,
     user: dict = Depends(get_current_user),

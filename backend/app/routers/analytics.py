@@ -10,15 +10,15 @@ Provides:
 
 from datetime import datetime, timedelta, timezone, date, time
 from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
-import logging
-
 from ..database import get_db
+from ..logging_config import get_logger
 from ..auth import get_current_user, get_user_email
 from ..models import Baby, Feeding, Sleep, Diaper
 from ..benchmarks import get_all_benchmarks, calculate_age_weeks
+from ..rate_limit import limiter, RATE_READ
 from .utils import verify_baby_access
 from ..predictions import (
     predict_next_nap_wake_window,
@@ -30,7 +30,7 @@ from ..predictions import (
 )
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def make_aware(dt: Optional[datetime]) -> Optional[datetime]:
@@ -122,7 +122,9 @@ def predict_next_event(
 
 
 @router.get("/{baby_id}")
+@limiter.limit(RATE_READ)
 async def get_baby_analytics(
+    request: Request,
     baby_id: int,
     days: int = Query(default=7, ge=3, le=30, description="Days of data to analyze"),
     tz_offset: int = Query(default=0, description="Timezone offset in minutes"),

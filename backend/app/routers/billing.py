@@ -10,8 +10,12 @@ from pydantic import BaseModel
 
 from ..auth import get_current_user
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import User, utc_now
+from ..rate_limit import limiter, RATE_READ, RATE_WRITE
 from .subscription import get_or_create_user
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -86,7 +90,9 @@ def _plan_from_price(price_id: str) -> str | None:
 # POST /billing/create-checkout-session
 # ---------------------------------------------------------------------------
 @router.post("/create-checkout-session", response_model=CheckoutResponse)
+@limiter.limit(RATE_WRITE)
 async def create_checkout_session(
+    request: Request,
     body: CheckoutRequest,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -109,6 +115,7 @@ async def create_checkout_session(
         subscription_data={"trial_period_days": 7},
         metadata={"user_id": user_id},
     )
+    logger.info("Created checkout session", extra={"user_id": user_id, "price_id": body.price_id})
     return CheckoutResponse(checkout_url=session.url)
 
 
@@ -116,6 +123,7 @@ async def create_checkout_session(
 # POST /billing/webhook
 # ---------------------------------------------------------------------------
 @router.post("/webhook")
+@limiter.limit(RATE_WRITE)
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig = request.headers.get("stripe-signature", "")
@@ -124,6 +132,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         try:
             event = stripe.Webhook.construct_event(payload, sig, STRIPE_WEBHOOK_SECRET)
         except stripe.error.SignatureVerificationError:
+            logger.warning("Stripe webhook invalid signature")
             raise HTTPException(400, "Invalid signature")
     else:
         # Dev fallback — no secret configured
@@ -207,7 +216,9 @@ def _handle_subscription_deleted(sub_obj: dict, db: Session):
 # GET /billing/subscription
 # ---------------------------------------------------------------------------
 @router.get("/subscription", response_model=SubscriptionStatusResponse)
+@limiter.limit(RATE_READ)
 async def get_subscription(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -235,7 +246,9 @@ async def get_subscription(
 # POST /billing/portal
 # ---------------------------------------------------------------------------
 @router.post("/portal", response_model=PortalResponse)
+@limiter.limit(RATE_WRITE)
 async def create_portal_session(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

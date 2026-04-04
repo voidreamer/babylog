@@ -1,18 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timezone
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Sleep, Baby
 from ..schemas import SleepCreate, SleepUpdate, SleepResponse
 from ..auth import get_current_user, get_user_email
+from ..rate_limit import limiter, RATE_READ, RATE_WRITE
 from .utils import verify_baby_access, require_write_access, baby_access_filter
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/sleeps", tags=["sleeps"])
 
 
 @router.get("/", response_model=List[SleepResponse])
+@limiter.limit(RATE_READ)
 def get_sleeps(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -30,7 +36,9 @@ def get_sleeps(
 
 
 @router.get("/current", response_model=Optional[SleepResponse])
+@limiter.limit(RATE_READ)
 def get_current_sleep(
+    request: Request,
     baby_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -47,7 +55,9 @@ def get_current_sleep(
 
 
 @router.get("/{sleep_id}", response_model=SleepResponse)
+@limiter.limit(RATE_READ)
 def get_sleep(
+    request: Request,
     sleep_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -68,7 +78,9 @@ def get_sleep(
 
 
 @router.post("/", response_model=SleepResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_sleep(
+    request: Request,
     sleep_data: SleepCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -88,11 +100,14 @@ def create_sleep(
     db.add(sleep)
     db.commit()
     db.refresh(sleep)
+    logger.info("Created sleep", extra={"baby_id": sleep.baby_id, "sleep_id": sleep.id})
     return sleep
 
 
 @router.put("/{sleep_id}", response_model=SleepResponse)
+@limiter.limit(RATE_WRITE)
 def update_sleep(
+    request: Request,
     sleep_id: int,
     sleep_data: SleepUpdate,
     user: dict = Depends(get_current_user),
@@ -124,7 +139,9 @@ def update_sleep(
 
 
 @router.post("/{sleep_id}/end", response_model=SleepResponse)
+@limiter.limit(RATE_WRITE)
 def end_sleep(
+    request: Request,
     sleep_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -155,7 +172,9 @@ def end_sleep(
 
 
 @router.delete("/{sleep_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_sleep(
+    request: Request,
     sleep_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -170,12 +189,14 @@ def delete_sleep(
     ).first()
 
     if not sleep:
+        logger.warning("Delete sleep not found", extra={"sleep_id": sleep_id})
         raise HTTPException(status_code=404, detail="Sleep not found")
 
     # Verify write access
     _, role = verify_baby_access(db, sleep.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted sleep", extra={"sleep_id": sleep_id, "baby_id": sleep.baby_id})
     db.delete(sleep)
     db.commit()
     return None

@@ -1,17 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Pumping, Baby
 from ..schemas import PumpingCreate, PumpingUpdate, PumpingResponse
 from ..auth import get_current_user, get_user_email
+from ..rate_limit import limiter, RATE_READ, RATE_WRITE
 from .utils import verify_baby_access, require_write_access, baby_access_filter
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/pumpings", tags=["pumpings"])
 
 
 @router.get("/", response_model=List[PumpingResponse])
+@limiter.limit(RATE_READ)
 def get_pumpings(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -29,7 +35,9 @@ def get_pumpings(
 
 
 @router.get("/{pumping_id}", response_model=PumpingResponse)
+@limiter.limit(RATE_READ)
 def get_pumping(
+    request: Request,
     pumping_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -50,7 +58,9 @@ def get_pumping(
 
 
 @router.post("/", response_model=PumpingResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_pumping(
+    request: Request,
     pumping_data: PumpingCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -71,11 +81,14 @@ def create_pumping(
     db.add(pumping)
     db.commit()
     db.refresh(pumping)
+    logger.info("Created pumping", extra={"baby_id": pumping.baby_id, "pumping_id": pumping.id})
     return pumping
 
 
 @router.put("/{pumping_id}", response_model=PumpingResponse)
+@limiter.limit(RATE_WRITE)
 def update_pumping(
+    request: Request,
     pumping_id: int,
     pumping_data: PumpingUpdate,
     user: dict = Depends(get_current_user),
@@ -107,7 +120,9 @@ def update_pumping(
 
 
 @router.delete("/{pumping_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_pumping(
+    request: Request,
     pumping_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -122,12 +137,14 @@ def delete_pumping(
     ).first()
 
     if not pumping:
+        logger.warning("Delete pumping not found", extra={"pumping_id": pumping_id})
         raise HTTPException(status_code=404, detail="Pumping not found")
 
     # Verify write access
     _, role = verify_baby_access(db, pumping.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted pumping", extra={"pumping_id": pumping_id, "baby_id": pumping.baby_id})
     db.delete(pumping)
     db.commit()
     return None

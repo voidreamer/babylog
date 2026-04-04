@@ -5,8 +5,12 @@ Protected endpoints for database migrations and admin operations.
 """
 
 import os
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from ..config import get_settings
+from ..logging_config import get_logger
+from ..rate_limit import limiter, RATE_ADMIN
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 settings = get_settings()
@@ -31,13 +35,15 @@ def verify_admin_key(x_admin_key: str = Header(None)):
         return True
 
     if not x_admin_key or x_admin_key != expected_key:
+        logger.warning("Invalid admin key attempt")
         raise HTTPException(status_code=403, detail="Invalid admin key")
 
     return True
 
 
 @router.post("/migrate")
-async def run_migrations(authorized: bool = Depends(verify_admin_key)):
+@limiter.limit(RATE_ADMIN)
+async def run_migrations(request: Request, authorized: bool = Depends(verify_admin_key)):
     """
     Run pending database migrations.
 
@@ -87,6 +93,7 @@ async def run_migrations(authorized: bool = Depends(verify_admin_key)):
                 "revision": new_rev
             }
 
+        logger.info("Migrations applied", extra={"previous_revision": current_rev, "current_revision": new_rev})
         return {
             "status": "ok",
             "message": "Migrations applied successfully",
@@ -102,7 +109,8 @@ async def run_migrations(authorized: bool = Depends(verify_admin_key)):
 
 
 @router.get("/migration-status")
-async def get_migration_status(authorized: bool = Depends(verify_admin_key)):
+@limiter.limit(RATE_ADMIN)
+async def get_migration_status(request: Request, authorized: bool = Depends(verify_admin_key)):
     """
     Get current migration status.
 

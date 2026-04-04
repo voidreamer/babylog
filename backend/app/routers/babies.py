@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Baby
 from ..schemas import BabyCreate, BabyUpdate, BabyResponse, BabyShareRequest, CaregiverRoleUpdate
 from ..auth import get_user_id, get_user_email, get_current_user
+from ..rate_limit import limiter, RATE_READ, RATE_WRITE
 from .utils import baby_access_filter
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/babies", tags=["babies"])
 
@@ -30,7 +34,9 @@ def baby_to_response(baby: Baby, user_id: str) -> dict:
 
 
 @router.get("/", response_model=List[BabyResponse])
+@limiter.limit(RATE_READ)
 def get_babies(
+    request: Request,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db)
@@ -46,7 +52,9 @@ def get_babies(
 
 
 @router.get("/{baby_id}", response_model=BabyResponse)
+@limiter.limit(RATE_READ)
 def get_baby(
+    request: Request,
     baby_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -67,7 +75,9 @@ def get_baby(
 
 
 @router.post("/", response_model=BabyResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_baby(
+    request: Request,
     baby_data: BabyCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -87,11 +97,14 @@ def create_baby(
     db.add(baby)
     db.commit()
     db.refresh(baby)
+    logger.info("Created baby", extra={"baby_id": baby.id, "user_id": user_id})
     return baby_to_response(baby, user_id)
 
 
 @router.put("/{baby_id}", response_model=BabyResponse)
+@limiter.limit(RATE_WRITE)
 def update_baby(
+    request: Request,
     baby_id: int,
     baby_data: BabyUpdate,
     user: dict = Depends(get_current_user),
@@ -119,7 +132,9 @@ def update_baby(
 
 
 @router.delete("/{baby_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_baby(
+    request: Request,
     baby_id: int,
     user_id: str = Depends(get_user_id),
     db: Session = Depends(get_db)
@@ -131,8 +146,10 @@ def delete_baby(
     ).first()
 
     if not baby:
+        logger.warning("Delete baby not found", extra={"baby_id": baby_id, "user_id": user_id})
         raise HTTPException(status_code=404, detail="Baby not found or you don't have permission")
 
+    logger.info("Deleted baby", extra={"baby_id": baby_id, "user_id": user_id})
     db.delete(baby)
     db.commit()
     return None
@@ -143,7 +160,9 @@ def delete_baby(
 # ============================================================================
 
 @router.post("/{baby_id}/share", response_model=BabyResponse)
+@limiter.limit(RATE_WRITE)
 def share_baby(
+    request: Request,
     baby_id: int,
     share_request: BabyShareRequest,
     user: dict = Depends(get_current_user),
@@ -176,12 +195,15 @@ def share_baby(
     baby.shared_with = baby.shared_with + [{"email": email, "role": role}]
     db.commit()
     db.refresh(baby)
+    logger.info("Shared baby", extra={"baby_id": baby_id, "shared_with": email, "role": role})
 
     return baby_to_response(baby, user_id)
 
 
 @router.delete("/{baby_id}/share/{email}")
+@limiter.limit(RATE_WRITE)
 def unshare_baby(
+    request: Request,
     baby_id: int,
     email: str,
     user: dict = Depends(get_current_user),
@@ -204,12 +226,15 @@ def unshare_baby(
         baby.shared_with = [e for e in baby.shared_with if e.get("email") != email]
         db.commit()
         db.refresh(baby)
+        logger.info("Unshared baby", extra={"baby_id": baby_id, "removed_email": email})
 
     return baby_to_response(baby, user_id)
 
 
 @router.patch("/{baby_id}/share/{email}", response_model=BabyResponse)
+@limiter.limit(RATE_WRITE)
 def update_caregiver_role(
+    request: Request,
     baby_id: int,
     email: str,
     role_update: CaregiverRoleUpdate,

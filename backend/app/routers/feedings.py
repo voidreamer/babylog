@@ -1,17 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Feeding, Baby
 from ..schemas import FeedingCreate, FeedingUpdate, FeedingResponse
 from ..auth import get_current_user, get_user_email
+from ..rate_limit import limiter, RATE_READ, RATE_WRITE
 from .utils import verify_baby_access, require_write_access, baby_access_filter
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/feedings", tags=["feedings"])
 
 
 @router.get("/", response_model=List[FeedingResponse])
+@limiter.limit(RATE_READ)
 def get_feedings(
+    request: Request,
     baby_id: int,
     skip: int = 0,
     limit: int = 50,
@@ -29,7 +35,9 @@ def get_feedings(
 
 
 @router.get("/{feeding_id}", response_model=FeedingResponse)
+@limiter.limit(RATE_READ)
 def get_feeding(
+    request: Request,
     feeding_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -50,7 +58,9 @@ def get_feeding(
 
 
 @router.post("/", response_model=FeedingResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(RATE_WRITE)
 def create_feeding(
+    request: Request,
     feeding_data: FeedingCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -72,11 +82,14 @@ def create_feeding(
     db.add(feeding)
     db.commit()
     db.refresh(feeding)
+    logger.info("Created feeding", extra={"baby_id": feeding.baby_id, "feeding_id": feeding.id})
     return feeding
 
 
 @router.put("/{feeding_id}", response_model=FeedingResponse)
+@limiter.limit(RATE_WRITE)
 def update_feeding(
+    request: Request,
     feeding_id: int,
     feeding_data: FeedingUpdate,
     user: dict = Depends(get_current_user),
@@ -108,7 +121,9 @@ def update_feeding(
 
 
 @router.delete("/{feeding_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(RATE_WRITE)
 def delete_feeding(
+    request: Request,
     feeding_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
@@ -123,12 +138,14 @@ def delete_feeding(
     ).first()
 
     if not feeding:
+        logger.warning("Delete feeding not found", extra={"feeding_id": feeding_id})
         raise HTTPException(status_code=404, detail="Feeding not found")
 
     # Verify write access
     _, role = verify_baby_access(db, feeding.baby_id, user_id, user_email)
     require_write_access(role)
 
+    logger.info("Deleted feeding", extra={"feeding_id": feeding_id, "baby_id": feeding.baby_id})
     db.delete(feeding)
     db.commit()
     return None

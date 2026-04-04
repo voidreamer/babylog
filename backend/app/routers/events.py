@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_, func, text
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import Baby, Feeding, Diaper, Sleep, Pumping, Potty, TummyTime, Bath, Supplement, Solid
 from ..schemas import (
     TimelineEvent, DashboardStats, DailySummary,
@@ -11,13 +12,18 @@ from ..schemas import (
     PottyResponse, TummyTimeResponse, BathResponse, SupplementResponse, SolidResponse
 )
 from ..auth import get_current_user, get_user_email
+from ..rate_limit import limiter, RATE_READ
 from .utils import verify_baby_access
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.get("/timeline", response_model=List[TimelineEvent])
+@limiter.limit(RATE_READ)
 def get_timeline(
+    request: Request,
     baby_id: int,
     date: Optional[str] = None,
     tz_offset: int = 0,
@@ -385,7 +391,9 @@ def get_daily_summary_for_baby(db: Session, baby_id: int, date: datetime, tz_off
 
 
 @router.get("/dashboard", response_model=DashboardStats)
+@limiter.limit(RATE_READ)
 def get_dashboard(
+    request: Request,
     baby_id: int,
     local_date: Optional[str] = None,
     tz_offset: int = 0,
@@ -576,7 +584,9 @@ def get_daily_summary_optimized(db: Session, baby_id: int, date: datetime, tz_of
 
 
 @router.get("/summary/{date}", response_model=DailySummary)
+@limiter.limit(RATE_READ)
 def get_summary(
+    request: Request,
     baby_id: int,
     date: str,
     user: dict = Depends(get_current_user),
