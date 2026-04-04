@@ -7,14 +7,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from ..auth import get_user_id
-from ..bot.telegram import handle_update, bot_url
+from ..bot.telegram import bot_url, handle_update
 from ..config import get_settings
 from ..database import get_db
 from ..logging_config import get_logger
 from ..models import User
-from ..rate_limit import limiter, RATE_WRITE, RATE_ADMIN
-from .admin import verify_admin_key
+from ..rate_limit import RATE_ADMIN, RATE_WRITE, limiter
 from ..schemas import TelegramLinkRequest
+from .admin import verify_admin_key
 
 logger = get_logger(__name__)
 

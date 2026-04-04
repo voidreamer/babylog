@@ -6,14 +6,15 @@ the database to log events and return status summaries.
 """
 
 import re
+from datetime import UTC, datetime, timedelta
+
 import httpx
-from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
 
 from ..config import get_settings
 from ..database import SessionLocal
-from ..models import User, Baby, Feeding, Diaper, Sleep
 from ..logging_config import get_logger
+from ..models import Baby, Diaper, Feeding, Sleep, User
 
 logger = get_logger(__name__)
 
@@ -106,7 +107,7 @@ def _get_first_baby(db: Session, user: User) -> Baby | None:
 
 def _today_range() -> tuple[datetime, datetime]:
     """Return (start, end) for today in UTC."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end = start + timedelta(days=1)
     return start, end
@@ -171,7 +172,10 @@ def _cmd_link(chat_id: int, args: str) -> None:
     try:
         user = db.query(User).filter(User.email == email).first()
         if not user:
-            send_message(chat_id, f"No HeyBub account found for <b>{email}</b>.\nMake sure you use the same email as your app login.")
+            send_message(
+                chat_id,
+                f"No HeyBub account found for <b>{email}</b>.\nMake sure you use the same email as your app login.",
+            )
             return
 
         user.telegram_chat_id = str(chat_id)
@@ -197,24 +201,9 @@ def _cmd_status(chat_id: int, _args: str) -> None:
 
         today_start, today_end = _today_range()
 
-        last_feeding = (
-            db.query(Feeding)
-            .filter(Feeding.baby_id == baby.id)
-            .order_by(Feeding.time.desc())
-            .first()
-        )
-        last_diaper = (
-            db.query(Diaper)
-            .filter(Diaper.baby_id == baby.id)
-            .order_by(Diaper.time.desc())
-            .first()
-        )
-        last_sleep = (
-            db.query(Sleep)
-            .filter(Sleep.baby_id == baby.id)
-            .order_by(Sleep.start_time.desc())
-            .first()
-        )
+        last_feeding = db.query(Feeding).filter(Feeding.baby_id == baby.id).order_by(Feeding.time.desc()).first()
+        last_diaper = db.query(Diaper).filter(Diaper.baby_id == baby.id).order_by(Diaper.time.desc()).first()
+        last_sleep = db.query(Sleep).filter(Sleep.baby_id == baby.id).order_by(Sleep.start_time.desc()).first()
 
         feeding_count = (
             db.query(Feeding)
@@ -232,11 +221,7 @@ def _cmd_status(chat_id: int, _args: str) -> None:
             .count()
         )
 
-        active_sleep = (
-            db.query(Sleep)
-            .filter(Sleep.baby_id == baby.id, Sleep.end_time.is_(None))
-            .first()
-        )
+        active_sleep = db.query(Sleep).filter(Sleep.baby_id == baby.id, Sleep.end_time.is_(None)).first()
 
         lines = [f"<b>Status for {baby.name}</b>\n"]
 
@@ -295,14 +280,16 @@ def _cmd_feed(chat_id: int, args: str) -> None:
         valid_types = {"formula", "breast", "bottle", "solid"}
         feed_type = parts[0].lower()
         if feed_type not in valid_types:
-            send_message(chat_id, f"Unknown feeding type '<b>{feed_type}</b>'. Use one of: formula, breast, bottle, solid")
+            send_message(
+                chat_id, f"Unknown feeding type '<b>{feed_type}</b>'. Use one of: formula, breast, bottle, solid"
+            )
             return
 
         amount_ml, duration = None, None
         if len(parts) > 1:
             amount_ml, duration = _parse_amount(parts[1])
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         feeding = Feeding(
             baby_id=baby.id,
             time=now,
@@ -348,7 +335,7 @@ def _cmd_diaper(chat_id: int, args: str) -> None:
             )
             return
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         diaper = Diaper(
             baby_id=baby.id,
             time=now,
@@ -378,17 +365,16 @@ def _cmd_sleep(chat_id: int, args: str) -> None:
             return
 
         action = args.strip().lower()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         if action == "start":
             # Check for an already-active sleep
-            active = (
-                db.query(Sleep)
-                .filter(Sleep.baby_id == baby.id, Sleep.end_time.is_(None))
-                .first()
-            )
+            active = db.query(Sleep).filter(Sleep.baby_id == baby.id, Sleep.end_time.is_(None)).first()
             if active:
-                send_message(chat_id, f"{baby.name} is already sleeping (since {_fmt_time(active.start_time)}). Send /sleep end first.")
+                send_message(
+                    chat_id,
+                    f"{baby.name} is already sleeping (since {_fmt_time(active.start_time)}). Send /sleep end first.",
+                )
                 return
 
             sleep = Sleep(
@@ -415,7 +401,9 @@ def _cmd_sleep(chat_id: int, args: str) -> None:
             active.end_time = now
             db.commit()
             dur = int((now - active.start_time).total_seconds() / 60)
-            logger.info("Sleep ended via Telegram", extra={"baby_id": baby.id, "sleep_id": active.id, "duration_min": dur})
+            logger.info(
+                "Sleep ended via Telegram", extra={"baby_id": baby.id, "sleep_id": active.id, "duration_min": dur}
+            )
             send_message(chat_id, f"Sleep ended for {baby.name}. Duration: {dur} minutes.")
         else:
             send_message(chat_id, "Usage: /sleep start or /sleep end")
