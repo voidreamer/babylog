@@ -741,3 +741,11 @@ class PhotoUploadResponse(BaseModel):
     upload_url: str
     storage_key: str
     public_url: str
+
+
+# ============================================================================
+# Telegram Schemas
+# ============================================================================
+
+class TelegramLinkRequest(BaseModel):
+    chat_id: str

@@ -39,6 +39,7 @@ class User(Base):
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
     onboarding_completed_at = Column(DateTime, nullable=True)
     tour_completed_at = Column(DateTime, nullable=True)
+    telegram_chat_id = Column(String, nullable=True, index=True)
 
 
 class Baby(Base):

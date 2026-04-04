@@ -26,6 +26,7 @@ from .routers import (
     rest_planner,
     sleeps,
     subscription,
+    telegram,
     users,
     voice,
 )
@@ -90,6 +91,7 @@ app.include_router(billing.router)
 app.include_router(rest_planner.router)
 app.include_router(users.router)
 app.include_router(voice.router)
+app.include_router(telegram.router)
 
 
 # Request logging middleware
