@@ -59,3 +59,8 @@ output "lambda_function_name" {
   description = "Lambda function name"
   value       = aws_lambda_function.api.function_name
 }
+
+output "scheduler_function_name" {
+  description = "Notification scheduler Lambda function name"
+  value       = aws_lambda_function.notification_scheduler.function_name
+}

@@ -86,6 +86,19 @@ variable "sentry_dsn" {
   default     = ""
 }
 
+variable "vapid_private_key" {
+  description = "VAPID private key for Web Push"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "vapid_public_key" {
+  description = "VAPID public key for Web Push"
+  type        = string
+  default     = ""
+}
+
 # BabyHub Integration
 variable "babyhub_cloudfront_arn" {
   description = "ARN of BabyHub's CloudFront distribution (for unified routing)"

@@ -22,6 +22,7 @@ from .routers import (
     export,
     feedings,
     health,
+    notifications,
     pumpings,
     rest_planner,
     sleeps,
@@ -88,6 +89,7 @@ app.include_router(export.router)
 app.include_router(billing.router)
 app.include_router(rest_planner.router)
 app.include_router(users.router)
+app.include_router(notifications.router)
 
 
 # Request logging middleware
