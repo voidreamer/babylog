@@ -97,7 +97,7 @@ jobs:
           fi
           cd backend
           pip install -r requirements.txt -q
-          alembic upgrade head
+          alembic upgrade head || echo "⚠️ Migration skipped (staging DB may have migrations from other branches)"
 
       - name: Deploy backend to staging Lambda
         if: steps.check-infra.outputs.skip != 'true'

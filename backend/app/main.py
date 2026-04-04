@@ -27,6 +27,7 @@ from .routers import (
     sleeps,
     subscription,
     users,
+    voice,
 )
 
 # Configure structured JSON logging
@@ -88,6 +89,7 @@ app.include_router(export.router)
 app.include_router(billing.router)
 app.include_router(rest_planner.router)
 app.include_router(users.router)
+app.include_router(voice.router)
 
 
 # Request logging middleware

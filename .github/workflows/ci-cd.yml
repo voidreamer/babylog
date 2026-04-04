@@ -165,6 +165,7 @@ jobs:
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_sentry_dsn: ${{ secrets.SENTRY_DSN }}
+          TF_VAR_groq_api_key: ${{ secrets.GROQ_API_KEY }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
@@ -180,6 +181,7 @@ jobs:
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_sentry_dsn: ${{ secrets.SENTRY_DSN }}
+          TF_VAR_groq_api_key: ${{ secrets.GROQ_API_KEY }}
         run: terraform apply -auto-approve tfplan
 
       - name: Get Terraform outputs

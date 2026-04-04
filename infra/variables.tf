@@ -86,6 +86,13 @@ variable "sentry_dsn" {
   default     = ""
 }
 
+variable "groq_api_key" {
+  description = "Groq API key for voice command parsing"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # BabyHub Integration
 variable "babyhub_cloudfront_arn" {
   description = "ARN of BabyHub's CloudFront distribution (for unified routing)"
