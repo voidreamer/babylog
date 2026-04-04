@@ -747,5 +747,6 @@ class PhotoUploadResponse(BaseModel):
 # Telegram Schemas
 # ============================================================================
 
+
 class TelegramLinkRequest(BaseModel):
     chat_id: str
