@@ -3,15 +3,21 @@ Billing router — Stripe subscriptions for HeyBub Premium.
 """
 
 import os
+from datetime import UTC
+
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
+from ..logging_config import get_logger
 from ..models import User, utc_now
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
 from .subscription import get_or_create_user
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -54,6 +60,7 @@ class SubscriptionStatusResponse(BaseModel):
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_or_create_stripe_customer(email: str, user_id: str, db_user: User) -> str:
     """Return existing Stripe customer id or create one."""
     if db_user.stripe_customer_id:
@@ -86,7 +93,9 @@ def _plan_from_price(price_id: str) -> str | None:
 # POST /billing/create-checkout-session
 # ---------------------------------------------------------------------------
 @router.post("/create-checkout-session", response_model=CheckoutResponse)
+@limiter.limit(RATE_WRITE)
 async def create_checkout_session(
+    request: Request,
     body: CheckoutRequest,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -109,6 +118,7 @@ async def create_checkout_session(
         subscription_data={"trial_period_days": 7},
         metadata={"user_id": user_id},
     )
+    logger.info("Created checkout session", extra={"user_id": user_id, "price_id": body.price_id})
     return CheckoutResponse(checkout_url=session.url)
 
 
@@ -116,6 +126,7 @@ async def create_checkout_session(
 # POST /billing/webhook
 # ---------------------------------------------------------------------------
 @router.post("/webhook")
+@limiter.limit(RATE_WRITE)
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig = request.headers.get("stripe-signature", "")
@@ -124,10 +135,12 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         try:
             event = stripe.Webhook.construct_event(payload, sig, STRIPE_WEBHOOK_SECRET)
         except stripe.error.SignatureVerificationError:
+            logger.warning("Stripe webhook invalid signature")
             raise HTTPException(400, "Invalid signature")
     else:
         # Dev fallback — no secret configured
         import json
+
         event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
 
     etype = event["type"]
@@ -170,8 +183,9 @@ def _handle_checkout_completed(session_obj: dict, db: Session):
         if sub.get("items", {}).get("data"):
             price_id = sub["items"]["data"][0]["price"]["id"]
             db_user.premium_plan = _plan_from_price(price_id)
-        from datetime import datetime, timezone
-        db_user.premium_expires_at = datetime.fromtimestamp(sub["current_period_end"], tz=timezone.utc)
+        from datetime import datetime
+
+        db_user.premium_expires_at = datetime.fromtimestamp(sub["current_period_end"], tz=UTC)
 
 
 def _handle_subscription_updated(sub_obj: dict, db: Session):
@@ -188,8 +202,9 @@ def _handle_subscription_updated(sub_obj: dict, db: Session):
         price_id = sub_obj["items"]["data"][0]["price"]["id"]
         db_user.premium_plan = _plan_from_price(price_id)
 
-    from datetime import datetime, timezone
-    db_user.premium_expires_at = datetime.fromtimestamp(sub_obj["current_period_end"], tz=timezone.utc)
+    from datetime import datetime
+
+    db_user.premium_expires_at = datetime.fromtimestamp(sub_obj["current_period_end"], tz=UTC)
 
 
 def _handle_subscription_deleted(sub_obj: dict, db: Session):
@@ -207,7 +222,9 @@ def _handle_subscription_deleted(sub_obj: dict, db: Session):
 # GET /billing/subscription
 # ---------------------------------------------------------------------------
 @router.get("/subscription", response_model=SubscriptionStatusResponse)
+@limiter.limit(RATE_READ)
 async def get_subscription(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -235,7 +252,9 @@ async def get_subscription(
 # POST /billing/portal
 # ---------------------------------------------------------------------------
 @router.post("/portal", response_model=PortalResponse)
+@limiter.limit(RATE_WRITE)
 async def create_portal_session(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -248,6 +267,6 @@ async def create_portal_session(
 
     session = stripe.billing_portal.Session.create(
         customer=db_user.stripe_customer_id,
-        return_url=f"https://app.heybub.app/",
+        return_url="https://app.heybub.app/",
     )
     return PortalResponse(portal_url=session.url)

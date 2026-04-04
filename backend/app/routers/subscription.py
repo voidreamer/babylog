@@ -5,11 +5,13 @@ Premium is now managed via Stripe (see billing.py).
 This module provides the subscription status endpoint.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
+
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import User
+from ..rate_limit import RATE_READ, limiter
 
 router = APIRouter(prefix="/subscription", tags=["subscription"])
 
@@ -30,9 +32,9 @@ def get_or_create_user(db: Session, user_id: str, email: str | None = None) -> U
 
 
 @router.get("/status")
+@limiter.limit(RATE_READ)
 async def get_subscription_status(
-    user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    request: Request, user: dict = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """Get current subscription status for the user."""
     user_id = user.get("sub") or user.get("user_id")
@@ -50,5 +52,5 @@ async def get_subscription_status(
             "patterns": is_premium,
             "trends": is_premium,
             "export": True,
-        }
+        },
     }

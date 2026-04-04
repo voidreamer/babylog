@@ -11,7 +11,11 @@ from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.database import Base, get_db
+from app.rate_limit import limiter
 from app import models
+
+# Disable rate limiting in tests — TestClient shares one IP across all requests
+limiter.enabled = False
 
 
 # Check if we're running in CI with PostgreSQL or locally with SQLite

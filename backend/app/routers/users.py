@@ -1,13 +1,18 @@
 """User profile endpoints for onboarding/tour state and account deletion."""
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
+
 from ..auth import get_current_user
 from ..config import get_settings
 from ..database import get_db
-from ..models import User, Baby, AnalyticsEvent, PushSubscription, utc_now
+from ..logging_config import get_logger
+from ..models import AnalyticsEvent, Baby, PushSubscription, User, utc_now
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
 from .subscription import get_or_create_user
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -19,7 +24,9 @@ def _get_user(user: dict, db: Session):
 
 
 @router.get("/me")
+@limiter.limit(RATE_READ)
 async def get_user_info(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -31,7 +38,9 @@ async def get_user_info(
 
 
 @router.post("/me/onboarding")
+@limiter.limit(RATE_WRITE)
 async def complete_onboarding(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -43,7 +52,9 @@ async def complete_onboarding(
 
 
 @router.post("/me/tour")
+@limiter.limit(RATE_WRITE)
 async def complete_tour(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -55,7 +66,9 @@ async def complete_tour(
 
 
 @router.delete("/me")
+@limiter.limit(RATE_WRITE)
 async def delete_account(
+    request: Request,
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -78,6 +91,7 @@ async def delete_account(
     db.query(User).filter(User.user_id == user_id).delete()
 
     db.commit()
+    logger.info("Deleted user account", extra={"user_id": user_id})
 
     # 5. Delete Supabase auth user (best-effort, don't fail if this errors)
     if settings.supabase_url and settings.supabase_service_key:
@@ -93,6 +107,6 @@ async def delete_account(
                 )
         except Exception as e:
             # Log but don't fail — DB data is already gone
-            print(f"Warning: failed to delete Supabase auth user: {e}")
+            logger.warning("Failed to delete Supabase auth user", extra={"user_id": user_id, "error": str(e)})
 
     return {"ok": True, "message": "Account and all data deleted"}

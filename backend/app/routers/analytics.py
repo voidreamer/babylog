@@ -8,41 +8,41 @@ Provides:
 - Today vs. average comparisons
 """
 
-from datetime import datetime, timedelta, timezone, date, time
-from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import func, and_
-import logging
+from datetime import UTC, datetime, timedelta
 
-from ..database import get_db
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from sqlalchemy.orm import Session
+
 from ..auth import get_current_user, get_user_email
-from ..models import Baby, Feeding, Sleep, Diaper
-from ..benchmarks import get_all_benchmarks, calculate_age_weeks
-from .utils import verify_baby_access
+from ..benchmarks import calculate_age_weeks, get_all_benchmarks
+from ..database import get_db
+from ..logging_config import get_logger
+from ..models import Diaper, Feeding, Sleep
 from ..predictions import (
-    predict_next_nap_wake_window,
     calculate_confidence_interval,
-    calculate_sleep_pressure,
-    detect_trend,
     calculate_daily_totals,
     calculate_intervals_hours,
+    calculate_sleep_pressure,
+    detect_trend,
+    predict_next_nap_wake_window,
 )
+from ..rate_limit import RATE_READ, limiter
+from .utils import verify_baby_access
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
-def make_aware(dt: Optional[datetime]) -> Optional[datetime]:
+def make_aware(dt: datetime | None) -> datetime | None:
     """Ensure datetime is timezone-aware (UTC)."""
     if dt is None:
         return None
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
+        return dt.replace(tzinfo=UTC)
     return dt
 
 
-def calculate_average_time_of_day(timestamps: List[datetime], reference_hour: int = 0) -> Optional[str]:
+def calculate_average_time_of_day(timestamps: list[datetime], reference_hour: int = 0) -> str | None:
     """Calculate average time of day from list of timestamps using circular averaging.
 
     Uses circular mean to handle midnight wraparound correctly.
@@ -53,6 +53,7 @@ def calculate_average_time_of_day(timestamps: List[datetime], reference_hour: in
         return None
 
     import math
+
     # Convert to radians on a 24h circle, shifted by reference
     angles = []
     for ts in timestamps:
@@ -77,43 +78,40 @@ def calculate_average_time_of_day(timestamps: List[datetime], reference_hour: in
     return f"{hours:02d}:{mins:02d}"
 
 
-def calculate_average_interval(timestamps: List[datetime]) -> Optional[float]:
+def calculate_average_interval(timestamps: list[datetime]) -> float | None:
     """Calculate average interval between timestamps in hours."""
     if len(timestamps) < 2:
         return None
-    
+
     # Sort timestamps (ensure timezone-aware)
     sorted_ts = sorted([make_aware(ts) for ts in timestamps])
-    
+
     # Calculate intervals
     intervals = []
     for i in range(1, len(sorted_ts)):
-        diff = (sorted_ts[i] - sorted_ts[i-1]).total_seconds() / 3600
+        diff = (sorted_ts[i] - sorted_ts[i - 1]).total_seconds() / 3600
         # Filter out unreasonable intervals (> 24 hours)
         if diff < 24:
             intervals.append(diff)
-    
+
     if not intervals:
         return None
     return round(sum(intervals) / len(intervals), 2)
 
 
-def predict_next_event(
-    timestamps: List[datetime], 
-    avg_interval_hours: Optional[float]
-) -> Optional[dict]:
+def predict_next_event(timestamps: list[datetime], avg_interval_hours: float | None) -> dict | None:
     """Predict next event based on last occurrence and average interval."""
     if not timestamps or not avg_interval_hours:
         return None
-    
+
     last_event = make_aware(max(timestamps))
     predicted_time = last_event + timedelta(hours=avg_interval_hours)
-    now = datetime.now(timezone.utc)
-    
+    now = datetime.now(UTC)
+
     # Calculate minutes until predicted event
     diff = predicted_time - now
     in_minutes = int(diff.total_seconds() / 60)
-    
+
     return {
         "time": predicted_time.isoformat(),
         "in_minutes": in_minutes,
@@ -122,7 +120,9 @@ def predict_next_event(
 
 
 @router.get("/{baby_id}")
+@limiter.limit(RATE_READ)
 async def get_baby_analytics(
+    request: Request,
     baby_id: int,
     days: int = Query(default=7, ge=3, le=30, description="Days of data to analyze"),
     tz_offset: int = Query(default=0, description="Timezone offset in minutes"),
@@ -132,64 +132,79 @@ async def get_baby_analytics(
 ):
     """
     Get comprehensive analytics for a baby.
-    
+
     Returns patterns, predictions, benchmarks, and comparisons.
     """
     try:
         user_id = user.get("sub")
         baby, _role = verify_baby_access(db, baby_id, user_id, user_email)
-        
+
         # Calculate date range
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         start_date = now - timedelta(days=days)
-        
+
         # Calculate user's local "today" start using their timezone offset
         # tz_offset is minutes behind UTC (e.g., EST = 300 means UTC-5)
         user_now = now - timedelta(minutes=tz_offset)
         today_start = user_now.replace(hour=0, minute=0, second=0, microsecond=0)
         # Convert back to UTC for comparison
         today_start_utc = today_start + timedelta(minutes=tz_offset)
-        
+
         # ==========================================================================
         # Fetch data
         # ==========================================================================
-        
+
         # Feedings in analysis window
-        feedings = db.query(Feeding).filter(
-            Feeding.baby_id == baby_id,
-        ).order_by(Feeding.time.desc()).limit(100).all()
-        
+        feedings = (
+            db.query(Feeding)
+            .filter(
+                Feeding.baby_id == baby_id,
+            )
+            .order_by(Feeding.time.desc())
+            .limit(100)
+            .all()
+        )
+
         # Filter by date in Python to avoid timezone issues
         feedings = [f for f in feedings if make_aware(f.time) >= start_date]
-        
+
         # Today's feedings
         todays_feedings = [f for f in feedings if make_aware(f.time) >= today_start_utc]
-        
+
         # Sleep records in analysis window
-        sleeps = db.query(Sleep).filter(
-            Sleep.baby_id == baby_id,
-        ).order_by(Sleep.start_time.desc()).limit(100).all()
-        
+        sleeps = (
+            db.query(Sleep)
+            .filter(
+                Sleep.baby_id == baby_id,
+            )
+            .order_by(Sleep.start_time.desc())
+            .limit(100)
+            .all()
+        )
+
         # Filter by date in Python
         sleeps = [s for s in sleeps if make_aware(s.start_time) >= start_date]
-        
+
         # Today's completed sleeps
-        todays_sleeps = [
-            s for s in sleeps 
-            if make_aware(s.start_time) >= today_start_utc and s.end_time
-        ]
-        
+        todays_sleeps = [s for s in sleeps if make_aware(s.start_time) >= today_start_utc and s.end_time]
+
         # Diapers in analysis window
-        diapers = db.query(Diaper).filter(
-            Diaper.baby_id == baby_id,
-        ).order_by(Diaper.time.desc()).limit(100).all()
-        
+        diapers = (
+            db.query(Diaper)
+            .filter(
+                Diaper.baby_id == baby_id,
+            )
+            .order_by(Diaper.time.desc())
+            .limit(100)
+            .all()
+        )
+
         # Filter by date in Python
         diapers = [d for d in diapers if make_aware(d.time) >= start_date]
-        
+
         # Today's diapers
         todays_diapers = [d for d in diapers if make_aware(d.time) >= today_start_utc]
-        
+
         # ==========================================================================
         # Calculate patterns
         # ==========================================================================
@@ -198,7 +213,7 @@ async def get_baby_analytics(
         birth_date = None
         if baby.birth_date:
             bd = make_aware(baby.birth_date)
-            birth_date = bd.date() if hasattr(bd, 'date') else bd
+            birth_date = bd.date() if hasattr(bd, "date") else bd
 
         age_weeks = 0
         if birth_date:
@@ -249,7 +264,7 @@ async def get_baby_analytics(
                 wake_intervals = []
                 sorted_wakes = sorted([make_aware(wt) for wt in wake_times])
                 for i in range(1, len(sorted_wakes)):
-                    interval_hours = (sorted_wakes[i] - sorted_wakes[i-1]).total_seconds() / 3600
+                    interval_hours = (sorted_wakes[i] - sorted_wakes[i - 1]).total_seconds() / 3600
                     if interval_hours < 8:  # Filter out unreasonably long gaps
                         wake_intervals.append(interval_hours)
                 if wake_intervals:
@@ -257,8 +272,7 @@ async def get_baby_analytics(
         else:
             # Older baby: separate morning wakes from nap wakes
             # Morning wake = wake times between 4am and 10am
-            morning_wakes = [wt for wt in wake_times
-                            if 4 <= make_aware(wt).hour < 10]
+            morning_wakes = [wt for wt in wake_times if 4 <= make_aware(wt).hour < 10]
             if morning_wakes:
                 usual_wake_time = calculate_average_time_of_day(morning_wakes, reference_hour=6)
 
@@ -300,10 +314,7 @@ async def get_baby_analytics(
             last_wake_time = max(make_aware(wt) for wt in wake_times)
 
         # Check if baby is currently sleeping (active sleep session)
-        active_sleep = db.query(Sleep).filter(
-            Sleep.baby_id == baby_id,
-            Sleep.end_time.is_(None)
-        ).first()
+        active_sleep = db.query(Sleep).filter(Sleep.baby_id == baby_id, Sleep.end_time.is_(None)).first()
 
         if active_sleep:
             # Baby is sleeping - no nap prediction needed
@@ -329,7 +340,7 @@ async def get_baby_analytics(
             sleeps,
             get_value=lambda s: (s.duration_minutes or 0) / 60,  # Convert to hours
             get_date=lambda s: make_aware(s.start_time).date(),
-            days=14
+            days=14,
         )
         sleep_trend = detect_trend(sleep_daily_totals, metric_name="sleep")
 
@@ -338,42 +349,42 @@ async def get_baby_analytics(
             feedings,
             get_value=lambda f: 1,  # Count each feeding
             get_date=lambda f: make_aware(f.time).date(),
-            days=14
+            days=14,
         )
         feeding_trend = detect_trend(feeding_daily_counts, metric_name="feeding")
-        
+
         # ==========================================================================
         # Get benchmarks
         # ==========================================================================
 
         benchmarks = get_all_benchmarks(birth_date)
-        
+
         # ==========================================================================
         # Today vs. average comparisons
         # ==========================================================================
-        
+
         # Daily averages
         avg_feedings_per_day = len(feedings) / days if days > 0 else 0
         avg_diapers_per_day = len(diapers) / days if days > 0 else 0
-        
+
         # Total sleep today
         todays_sleep_minutes = sum(s.duration_minutes or 0 for s in todays_sleeps)
-        
+
         # Average daily sleep
         total_sleep_minutes = sum(s.duration_minutes or 0 for s in sleeps if s.duration_minutes)
         avg_sleep_per_day = total_sleep_minutes / days if days > 0 else 0
-        
+
         # Diaper breakdown today
         todays_wet = len([d for d in todays_diapers if d.type in ("pee", "mixed")])
         todays_dirty = len([d for d in todays_diapers if d.type in ("poo", "mixed")])
-        
+
         # ==========================================================================
         # Build response
         # ==========================================================================
-        
+
         # Check if we have enough data for patterns
         has_enough_data = len(feedings) >= 5 or len(sleeps) >= 3
-        
+
         return {
             "baby_id": baby_id,
             "analysis_window_days": days,
@@ -383,7 +394,6 @@ async def get_baby_analytics(
                 "diapers": len(diapers),
             },
             "has_enough_data": has_enough_data,
-            
             "patterns": {
                 "avg_feeding_interval_hours": avg_feeding_interval,
                 "avg_nap_duration_minutes": avg_nap_duration,
@@ -394,21 +404,21 @@ async def get_baby_analytics(
                 "day_sleep_avg_hours": day_sleep_avg_hours,
                 "longest_sleep_block_hours": longest_sleep_block_hours,
                 "age_weeks": age_weeks,  # Include age for frontend logic
-            } if has_enough_data else None,
-            
+            }
+            if has_enough_data
+            else None,
             "predictions": {
                 "next_feeding": next_feeding,
                 "next_nap": next_nap,
                 "sleep_pressure": sleep_pressure,
-            } if has_enough_data else None,
-
+            }
+            if has_enough_data
+            else None,
             "trends": {
                 "sleep": sleep_trend,
                 "feeding": feeding_trend,
             },
-
             "benchmarks": benchmarks,
-            
             "today_vs_average": {
                 "feedings": {
                     "today": len(todays_feedings),
