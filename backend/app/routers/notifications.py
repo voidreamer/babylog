@@ -9,17 +9,17 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
-from ..config import get_settings, Settings
+from ..config import Settings, get_settings
 from ..database import get_db
 from ..logging_config import get_logger
 from ..models import PushSubscription
-from ..push import send_push, send_push_to_user
-from ..rate_limit import limiter, RATE_READ, RATE_WRITE, RATE_ADMIN
+from ..push import send_push_to_user
+from ..rate_limit import RATE_ADMIN, RATE_READ, RATE_WRITE, limiter
 from ..schemas import (
-    PushSubscribeRequest,
-    PushUnsubscribeRequest,
     PushSendRequest,
+    PushSubscribeRequest,
     PushSubscriptionResponse,
+    PushUnsubscribeRequest,
 )
 from .admin import verify_admin_key
 
@@ -30,6 +30,7 @@ logger = get_logger(__name__)
 # ---------------------------------------------------------------------------
 # POST /notifications/subscribe
 # ---------------------------------------------------------------------------
+
 
 @router.post("/subscribe", status_code=201)
 @limiter.limit(RATE_WRITE)
@@ -69,6 +70,7 @@ async def subscribe(
         )
         # Return 200 for update (override the default 201)
         from fastapi.responses import JSONResponse
+
         return JSONResponse(
             status_code=200,
             content={"id": existing.id, "status": "updated"},
@@ -96,6 +98,7 @@ async def subscribe(
 # ---------------------------------------------------------------------------
 # DELETE /notifications/unsubscribe
 # ---------------------------------------------------------------------------
+
 
 @router.delete("/unsubscribe", status_code=204)
 @limiter.limit(RATE_WRITE)
@@ -133,6 +136,7 @@ async def unsubscribe(
 # POST /notifications/test
 # ---------------------------------------------------------------------------
 
+
 @router.post("/test")
 @limiter.limit(RATE_WRITE)
 async def send_test_notification(
@@ -169,6 +173,7 @@ async def send_test_notification(
 # ---------------------------------------------------------------------------
 # GET /notifications/subscriptions
 # ---------------------------------------------------------------------------
+
 
 @router.get("/subscriptions", response_model=list[PushSubscriptionResponse])
 @limiter.limit(RATE_READ)
@@ -208,6 +213,7 @@ async def list_subscriptions(
 # ---------------------------------------------------------------------------
 # POST /notifications/send  (admin-only)
 # ---------------------------------------------------------------------------
+
 
 @router.post("/send")
 @limiter.limit(RATE_ADMIN)

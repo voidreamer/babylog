@@ -704,6 +704,7 @@ class AnalyticsEventResponse(BaseModel):
 # Push Notification Schemas
 # ============================================================================
 
+
 class PushSubscribeRequest(BaseModel):
     endpoint: str
     p256dh_key: str
@@ -718,8 +719,8 @@ class PushSendRequest(BaseModel):
     user_id: str
     title: str = Field(..., max_length=200)
     body: str = Field(..., max_length=1000)
-    url: Optional[str] = None
-    baby_id: Optional[int] = None
+    url: str | None = None
+    baby_id: int | None = None
 
 
 class PushSubscriptionResponse(BaseModel):

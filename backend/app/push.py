@@ -7,7 +7,7 @@ with VAPID authentication.
 
 import json
 
-from pywebpush import webpush, WebPushException
+from pywebpush import WebPushException, webpush
 from sqlalchemy.orm import Session
 
 from .config import Settings
@@ -77,11 +77,7 @@ def send_push_to_user(
     Returns (success_count, failure_count).
     Cleans up expired subscriptions (410 Gone) automatically.
     """
-    subscriptions = (
-        db.query(PushSubscription)
-        .filter(PushSubscription.user_id == user_id)
-        .all()
-    )
+    subscriptions = db.query(PushSubscription).filter(PushSubscription.user_id == user_id).all()
 
     if not subscriptions:
         logger.info(
@@ -106,9 +102,7 @@ def send_push_to_user(
 
     # Clean up expired subscriptions
     if expired_ids:
-        db.query(PushSubscription).filter(
-            PushSubscription.id.in_(expired_ids)
-        ).delete(synchronize_session="fetch")
+        db.query(PushSubscription).filter(PushSubscription.id.in_(expired_ids)).delete(synchronize_session="fetch")
         db.commit()
         logger.info(
             "Deleted %d expired push subscriptions for user %s",
