@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { captureException } from '../utils/analytics';
 
 type ErrorLevel = 'app' | 'page' | 'widget';
 
@@ -90,6 +91,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        captureException(error, { componentStack: errorInfo.componentStack ?? undefined, level: this.props.level });
         if (import.meta.env.DEV) {
             console.error('ErrorBoundary caught an error:', error, errorInfo);
         }

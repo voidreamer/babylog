@@ -38,6 +38,19 @@ Base.metadata.create_all(bind=engine)
 
 settings = get_settings()
 
+# Initialize Sentry error monitoring
+if settings.sentry_dsn:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        traces_sample_rate=0.1,
+        profiles_sample_rate=0.1,
+        enable_tracing=True,
+    )
+    logger.info("Sentry initialized", extra={"environment": settings.environment})
+
 app = FastAPI(
     title="HeyBub Baby Tracker API",
     description="API for tracking baby sleep, feeding, and diaper changes",

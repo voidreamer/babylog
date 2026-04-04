@@ -9,6 +9,7 @@ if (!API_BASE && import.meta.env.PROD) {
 }
 
 import { supabase } from '../lib/supabase';
+import { captureException } from '../utils/analytics';
 import {
     isOnline,
     getCachedBabies, getCachedFeedings, getCachedSleeps, getCachedDiapers, getCachedPumpings,
@@ -248,7 +249,11 @@ class ApiClient {
                     message = JSON.stringify(error.detail);
                 }
             }
-            throw new ApiError(message, response.status);
+            const apiError = new ApiError(message, response.status);
+            if (response.status >= 500) {
+                captureException(apiError, { endpoint, status: response.status });
+            }
+            throw apiError;
         }
 
         if (response.status === 204) return null;

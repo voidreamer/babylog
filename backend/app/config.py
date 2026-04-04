@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     vapid_private_key: str = ""
     vapid_public_key: str = ""
     vapid_contact_email: str = "support@heybub.app"
+    # Sentry error monitoring
+    sentry_dsn: str = ""
     # Supabase Storage (for photo uploads)
     supabase_url: str = ""
     supabase_service_key: str = ""

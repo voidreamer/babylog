@@ -79,6 +79,13 @@ variable "acm_certificate_arn" {
   default     = ""
 }
 
+variable "sentry_dsn" {
+  description = "Sentry DSN for backend error monitoring"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # BabyHub Integration
 variable "babyhub_cloudfront_arn" {
   description = "ARN of BabyHub's CloudFront distribution (for unified routing)"
