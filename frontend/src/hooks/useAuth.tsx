@@ -3,6 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { identifyUser, resetUser, trackEvent } from '../utils/analytics';
 
 const isDev = import.meta.env.DEV;
 const log = (...args: unknown[]) => isDev && console.log(...args);
@@ -155,6 +156,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
             browserCleanup?.();
         };
     }, []);
+
+    // Identify/reset user in Sentry + Mixpanel when auth state changes
+    useEffect(() => {
+        if (user) {
+            identifyUser(user.id, user.email ?? undefined);
+            trackEvent('Login');
+        } else if (!loading) {
+            resetUser();
+        }
+    }, [user, loading]);
 
     const login = async () => {
         if (!import.meta.env.VITE_SUPABASE_URL) {

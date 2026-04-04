@@ -8,6 +8,10 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
+import { initAnalytics } from './utils/analytics';
+
+// Initialize Sentry + Mixpanel before rendering
+initAnalytics();
 import { Capacitor } from '@capacitor/core';
 import { App as CapApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';

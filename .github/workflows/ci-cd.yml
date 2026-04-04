@@ -164,6 +164,7 @@ jobs:
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_sentry_dsn: ${{ secrets.SENTRY_DSN }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
@@ -178,6 +179,7 @@ jobs:
           TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_sentry_dsn: ${{ secrets.SENTRY_DSN }}
         run: terraform apply -auto-approve tfplan
 
       - name: Get Terraform outputs
@@ -240,6 +242,8 @@ jobs:
           VITE_API_URL: ${{ steps.tf-outputs.outputs.api_url }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_MIXPANEL_TOKEN: ${{ secrets.VITE_MIXPANEL_TOKEN }}
         run: |
           cd frontend
           npm ci

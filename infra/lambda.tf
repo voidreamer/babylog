@@ -50,6 +50,7 @@ resource "aws_lambda_function" "api" {
       STRIPE_WEBHOOK_SECRET  = var.stripe_webhook_secret
       STRIPE_PRICE_MONTHLY   = var.stripe_price_monthly
       STRIPE_PRICE_YEARLY    = var.stripe_price_yearly
+      SENTRY_DSN             = var.sentry_dsn
     }
   }
 }
