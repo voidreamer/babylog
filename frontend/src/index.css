@@ -8675,3 +8675,261 @@ a.settings-row {
 .theme-toggle-float:active {
   transform: scale(0.95);
 }
+
+/* ============================================================================
+   VOICE COMMAND BAR
+   ============================================================================ */
+
+/* Container anchored to bottom-right */
+.voice-bar-container {
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  right: var(--space-md);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-sm);
+  pointer-events: none;
+}
+
+.voice-bar-container > * {
+  pointer-events: auto;
+}
+
+/* Floating Action Button */
+.voice-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--primary);
+  color: var(--text-on-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.35);
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.2s ease;
+}
+
+.voice-fab:hover {
+  box-shadow: 0 6px 24px rgba(var(--primary-rgb), 0.45);
+}
+
+/* Backdrop overlay */
+.voice-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 899;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Floating panel (listening, confirming, processing, done, error) */
+.voice-panel {
+  width: min(320px, calc(100vw - 2 * var(--space-md)));
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--border-light);
+}
+
+.voice-panel-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+  position: relative;
+}
+
+/* Pulsing ring behind mic during listening */
+.voice-pulse-ring {
+  position: absolute;
+  top: -8px;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--primary-rgb), 0.25);
+  pointer-events: none;
+}
+
+/* Active mic button (large, during listening) */
+.voice-mic-active {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--primary);
+  color: var(--text-on-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.voice-listening-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+}
+
+/* Live transcript text */
+.voice-transcript {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.4;
+  max-height: 80px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+
+.voice-cancel-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.voice-cancel-btn:hover {
+  color: var(--text-secondary);
+}
+
+/* Confirmation state */
+.voice-heard-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+.voice-confirm-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: var(--space-xs) 0;
+}
+
+.voice-action-badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-on-color);
+  background: var(--primary);
+  text-transform: capitalize;
+}
+
+/* Color-code badges by action type */
+.voice-action-badge[data-action="feeding"] { background: var(--feeding); }
+.voice-action-badge[data-action="diaper"] { background: var(--diaper); }
+.voice-action-badge[data-action="sleep_start"],
+.voice-action-badge[data-action="sleep_end"] { background: var(--sleep); }
+.voice-action-badge[data-action="tummy_time"] { background: var(--tummy); color: var(--tummy-text); }
+.voice-action-badge[data-action="bath"] { background: var(--bath); }
+.voice-action-badge[data-action="status"] { background: var(--text-secondary); }
+
+.voice-low-confidence {
+  font-size: 0.75rem;
+  color: var(--danger);
+}
+
+/* Confirm / Cancel buttons */
+.voice-confirm-buttons {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  width: 100%;
+}
+
+.voice-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: var(--transition);
+}
+
+.voice-btn-confirm {
+  background: var(--success);
+  color: #fff;
+}
+
+.voice-btn-confirm:hover {
+  filter: brightness(0.95);
+}
+
+.voice-btn-cancel {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+}
+
+.voice-btn-cancel:hover {
+  background: var(--border);
+}
+
+/* Processing spinner */
+.voice-spinner {
+  color: var(--primary);
+}
+
+.voice-processing-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Success state */
+.voice-success-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--success);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-success-label {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Error state */
+.voice-error-icon {
+  color: var(--danger);
+}
+
+.voice-error-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Desktop: nudge FAB position for wider screens */
+@media (min-width: 768px) {
+  .voice-bar-container {
+    right: var(--space-xl);
+    bottom: var(--space-xl);
+  }
+}
