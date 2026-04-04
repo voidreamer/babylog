@@ -1,24 +1,28 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Numeric
+from datetime import UTC, datetime
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
+
 from .database import Base
 
 
 # Helper for timezone-aware UTC timestamps (datetime.utcnow is deprecated in Python 3.12+)
 def utc_now():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 # ============================================================================
 # User Model - for premium status and user settings
 # ============================================================================
 
+
 class User(Base):
     """
     User model to store user-specific data.
     The user_id comes from Cognito (sub claim).
     """
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -39,7 +43,7 @@ class User(Base):
 
 class Baby(Base):
     __tablename__ = "babies"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, index=True, nullable=False)
     owner_email = Column(String, nullable=True)
@@ -77,7 +81,7 @@ class Baby(Base):
 
 class Feeding(Base):
     __tablename__ = "feedings"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
@@ -86,13 +90,13 @@ class Feeding(Base):
     amount_ml = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="feedings")
 
 
 class Diaper(Base):
     __tablename__ = "diapers"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
@@ -103,22 +107,22 @@ class Diaper(Base):
     poo_amount = Column(String, nullable=True)  # 'small', 'medium', 'large', 'blowout'
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="diapers")
 
 
 class Sleep(Base):
     __tablename__ = "sleeps"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="sleeps")
-    
+
     @property
     def duration_minutes(self) -> "int | None":
         if self.end_time and self.start_time:
@@ -128,7 +132,7 @@ class Sleep(Base):
 
 class Pumping(Base):
     __tablename__ = "pumpings"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
@@ -136,7 +140,7 @@ class Pumping(Base):
     amount_ml = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="pumpings")
 
 
@@ -144,9 +148,10 @@ class Pumping(Base):
 # Health Integration Models
 # ============================================================================
 
+
 class DoctorVisit(Base):
     __tablename__ = "doctor_visits"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     visit_date = Column(DateTime, nullable=False)
@@ -164,7 +169,7 @@ class DoctorVisit(Base):
 
 class Vaccination(Base):
     __tablename__ = "vaccinations"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     vaccine_name = Column(String(200), nullable=False)
@@ -174,13 +179,13 @@ class Vaccination(Base):
     administered_by = Column(String(200), nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="vaccinations")
 
 
 class Medication(Base):
     __tablename__ = "medications"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     medication_name = Column(String(200), nullable=False)
@@ -191,7 +196,7 @@ class Medication(Base):
     is_active = Column(Boolean, default=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="medications")
 
 
@@ -226,6 +231,7 @@ class GrowthRecord(Base):
 
 class Tooth(Base):
     """Track individual baby teeth emergence."""
+
     __tablename__ = "teeth"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -240,6 +246,7 @@ class Tooth(Base):
 
 class SickDay(Base):
     """Track illness episodes and symptoms."""
+
     __tablename__ = "sick_days"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -255,6 +262,7 @@ class SickDay(Base):
 
 class Allergy(Base):
     """Track known allergies for safety reference."""
+
     __tablename__ = "allergies"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -273,9 +281,10 @@ class Allergy(Base):
 # Activity Tracking Models
 # ============================================================================
 
+
 class Potty(Base):
     __tablename__ = "potty"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
@@ -283,37 +292,38 @@ class Potty(Base):
     potty_type = Column(String, nullable=True)  # 'pee', 'poo', 'both'
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="potty_logs")
 
 
 class TummyTime(Base):
     __tablename__ = "tummy_time"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     start_time = Column(DateTime, nullable=False)
     duration_minutes = Column(Integer, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="tummy_times")
 
 
 class Bath(Base):
     __tablename__ = "baths"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     time = Column(DateTime, nullable=False)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
-    
+
     baby = relationship("Baby", back_populates="baths")
 
 
 class Solid(Base):
     """Track solid food introductions and meals."""
+
     __tablename__ = "solids"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -330,6 +340,7 @@ class Solid(Base):
 
 class Supplement(Base):
     """Track daily supplements like Vitamin D, Iron, etc."""
+
     __tablename__ = "supplements"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -347,8 +358,10 @@ class Supplement(Base):
 # Analytics & Marketing Models
 # ============================================================================
 
+
 class AnalyticsEvent(Base):
     """Lightweight event tracking for product analytics."""
+
     __tablename__ = "analytics_events"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -361,6 +374,7 @@ class AnalyticsEvent(Base):
 
 class PushSubscription(Base):
     """Web Push subscription info for notifications."""
+
     __tablename__ = "push_subscriptions"
 
     id = Column(Integer, primary_key=True, index=True)

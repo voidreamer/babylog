@@ -5,10 +5,12 @@ Protected endpoints for database migrations and admin operations.
 """
 
 import os
-from fastapi import APIRouter, Depends, HTTPException, Header, Request
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
+
 from ..config import get_settings
 from ..logging_config import get_logger
-from ..rate_limit import limiter, RATE_ADMIN
+from ..rate_limit import RATE_ADMIN, limiter
 
 logger = get_logger(__name__)
 
@@ -28,10 +30,7 @@ def verify_admin_key(x_admin_key: str = Header(None)):
     if not expected_key:
         # If no admin key is configured, only allow in development
         if settings.environment in ("prod", "production", "staging"):
-            raise HTTPException(
-                status_code=403,
-                detail="Admin operations require ADMIN_API_KEY to be configured"
-            )
+            raise HTTPException(status_code=403, detail="Admin operations require ADMIN_API_KEY to be configured")
         return True
 
     if not x_admin_key or x_admin_key != expected_key:
@@ -55,19 +54,18 @@ async def run_migrations(request: Request, authorized: bool = Depends(verify_adm
              -H "X-Admin-Key: your-secret-key"
     """
     try:
-        from alembic.config import Config
-        from alembic import command
         import os
+
+        from alembic.config import Config
+
+        from alembic import command
 
         # Get the directory where this file is located
         backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         alembic_cfg = Config(os.path.join(backend_dir, "alembic.ini"))
 
         # Set the script location relative to where we are
-        alembic_cfg.set_main_option(
-            "script_location",
-            os.path.join(backend_dir, "alembic")
-        )
+        alembic_cfg.set_main_option("script_location", os.path.join(backend_dir, "alembic"))
 
         # Get current revision before upgrade
         from alembic.runtime.migration import MigrationContext
@@ -87,25 +85,18 @@ async def run_migrations(request: Request, authorized: bool = Depends(verify_adm
             new_rev = context.get_current_revision()
 
         if current_rev == new_rev:
-            return {
-                "status": "ok",
-                "message": "Already at latest migration",
-                "revision": new_rev
-            }
+            return {"status": "ok", "message": "Already at latest migration", "revision": new_rev}
 
         logger.info("Migrations applied", extra={"previous_revision": current_rev, "current_revision": new_rev})
         return {
             "status": "ok",
             "message": "Migrations applied successfully",
             "previous_revision": current_rev,
-            "current_revision": new_rev
+            "current_revision": new_rev,
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Migration failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Migration failed: {str(e)}")
 
 
 @router.get("/migration-status")
@@ -128,11 +119,8 @@ async def get_migration_status(request: Request, authorized: bool = Depends(veri
         return {
             "status": "ok",
             "current_revision": current_rev,
-            "message": "No migrations applied yet" if not current_rev else f"At revision {current_rev}"
+            "message": "No migrations applied yet" if not current_rev else f"At revision {current_rev}",
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get migration status: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get migration status: {str(e)}")

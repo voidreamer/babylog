@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
-from typing import List
+
+from ..auth import get_current_user, get_user_email, get_user_id
 from ..database import get_db
 from ..logging_config import get_logger
 from ..models import Baby
-from ..schemas import BabyCreate, BabyUpdate, BabyResponse, BabyShareRequest, CaregiverRoleUpdate
-from ..auth import get_user_id, get_user_email, get_current_user
-from ..rate_limit import limiter, RATE_READ, RATE_WRITE
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
+from ..schemas import BabyCreate, BabyResponse, BabyShareRequest, BabyUpdate, CaregiverRoleUpdate
 from .utils import baby_access_filter
 
 logger = get_logger(__name__)
@@ -33,20 +33,18 @@ def baby_to_response(baby: Baby, user_id: str) -> dict:
     }
 
 
-@router.get("/", response_model=List[BabyResponse])
+@router.get("/", response_model=list[BabyResponse])
 @limiter.limit(RATE_READ)
 def get_babies(
     request: Request,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get all babies for the current user (owned or shared)."""
     user_id = user.get("sub")
 
-    babies = db.query(Baby).filter(
-        baby_access_filter(user_id, user_email)
-    ).all()
+    babies = db.query(Baby).filter(baby_access_filter(user_id, user_email)).all()
 
     return [baby_to_response(b, user_id) for b in babies]
 
@@ -58,15 +56,12 @@ def get_baby(
     baby_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get a specific baby by ID."""
     user_id = user.get("sub")
 
-    baby = db.query(Baby).filter(
-        Baby.id == baby_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, baby_access_filter(user_id, user_email)).first()
 
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")
@@ -81,7 +76,7 @@ def create_baby(
     baby_data: BabyCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Create a new baby."""
     user_id = user.get("sub")
@@ -92,7 +87,7 @@ def create_baby(
         name=baby_data.name,
         birth_date=baby_data.birth_date,
         gender=baby_data.gender,
-        shared_with=[]
+        shared_with=[],
     )
     db.add(baby)
     db.commit()
@@ -108,16 +103,13 @@ def update_baby(
     baby_id: int,
     baby_data: BabyUpdate,
     user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update a baby's information. Only owner can update."""
     user_id = user.get("sub")
 
     # Only owner can update
-    baby = db.query(Baby).filter(
-        Baby.id == baby_id,
-        Baby.user_id == user_id
-    ).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
 
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found or you don't have permission")
@@ -133,17 +125,9 @@ def update_baby(
 
 @router.delete("/{baby_id}", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit(RATE_WRITE)
-def delete_baby(
-    request: Request,
-    baby_id: int,
-    user_id: str = Depends(get_user_id),
-    db: Session = Depends(get_db)
-):
+def delete_baby(request: Request, baby_id: int, user_id: str = Depends(get_user_id), db: Session = Depends(get_db)):
     """Delete a baby and all associated records. Only owner can delete."""
-    baby = db.query(Baby).filter(
-        Baby.id == baby_id,
-        Baby.user_id == user_id
-    ).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
 
     if not baby:
         logger.warning("Delete baby not found", extra={"baby_id": baby_id, "user_id": user_id})
@@ -159,6 +143,7 @@ def delete_baby(
 # Sharing Endpoints
 # ============================================================================
 
+
 @router.post("/{baby_id}/share", response_model=BabyResponse)
 @limiter.limit(RATE_WRITE)
 def share_baby(
@@ -166,15 +151,12 @@ def share_baby(
     baby_id: int,
     share_request: BabyShareRequest,
     user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Share a baby with another user by email. Only owner can share."""
     user_id = user.get("sub")
 
-    baby = db.query(Baby).filter(
-        Baby.id == baby_id,
-        Baby.user_id == user_id
-    ).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
 
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found or you don't have permission")
@@ -203,19 +185,12 @@ def share_baby(
 @router.delete("/{baby_id}/share/{email}")
 @limiter.limit(RATE_WRITE)
 def unshare_baby(
-    request: Request,
-    baby_id: int,
-    email: str,
-    user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    request: Request, baby_id: int, email: str, user: dict = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """Remove sharing for a baby. Only owner can unshare."""
     user_id = user.get("sub")
 
-    baby = db.query(Baby).filter(
-        Baby.id == baby_id,
-        Baby.user_id == user_id
-    ).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
 
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found or you don't have permission")
@@ -239,15 +214,12 @@ def update_caregiver_role(
     email: str,
     role_update: CaregiverRoleUpdate,
     user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update a caregiver's role. Only owner can change roles."""
     user_id = user.get("sub")
 
-    baby = db.query(Baby).filter(
-        Baby.id == baby_id,
-        Baby.user_id == user_id
-    ).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, Baby.user_id == user_id).first()
 
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found or you don't have permission")

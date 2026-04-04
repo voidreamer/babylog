@@ -3,16 +3,31 @@ import uuid
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from mangum import Mangum
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from .config import get_settings
-from .logging_config import setup_logging, get_logger
+from .database import Base, engine
+from .logging_config import get_logger, setup_logging
 from .rate_limit import limiter
-from .database import engine, Base
-from .routers import babies, feedings, diapers, sleeps, events, pumpings, health, activities, analytics, subscription, admin, export, billing, rest_planner, users
+from .routers import (
+    activities,
+    admin,
+    analytics,
+    babies,
+    billing,
+    diapers,
+    events,
+    export,
+    feedings,
+    health,
+    pumpings,
+    rest_planner,
+    sleeps,
+    subscription,
+    users,
+)
 
 # Configure structured JSON logging
 setup_logging()
@@ -27,7 +42,7 @@ app = FastAPI(
     title="HeyBub Baby Tracker API",
     description="API for tracking baby sleep, feeding, and diaper changes",
     version="1.0.0",
-    root_path="/api" if settings.environment in ("prod", "staging") else ""
+    root_path="/api" if settings.environment in ("prod", "staging") else "",
 )
 
 # Add rate limiter to app state
@@ -70,8 +85,9 @@ async def log_requests(request: Request, call_next):
     user_id = "anonymous"
     auth = request.headers.get("authorization", "")
     if auth.startswith("Bearer ") and auth.count(".") == 2:
-        import json as _json
         import base64
+        import json as _json
+
         try:
             payload = auth.split(".")[1]
             # Fix base64 padding
@@ -115,15 +131,11 @@ async def add_cache_control(request: Request, call_next):
 
     if "/events/dashboard" in path:
         response.headers["Cache-Control"] = "private, max-age=60"
-    elif "/analytics" in path:
-        response.headers["Cache-Control"] = "private, max-age=300"
-    elif "/rest-planner" in path:
+    elif "/analytics" in path or "/rest-planner" in path:
         response.headers["Cache-Control"] = "private, max-age=300"
     elif "/babies" in path:
         response.headers["Cache-Control"] = "private, max-age=60"
-    elif "/events/timeline" in path:
-        response.headers["Cache-Control"] = "no-cache"
-    elif "/health" == path:
+    elif "/events/timeline" in path or path == "/health":
         response.headers["Cache-Control"] = "no-cache"
 
     return response

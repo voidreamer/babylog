@@ -1,20 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
-from typing import List
+
+from ..auth import get_current_user, get_user_email
 from ..database import get_db
 from ..logging_config import get_logger
-from ..models import Diaper, Baby
-from ..schemas import DiaperCreate, DiaperUpdate, DiaperResponse
-from ..auth import get_current_user, get_user_email
-from ..rate_limit import limiter, RATE_READ, RATE_WRITE
-from .utils import verify_baby_access, require_write_access, baby_access_filter
+from ..models import Baby, Diaper
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
+from ..schemas import DiaperCreate, DiaperResponse, DiaperUpdate
+from .utils import baby_access_filter, require_write_access, verify_baby_access
 
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/diapers", tags=["diapers"])
 
 
-@router.get("/", response_model=List[DiaperResponse])
+@router.get("/", response_model=list[DiaperResponse])
 @limiter.limit(RATE_READ)
 def get_diapers(
     request: Request,
@@ -23,15 +23,15 @@ def get_diapers(
     limit: int = 50,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get all diaper changes for a baby."""
     user_id = user.get("sub")
     baby, role = verify_baby_access(db, baby_id, user_id, user_email)
 
-    return db.query(Diaper).filter(
-        Diaper.baby_id == baby_id
-    ).order_by(Diaper.time.desc()).offset(skip).limit(limit).all()
+    return (
+        db.query(Diaper).filter(Diaper.baby_id == baby_id).order_by(Diaper.time.desc()).offset(skip).limit(limit).all()
+    )
 
 
 @router.get("/{diaper_id}", response_model=DiaperResponse)
@@ -41,19 +41,16 @@ def get_diaper(
     diaper_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get a specific diaper change by ID."""
     user_id = user.get("sub")
 
-    diaper = db.query(Diaper).join(Baby).filter(
-        Diaper.id == diaper_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
-    
+    diaper = db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email)).first()
+
     if not diaper:
         raise HTTPException(status_code=404, detail="Diaper not found")
-    
+
     return diaper
 
 
@@ -64,7 +61,7 @@ def create_diaper(
     diaper_data: DiaperCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Log a new diaper change."""
     user_id = user.get("sub")
@@ -78,7 +75,7 @@ def create_diaper(
         poo_color=diaper_data.poo_color,
         poo_consistency=diaper_data.poo_consistency,
         poo_amount=diaper_data.poo_amount,
-        notes=diaper_data.notes
+        notes=diaper_data.notes,
     )
     db.add(diaper)
     db.commit()
@@ -95,15 +92,12 @@ def update_diaper(
     diaper_data: DiaperUpdate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update a diaper record."""
     user_id = user.get("sub")
 
-    diaper = db.query(Diaper).join(Baby).filter(
-        Diaper.id == diaper_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
+    diaper = db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email)).first()
 
     if not diaper:
         raise HTTPException(status_code=404, detail="Diaper not found")
@@ -115,7 +109,7 @@ def update_diaper(
     update_data = diaper_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(diaper, field, value)
-    
+
     db.commit()
     db.refresh(diaper)
     return diaper
@@ -128,15 +122,12 @@ def delete_diaper(
     diaper_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Delete a diaper record."""
     user_id = user.get("sub")
 
-    diaper = db.query(Diaper).join(Baby).filter(
-        Diaper.id == diaper_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
+    diaper = db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email)).first()
 
     if not diaper:
         logger.warning("Delete diaper not found", extra={"diaper_id": diaper_id})

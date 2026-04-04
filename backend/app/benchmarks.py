@@ -8,7 +8,6 @@ Sources:
 """
 
 from datetime import date
-from typing import Optional
 
 
 def calculate_age_weeks(birth_date: date) -> int:
@@ -179,7 +178,10 @@ def get_feeding_benchmarks(age_weeks: int) -> dict:
             return {
                 "expected_feeds_per_day": {"min": benchmarks["feeds"][0], "max": benchmarks["feeds"][1]},
                 "expected_amount_per_feed_ml": {"min": benchmarks["amount_ml"][0], "max": benchmarks["amount_ml"][1]},
-                "expected_interval_hours": {"min": benchmarks["interval_hours"][0], "max": benchmarks["interval_hours"][1]},
+                "expected_interval_hours": {
+                    "min": benchmarks["interval_hours"][0],
+                    "max": benchmarks["interval_hours"][1],
+                },
                 "notes": benchmarks["notes"],
             }
     return get_feeding_benchmarks(999)
@@ -188,7 +190,7 @@ def get_feeding_benchmarks(age_weeks: int) -> dict:
 # =============================================================================
 # Combined Benchmarks
 # =============================================================================
-def get_all_benchmarks(birth_date: Optional[date]) -> dict:
+def get_all_benchmarks(birth_date: date | None) -> dict:
     """Get all benchmarks for a baby based on their birth date."""
     if not birth_date:
         return {
@@ -196,10 +198,10 @@ def get_all_benchmarks(birth_date: Optional[date]) -> dict:
             "age_months": None,
             "error": "Birth date required for benchmarks",
         }
-    
+
     age_weeks = calculate_age_weeks(birth_date)
     age_months = round(calculate_age_months(birth_date), 1)
-    
+
     return {
         "age_weeks": age_weeks,
         "age_months": age_months,

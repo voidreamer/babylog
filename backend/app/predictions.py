@@ -8,17 +8,17 @@ Features:
 4. Trend Detection - Pattern improvement/decline analysis
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional, List, Dict
+from datetime import UTC, datetime, timedelta
+
 from .benchmarks import get_wake_window_benchmarks
 
 
-def make_aware(dt: Optional[datetime]) -> Optional[datetime]:
+def make_aware(dt: datetime | None) -> datetime | None:
     """Ensure datetime is timezone-aware (UTC)."""
     if dt is None:
         return None
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
+        return dt.replace(tzinfo=UTC)
     return dt
 
 
@@ -26,16 +26,17 @@ def make_aware(dt: Optional[datetime]) -> Optional[datetime]:
 # Statistical Utilities
 # =============================================================================
 
-def calculate_standard_deviation(values: List[float]) -> float:
+
+def calculate_standard_deviation(values: list[float]) -> float:
     """Calculate sample standard deviation without numpy."""
     if len(values) < 2:
         return 0.0
     mean = sum(values) / len(values)
     variance = sum((x - mean) ** 2 for x in values) / (len(values) - 1)
-    return variance ** 0.5
+    return variance**0.5
 
 
-def calculate_intervals_hours(timestamps: List[datetime]) -> List[float]:
+def calculate_intervals_hours(timestamps: list[datetime]) -> list[float]:
     """Calculate intervals between timestamps in hours."""
     if len(timestamps) < 2:
         return []
@@ -50,7 +51,7 @@ def calculate_intervals_hours(timestamps: List[datetime]) -> List[float]:
     return intervals
 
 
-def linear_regression_slope(values: List[float]) -> float:
+def linear_regression_slope(values: list[float]) -> float:
     """Calculate slope of simple linear regression (trend direction)."""
     if len(values) < 2:
         return 0.0
@@ -74,11 +75,10 @@ def linear_regression_slope(values: List[float]) -> float:
 # Feature 1: Wake Window-Based Nap Predictions
 # =============================================================================
 
+
 def predict_next_nap_wake_window(
-    last_wake_time: Optional[datetime],
-    age_weeks: int,
-    now: Optional[datetime] = None
-) -> Optional[Dict]:
+    last_wake_time: datetime | None, age_weeks: int, now: datetime | None = None
+) -> dict | None:
     """
     Predict next nap time based on age-appropriate wake windows.
 
@@ -92,7 +92,7 @@ def predict_next_nap_wake_window(
         return None
 
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
     last_wake = make_aware(last_wake_time)
     now = make_aware(now)
@@ -139,7 +139,7 @@ def predict_next_nap_wake_window(
             "optimal": optimal_minutes,
             "max": max_minutes,
             "notes": wake_window["notes"],
-        }
+        },
     }
 
 
@@ -147,10 +147,8 @@ def predict_next_nap_wake_window(
 # Feature 2: Confidence Intervals
 # =============================================================================
 
-def calculate_confidence_interval(
-    intervals: List[float],
-    confidence_level: float = 0.80
-) -> Optional[Dict]:
+
+def calculate_confidence_interval(intervals: list[float], confidence_level: float = 0.80) -> dict | None:
     """
     Calculate statistical confidence interval for predictions.
 
@@ -215,11 +213,10 @@ def calculate_confidence_interval(
 # Feature 3: Sleep Pressure Score
 # =============================================================================
 
+
 def calculate_sleep_pressure(
-    last_wake_time: Optional[datetime],
-    age_weeks: int,
-    now: Optional[datetime] = None
-) -> Optional[Dict]:
+    last_wake_time: datetime | None, age_weeks: int, now: datetime | None = None
+) -> dict | None:
     """
     Calculate real-time "tiredness" score (0-100).
 
@@ -240,7 +237,7 @@ def calculate_sleep_pressure(
         return None
 
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
     last_wake = make_aware(last_wake_time)
     now = make_aware(now)
@@ -311,11 +308,8 @@ def calculate_sleep_pressure(
 # Feature 4: Trend Detection
 # =============================================================================
 
-def detect_trend(
-    daily_values: List[float],
-    metric_name: str = "metric",
-    threshold: float = 0.05
-) -> Optional[Dict]:
+
+def detect_trend(daily_values: list[float], metric_name: str = "metric", threshold: float = 0.05) -> dict | None:
     """
     Detect whether a pattern is improving, declining, or stable.
 
@@ -333,7 +327,7 @@ def detect_trend(
         return {
             "trend": "insufficient_data",
             "trend_label": "Need more data",
-            "description": f"Need at least 4 days of data to detect trends",
+            "description": "Need at least 4 days of data to detect trends",
             "days_analyzed": len(daily_values),
         }
 
@@ -395,12 +389,7 @@ def detect_trend(
     }
 
 
-def calculate_daily_totals(
-    records: List,
-    get_value: callable,
-    get_date: callable,
-    days: int = 14
-) -> List[float]:
+def calculate_daily_totals(records: list, get_value: callable, get_date: callable, days: int = 14) -> list[float]:
     """
     Aggregate records into daily totals for trend analysis.
 

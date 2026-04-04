@@ -10,19 +10,19 @@ Uses science-backed models:
 6. Multi-signal fusion with data-quality-based weights
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional, List, Dict, Tuple
+import math
+from datetime import UTC, datetime, timedelta
+
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
-import math
 
+from ..auth import get_current_user, get_user_email
+from ..benchmarks import calculate_age_weeks, get_wake_window_benchmarks
 from ..database import get_db
 from ..logging_config import get_logger
-from ..auth import get_current_user, get_user_email
-from ..models import Baby, Feeding, Sleep
-from ..benchmarks import calculate_age_weeks, get_wake_window_benchmarks
-from ..predictions import make_aware, calculate_standard_deviation, calculate_sleep_pressure
-from ..rate_limit import limiter, RATE_READ
+from ..models import Feeding, Sleep
+from ..predictions import calculate_sleep_pressure, calculate_standard_deviation, make_aware
+from ..rate_limit import RATE_READ, limiter
 from .utils import verify_baby_access
 
 router = APIRouter(prefix="/rest-planner", tags=["rest-planner"])
@@ -35,11 +35,11 @@ logger = get_logger(__name__)
 EWMA_DECAY = 0.85
 PRESSURE_THRESHOLD = 0.65
 DEFAULT_TAU_MINUTES = 150.0
-CIRCADIAN_GATES: Dict[Tuple[int, int], List[Tuple[float, float]]] = {
-    (12, 26): [(9.0, 0.7), (12.5, 0.9), (15.5, 0.6)],   # 3-6m
-    (26, 52): [(9.5, 0.8), (13.0, 0.9)],                   # 6-12m
-    (52, 78): [(9.5, 0.7), (12.5, 0.8)],                   # 12-18m
-    (78, 999): [(13.0, 0.9)],                                # 18m+
+CIRCADIAN_GATES: dict[tuple[int, int], list[tuple[float, float]]] = {
+    (12, 26): [(9.0, 0.7), (12.5, 0.9), (15.5, 0.6)],  # 3-6m
+    (26, 52): [(9.5, 0.8), (13.0, 0.9)],  # 6-12m
+    (52, 78): [(9.5, 0.7), (12.5, 0.8)],  # 12-18m
+    (78, 999): [(13.0, 0.9)],  # 18m+
 }
 CIRCADIAN_SIGMA = 1.0
 
@@ -48,7 +48,8 @@ CIRCADIAN_SIGMA = 1.0
 # Pure Helper Functions (no DB access, independently testable)
 # =============================================================================
 
-def weighted_median(values: List[float], weights: List[float]) -> float:
+
+def weighted_median(values: list[float], weights: list[float]) -> float:
     """Compute weighted median — robust central tendency."""
     if not values:
         return 0.0
@@ -68,7 +69,7 @@ def weighted_median(values: List[float], weights: List[float]) -> float:
     return paired[-1][0]
 
 
-def weighted_iqr(values: List[float], weights: List[float]) -> float:
+def weighted_iqr(values: list[float], weights: list[float]) -> float:
     """Compute weighted IQR — robust spread estimate."""
     if len(values) < 4:
         return calculate_standard_deviation(values) if len(values) >= 2 else 0.0
@@ -93,22 +94,20 @@ def weighted_iqr(values: List[float], weights: List[float]) -> float:
     return q3 - q1
 
 
-def compute_ewma_weights(
-    timestamps: List[datetime], now: datetime, decay: float = EWMA_DECAY
-) -> List[float]:
+def compute_ewma_weights(timestamps: list[datetime], now: datetime, decay: float = EWMA_DECAY) -> list[float]:
     """Compute recency weights: decay^days_ago for each timestamp."""
     weights = []
     for ts in timestamps:
         days_ago = max(0, (now - ts).total_seconds() / 86400)
-        weights.append(decay ** days_ago)
+        weights.append(decay**days_ago)
     return weights
 
 
 def bayesian_wake_window(
-    observed_wake_durations: List[float],
-    weights: List[float],
+    observed_wake_durations: list[float],
+    weights: list[float],
     age_weeks: int,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Bayesian Normal-Normal conjugate update for wake windows.
 
@@ -137,13 +136,13 @@ def bayesian_wake_window(
     if len(observed_wake_durations) >= 2:
         wss = sum(w * (v - obs_mean) ** 2 for v, w in zip(observed_wake_durations, weights))
         obs_var = wss / total_w
-        obs_std = max(obs_var ** 0.5, 5.0)  # floor at 5 min
+        obs_std = max(obs_var**0.5, 5.0)  # floor at 5 min
     else:
         obs_std = prior_std
 
     # Normal-Normal conjugate update
-    prior_prec = 1.0 / (prior_std ** 2)
-    obs_prec = n_eff / (obs_std ** 2)
+    prior_prec = 1.0 / (prior_std**2)
+    obs_prec = n_eff / (obs_std**2)
     posterior_prec = prior_prec + obs_prec
     posterior_mean = (prior_prec * prior_mean + obs_prec * obs_mean) / posterior_prec
     posterior_std = (1.0 / posterior_prec) ** 0.5
@@ -151,7 +150,7 @@ def bayesian_wake_window(
     return (posterior_mean, posterior_std)
 
 
-def estimate_tau(wake_durations: List[float]) -> float:
+def estimate_tau(wake_durations: list[float]) -> float:
     """
     Estimate Process S time constant from observed wake-to-sleep durations.
     τ = -median_wake / ln(1 - threshold)
@@ -194,7 +193,7 @@ def minutes_until_pressure_threshold(
     return max(0.0, remaining)
 
 
-def get_circadian_gates(age_weeks: int) -> List[Tuple[float, float]]:
+def get_circadian_gates(age_weeks: int) -> list[tuple[float, float]]:
     """Get age-appropriate circadian sleep gates as (hour, strength) tuples."""
     for (lo, hi), gates in CIRCADIAN_GATES.items():
         if lo <= age_weeks < hi:
@@ -203,7 +202,7 @@ def get_circadian_gates(age_weeks: int) -> List[Tuple[float, float]]:
     return [(9.0, 0.5), (12.5, 0.6), (15.5, 0.4)]
 
 
-def circadian_score(hour: float, gates: List[Tuple[float, float]]) -> float:
+def circadian_score(hour: float, gates: list[tuple[float, float]]) -> float:
     """Compute circadian alignment score at a given hour (sum of Gaussian kernels)."""
     total = 0.0
     for gate_hour, strength in gates:
@@ -212,9 +211,7 @@ def circadian_score(hour: float, gates: List[Tuple[float, float]]) -> float:
     return total
 
 
-def circadian_nearest_gate(
-    current_hour: float, gates: List[Tuple[float, float]]
-) -> Optional[Tuple[float, float]]:
+def circadian_nearest_gate(current_hour: float, gates: list[tuple[float, float]]) -> tuple[float, float] | None:
     """Find the next future circadian gate from current_hour."""
     future = [(h, s) for h, s in gates if h > current_hour]
     if future:
@@ -222,9 +219,7 @@ def circadian_nearest_gate(
     return None
 
 
-def compute_feed_to_sleep_interval(
-    sleeps: List, feedings: List, tz_offset: int
-) -> Optional[float]:
+def compute_feed_to_sleep_interval(sleeps: list, feedings: list, tz_offset: int) -> float | None:
     """
     Compute median minutes from last feeding to sleep onset.
     Returns None if insufficient data.
@@ -264,13 +259,13 @@ def compute_feed_to_sleep_interval(
 
 
 def fuse_predictions(
-    pattern_time: Optional[datetime],
-    pressure_time: Optional[datetime],
-    circadian_time: Optional[datetime],
-    feeding_time: Optional[datetime],
+    pattern_time: datetime | None,
+    pressure_time: datetime | None,
+    circadian_time: datetime | None,
+    feeding_time: datetime | None,
     data_quality: float,
     now: datetime,
-) -> Tuple[datetime, Dict]:
+) -> tuple[datetime, dict]:
     """
     Multi-signal fusion with data-quality-based weights.
     Returns (predicted_start, signals_dict).
@@ -306,9 +301,7 @@ def fuse_predictions(
     return (fused_time, signals)
 
 
-def compute_prediction_interval(
-    posterior_std: float, signals: Dict, now: datetime
-) -> Tuple[datetime, datetime]:
+def compute_prediction_interval(posterior_std: float, signals: dict, now: datetime) -> tuple[datetime, datetime]:
     """
     Compute earliest/latest prediction from posterior uncertainty + signal spread.
     """
@@ -329,9 +322,7 @@ def compute_prediction_interval(
     half_range = min(half_range, 60.0)  # cap at ±60 minutes
 
     center_offset = sum(
-        (datetime.fromisoformat(s["time"]) - now).total_seconds() / 60
-        for s in signals.values()
-        if "time" in s
+        (datetime.fromisoformat(s["time"]) - now).total_seconds() / 60 for s in signals.values() if "time" in s
     ) / max(1, len(signals))
 
     center = now + timedelta(minutes=center_offset)
@@ -373,9 +364,8 @@ def compute_confidence_score(
 # Nap Clustering (updated with EWMA + robust stats)
 # =============================================================================
 
-def cluster_naps(
-    sleeps: List[Sleep], tz_offset: int, now: Optional[datetime] = None
-) -> Dict[str, dict]:
+
+def cluster_naps(sleeps: list[Sleep], tz_offset: int, now: datetime | None = None) -> dict[str, dict]:
     """
     Group historical daytime naps into morning/midday/afternoon clusters.
     Uses EWMA weights and weighted median/IQR for robustness.
@@ -384,11 +374,11 @@ def cluster_naps(
     std_dev_start, count (backward compat), plus new median/iqr fields.
     """
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
-    clusters: Dict[str, List[dict]] = {
-        "morning": [],    # 6:00-10:00
-        "midday": [],     # 10:00-14:00
+    clusters: dict[str, list[dict]] = {
+        "morning": [],  # 6:00-10:00
+        "midday": [],  # 10:00-14:00
         "afternoon": [],  # 14:00-18:00
     }
 
@@ -412,11 +402,13 @@ def cluster_naps(
             continue  # skip nighttime
 
         minutes_from_midnight = st.hour * 60 + st.minute
-        clusters[bucket].append({
-            "start_minutes": minutes_from_midnight,
-            "duration": duration,
-            "timestamp": make_aware(s.start_time),
-        })
+        clusters[bucket].append(
+            {
+                "start_minutes": minutes_from_midnight,
+                "duration": duration,
+                "timestamp": make_aware(s.start_time),
+            }
+        )
 
     result = {}
     for name, naps in clusters.items():
@@ -449,21 +441,22 @@ def cluster_naps(
 # Rest Window Projection (updated with multi-signal fusion)
 # =============================================================================
 
+
 def project_rest_windows(
-    last_wake_time: Optional[datetime],
-    active_sleep: Optional[Sleep],
-    nap_clusters: Dict[str, dict],
+    last_wake_time: datetime | None,
+    active_sleep: Sleep | None,
+    nap_clusters: dict[str, dict],
     wake_window_minutes: float,
     wake_window_std: float,
     avg_nap_duration: float,
-    feeding_times: List[datetime],
-    avg_feeding_interval_minutes: Optional[float],
+    feeding_times: list[datetime],
+    avg_feeding_interval_minutes: float | None,
     tau_minutes: float,
-    circadian_gates_list: List[Tuple[float, float]],
-    feed_to_sleep_minutes: Optional[float],
+    circadian_gates_list: list[tuple[float, float]],
+    feed_to_sleep_minutes: float | None,
     tz_offset: int,
     now: datetime,
-) -> List[dict]:
+) -> list[dict]:
     """
     Chain forward from last wake time to project today's remaining rest windows.
     Uses multi-signal fusion for each predicted nap.
@@ -486,14 +479,16 @@ def project_rest_windows(
             tau_minutes,
         )
 
-        windows.append({
-            "start": sleep_start.isoformat(),
-            "end": predicted_end.isoformat(),
-            "duration_minutes": round(predicted_remaining),
-            "label": "current_nap",
-            "is_current": True,
-            "sleep_pressure_at_start": round(pressure_val, 2),
-        })
+        windows.append(
+            {
+                "start": sleep_start.isoformat(),
+                "end": predicted_end.isoformat(),
+                "duration_minutes": round(predicted_remaining),
+                "label": "current_nap",
+                "is_current": True,
+                "sleep_pressure_at_start": round(pressure_val, 2),
+            }
+        )
         # After this nap, chain forward
         chain_start = predicted_end
     elif last_wake_time:
@@ -509,7 +504,7 @@ def project_rest_windows(
         pattern_pred = cursor + timedelta(minutes=wake_window_minutes)
 
         # --- Signal 2: Sleep pressure prediction ---
-        awake_since_cursor = (cursor - (last_wake_time or cursor)).total_seconds() / 60
+        (cursor - (last_wake_time or cursor)).total_seconds() / 60
         # For chained naps, cursor IS the wake time from previous nap
         mins_pressure = minutes_until_pressure_threshold(0, tau_minutes)
         pressure_pred = cursor + timedelta(minutes=mins_pressure)
@@ -524,7 +519,8 @@ def project_rest_windows(
             gate_local = cursor_local.replace(
                 hour=int(gate_hour),
                 minute=int((gate_hour % 1) * 60),
-                second=0, microsecond=0,
+                second=0,
+                microsecond=0,
             )
             circadian_pred = gate_local + timedelta(minutes=tz_offset)
         else:
@@ -631,23 +627,25 @@ def project_rest_windows(
             iqr_minutes=iqr_val,
         )
 
-        windows.append({
-            "start": next_nap_start.isoformat(),
-            "end": nap_end.isoformat(),
-            "duration_minutes": round(duration),
-            "label": label,
-            "is_current": False,
-            "has_feeding_overlap": has_feeding_overlap,
-            "notes": notes,
-            # New fields
-            "start_range": {
-                "earliest": earliest.isoformat(),
-                "latest": latest.isoformat(),
-            },
-            "confidence_score": conf_score,
-            "sleep_pressure_at_start": round(pressure_val, 2),
-            "signals": signals,
-        })
+        windows.append(
+            {
+                "start": next_nap_start.isoformat(),
+                "end": nap_end.isoformat(),
+                "duration_minutes": round(duration),
+                "label": label,
+                "is_current": False,
+                "has_feeding_overlap": has_feeding_overlap,
+                "notes": notes,
+                # New fields
+                "start_range": {
+                    "earliest": earliest.isoformat(),
+                    "latest": latest.isoformat(),
+                },
+                "confidence_score": conf_score,
+                "sleep_pressure_at_start": round(pressure_val, 2),
+                "signals": signals,
+            }
+        )
 
         cursor = nap_end
 
@@ -658,7 +656,8 @@ def project_rest_windows(
 # Scoring (updated with confidence_score thresholds)
 # =============================================================================
 
-def score_window(window: dict, nap_clusters: Dict[str, dict]) -> dict:
+
+def score_window(window: dict, nap_clusters: dict[str, dict]) -> dict:
     """Add confidence and quality scores to a rest window."""
     label = window.get("label", "")
     cluster_name = label.replace("_nap", "")
@@ -708,6 +707,7 @@ def score_window(window: dict, nap_clusters: Dict[str, dict]) -> dict:
 # Main Endpoint
 # =============================================================================
 
+
 @router.get("/{baby_id}")
 @limiter.limit(RATE_READ)
 async def get_rest_plan(
@@ -726,29 +726,46 @@ async def get_rest_plan(
     circadian sleep gates, and feeding correlation.
     """
     from fastapi import HTTPException
+
     try:
         user_id = user.get("sub")
         baby, _role = verify_baby_access(db, baby_id, user_id, user_email)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         start_date = now - timedelta(days=days)
 
         # ------------------------------------------------------------------
         # Phase 1: Data Gathering
         # ------------------------------------------------------------------
-        sleeps = db.query(Sleep).filter(
-            Sleep.baby_id == baby_id,
-        ).order_by(Sleep.start_time.desc()).limit(200).all()
+        sleeps = (
+            db.query(Sleep)
+            .filter(
+                Sleep.baby_id == baby_id,
+            )
+            .order_by(Sleep.start_time.desc())
+            .limit(200)
+            .all()
+        )
         sleeps = [s for s in sleeps if make_aware(s.start_time) >= start_date]
 
-        feedings = db.query(Feeding).filter(
-            Feeding.baby_id == baby_id,
-        ).order_by(Feeding.time.desc()).limit(200).all()
+        feedings = (
+            db.query(Feeding)
+            .filter(
+                Feeding.baby_id == baby_id,
+            )
+            .order_by(Feeding.time.desc())
+            .limit(200)
+            .all()
+        )
         feedings = [f for f in feedings if make_aware(f.time) >= start_date]
 
-        active_sleep = db.query(Sleep).filter(
-            Sleep.baby_id == baby_id,
-            Sleep.end_time.is_(None),
-        ).first()
+        active_sleep = (
+            db.query(Sleep)
+            .filter(
+                Sleep.baby_id == baby_id,
+                Sleep.end_time.is_(None),
+            )
+            .first()
+        )
 
         # Baby age
         birth_date = None
@@ -816,13 +833,11 @@ async def get_rest_plan(
             if prev.end_time:
                 wake_timestamps.append(make_aware(prev.end_time))
         if len(wake_timestamps) > len(wake_durations):
-            wake_timestamps = wake_timestamps[:len(wake_durations)]
+            wake_timestamps = wake_timestamps[: len(wake_durations)]
         wake_weights = compute_ewma_weights(wake_timestamps, now) if wake_timestamps else []
 
         # Bayesian adaptive wake window
-        adapted_ww_mean, adapted_ww_std = bayesian_wake_window(
-            wake_durations, wake_weights, age_weeks
-        )
+        adapted_ww_mean, adapted_ww_std = bayesian_wake_window(wake_durations, wake_weights, age_weeks)
 
         # Process S time constant
         tau = estimate_tau(wake_durations)
@@ -963,4 +978,5 @@ async def get_rest_plan(
     except Exception as e:
         logger.exception(f"Rest planner error for baby {baby_id}: {str(e)}")
         from fastapi import HTTPException
+
         raise HTTPException(status_code=500, detail=f"Rest planner calculation failed: {str(e)}")

@@ -3,16 +3,18 @@ Billing router — Stripe subscriptions for HeyBub Premium.
 """
 
 import os
+from datetime import UTC
+
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
 from ..logging_config import get_logger
 from ..models import User, utc_now
-from ..rate_limit import limiter, RATE_READ, RATE_WRITE
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
 from .subscription import get_or_create_user
 
 logger = get_logger(__name__)
@@ -57,6 +59,7 @@ class SubscriptionStatusResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _get_or_create_stripe_customer(email: str, user_id: str, db_user: User) -> str:
     """Return existing Stripe customer id or create one."""
@@ -137,6 +140,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     else:
         # Dev fallback — no secret configured
         import json
+
         event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
 
     etype = event["type"]
@@ -179,8 +183,9 @@ def _handle_checkout_completed(session_obj: dict, db: Session):
         if sub.get("items", {}).get("data"):
             price_id = sub["items"]["data"][0]["price"]["id"]
             db_user.premium_plan = _plan_from_price(price_id)
-        from datetime import datetime, timezone
-        db_user.premium_expires_at = datetime.fromtimestamp(sub["current_period_end"], tz=timezone.utc)
+        from datetime import datetime
+
+        db_user.premium_expires_at = datetime.fromtimestamp(sub["current_period_end"], tz=UTC)
 
 
 def _handle_subscription_updated(sub_obj: dict, db: Session):
@@ -197,8 +202,9 @@ def _handle_subscription_updated(sub_obj: dict, db: Session):
         price_id = sub_obj["items"]["data"][0]["price"]["id"]
         db_user.premium_plan = _plan_from_price(price_id)
 
-    from datetime import datetime, timezone
-    db_user.premium_expires_at = datetime.fromtimestamp(sub_obj["current_period_end"], tz=timezone.utc)
+    from datetime import datetime
+
+    db_user.premium_expires_at = datetime.fromtimestamp(sub_obj["current_period_end"], tz=UTC)
 
 
 def _handle_subscription_deleted(sub_obj: dict, db: Session):
@@ -261,6 +267,6 @@ async def create_portal_session(
 
     session = stripe.billing_portal.Session.create(
         customer=db_user.stripe_customer_id,
-        return_url=f"https://app.heybub.app/",
+        return_url="https://app.heybub.app/",
     )
     return PortalResponse(portal_url=session.url)

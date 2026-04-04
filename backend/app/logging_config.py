@@ -8,7 +8,7 @@ Uses only Python's built-in logging module (no external dependencies).
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 class JSONFormatter(logging.Formatter):
@@ -16,7 +16,7 @@ class JSONFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         log_entry = {
-            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "timestamp": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -25,10 +25,27 @@ class JSONFormatter(logging.Formatter):
         # Merge any extra context passed via logger.info("msg", extra={...})
         # Exclude standard LogRecord attributes to avoid noise
         standard_attrs = {
-            "name", "msg", "args", "created", "relativeCreated", "exc_info",
-            "exc_text", "stack_info", "lineno", "funcName", "pathname",
-            "filename", "module", "thread", "threadName", "process",
-            "processName", "levelname", "levelno", "message", "msecs",
+            "name",
+            "msg",
+            "args",
+            "created",
+            "relativeCreated",
+            "exc_info",
+            "exc_text",
+            "stack_info",
+            "lineno",
+            "funcName",
+            "pathname",
+            "filename",
+            "module",
+            "thread",
+            "threadName",
+            "process",
+            "processName",
+            "levelname",
+            "levelno",
+            "message",
+            "msecs",
             "taskName",
         }
         for key, value in record.__dict__.items():
@@ -47,8 +64,7 @@ def setup_logging(level: int = logging.INFO) -> None:
     root = logging.getLogger()
 
     # Avoid adding duplicate handlers on repeated calls (e.g. Lambda warm starts)
-    if any(isinstance(h, logging.StreamHandler) and isinstance(h.formatter, JSONFormatter)
-           for h in root.handlers):
+    if any(isinstance(h, logging.StreamHandler) and isinstance(h.formatter, JSONFormatter) for h in root.handlers):
         return
 
     root.setLevel(level)

@@ -73,10 +73,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run linter
+      - name: Run linter (ruff)
         run: |
-          pip install flake8
-          flake8 app --max-line-length=120 --exclude=__pycache__ || true
+          pip install ruff
+          ruff check app/
+          ruff format --check app/
 
       - name: Check imports
         run: python -c "from app.main import app; print('Imports successful')"

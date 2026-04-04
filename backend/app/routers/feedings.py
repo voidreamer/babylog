@@ -1,20 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
-from typing import List
+
+from ..auth import get_current_user, get_user_email
 from ..database import get_db
 from ..logging_config import get_logger
-from ..models import Feeding, Baby
-from ..schemas import FeedingCreate, FeedingUpdate, FeedingResponse
-from ..auth import get_current_user, get_user_email
-from ..rate_limit import limiter, RATE_READ, RATE_WRITE
-from .utils import verify_baby_access, require_write_access, baby_access_filter
+from ..models import Baby, Feeding
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
+from ..schemas import FeedingCreate, FeedingResponse, FeedingUpdate
+from .utils import baby_access_filter, require_write_access, verify_baby_access
 
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/feedings", tags=["feedings"])
 
 
-@router.get("/", response_model=List[FeedingResponse])
+@router.get("/", response_model=list[FeedingResponse])
 @limiter.limit(RATE_READ)
 def get_feedings(
     request: Request,
@@ -23,15 +23,20 @@ def get_feedings(
     limit: int = 50,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get all feedings for a baby."""
     user_id = user.get("sub")
     baby, role = verify_baby_access(db, baby_id, user_id, user_email)
 
-    return db.query(Feeding).filter(
-        Feeding.baby_id == baby_id
-    ).order_by(Feeding.time.desc()).offset(skip).limit(limit).all()
+    return (
+        db.query(Feeding)
+        .filter(Feeding.baby_id == baby_id)
+        .order_by(Feeding.time.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 @router.get("/{feeding_id}", response_model=FeedingResponse)
@@ -41,19 +46,18 @@ def get_feeding(
     feeding_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get a specific feeding by ID."""
     user_id = user.get("sub")
 
-    feeding = db.query(Feeding).join(Baby).filter(
-        Feeding.id == feeding_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
-    
+    feeding = (
+        db.query(Feeding).join(Baby).filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email)).first()
+    )
+
     if not feeding:
         raise HTTPException(status_code=404, detail="Feeding not found")
-    
+
     return feeding
 
 
@@ -64,7 +68,7 @@ def create_feeding(
     feeding_data: FeedingCreate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Log a new feeding."""
     user_id = user.get("sub")
@@ -77,7 +81,7 @@ def create_feeding(
         type=feeding_data.type,
         duration_minutes=feeding_data.duration_minutes,
         amount_ml=feeding_data.amount_ml,
-        notes=feeding_data.notes
+        notes=feeding_data.notes,
     )
     db.add(feeding)
     db.commit()
@@ -94,15 +98,14 @@ def update_feeding(
     feeding_data: FeedingUpdate,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update a feeding record."""
     user_id = user.get("sub")
 
-    feeding = db.query(Feeding).join(Baby).filter(
-        Feeding.id == feeding_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
+    feeding = (
+        db.query(Feeding).join(Baby).filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email)).first()
+    )
 
     if not feeding:
         raise HTTPException(status_code=404, detail="Feeding not found")
@@ -114,7 +117,7 @@ def update_feeding(
     update_data = feeding_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(feeding, field, value)
-    
+
     db.commit()
     db.refresh(feeding)
     return feeding
@@ -127,15 +130,14 @@ def delete_feeding(
     feeding_id: int,
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Delete a feeding record."""
     user_id = user.get("sub")
 
-    feeding = db.query(Feeding).join(Baby).filter(
-        Feeding.id == feeding_id,
-        baby_access_filter(user_id, user_email)
-    ).first()
+    feeding = (
+        db.query(Feeding).join(Baby).filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email)).first()
+    )
 
     if not feeding:
         logger.warning("Delete feeding not found", extra={"feeding_id": feeding_id})

@@ -1,14 +1,15 @@
 """User profile endpoints for onboarding/tour state and account deletion."""
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
+
 from ..auth import get_current_user
 from ..config import get_settings
 from ..database import get_db
 from ..logging_config import get_logger
-from ..models import User, Baby, AnalyticsEvent, PushSubscription, utc_now
-from ..rate_limit import limiter, RATE_READ, RATE_WRITE
+from ..models import AnalyticsEvent, Baby, PushSubscription, User, utc_now
+from ..rate_limit import RATE_READ, RATE_WRITE, limiter
 from .subscription import get_or_create_user
 
 logger = get_logger(__name__)

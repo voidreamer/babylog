@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
+
 from .config import get_settings
 
 security = HTTPBearer()
@@ -14,7 +15,7 @@ def verify_token(token: str) -> dict:
         if settings.environment in ("prod", "production", "staging"):
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Authentication not configured. SUPABASE_JWT_SECRET is required in production."
+                detail="Authentication not configured. SUPABASE_JWT_SECRET is required in production.",
             )
         # Development mode - return mock user
         return {"sub": "dev-user-123", "email": "dev@example.com"}
@@ -30,16 +31,11 @@ def verify_token(token: str) -> dict:
 
         return claims
 
-    except JWTError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token"
-        )
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-) -> dict:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     """Dependency to get current authenticated user."""
     return verify_token(credentials.credentials)
 

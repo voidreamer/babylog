@@ -1,7 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-from datetime import datetime, timezone
-from typing import Optional, List, Literal
 import warnings
+from datetime import UTC, datetime
+from typing import Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 # Custom datetime serialization to ensure UTC 'Z' suffix
@@ -10,8 +11,8 @@ def serialize_datetime(dt: datetime) -> str:
         return None
     # Ensure timezone-aware and convert to ISO format with Z suffix
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        dt = dt.replace(tzinfo=UTC)
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 # ============================================================================
@@ -20,14 +21,15 @@ def serialize_datetime(dt: datetime) -> str:
 
 GenderEnum = Literal["boy", "girl"]
 
+
 class BabyBase(BaseModel):
     name: str = Field(..., max_length=200)
-    birth_date: Optional[datetime] = None
-    gender: Optional[GenderEnum] = None
-    profile_photo_url: Optional[str] = None
-    blood_type: Optional[str] = None
-    birthplace: Optional[str] = None
-    birth_time: Optional[str] = None
+    birth_date: datetime | None = None
+    gender: GenderEnum | None = None
+    profile_photo_url: str | None = None
+    blood_type: str | None = None
+    birthplace: str | None = None
+    birth_time: str | None = None
 
 
 class BabyCreate(BabyBase):
@@ -35,13 +37,13 @@ class BabyCreate(BabyBase):
 
 
 class BabyUpdate(BaseModel):
-    name: Optional[str] = None
-    birth_date: Optional[datetime] = None
-    gender: Optional[GenderEnum] = None
-    profile_photo_url: Optional[str] = None
-    blood_type: Optional[str] = None
-    birthplace: Optional[str] = None
-    birth_time: Optional[str] = None
+    name: str | None = None
+    birth_date: datetime | None = None
+    gender: GenderEnum | None = None
+    profile_photo_url: str | None = None
+    blood_type: str | None = None
+    birthplace: str | None = None
+    birth_time: str | None = None
 
 
 CaregiverRole = Literal["viewer", "caregiver"]
@@ -55,15 +57,12 @@ class CaregiverEntry(BaseModel):
 class BabyResponse(BabyBase):
     id: int
     user_id: str
-    owner_email: Optional[str] = None
-    shared_with: List[CaregiverEntry] = []
+    owner_email: str | None = None
+    shared_with: list[CaregiverEntry] = []
     is_owner: bool = True
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class BabyShareRequest(BaseModel):
@@ -82,12 +81,13 @@ class CaregiverRoleUpdate(BaseModel):
 
 FeedingTypeEnum = Literal["formula", "breast", "bottle", "solid"]
 
+
 class FeedingBase(BaseModel):
     time: datetime
     type: FeedingTypeEnum
-    duration_minutes: Optional[int] = None
-    amount_ml: Optional[int] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    duration_minutes: int | None = None
+    amount_ml: int | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class FeedingCreate(FeedingBase):
@@ -101,11 +101,11 @@ class FeedingCreate(FeedingBase):
 
 
 class FeedingUpdate(BaseModel):
-    time: Optional[datetime] = None
-    type: Optional[FeedingTypeEnum] = None
-    duration_minutes: Optional[int] = None
-    amount_ml: Optional[int] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    time: datetime | None = None
+    type: FeedingTypeEnum | None = None
+    duration_minutes: int | None = None
+    amount_ml: int | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class FeedingResponse(FeedingBase):
@@ -113,10 +113,7 @@ class FeedingResponse(FeedingBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
@@ -128,13 +125,14 @@ PooColorEnum = Literal["yellow", "brown", "green", "black", "red", "white", "ora
 PooConsistencyEnum = Literal["liquid", "soft", "formed", "hard", "pellets"]
 PooAmountEnum = Literal["small", "medium", "large", "blowout"]
 
+
 class DiaperBase(BaseModel):
     time: datetime
     type: DiaperTypeEnum
-    poo_color: Optional[PooColorEnum] = None
-    poo_consistency: Optional[PooConsistencyEnum] = None
-    poo_amount: Optional[PooAmountEnum] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    poo_color: PooColorEnum | None = None
+    poo_consistency: PooConsistencyEnum | None = None
+    poo_amount: PooAmountEnum | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class DiaperCreate(DiaperBase):
@@ -152,12 +150,12 @@ class DiaperCreate(DiaperBase):
 
 
 class DiaperUpdate(BaseModel):
-    time: Optional[datetime] = None
-    type: Optional[DiaperTypeEnum] = None
-    poo_color: Optional[PooColorEnum] = None
-    poo_consistency: Optional[PooConsistencyEnum] = None
-    poo_amount: Optional[PooAmountEnum] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    time: datetime | None = None
+    type: DiaperTypeEnum | None = None
+    poo_color: PooColorEnum | None = None
+    poo_consistency: PooConsistencyEnum | None = None
+    poo_amount: PooAmountEnum | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class DiaperResponse(DiaperBase):
@@ -165,20 +163,18 @@ class DiaperResponse(DiaperBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Sleep Schemas
 # ============================================================================
 
+
 class SleepBase(BaseModel):
     start_time: datetime
-    end_time: Optional[datetime] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    end_time: datetime | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class SleepCreate(SleepBase):
@@ -192,9 +188,9 @@ class SleepCreate(SleepBase):
 
 
 class SleepUpdate(BaseModel):
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    notes: str | None = Field(None, max_length=2000)
 
     @model_validator(mode="after")
     def validate_sleep_times(self):
@@ -206,24 +202,22 @@ class SleepUpdate(BaseModel):
 class SleepResponse(SleepBase):
     id: int
     baby_id: int
-    duration_minutes: Optional[int] = None
+    duration_minutes: int | None = None
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Pumping Schemas
 # ============================================================================
 
+
 class PumpingBase(BaseModel):
     time: datetime
-    duration_minutes: Optional[int] = None
-    amount_ml: Optional[int] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    duration_minutes: int | None = None
+    amount_ml: int | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class PumpingCreate(PumpingBase):
@@ -231,10 +225,10 @@ class PumpingCreate(PumpingBase):
 
 
 class PumpingUpdate(BaseModel):
-    time: Optional[datetime] = None
-    duration_minutes: Optional[int] = None
-    amount_ml: Optional[int] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    time: datetime | None = None
+    duration_minutes: int | None = None
+    amount_ml: int | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class PumpingResponse(PumpingBase):
@@ -242,15 +236,13 @@ class PumpingResponse(PumpingBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Timeline / Event Schemas
 # ============================================================================
+
 
 class TimelineEvent(BaseModel):
     id: int
@@ -258,15 +250,13 @@ class TimelineEvent(BaseModel):
     time: datetime
     details: dict
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Dashboard / Summary Schemas
 # ============================================================================
+
 
 class DailySummary(BaseModel):
     date: str
@@ -295,17 +285,17 @@ class DailySummary(BaseModel):
 
 
 class DashboardStats(BaseModel):
-    last_feeding: Optional[FeedingResponse] = None
-    last_diaper: Optional[DiaperResponse] = None
-    last_sleep: Optional[SleepResponse] = None
-    last_pumping: Optional[PumpingResponse] = None
-    last_potty: Optional['PottyResponse'] = None
-    last_tummy: Optional['TummyTimeResponse'] = None
-    last_bath: Optional['BathResponse'] = None
-    last_supplement: Optional['SupplementResponse'] = None
-    last_solid: Optional['SolidResponse'] = None
-    current_sleep: Optional[SleepResponse] = None
-    daily_summary: Optional[DailySummary] = None
+    last_feeding: FeedingResponse | None = None
+    last_diaper: DiaperResponse | None = None
+    last_sleep: SleepResponse | None = None
+    last_pumping: PumpingResponse | None = None
+    last_potty: Optional["PottyResponse"] = None
+    last_tummy: Optional["TummyTimeResponse"] = None
+    last_bath: Optional["BathResponse"] = None
+    last_supplement: Optional["SupplementResponse"] = None
+    last_solid: Optional["SolidResponse"] = None
+    current_sleep: SleepResponse | None = None
+    daily_summary: DailySummary | None = None
 
 
 # ============================================================================
@@ -314,15 +304,16 @@ class DashboardStats(BaseModel):
 
 VisitTypeEnum = Literal["checkup", "sick", "emergency", "specialist", "vaccination"]
 
+
 class DoctorVisitBase(BaseModel):
     visit_date: datetime
-    doctor_name: Optional[str] = None
-    visit_type: Optional[VisitTypeEnum] = None
-    weight_kg: Optional[float] = None
-    height_cm: Optional[float] = None
-    head_cm: Optional[float] = None
-    next_visit_date: Optional[datetime] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    doctor_name: str | None = None
+    visit_type: VisitTypeEnum | None = None
+    weight_kg: float | None = None
+    height_cm: float | None = None
+    head_cm: float | None = None
+    next_visit_date: datetime | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class DoctorVisitCreate(DoctorVisitBase):
@@ -340,30 +331,27 @@ class DoctorVisitResponse(DoctorVisitBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class DoctorVisitUpdate(BaseModel):
-    visit_date: Optional[datetime] = None
-    doctor_name: Optional[str] = None
-    visit_type: Optional[VisitTypeEnum] = None
-    weight_kg: Optional[float] = None
-    height_cm: Optional[float] = None
-    head_cm: Optional[float] = None
-    next_visit_date: Optional[datetime] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    visit_date: datetime | None = None
+    doctor_name: str | None = None
+    visit_type: VisitTypeEnum | None = None
+    weight_kg: float | None = None
+    height_cm: float | None = None
+    head_cm: float | None = None
+    next_visit_date: datetime | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class VaccinationBase(BaseModel):
     vaccine_name: str = Field(..., max_length=200)
     dose_number: int = 1
     given_date: datetime
-    next_due_date: Optional[datetime] = None
-    administered_by: Optional[str] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    next_due_date: datetime | None = None
+    administered_by: str | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class VaccinationCreate(VaccinationBase):
@@ -375,29 +363,26 @@ class VaccinationResponse(VaccinationBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class VaccinationUpdate(BaseModel):
-    vaccine_name: Optional[str] = None
-    dose_number: Optional[int] = None
-    given_date: Optional[datetime] = None
-    next_due_date: Optional[datetime] = None
-    administered_by: Optional[str] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    vaccine_name: str | None = None
+    dose_number: int | None = None
+    given_date: datetime | None = None
+    next_due_date: datetime | None = None
+    administered_by: str | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class MedicationBase(BaseModel):
     medication_name: str = Field(..., max_length=200)
-    dosage: Optional[str] = None
-    frequency: Optional[str] = None
+    dosage: str | None = None
+    frequency: str | None = None
     start_date: datetime
-    end_date: Optional[datetime] = None
+    end_date: datetime | None = None
     is_active: bool = True
-    notes: Optional[str] = Field(None, max_length=2000)
+    notes: str | None = Field(None, max_length=2000)
 
 
 class MedicationCreate(MedicationBase):
@@ -409,27 +394,24 @@ class MedicationResponse(MedicationBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class MedicationUpdate(BaseModel):
-    medication_name: Optional[str] = None
-    dosage: Optional[str] = None
-    frequency: Optional[str] = None
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    is_active: Optional[bool] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    medication_name: str | None = None
+    dosage: str | None = None
+    frequency: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    is_active: bool | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class MilestoneBase(BaseModel):
     milestone_type: str = Field(..., max_length=200)
     achieved_date: datetime
-    photo_url: Optional[str] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    photo_url: str | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class MilestoneCreate(MilestoneBase):
@@ -441,25 +423,22 @@ class MilestoneResponse(MilestoneBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class MilestoneUpdate(BaseModel):
-    milestone_type: Optional[str] = None
-    achieved_date: Optional[datetime] = None
-    photo_url: Optional[str] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    milestone_type: str | None = None
+    achieved_date: datetime | None = None
+    photo_url: str | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class GrowthRecordBase(BaseModel):
     recorded_date: datetime
-    weight_kg: Optional[float] = None
-    height_cm: Optional[float] = None
-    head_cm: Optional[float] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    weight_kg: float | None = None
+    height_cm: float | None = None
+    head_cm: float | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class GrowthRecordCreate(GrowthRecordBase):
@@ -481,18 +460,15 @@ class GrowthRecordResponse(GrowthRecordBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class GrowthRecordUpdate(BaseModel):
-    recorded_date: Optional[datetime] = None
-    weight_kg: Optional[float] = None
-    height_cm: Optional[float] = None
-    head_cm: Optional[float] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    recorded_date: datetime | None = None
+    weight_kg: float | None = None
+    height_cm: float | None = None
+    head_cm: float | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 # ============================================================================
@@ -502,11 +478,12 @@ class GrowthRecordUpdate(BaseModel):
 PottyResultEnum = Literal["success", "accident", "attempt"]
 PottyTypeEnum = Literal["pee", "poo", "both"]
 
+
 class PottyBase(BaseModel):
     time: datetime
     result: PottyResultEnum
-    potty_type: Optional[PottyTypeEnum] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    potty_type: PottyTypeEnum | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class PottyCreate(PottyBase):
@@ -518,16 +495,13 @@ class PottyResponse(PottyBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class TummyTimeBase(BaseModel):
     start_time: datetime
-    duration_minutes: Optional[int] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    duration_minutes: int | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class TummyTimeCreate(TummyTimeBase):
@@ -539,15 +513,12 @@ class TummyTimeResponse(TummyTimeBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class BathBase(BaseModel):
     time: datetime
-    notes: Optional[str] = Field(None, max_length=2000)
+    notes: str | None = Field(None, max_length=2000)
 
 
 class BathCreate(BathBase):
@@ -559,10 +530,7 @@ class BathResponse(BathBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
@@ -576,12 +544,13 @@ class BathResponse(BathBase):
 SolidReactionEnum = Literal["liked", "disliked", "allergic", "neutral"]
 SolidAmountEnum = Literal["taste", "small", "medium", "large"]
 
+
 class SolidBase(BaseModel):
     time: datetime
     food_name: str = Field(..., max_length=200)
-    amount: Optional[str] = None
-    reaction: Optional[SolidReactionEnum] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    amount: str | None = None
+    reaction: SolidReactionEnum | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class SolidCreate(SolidBase):
@@ -589,11 +558,11 @@ class SolidCreate(SolidBase):
 
 
 class SolidUpdate(BaseModel):
-    time: Optional[datetime] = None
-    food_name: Optional[str] = None
-    amount: Optional[str] = None
-    reaction: Optional[SolidReactionEnum] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    time: datetime | None = None
+    food_name: str | None = None
+    amount: str | None = None
+    reaction: SolidReactionEnum | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class SolidResponse(SolidBase):
@@ -601,19 +570,17 @@ class SolidResponse(SolidBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 SupplementNameEnum = Literal["vitamin_d", "iron", "dha", "probiotic", "multivitamin", "other"]
 
+
 class SupplementBase(BaseModel):
     time: datetime
     name: SupplementNameEnum
-    dosage: Optional[str] = None  # e.g., "400 IU", "1ml"
-    notes: Optional[str] = Field(None, max_length=2000)
+    dosage: str | None = None  # e.g., "400 IU", "1ml"
+    notes: str | None = Field(None, max_length=2000)
 
 
 class SupplementCreate(SupplementBase):
@@ -625,27 +592,25 @@ class SupplementResponse(SupplementBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class SupplementUpdate(BaseModel):
-    time: Optional[datetime] = None
-    name: Optional[SupplementNameEnum] = None
-    dosage: Optional[str] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    time: datetime | None = None
+    name: SupplementNameEnum | None = None
+    dosage: str | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 # ============================================================================
 # Teeth Schemas
 # ============================================================================
 
+
 class ToothBase(BaseModel):
     position: str  # e.g., "upper_A_left", "lower_E_right"
     emerged_date: datetime
-    notes: Optional[str] = Field(None, max_length=2000)
+    notes: str | None = Field(None, max_length=2000)
 
 
 class ToothCreate(ToothBase):
@@ -657,21 +622,19 @@ class ToothResponse(ToothBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Sick Days Schemas
 # ============================================================================
 
+
 class SickDayBase(BaseModel):
     date: datetime
-    symptoms: Optional[List[str]] = []  # ["fever", "cough", "runny_nose"]
-    temperature: Optional[float] = None  # e.g., 38.5
-    notes: Optional[str] = Field(None, max_length=2000)
+    symptoms: list[str] | None = []  # ["fever", "cough", "runny_nose"]
+    temperature: float | None = None  # e.g., 38.5
+    notes: str | None = Field(None, max_length=2000)
 
 
 class SickDayCreate(SickDayBase):
@@ -683,22 +646,20 @@ class SickDayResponse(SickDayBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Allergy Schemas
 # ============================================================================
 
+
 class AllergyBase(BaseModel):
     allergen: str = Field(..., max_length=200)  # "Dairy", "Peanuts", "Eggs"
-    severity: Optional[str] = None  # "mild", "moderate", "severe"
-    reaction: Optional[str] = None  # "hives", "vomiting", "swelling"
-    discovered_date: Optional[datetime] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    severity: str | None = None  # "mild", "moderate", "severe"
+    reaction: str | None = None  # "hives", "vomiting", "swelling"
+    discovered_date: datetime | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class AllergyCreate(AllergyBase):
@@ -710,43 +671,39 @@ class AllergyResponse(AllergyBase):
     baby_id: int
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Analytics Schemas
 # ============================================================================
 
+
 class AnalyticsEventCreate(BaseModel):
     event_name: str = Field(..., max_length=100)
-    event_data: Optional[str] = None  # JSON string
-    session_id: Optional[str] = Field(None, max_length=64)
+    event_data: str | None = None  # JSON string
+    session_id: str | None = Field(None, max_length=64)
 
 
 class AnalyticsEventBatch(BaseModel):
-    events: List[AnalyticsEventCreate]
+    events: list[AnalyticsEventCreate]
 
 
 class AnalyticsEventResponse(BaseModel):
     id: int
     user_id: str
     event_name: str
-    event_data: Optional[str] = None
-    session_id: Optional[str] = None
+    event_data: str | None = None
+    session_id: str | None = None
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 # ============================================================================
 # Push Notification Schemas
 # ============================================================================
+
 
 class PushSubscriptionCreate(BaseModel):
     endpoint: str
@@ -760,21 +717,19 @@ class PushSubscriptionResponse(BaseModel):
     endpoint: str
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: serialize_datetime}
-    )
+    model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
 
 
 class PushNotificationSend(BaseModel):
     title: str = Field(..., max_length=200)
     body: str = Field(..., max_length=1000)
-    user_ids: Optional[List[str]] = None  # None = broadcast to all
+    user_ids: list[str] | None = None  # None = broadcast to all
 
 
 # ============================================================================
 # Photo Upload Schemas
 # ============================================================================
+
 
 class PhotoUploadRequest(BaseModel):
     filename: str
