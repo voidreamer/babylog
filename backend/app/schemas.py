@@ -704,26 +704,30 @@ class AnalyticsEventResponse(BaseModel):
 # Push Notification Schemas
 # ============================================================================
 
-
-class PushSubscriptionCreate(BaseModel):
+class PushSubscribeRequest(BaseModel):
     endpoint: str
     p256dh_key: str
     auth_key: str
 
 
+class PushUnsubscribeRequest(BaseModel):
+    endpoint: str
+
+
+class PushSendRequest(BaseModel):
+    user_id: str
+    title: str = Field(..., max_length=200)
+    body: str = Field(..., max_length=1000)
+    url: Optional[str] = None
+    baby_id: Optional[int] = None
+
+
 class PushSubscriptionResponse(BaseModel):
     id: int
-    user_id: str
-    endpoint: str
+    endpoint_preview: str
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True, json_encoders={datetime: serialize_datetime})
-
-
-class PushNotificationSend(BaseModel):
-    title: str = Field(..., max_length=200)
-    body: str = Field(..., max_length=1000)
-    user_ids: list[str] | None = None  # None = broadcast to all
 
 
 # ============================================================================
