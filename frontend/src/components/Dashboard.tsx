@@ -30,6 +30,7 @@ import { motion } from 'framer-motion';
 import { Baby, WifiOff, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { calculateAgeInMonths } from '../utils/ageUtils';
+import { VoiceCommandBar, isSpeechRecognitionSupported } from './VoiceCommandBar';
 
 type ModalType = 'feeding'|'diaper'|'sleep'|'pumping'|'potty'|'tummy'|'bath'|'supplement'|'solid'|null;
 
@@ -419,6 +420,11 @@ export default function Dashboard() {
                     onClose={() => setActiveModal(null)}
                     onSave={handleEventLogged}
                 />
+            )}
+
+            {/* Voice Command Bar - only when Speech API is available */}
+            {isSpeechRecognitionSupported() && (
+                <VoiceCommandBar babyId={selectedBaby.id} onCommandExecuted={loadData} />
             )}
         </div>
     );
