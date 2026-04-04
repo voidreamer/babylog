@@ -264,11 +264,8 @@ def _build_baby_context(db: Session, baby: Baby) -> str:
     lines = [f"Baby: {baby.name}"]
 
     if baby.birth_date:
-        age_days = (
-            (now.date() - baby.birth_date).days
-            if hasattr(baby.birth_date, "date")
-            else (now.date() - baby.birth_date).days
-        )
+        bd = baby.birth_date.date() if hasattr(baby.birth_date, "date") else baby.birth_date
+        age_days = (now.date() - bd).days
         months = age_days // 30
         if months > 0:
             lines.append(f"Age: {months} months")
