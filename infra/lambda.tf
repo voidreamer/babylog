@@ -51,6 +51,7 @@ resource "aws_lambda_function" "api" {
       STRIPE_PRICE_MONTHLY   = var.stripe_price_monthly
       STRIPE_PRICE_YEARLY    = var.stripe_price_yearly
       SENTRY_DSN             = var.sentry_dsn
+      GROQ_API_KEY           = var.groq_api_key
     }
   }
 }

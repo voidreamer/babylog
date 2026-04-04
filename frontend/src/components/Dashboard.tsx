@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { api } from '../api/client';
 import { useBaby } from '../hooks/useBaby';
+import VoiceCommandBar from './VoiceCommandBar';
 import { format } from 'date-fns';
 import SleepWidget from './SleepWidget';
 import FeedingWidget from './FeedingWidget';
@@ -236,6 +237,7 @@ export default function Dashboard() {
     }
 
     return (
+        <>
         <div>
             {/* Status indicators */}
             {isOffline && (
@@ -421,5 +423,14 @@ export default function Dashboard() {
                 />
             )}
         </div>
+
+            {/* Voice command bar */}
+            {selectedBaby && (
+                <VoiceCommandBar
+                    babyId={selectedBaby.id}
+                    onCommandExecuted={loadData}
+                />
+            )}
+        </>
     );
 }

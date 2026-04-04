@@ -24,6 +24,7 @@
         "@capacitor/ios": "^8.0.2",
         "@capacitor/local-notifications": "^8.0.1",
         "@capacitor/status-bar": "^8.0.1",
+        "@capgo/capacitor-speech-recognition": "^8.1.0",
         "@fontsource-variable/nunito": "^5.2.7",
         "@fontsource-variable/quicksand": "^5.2.10",
         "@sentry/react": "^10.47.0",

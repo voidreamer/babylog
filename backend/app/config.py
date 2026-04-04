@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     vapid_contact_email: str = "support@heybub.app"
     # Sentry error monitoring
     sentry_dsn: str = ""
+    # Groq API for voice intent parsing
+    groq_api_key: str = ""
     # Supabase Storage (for photo uploads)
     supabase_url: str = ""
     supabase_service_key: str = ""
