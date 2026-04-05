@@ -3,42 +3,43 @@
 const ELEVENLABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = import.meta.env.VITE_DEEPGRAM_API_KEY || '';
 
-// ElevenLabs Flash v2.5 — fast, high quality
 const ELEVENLABS_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // "Sarah" — warm, friendly
 const ELEVENLABS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}/stream`;
-
-// Deepgram Aura — fallback
-const DEEPGRAM_URL = 'https://api.deepgram.com/v1/speak?model=aura-asteria-en';
+const DEEPGRAM_URL = 'https://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mp3';
 
 let elevenlabsFailed = false;
-let audioContext: AudioContext | null = null;
-
-function getAudioContext(): AudioContext {
-  if (!audioContext) {
-    audioContext = new AudioContext();
-  }
-  return audioContext;
-}
 
 /**
- * Play audio from an ArrayBuffer.
+ * Play audio from a Blob using an HTMLAudioElement.
+ * This works reliably across Safari, Chrome, and Capacitor WebView
+ * (unlike AudioContext which Safari blocks without user gesture).
  */
-async function playAudio(buffer: ArrayBuffer): Promise<void> {
-  const ctx = getAudioContext();
-  // Resume if suspended (browser autoplay policy)
-  if (ctx.state === 'suspended') await ctx.resume();
-  const audioBuffer = await ctx.decodeAudioData(buffer);
-  const source = ctx.createBufferSource();
-  source.buffer = audioBuffer;
-  source.connect(ctx.destination);
-  return new Promise((resolve) => {
-    source.onended = () => resolve();
-    source.start();
+function playAudioBlob(blob: Blob): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => {
+      URL.revokeObjectURL(url);
+      resolve();
+    };
+    audio.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Audio playback failed'));
+    };
+    // Safari sometimes needs this
+    audio.load();
+    const playPromise = audio.play();
+    if (playPromise) {
+      playPromise.catch(() => {
+        URL.revokeObjectURL(url);
+        resolve(); // Silently fall through if autoplay blocked
+      });
+    }
   });
 }
 
 /**
- * Try ElevenLabs TTS. Returns true if successful.
+ * ElevenLabs Flash v2.5 TTS.
  */
 async function speakElevenLabs(text: string): Promise<boolean> {
   if (!ELEVENLABS_API_KEY || elevenlabsFailed) return false;
@@ -48,6 +49,7 @@ async function speakElevenLabs(text: string): Promise<boolean> {
       headers: {
         'xi-api-key': ELEVENLABS_API_KEY,
         'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg',
       },
       body: JSON.stringify({
         text,
@@ -56,14 +58,13 @@ async function speakElevenLabs(text: string): Promise<boolean> {
       }),
     });
     if (!resp.ok) {
-      // 401 = bad key, 429 = quota exceeded
       if (resp.status === 401 || resp.status === 429) {
         elevenlabsFailed = true;
       }
       return false;
     }
-    const buffer = await resp.arrayBuffer();
-    await playAudio(buffer);
+    const blob = await resp.blob();
+    await playAudioBlob(blob);
     return true;
   } catch {
     return false;
@@ -71,7 +72,7 @@ async function speakElevenLabs(text: string): Promise<boolean> {
 }
 
 /**
- * Try Deepgram Aura TTS. Returns true if successful.
+ * Deepgram Aura TTS.
  */
 async function speakDeepgram(text: string): Promise<boolean> {
   if (!DEEPGRAM_API_KEY) return false;
@@ -85,8 +86,8 @@ async function speakDeepgram(text: string): Promise<boolean> {
       body: JSON.stringify({ text }),
     });
     if (!resp.ok) return false;
-    const buffer = await resp.arrayBuffer();
-    await playAudio(buffer);
+    const blob = await resp.blob();
+    await playAudioBlob(blob);
     return true;
   } catch {
     return false;
@@ -94,7 +95,7 @@ async function speakDeepgram(text: string): Promise<boolean> {
 }
 
 /**
- * Browser built-in SpeechSynthesis (always available, free).
+ * Browser SpeechSynthesis (always available, free).
  */
 function speakBrowser(text: string): Promise<void> {
   return new Promise((resolve) => {
@@ -106,9 +107,14 @@ function speakBrowser(text: string): Promise<void> {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    utterance.volume = 0.8;
+    utterance.volume = 1.0;
     utterance.onend = () => resolve();
     utterance.onerror = () => resolve();
+    // Safari workaround: sometimes voices aren't loaded yet
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      utterance.voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+    }
     window.speechSynthesis.speak(utterance);
   });
 }
@@ -120,10 +126,7 @@ function speakBrowser(text: string): Promise<void> {
  * 3. Web Speech API (0ms, free fallback)
  */
 export async function speak(text: string): Promise<void> {
-  // Try ElevenLabs first
   if (await speakElevenLabs(text)) return;
-  // Try Deepgram
   if (await speakDeepgram(text)) return;
-  // Fall back to browser
   await speakBrowser(text);
 }
