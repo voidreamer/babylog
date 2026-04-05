@@ -262,10 +262,8 @@ export function useVoiceAssistant(babyId: number | null, onCommandExecuted?: () 
         await api.createSleep({ baby_id: babyId, start_time: now, ...params });
         break;
       case 'endSleep': {
-        // Find the active sleep and end it
-        const sleeps = await api.getSleeps(babyId, 5);
-        const active = sleeps?.find((s: any) => !s.end_time);
-        if (active) {
+        const active = await api.getCurrentSleep(babyId);
+        if (active?.id) {
           await api.endSleep(active.id);
         }
         break;
