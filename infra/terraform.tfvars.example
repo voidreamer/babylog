@@ -10,8 +10,8 @@ database_url = "postgresql://user:password@host:6543/postgres"
 # Supabase JWT Secret (from Supabase Dashboard > Settings > API)
 supabase_jwt_secret = "your-jwt-secret-here"
 
-# CORS allowed origins (comma-separated)
-cors_origins = "https://your-cloudfront-domain.cloudfront.net"
+# CORS origins are set in variables.tf (not sensitive, committed to repo)
+# Override here only if you need different origins for local testing
 
 # Admin API key for protected endpoints
 admin_api_key = ""

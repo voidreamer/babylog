@@ -31,7 +31,7 @@ variable "supabase_jwt_secret" {
 variable "cors_origins" {
   description = "Comma-separated list of allowed CORS origins"
   type        = string
-  default     = "http://localhost:5173"
+  default     = "https://app.heybub.app,https://heybub.app,https://previews.heybub.app,http://localhost:5173,capacitor://localhost"
 }
 
 variable "admin_api_key" {
