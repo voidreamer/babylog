@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/voice", tags=["voice"])
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
 # -- Request / Response schemas --
