@@ -52,7 +52,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "createFeeding",
-            "description": "Log a feeding. Types: breast, bottle, formula, solid.",
+            "description": "Log a feeding. Types: breast, bottle, formula, solid. 'formula' means formula milk specifically. If user just says 'formula', use type='formula' with no amount unless specified.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -62,13 +62,12 @@ TOOLS = [
                     },
                     "amount_ml": {
                         "type": "integer",
-                        "description": "Amount in ml. Convert oz to ml (1oz=30ml).",
+                        "description": "Amount in ml. Convert oz to ml (1oz=30ml). Only include if user specified an amount.",
                     },
                     "duration_minutes": {
                         "type": "integer",
-                        "description": "Duration in minutes (for breast feeding).",
+                        "description": "Duration in minutes (for breast feeding only).",
                     },
-                    "notes": {"type": "string"},
                 },
                 "required": ["type"],
             },
@@ -174,11 +173,15 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "createSupplement",
-            "description": "Log a supplement (vitamin D, iron, DHA, probiotic, etc.).",
+            "description": "Log a supplement. Map spoken names: 'vitamin d'→'vitamin_d', 'vitamin D'→'vitamin_d', 'DHA'→'dha', etc.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "name": {"type": "string"},
+                    "name": {
+                        "type": "string",
+                        "enum": ["vitamin_d", "iron", "dha", "probiotic", "multivitamin", "other"],
+                        "description": "Supplement type. Use vitamin_d for 'vitamin d/D3'.",
+                    },
                     "dosage": {"type": "string"},
                 },
                 "required": ["name"],
@@ -312,6 +315,8 @@ RULES:
 - Convert ounces to ml: 1oz = 30ml (e.g., "4 ounces" → amount_ml=120)
 - "wet diaper" or "pee" → createDiaper(type="pee")
 - "dirty diaper" or "poo" or "poop" → createDiaper(type="poo")
+- "formula" alone → createFeeding(type="formula") — do NOT add amount unless user said one
+- ONLY include parameters the user explicitly mentioned. Do NOT invent amounts, durations, or notes.
 - If the command is unclear or missing critical info, use askClarification()
 - For status questions ("how's the day", "when did she eat"), use getStatus()
 - Use the baby's name in any clarification or status response
@@ -369,7 +374,35 @@ async def parse_voice_command(
         logger.warning("Groq API timeout for voice parse")
         raise HTTPException(504, "Voice parsing timed out")
     except httpx.HTTPStatusError as e:
-        logger.error("Groq API error: %s", e.response.text)
+        error_body = e.response.text
+        logger.error("Groq API error (status=%s): %s", e.response.status_code, error_body)
+        # If tool_use_failed, retry without tools — let LLM respond as text
+        if "tool_use_failed" in error_body:
+            logger.info("Retrying without tools due to tool_use_failed")
+            try:
+                async with httpx.AsyncClient(timeout=10) as client2:
+                    resp = await client2.post(
+                        GROQ_API_URL,
+                        headers={
+                            "Authorization": f"Bearer {settings.groq_api_key}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "model": GROQ_MODEL,
+                            "messages": messages,
+                            "temperature": 0.1,
+                            "max_tokens": 200,
+                        },
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                    content = data["choices"][0]["message"].get("content", "")
+                    return VoiceParseResponse(
+                        type="clarification",
+                        question=content or "Could you say that again?",
+                    )
+            except Exception:
+                pass
         raise HTTPException(502, "Voice parsing service error")
 
     data = resp.json()
@@ -382,7 +415,13 @@ async def parse_voice_command(
         fn_name = tool_call["function"]["name"]
         import json
 
-        fn_args = json.loads(tool_call["function"]["arguments"])
+        try:
+            fn_args = json.loads(tool_call["function"]["arguments"])
+        except json.JSONDecodeError:
+            return VoiceParseResponse(
+                type="clarification",
+                question="Sorry, could you say that again?",
+            )
 
         logger.info(
             "Voice parsed: %s(%s) from '%s'",

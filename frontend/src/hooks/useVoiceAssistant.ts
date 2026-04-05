@@ -33,7 +33,7 @@ interface VoiceResult {
   status_text?: string;
 }
 
-export function useVoiceAssistant(babyId: number | null) {
+export function useVoiceAssistant(babyId: number | null, onCommandExecuted?: () => void) {
   const [state, setState] = useState<VoiceState>('idle');
   const [transcript, setTranscript] = useState('');
   const [displayText, setDisplayText] = useState('');
@@ -221,11 +221,18 @@ export function useVoiceAssistant(babyId: number | null) {
         try {
           await Haptics.notification({ type: NotificationType.Success });
         } catch { /* non-native */ }
+        // Refresh dashboard
+        onCommandExecuted?.();
         if (result.confirmation_text) {
           await speak(result.confirmation_text);
         }
-        // Continuous mode: keep listening for 5 seconds
-        startContinuousWindow();
+        // Auto-dismiss after confirmation
+        setTimeout(() => {
+          setState('idle');
+          setDisplayText('');
+          setTranscript('');
+          conversationHistory.current = [];
+        }, 2000);
         return;
       }
 

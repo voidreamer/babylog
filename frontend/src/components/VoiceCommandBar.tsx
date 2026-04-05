@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, X, Loader2 } from 'lucide-react';
+import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { useVoiceAssistant } from '../hooks/useVoiceAssistant';
 
 interface VoiceCommandBarProps {
@@ -17,102 +17,43 @@ export function VoiceCommandBar({ babyId, onCommandExecuted }: VoiceCommandBarPr
     startListening,
     stopListening,
     cancel,
-  } = useVoiceAssistant(babyId);
+  } = useVoiceAssistant(babyId, onCommandExecuted);
 
   if (!isSupported) return null;
 
   const isActive = state !== 'idle';
+  const showBadge = isActive && (displayText || transcript || error);
 
   return (
     <>
-      {/* Overlay when active */}
+      {/* Inline status badge — floats above mic, auto-dismisses */}
       <AnimatePresence>
-        {isActive && (
+        {showBadge && (
           <motion.div
-            className="voice-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={cancel}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Floating panel when active */}
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            className="voice-panel"
-            initial={{ opacity: 0, y: 60, scale: 0.9 }}
+            className="voice-badge"
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 60, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            onClick={cancel}
           >
-            {/* Cancel button */}
-            <button className="voice-cancel" onClick={cancel} aria-label="Cancel">
-              <X size={18} />
-            </button>
-
-            {/* State indicator */}
-            <div className="voice-state-indicator">
-              {state === 'listening' && (
-                <div className="voice-listening-ring">
-                  <motion.div
-                    className="voice-pulse"
-                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
-                  <Mic size={28} className="voice-mic-active" />
-                </div>
-              )}
-              {state === 'processing' && <Loader2 size={28} className="voice-spinner" />}
-              {state === 'executing' && <Loader2 size={28} className="voice-spinner" />}
-              {state === 'speaking' && (
-                <motion.div
-                  className="voice-speaking-indicator"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.6, repeat: Infinity }}
-                >
-                  🔊
-                </motion.div>
-              )}
-              {state === 'confirming' && (
-                <div className="voice-listening-ring">
-                  <Mic size={28} className="voice-mic-active" />
-                </div>
-              )}
-              {state === 'error' && <span className="voice-error-icon">⚠️</span>}
-            </div>
-
-            {/* Status text */}
-            <div className="voice-status">
-              {state === 'listening' && (
-                <p className="voice-status-text">
-                  {transcript || 'Listening...'}
-                </p>
-              )}
-              {state === 'processing' && (
-                <p className="voice-status-text">Thinking...</p>
-              )}
-              {state === 'confirming' && (
-                <p className="voice-status-text voice-question">{displayText}</p>
-              )}
-              {state === 'executing' && (
-                <p className="voice-status-text">{displayText}</p>
-              )}
-              {state === 'speaking' && (
-                <p className="voice-status-text voice-confirmation">{displayText}</p>
-              )}
-              {state === 'error' && (
-                <p className="voice-status-text voice-error-text">
-                  {error || 'Something went wrong'}
-                </p>
-              )}
-            </div>
-
-            {/* Transcript preview */}
-            {state === 'processing' && transcript && (
-              <p className="voice-transcript-preview">"{transcript}"</p>
+            {state === 'listening' && (
+              <span className="voice-badge-text">{transcript || 'Listening...'}</span>
+            )}
+            {state === 'processing' && (
+              <span className="voice-badge-text voice-badge-dim">
+                <Loader2 size={14} className="voice-badge-spinner" />
+                {transcript ? `"${transcript}"` : 'Thinking...'}
+              </span>
+            )}
+            {state === 'confirming' && (
+              <span className="voice-badge-text voice-badge-question">{displayText}</span>
+            )}
+            {(state === 'executing' || state === 'speaking') && (
+              <span className="voice-badge-text voice-badge-success">{displayText}</span>
+            )}
+            {state === 'error' && (
+              <span className="voice-badge-text voice-badge-error">{error}</span>
             )}
           </motion.div>
         )}
@@ -120,26 +61,21 @@ export function VoiceCommandBar({ babyId, onCommandExecuted }: VoiceCommandBarPr
 
       {/* Floating mic button */}
       <motion.button
-        className={`voice-fab ${isActive ? 'voice-fab-active' : ''}`}
+        className={`voice-fab ${state === 'listening' ? 'voice-fab-listening' : ''} ${state === 'error' ? 'voice-fab-error' : ''}`}
         onClick={isActive ? (state === 'listening' ? stopListening : cancel) : startListening}
         whileTap={{ scale: 0.9 }}
         aria-label={isActive ? 'Stop listening' : 'Voice command'}
       >
-        {isActive && state === 'listening' ? (
+        {state === 'listening' ? (
           <MicOff size={24} />
+        ) : state === 'processing' || state === 'executing' ? (
+          <Loader2 size={24} className="voice-badge-spinner" />
         ) : (
           <Mic size={24} />
         )}
       </motion.button>
     </>
   );
-}
-
-export function isSpeechRecognitionSupported(): boolean {
-  if (typeof window === 'undefined') return false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const w = window as any;
-  return !!(w.SpeechRecognition || w.webkitSpeechRecognition);
 }
 
 export default VoiceCommandBar;

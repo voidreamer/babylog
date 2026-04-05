@@ -8677,16 +8677,8 @@ a.settings-row {
 }
 
 /* ============================================================================
-   Voice Command Bar — Conversational Mode
+   Voice Command Bar — Lightweight inline badge + FAB
    ============================================================================ */
-
-.voice-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 998;
-  backdrop-filter: blur(2px);
-}
 
 .voice-fab {
   position: fixed;
@@ -8711,80 +8703,68 @@ a.settings-row {
   background: var(--color-primary-dark, #c06e88);
 }
 
-.voice-fab-active {
+.voice-fab-listening {
   background: var(--color-danger, #e74c3c);
+  animation: voice-pulse-ring 1.5s ease-in-out infinite;
 }
 
-.voice-panel {
+.voice-fab-error {
+  background: var(--color-text-secondary, #888);
+}
+
+@keyframes voice-pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(231, 76, 60, 0); }
+}
+
+/* Badge that floats above the mic button */
+.voice-badge {
   position: fixed;
-  bottom: 160px;
-  right: 20px;
-  left: 20px;
-  max-width: 360px;
-  margin-left: auto;
+  bottom: 155px;
+  right: 12px;
+  max-width: 280px;
   background: var(--color-surface, #fff);
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 10px 14px;
   z-index: 999;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
-[data-theme="dark"] .voice-panel {
+[data-theme="dark"] .voice-badge {
   background: var(--color-surface-dark, #2a2a2a);
 }
 
-.voice-cancel {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
+.voice-badge-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-text-primary, #333);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.voice-badge-dim {
   color: var(--color-text-secondary, #888);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
 }
 
-.voice-cancel:hover {
-  background: var(--color-surface-hover, #f0f0f0);
-}
-
-.voice-state-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 56px;
-}
-
-.voice-listening-ring {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-}
-
-.voice-pulse {
-  position: absolute;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--color-primary, #d4849c);
-}
-
-.voice-mic-active {
+.voice-badge-question {
   color: var(--color-primary, #d4849c);
-  z-index: 1;
+  font-weight: 500;
 }
 
-.voice-spinner {
-  color: var(--color-primary, #d4849c);
+.voice-badge-success {
+  color: var(--color-success, #7ab89c);
+  font-weight: 500;
+}
+
+.voice-badge-error {
+  color: var(--color-danger, #e74c3c);
+}
+
+.voice-badge-spinner {
   animation: spin 1s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {
@@ -8792,55 +8772,13 @@ a.settings-row {
   to { transform: rotate(360deg); }
 }
 
-.voice-speaking-indicator {
-  font-size: 32px;
-}
-
-.voice-error-icon {
-  font-size: 32px;
-}
-
-.voice-status {
-  text-align: center;
-  min-height: 24px;
-}
-
-.voice-status-text {
-  margin: 0;
-  font-size: 16px;
-  color: var(--color-text-primary, #333);
-  line-height: 1.4;
-}
-
-.voice-question {
-  font-weight: 500;
-  color: var(--color-primary, #d4849c);
-}
-
-.voice-confirmation {
-  font-weight: 500;
-  color: var(--color-success, #7ab89c);
-}
-
-.voice-error-text {
-  color: var(--color-danger, #e74c3c);
-}
-
-.voice-transcript-preview {
-  margin: 0;
-  font-size: 13px;
-  color: var(--color-text-secondary, #888);
-  font-style: italic;
-}
-
 @media (min-width: 768px) {
-  .voice-panel {
-    left: auto;
-    right: 24px;
-    max-width: 380px;
-  }
   .voice-fab {
     bottom: 100px;
     right: 24px;
+  }
+  .voice-badge {
+    bottom: 165px;
+    right: 16px;
   }
 }
