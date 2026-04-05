@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/voice", tags=["voice"])
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
 # -- Request / Response schemas --
@@ -422,6 +422,15 @@ async def parse_voice_command(
                 type="clarification",
                 question="Sorry, could you say that again?",
             )
+
+        # Guard: auto-correct sleep direction if LLM got it wrong
+        active_sleep = db.query(Sleep).filter(Sleep.baby_id == body.baby_id, Sleep.end_time.is_(None)).first()
+        if fn_name == "startSleep" and active_sleep:
+            logger.warning("LLM said startSleep but baby is already sleeping — correcting to endSleep")
+            fn_name = "endSleep"
+        elif fn_name == "endSleep" and not active_sleep:
+            logger.warning("LLM said endSleep but baby is not sleeping — correcting to startSleep")
+            fn_name = "startSleep"
 
         logger.info(
             "Voice parsed: %s(%s) from '%s'",
