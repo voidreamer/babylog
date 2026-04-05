@@ -10,45 +10,63 @@ const DEEPGRAM_URL = 'https://api.deepgram.com/v1/speak?model=aura-asteria-en&en
 let elevenlabsFailed = false;
 let audioUnlocked = false;
 
+// Shared audio element — iOS Safari only allows play() on elements
+// that were first played during a user gesture. We create it once on
+// mic tap and reuse it for all subsequent TTS playback.
+let sharedAudio: HTMLAudioElement | null = null;
+
 /**
- * Unlock audio playback on Safari / iOS WebView.
- * Must be called from a user-gesture handler (e.g. mic button tap).
- * Plays a silent sample to prime the audio system so that later
- * non-gesture playback (after async API calls) is allowed.
+ * Unlock audio playback on Safari / iOS.
+ * Must be called synchronously from a user-gesture handler (e.g. mic tap).
+ * iOS Safari requires the *same* Audio element that was gesture-played
+ * to be reused for later non-gesture playback.
  */
 export function unlockAudio(): void {
   if (audioUnlocked) return;
+  audioUnlocked = true;
+
+  // Create the shared audio element and play silent audio to "unlock" it
+  try {
+    sharedAudio = new Audio();
+    sharedAudio.src =
+      'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    sharedAudio.play().catch(() => {});
+  } catch { /* ignore */ }
+
+  // Also prime an AudioContext (used by some WebViews)
   try {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (AudioCtx) {
       const ctx = new AudioCtx();
-      const buffer = ctx.createBuffer(1, 1, 22050);
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      source.start(0);
       ctx.resume().catch(() => {});
     }
   } catch { /* ignore */ }
+
+  // Unlock speechSynthesis with a near-silent utterance
   try {
-    const audio = new Audio();
-    audio.src =
-      'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-    audio.volume = 0;
-    audio.play().then(() => audio.pause()).catch(() => {});
+    if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0.01;
+      u.rate = 10;
+      window.speechSynthesis.speak(u);
+    }
   } catch { /* ignore */ }
-  audioUnlocked = true;
 }
 
 /**
- * Play audio from a Blob using an HTMLAudioElement.
+ * Play audio from a Blob using the shared (gesture-unlocked) HTMLAudioElement.
+ * Falls back to a new element if unlockAudio() wasn't called.
  * Rejects on failure so the tiered TTS chain can fall through.
  */
 function playAudioBlob(blob: Blob): Promise<void> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.volume = 1.0;
+    const audio = sharedAudio || new Audio();
+
+    // Reset handlers from any previous playback
+    audio.onended = null;
+    audio.onerror = null;
+
     audio.onended = () => {
       URL.revokeObjectURL(url);
       resolve();
@@ -57,6 +75,9 @@ function playAudioBlob(blob: Blob): Promise<void> {
       URL.revokeObjectURL(url);
       reject(new Error('Audio playback failed'));
     };
+
+    audio.src = url;
+    audio.volume = 1.0;
     audio.load();
     const playPromise = audio.play();
     if (playPromise) {
@@ -196,7 +217,14 @@ function speakBrowser(text: string): Promise<void> {
  * 3. Web Speech API (0ms, free fallback)
  */
 export async function speak(text: string): Promise<void> {
-  if (await speakElevenLabs(text)) return;
-  if (await speakDeepgram(text)) return;
+  if (await speakElevenLabs(text)) {
+    console.log('[TTS] played via ElevenLabs');
+    return;
+  }
+  if (await speakDeepgram(text)) {
+    console.log('[TTS] played via Deepgram');
+    return;
+  }
+  console.log('[TTS] falling back to browser speechSynthesis');
   await speakBrowser(text);
 }
