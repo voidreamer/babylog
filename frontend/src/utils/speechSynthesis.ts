@@ -8,16 +8,47 @@ const ELEVENLABS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS
 const DEEPGRAM_URL = 'https://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mp3';
 
 let elevenlabsFailed = false;
+let audioUnlocked = false;
+
+/**
+ * Unlock audio playback on Safari / iOS WebView.
+ * Must be called from a user-gesture handler (e.g. mic button tap).
+ * Plays a silent sample to prime the audio system so that later
+ * non-gesture playback (after async API calls) is allowed.
+ */
+export function unlockAudio(): void {
+  if (audioUnlocked) return;
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (AudioCtx) {
+      const ctx = new AudioCtx();
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.start(0);
+      ctx.resume().catch(() => {});
+    }
+  } catch { /* ignore */ }
+  try {
+    const audio = new Audio();
+    audio.src =
+      'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    audio.volume = 0;
+    audio.play().then(() => audio.pause()).catch(() => {});
+  } catch { /* ignore */ }
+  audioUnlocked = true;
+}
 
 /**
  * Play audio from a Blob using an HTMLAudioElement.
- * This works reliably across Safari, Chrome, and Capacitor WebView
- * (unlike AudioContext which Safari blocks without user gesture).
+ * Rejects on failure so the tiered TTS chain can fall through.
  */
 function playAudioBlob(blob: Blob): Promise<void> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
+    audio.volume = 1.0;
     audio.onended = () => {
       URL.revokeObjectURL(url);
       resolve();
@@ -26,13 +57,12 @@ function playAudioBlob(blob: Blob): Promise<void> {
       URL.revokeObjectURL(url);
       reject(new Error('Audio playback failed'));
     };
-    // Safari sometimes needs this
     audio.load();
     const playPromise = audio.play();
     if (playPromise) {
-      playPromise.catch(() => {
+      playPromise.catch((err) => {
         URL.revokeObjectURL(url);
-        resolve(); // Silently fall through if autoplay blocked
+        reject(err);
       });
     }
   });
@@ -108,14 +138,54 @@ function speakBrowser(text: string): Promise<void> {
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
-    utterance.onend = () => resolve();
-    utterance.onerror = () => resolve();
-    // Safari workaround: sometimes voices aren't loaded yet
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      utterance.voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+
+    let resolved = false;
+    const safeResolve = () => {
+      if (!resolved) {
+        resolved = true;
+        resolve();
+      }
+    };
+    utterance.onend = safeResolve;
+    utterance.onerror = safeResolve;
+
+    const trySpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        utterance.voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+      }
+      window.speechSynthesis.speak(utterance);
+      // Safari bug: long utterances pause after ~15s and never resume
+      const keepAlive = setInterval(() => {
+        if (!window.speechSynthesis.speaking) {
+          clearInterval(keepAlive);
+        } else {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }
+      }, 14000);
+      // Safety timeout: Safari sometimes never fires onend
+      setTimeout(() => {
+        clearInterval(keepAlive);
+        safeResolve();
+      }, 30000);
+    };
+
+    // Safari loads voices async — wait if they're not ready yet
+    if (window.speechSynthesis.getVoices().length === 0) {
+      const onReady = () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', onReady);
+        trySpeak();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', onReady);
+      // Fallback if voiceschanged never fires (some WebViews)
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener('voiceschanged', onReady);
+        if (!resolved) trySpeak();
+      }, 300);
+    } else {
+      trySpeak();
     }
-    window.speechSynthesis.speak(utterance);
   });
 }
 
