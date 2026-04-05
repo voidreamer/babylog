@@ -170,7 +170,10 @@ function speakBrowser(text: string): Promise<void> {
     utterance.onend = safeResolve;
     utterance.onerror = safeResolve;
 
+    let started = false;
     const trySpeak = () => {
+      if (started) return;
+      started = true;
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
         utterance.voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
@@ -202,7 +205,7 @@ function speakBrowser(text: string): Promise<void> {
       // Fallback if voiceschanged never fires (some WebViews)
       setTimeout(() => {
         window.speechSynthesis.removeEventListener('voiceschanged', onReady);
-        if (!resolved) trySpeak();
+        trySpeak();
       }, 300);
     } else {
       trySpeak();
@@ -217,6 +220,10 @@ function speakBrowser(text: string): Promise<void> {
  * 3. Web Speech API (0ms, free fallback)
  */
 export async function speak(text: string): Promise<void> {
+  console.log('[TTS] keys:', {
+    elevenlabs: !!ELEVENLABS_API_KEY,
+    deepgram: !!DEEPGRAM_API_KEY,
+  });
   if (await speakElevenLabs(text)) {
     console.log('[TTS] played via ElevenLabs');
     return;
