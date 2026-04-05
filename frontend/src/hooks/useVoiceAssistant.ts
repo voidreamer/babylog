@@ -3,7 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { api } from '../api/client';
-import { speak } from '../utils/speechSynthesis';
+import { speak, unlockAudio } from '../utils/speechSynthesis';
 
 /**
  * Voice assistant states:
@@ -54,6 +54,8 @@ export function useVoiceAssistant(babyId: number | null, onCommandExecuted?: () 
   // Start listening
   const startListening = useCallback(async () => {
     if (!babyId) return;
+    // Unlock audio during user gesture so TTS works later (Safari/iOS requirement)
+    unlockAudio();
     setState('listening');
     setTranscript('');
     setError(null);
