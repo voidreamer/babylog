@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function Callback() {
     const { t } = useTranslation('auth');
@@ -103,9 +104,5 @@ export default function Callback() {
         );
     }
 
-    return (
-        <div className="loading" style={{ minHeight: '100vh' }}>
-            <img src="/icons/loading.png" alt="" className="loading-logo" />
-        </div>
-    );
+    return <LoadingSpinner text="Signing you in..." />;
 }

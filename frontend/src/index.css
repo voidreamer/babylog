@@ -3844,24 +3844,41 @@ h4 {
    Loading
    ============================================================================ */
 
+/* ---- Loading spinner (cute baby icon) ---- */
 .loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
   padding: var(--space-2xl);
+  gap: var(--space-md);
+}
+
+.loading-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.loading-spinner-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--space-md);
 }
 
 .loading-logo {
   width: 80px;
   height: 80px;
-  animation: float 2s ease-in-out infinite;
-  filter: drop-shadow(0 4px 12px rgba(212, 132, 156, 0.3));
+  animation: baby-float 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(var(--primary-rgb), 0.3));
 }
 
 .loading-text {
-  font-family: 'Quicksand Variable', 'Quicksand', sans-serif;
+  font-family: var(--font-family-heading);
   font-weight: 600;
   font-size: 1.1rem;
   color: var(--text-secondary);
@@ -3873,17 +3890,24 @@ h4 {
   to { opacity: 1; }
 }
 
-@keyframes float {
+@keyframes baby-float {
   0%, 100% {
-    transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1) rotate(0deg);
     opacity: 0.85;
   }
+  25% {
+    transform: translateY(-6px) scale(1.03) rotate(-3deg);
+  }
   50% {
-    transform: translateY(-8px) scale(1.05);
+    transform: translateY(-10px) scale(1.06) rotate(0deg);
     opacity: 1;
+  }
+  75% {
+    transform: translateY(-6px) scale(1.03) rotate(3deg);
   }
 }
 
+/* Legacy spinner kept for any remaining usages */
 .spinner {
   width: 40px;
   height: 40px;

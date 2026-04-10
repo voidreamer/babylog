@@ -464,12 +464,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
 
     if (loading) {
-        return (
-            <div className="loading" style={{ minHeight: '100vh' }}>
-                <img src="/icons/loading.png" alt="" className="loading-logo" />
-                <span className="loading-text">Getting things ready...</span>
-            </div>
-        );
+        return <LoadingSpinner text="Getting things ready..." />;
     }
 
     if (!user) {
@@ -743,12 +738,7 @@ function MainApp() {
     }
 
     if (babiesLoading && babies.length === 0) {
-        return (
-            <div className="loading" style={{ minHeight: '100vh' }}>
-                <img src="/icons/loading.png" alt="" className="loading-logo" />
-                <span className="loading-text">Loading your little one...</span>
-            </div>
-        );
+        return <LoadingSpinner text="Loading your little one..." />;
     }
 
     return (
@@ -782,11 +772,7 @@ function MainApp() {
                 )}
                 {activeTab === 'health' && (
                     <ErrorBoundary level="page">
-                        <Suspense fallback={
-                            <div className="loading">
-                                <div className="spinner"></div>
-                            </div>
-                        }>
+                        <Suspense fallback={<LoadingSpinner />}>
                             <Health
                                 showMedQuickLog={showMedQuickLog}
                                 onDismissMedQuickLog={() => setShowMedQuickLog(false)}
