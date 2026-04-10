@@ -91,6 +91,10 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(!dashboard);
     const [refreshing, setRefreshing] = useState(false);
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
+    // Track whether fresh data has been loaded from the API at least once.
+    // Until then, cached data is "stale" and cards show a shimmer overlay
+    // with interactions disabled so users don't log against outdated info.
+    const [hasLoadedFresh, setHasLoadedFresh] = useState(false);
 
     // Single modal state
     const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -192,10 +196,12 @@ export default function Dashboard() {
         } finally {
             setLoading(false);
             setRefreshing(false);
+            setHasLoadedFresh(true);
         }
     };
 
     useEffect(() => {
+        setHasLoadedFresh(false);
         loadData();
     }, [selectedBaby]);
 
@@ -236,6 +242,10 @@ export default function Dashboard() {
         );
     }
 
+    // Stale = we have cached data displayed but haven't confirmed it with the API yet.
+    // Cards get a shimmer overlay and interactions are blocked until fresh data arrives.
+    const stale = !hasLoadedFresh && !!dashboard && !isOffline;
+
     return (
         <>
         <div>
@@ -246,7 +256,7 @@ export default function Dashboard() {
                     <span>{t('statusOffline')}</span>
                 </div>
             )}
-            {refreshing && !isOffline && (
+            {refreshing && !isOffline && !stale && (
                 <div className="dashboard-status fetching">
                     <RefreshCw size={14} className="spin" />
                     <span>{t('statusFetching')}</span>
@@ -256,7 +266,7 @@ export default function Dashboard() {
             <BabyGreeting summary={dashboard?.daily_summary} latestGrowth={latestGrowth} />
 
             {/* Widgets Grid */}
-            <div className="widgets-grid">
+            <div className={`widgets-grid${stale ? ' stale' : ''}`}>
                 {visibleWidgets.includes('feeding') && (
                     <FeedingWidget
                         babyId={selectedBaby.id}
