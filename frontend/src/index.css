@@ -853,6 +853,61 @@ h4 {
   }
 }
 
+/* ---- Stale-data shimmer overlay ----
+   Shown when dashboard is displaying cached data and waiting for fresh API data.
+   Blocks interaction so users don't log against outdated info. */
+.widgets-grid.stale .widget {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Active timers (feeding/pumping/tummy) and sleeping state are driven by
+   local state, not the stale cached data, so keep them interactive. */
+.widgets-grid.stale .widget.active-timer,
+.widgets-grid.stale .widget.sleeping {
+  pointer-events: auto;
+  user-select: auto;
+}
+
+/* Travelling shimmer gradient over each stale card */
+.widgets-grid.stale .widget::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(128, 128, 128, 0.06) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: widget-shimmer 1.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Slightly fade stale widget content to reinforce "not ready yet" */
+.widgets-grid.stale .widget > .widget-content {
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+}
+
+/* Don't shimmer or fade active timers / sleeping widgets */
+.widgets-grid.stale .widget.active-timer::after,
+.widgets-grid.stale .widget.sleeping::after {
+  display: none;
+}
+.widgets-grid.stale .widget.active-timer > .widget-content,
+.widgets-grid.stale .widget.sleeping > .widget-content {
+  opacity: 1;
+}
+
+@keyframes widget-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .widget {
   position: relative;
   overflow: visible;
