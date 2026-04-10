@@ -1,33 +1,39 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
 
-/**
- * Standardized loading spinner component
- * @param {string} text - Optional loading text to display
- * @param {boolean} fullPage - Whether to show as full page loading
- * @param {string} size - Size: 'sm', 'md', 'lg'
- */
-interface LoadingSpinnerProps { text?: string; fullPage?: boolean; size?: 'sm' | 'md' | 'lg'; }
+const CUTE_MESSAGES = [
+    'Getting things ready...',
+    'Loading your little one...',
+    'Almost there...',
+    'Warming up the bottle...',
+    'Counting tiny toes...',
+];
+
+function pickMessage(): string {
+    return CUTE_MESSAGES[Math.floor(Math.random() * CUTE_MESSAGES.length)];
+}
+
+interface LoadingSpinnerProps {
+    text?: string;
+    fullPage?: boolean;
+    size?: 'sm' | 'md' | 'lg';
+}
+
 export default function LoadingSpinner({ text, fullPage = true, size = 'md' }: LoadingSpinnerProps) {
-    const sizeMap = {
-        sm: 16,
-        md: 24,
-        lg: 32,
-    };
+    const message = useMemo(() => text ?? pickMessage(), [text]);
+
+    const sizeMap = { sm: 48, md: 80, lg: 112 };
+    const imgSize = sizeMap[size];
 
     const content = (
-        <>
-            <div className="spinner"></div>
-            {text && (
-                <p style={{
-                    marginTop: 'var(--space-md)',
-                    color: 'var(--text-muted)',
-                    fontSize: size === 'sm' ? '0.85rem' : '1rem'
-                }}>
-                    {text}
-                </p>
-            )}
-        </>
+        <div className="loading-spinner-inner">
+            <img
+                src={`${import.meta.env.BASE_URL}icons/loading.png`}
+                alt=""
+                className="loading-logo"
+                style={{ width: imgSize, height: imgSize }}
+            />
+            <span className="loading-text">{message}</span>
+        </div>
     );
 
     if (fullPage) {
@@ -39,13 +45,7 @@ export default function LoadingSpinner({ text, fullPage = true, size = 'md' }: L
     }
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 'var(--space-xl)'
-        }}>
+        <div className="loading-inline">
             {content}
         </div>
     );
