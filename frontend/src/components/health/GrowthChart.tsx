@@ -12,9 +12,10 @@ import {
     ReferenceLine,
 } from 'recharts';
 import { WHO_WEIGHT_BOYS, WHO_WEIGHT_GIRLS, WHO_HEIGHT_BOYS, WHO_HEIGHT_GIRLS } from '../../data/whoGrowthData';
-import { differenceInMonths, differenceInDays } from 'date-fns';
+import { differenceInMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useUnits } from '../../hooks/useUnits';
+import { calculateFractionalAgeMonths } from '../../utils/ageUtils';
 
 // Consistent chart colors — use CSS custom properties for theme awareness
 const CHART_COLORS = {
@@ -69,11 +70,10 @@ export default function GrowthChart({ baby, growthRecords }: HealthGrowthChartPr
     const birthDate = baby?.birth_date;
     const gender = baby?.gender || 'boy';
 
-    // Calculate current age in fractional months for the reference line
+    // Calculate current age in fractional calendar months for the reference line
     const currentAgeMonths = useMemo(() => {
         if (!birthDate) return null;
-        const days = differenceInDays(new Date(), toLocalDate(birthDate));
-        const months = days / 30.44; // average days per month
+        const months = calculateFractionalAgeMonths(birthDate);
         return months >= 0 && months <= 24 ? Math.round(months * 10) / 10 : null;
     }, [birthDate]);
 

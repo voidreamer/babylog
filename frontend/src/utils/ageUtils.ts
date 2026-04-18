@@ -40,3 +40,53 @@ export function calculatePreciseAge(birthDate: string): { days: number; weeks: n
 
     return { days, weeks, months, years };
 }
+
+/**
+ * Fractional calendar-based age in months, suitable for plotting on a
+ * continuous axis (e.g. WHO growth charts). Uses the day-of-month to
+ * interpolate between whole calendar months instead of dividing by 30.44.
+ */
+export function calculateFractionalAgeMonths(birthDate: string, at: Date = new Date()): number {
+    const birth = parseBirthDate(birthDate);
+    let months = (at.getFullYear() - birth.getFullYear()) * 12 + (at.getMonth() - birth.getMonth());
+    const dayDelta = at.getDate() - birth.getDate();
+    if (dayDelta < 0) {
+        // Not yet reached the birth day this month — back off a month and
+        // add the fraction completed within that prior month.
+        const prevMonthEnd = new Date(at.getFullYear(), at.getMonth(), 0).getDate();
+        months -= 1;
+        months += (prevMonthEnd + dayDelta) / prevMonthEnd;
+    } else {
+        const curMonthEnd = new Date(at.getFullYear(), at.getMonth() + 1, 0).getDate();
+        months += dayDelta / curMonthEnd;
+    }
+    return Math.max(0, months);
+}
+
+type TFn = (key: string | string[], options?: Record<string, unknown>) => string;
+
+/**
+ * Render the baby's age as a translated human-readable label (e.g. "4 months old").
+ * Centralises age-label formatting so dashboard/insights/profile stay consistent.
+ * Translation keys live in the `dashboard` namespace.
+ */
+export function formatAgeLabel(birthDate: string | null | undefined, t: TFn): string | null {
+    if (!birthDate) return null;
+    const age = calculatePreciseAge(birthDate);
+    if (age.days < 0) return null;
+    if (age.days === 0) return t('dashboard:age.bornToday');
+    if (age.days < 7) {
+        return t(age.days === 1 ? 'dashboard:age.daysOld' : 'dashboard:age.daysOld_plural', { count: age.days });
+    }
+    if (age.weeks < 12) {
+        return t(age.weeks === 1 ? 'dashboard:age.weeksOld' : 'dashboard:age.weeksOld_plural', { count: age.weeks });
+    }
+    if (age.months < 24) {
+        return t(age.months === 1 ? 'dashboard:age.monthsOld' : 'dashboard:age.monthsOld_plural', { count: age.months });
+    }
+    const remainingMonths = age.months % 12;
+    if (remainingMonths === 0) {
+        return t(age.years === 1 ? 'dashboard:age.yearsOld' : 'dashboard:age.yearsOld_plural', { count: age.years });
+    }
+    return t('dashboard:age.yearsMonthsOld', { years: age.years, months: remainingMonths });
+}

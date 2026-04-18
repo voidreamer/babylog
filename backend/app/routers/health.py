@@ -1,7 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
@@ -593,7 +593,10 @@ def get_teeth(
         raise HTTPException(status_code=404, detail="Baby not found")
 
     return (
-        db.query(models.Tooth).filter(models.Tooth.baby_id == baby_id).order_by(desc(models.Tooth.emerged_date)).all()
+        db.query(models.Tooth)
+        .filter(models.Tooth.baby_id == baby_id)
+        .order_by(desc(func.coalesce(models.Tooth.emerged_date, models.Tooth.emerging_date)))
+        .all()
     )
 
 
@@ -608,6 +611,9 @@ def create_tooth(
 ):
     baby, role = verify_baby_access(db, tooth.baby_id, user_id, user_email)
     require_write_access(role)
+
+    if tooth.emerging_date is None and tooth.emerged_date is None:
+        raise HTTPException(status_code=400, detail="Provide at least one of emerging_date or emerged_date")
 
     # Check if tooth at this position already exists
     existing = (

@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { useBaby } from '../hooks/useBaby';
 import BabyInsights from './BabyInsights';
-import { calculatePreciseAge } from '../utils/ageUtils';
+import { formatAgeLabel } from '../utils/ageUtils';
 import { TrendingUp, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -12,18 +12,10 @@ export default function Insights({ isPremium = false }: InsightsProps) {
     const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
 
-    const ageLabel = useMemo(() => {
-        if (!selectedBaby?.birth_date) return null;
-        const age = calculatePreciseAge(selectedBaby.birth_date);
-        if (age.days < 0) return null;
-        if (age.days === 0) return t('age.bornToday');
-        if (age.days < 7) return t(age.days === 1 ? 'age.daysOld' : 'age.daysOld_plural', { count: age.days });
-        if (age.weeks < 12) return t(age.weeks === 1 ? 'age.weeksOld' : 'age.weeksOld_plural', { count: age.weeks });
-        if (age.months < 24) return t(age.months === 1 ? 'age.monthsOld' : 'age.monthsOld_plural', { count: age.months });
-        const rm = age.months % 12;
-        if (rm === 0) return t(age.years === 1 ? 'age.yearsOld' : 'age.yearsOld_plural', { count: age.years });
-        return t('age.yearsMonthsOld', { years: age.years, months: rm });
-    }, [selectedBaby, t]);
+    const ageLabel = useMemo(
+        () => formatAgeLabel(selectedBaby?.birth_date, t),
+        [selectedBaby, t],
+    );
 
     return (
         <div className="learn-page">
