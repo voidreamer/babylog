@@ -8,6 +8,7 @@ import AddBabyForm from './AddBabyForm';
 import BabyAvatar, { getAvatarColor } from './BabyAvatar';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { formatAgeLabel } from '../utils/ageUtils';
 
 
 // Get time-based greeting
@@ -16,32 +17,6 @@ function getGreeting() {
     if (hour < 12) return { text: 'goodMorning', icon: 'sun' };
     if (hour < 17) return { text: 'goodAfternoon', icon: 'cloud-sun' };
     return { text: 'goodEvening', icon: 'moon' };
-}
-
-// Calculate age from birth date
-function calculateAge(birthDate: string | null): string | null {
-    if (!birthDate) return null;
-
-    const birth = new Date(birthDate);
-    const now = new Date();
-    const diffMs = now.getTime() - birth.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return null;
-    if (diffDays === 0) return null; // handled by t()
-    if (diffDays === 1) return null;
-    if (diffDays < 7) return null;
-
-    const weeks = Math.floor(diffDays / 7);
-    if (weeks < 12) return null;
-
-    const months = Math.floor(diffDays / 30.44);
-    if (months < 24) return null;
-
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-    if (remainingMonths === 0) return null;
-    return null;
 }
 
 // Get encouraging message based on daily stats
@@ -169,7 +144,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
     if (!selectedBaby) return null;
 
     const greeting = getGreeting();
-    const age = calculateAge(selectedBaby.birth_date);
+    const ageLabel = formatAgeLabel(selectedBaby.birth_date, t);
     const encouragement = getEncouragement(summary);
     const avatarColor = getAvatarColor(selectedBaby.name);
 
@@ -202,7 +177,7 @@ export default function BabyGreeting({ summary }: BabyGreetingProps) {
                             {selectedBaby.name}
                             <ChevronDown size={20} className="baby-greeting-chevron" />
                         </div>
-                        {selectedBaby?.birth_date && <div className="baby-greeting-age">{(() => { const datePart = selectedBaby.birth_date.includes('T') ? selectedBaby.birth_date.split('T')[0] : selectedBaby.birth_date; const birth = new Date(datePart + 'T12:00:00'); const now = new Date(); const diffMs = now.getTime() - birth.getTime(); const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); if (diffDays < 0) return null; if (diffDays === 0) return t('age.bornToday'); if (diffDays === 1) return t('age.daysOld', { count: 1 }); if (diffDays < 7) return t('age.daysOld_plural', { count: diffDays }); const weeks = Math.floor(diffDays / 7); if (weeks < 12) return weeks > 1 ? t('age.weeksOld_plural', { count: weeks }) : t('age.weeksOld', { count: weeks }); const months = Math.floor(diffDays / 30.44); if (months < 24) return months > 1 ? t('age.monthsOld_plural', { count: months }) : t('age.monthsOld', { count: months }); const years = Math.floor(months / 12); const rm = months % 12; if (rm === 0) return years > 1 ? t('age.yearsOld_plural', { count: years }) : t('age.yearsOld', { count: years }); return t('age.yearsMonthsOld', { years, months: rm }); })()}</div>}
+                        {ageLabel && <div className="baby-greeting-age">{ageLabel}</div>}
                     </div>
                 </div>
 

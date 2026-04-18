@@ -8,6 +8,7 @@ import { api } from '../api/client';
 import { supabase } from '../lib/supabase';
 import { pickPhoto, uploadProfilePhoto } from '../utils/photoUpload';
 import BabyAvatar from './BabyAvatar';
+import { formatAgeLabel } from '../utils/ageUtils';
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -138,24 +139,7 @@ export default function BabyProfile({ onBack }: BabyProfileProps) {
         }
     };
 
-    // Age display
-    const getAge = () => {
-        if (!selectedBaby.birth_date) return '';
-        const datePart = selectedBaby.birth_date.includes('T')
-            ? selectedBaby.birth_date.split('T')[0]
-            : selectedBaby.birth_date;
-        const birth = new Date(datePart + 'T12:00:00');
-        const now = new Date();
-        const diffDays = Math.floor((now.getTime() - birth.getTime()) / (1000 * 60 * 60 * 24));
-        if (diffDays < 0) return '';
-        const months = Math.floor(diffDays / 30.44);
-        if (months < 1) return t('common:age.daysOld_plural', { count: diffDays });
-        if (months < 24) return t('common:age.monthsOld_plural', { count: months });
-        const years = Math.floor(months / 12);
-        const rm = months % 12;
-        if (rm === 0) return t('common:age.yearsOld_plural', { count: years });
-        return t('common:age.yearsMonthsOld', { years, months: rm });
-    };
+    const getAge = () => formatAgeLabel(selectedBaby.birth_date, t) ?? '';
 
     const weightUnit = unitsSystem === 'imperial' ? t('settings:units.lbs') : t('settings:units.kg');
     const lengthUnit = unitsSystem === 'imperial' ? t('settings:units.in') : t('settings:units.cm');

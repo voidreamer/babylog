@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { showApiError } from '../../utils/errorHandling';
 import { formatDate } from '../../utils/formatDate';
+import { calculateAgeInMonths } from '../../utils/ageUtils';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from '../ConfirmModal';
 
@@ -65,9 +66,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
     const teethCount = teeth?.length || 0;
 
     // Calculate baby age in months
-    const babyAgeMonths = baby?.birth_date
-        ? Math.floor((new Date().getTime() - new Date(baby.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 30.44))
-        : null;
+    const babyAgeMonths = baby?.birth_date ? calculateAgeInMonths(baby.birth_date) : null;
 
     const handleToothClick = (toothInfo: any) => {
         const existingTooth = emergedTeethMap[toothInfo.position];
