@@ -609,7 +609,8 @@ class SupplementUpdate(BaseModel):
 
 class ToothBase(BaseModel):
     position: str  # e.g., "upper_A_left", "lower_E_right"
-    emerged_date: datetime
+    emerging_date: datetime | None = None
+    emerged_date: datetime | None = None
     notes: str | None = Field(None, max_length=2000)
 
 

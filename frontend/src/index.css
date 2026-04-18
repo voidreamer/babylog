@@ -6172,9 +6172,15 @@ h4 {
   border-color: var(--primary);
 }
 
-.tooth-btn.expected {
+.tooth-btn.emerging {
+  border-color: var(--primary);
+  background: rgba(212, 132, 156, 0.25);
+}
+
+.tooth-btn.due-now {
   border-color: #eab308;
   background: rgba(234, 179, 8, 0.1);
+  border-style: dashed;
 }
 
 .tooth-btn.overdue {
@@ -6211,7 +6217,12 @@ h4 {
   background: var(--primary);
 }
 
-.legend-dot.expected {
+.legend-dot.emerging {
+  background: rgba(212, 132, 156, 0.5);
+  border: 1px solid var(--primary);
+}
+
+.legend-dot.due-now {
   background: #eab308;
 }
 

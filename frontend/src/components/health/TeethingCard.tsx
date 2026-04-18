@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { Smile, Plus, X } from 'lucide-react';
+import { Smile, Info, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { showApiError } from '../../utils/errorHandling';
@@ -48,51 +48,69 @@ const ERUPTION_AGES: Record<string, { min: number; max: number; avg: number }> =
     'E': { min: 23, max: 33, avg: 26 }, // 2nd Molar
 };
 
+type Mode = 'emerging' | 'emerged';
+
 interface TeethingCardProps { baby: any; teeth: any[]; onToothAdded?: () => void; onToothDeleted?: () => void; }
 export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted }: TeethingCardProps) {
     const { t } = useTranslation('health');
     const [selectedTooth, setSelectedTooth] = useState<any>(null);
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [emergedDate, setEmergedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [logMode, setLogMode] = useState<Mode | null>(null);
+    const [logDate, setLogDate] = useState(new Date().toISOString().split('T')[0]);
     const [saving, setSaving] = useState(false);
     const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
-    // Build a map of emerged teeth for quick lookup
-    const emergedTeethMap: Record<string, any> = {};
-    teeth?.forEach(t => {
-        emergedTeethMap[t.position] = t;
+    // Build a map of teeth records by position
+    const teethMap: Record<string, any> = {};
+    teeth?.forEach(tooth => {
+        teethMap[tooth.position] = tooth;
     });
 
-    const teethCount = teeth?.length || 0;
+    const emergedCount = (teeth ?? []).filter(t => t.emerged_date).length;
 
     // Calculate baby age in months
     const babyAgeMonths = baby?.birth_date ? calculateAgeInMonths(baby.birth_date) : null;
 
-    const handleToothClick = (toothInfo: any) => {
-        const existingTooth = emergedTeethMap[toothInfo.position];
-        if (existingTooth) {
-            // Show info about this tooth
-            setSelectedTooth({ ...toothInfo, emerged: existingTooth });
-        } else {
-            // Allow marking as emerged
-            setSelectedTooth(toothInfo);
-            setShowDatePicker(true);
-        }
+    const openLogModal = (toothInfo: any, mode: Mode) => {
+        setSelectedTooth(toothInfo);
+        setLogMode(mode);
+        setLogDate(new Date().toISOString().split('T')[0]);
     };
 
-    const handleMarkEmerged = async () => {
-        if (!selectedTooth) return;
+    const handleToothClick = (toothInfo: any) => {
+        const existing = teethMap[toothInfo.position];
+        setSelectedTooth({ ...toothInfo, record: existing ?? null });
+        setLogMode(null);
+    };
+
+    const handleSave = async () => {
+        if (!selectedTooth || !logMode) return;
 
         setSaving(true);
         try {
-            await api.createTooth({
-                baby_id: baby.id,
-                position: selectedTooth.position,
-                emerged_date: emergedDate,
-            });
-            toast.success(`${selectedTooth.name} marked as emerged!`);
+            const record = teethMap[selectedTooth.position];
+            if (record) {
+                // Promote an existing emerging record to emerged (or amend)
+                await api.updateTooth(record.id, {
+                    baby_id: baby.id,
+                    position: selectedTooth.position,
+                    emerging_date: record.emerging_date,
+                    emerged_date: logMode === 'emerged' ? logDate : record.emerged_date,
+                });
+            } else {
+                await api.createTooth({
+                    baby_id: baby.id,
+                    position: selectedTooth.position,
+                    emerging_date: logMode === 'emerging' ? logDate : null,
+                    emerged_date: logMode === 'emerged' ? logDate : null,
+                });
+            }
+            toast.success(
+                logMode === 'emerged'
+                    ? t('teething.toothMarkedEmerged', { name: selectedTooth.name })
+                    : t('teething.toothMarkedEmerging', { name: selectedTooth.name }),
+            );
             setSelectedTooth(null);
-            setShowDatePicker(false);
+            setLogMode(null);
             if (onToothAdded) onToothAdded();
         } catch (error) {
             showApiError(error, t('failedToSave'), t);
@@ -106,21 +124,23 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
             await api.deleteTooth(toothId);
             toast.success(t('toast_toothRecordRemoved'));
             setSelectedTooth(null);
+            setLogMode(null);
             if (onToothDeleted) onToothDeleted();
         } catch (error) {
             showApiError(error, t('failedToDelete'), t);
         }
     };
 
-
     const getToothStatus = (position: string, label: string): string => {
-        if (emergedTeethMap[position]) return 'emerged';
+        const record = teethMap[position];
+        if (record?.emerged_date) return 'emerged';
+        if (record?.emerging_date) return 'emerging';
         if (babyAgeMonths === null) return 'unknown';
 
         const ages = ERUPTION_AGES[label];
         if (!ages) return 'unknown';
 
-        if (babyAgeMonths >= ages.min && babyAgeMonths <= ages.max) return 'expected';
+        if (babyAgeMonths >= ages.min && babyAgeMonths <= ages.max) return 'due-now';
         if (babyAgeMonths > ages.max) return 'overdue';
         return 'future';
     };
@@ -136,12 +156,17 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                         onClick={() => handleToothClick(tooth)}
                         title={`${tooth.name} (${tooth.label})`}
                     >
-                        <span className="tooth-icon">{status === 'emerged' ? '🦷' : '○'}</span>
+                        <span className="tooth-icon">
+                            {status === 'emerged' ? '🦷' : status === 'emerging' ? '◐' : '○'}
+                        </span>
                     </button>
                 );
             })}
         </div>
     );
+
+    const record = selectedTooth?.record ?? null;
+    const showInfo = selectedTooth && logMode === null;
 
     return (
         <div className="health-card teething-card">
@@ -150,7 +175,7 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                     <Smile size={18} />
                     {t('teething.title')}
                 </h3>
-                <span className="health-card-count">{t('teething.teethCount', { count: teethCount })}</span>
+                <span className="health-card-count">{t('teething.teethCount', { count: emergedCount })}</span>
             </div>
 
             {/* Teeth Diagram */}
@@ -165,42 +190,19 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
             {/* Legend */}
             <div className="teeth-legend">
                 <span className="legend-item"><span className="legend-dot emerged" /> {t('teething.emerged')}</span>
-                <span className="legend-item"><span className="legend-dot expected" /> {t('teething.expected')}</span>
+                <span className="legend-item"><span className="legend-dot emerging" /> {t('teething.emerging')}</span>
+                <span
+                    className="legend-item"
+                    title={t('teething.dueNowHint')}
+                >
+                    <span className="legend-dot due-now" /> {t('teething.dueNow')}
+                    <Info size={12} style={{ marginLeft: 4, opacity: 0.6 }} aria-hidden="true" />
+                </span>
                 <span className="legend-item"><span className="legend-dot future" /> {t('teething.future')}</span>
             </div>
 
-            {/* Date Picker Modal */}
-            {showDatePicker && selectedTooth && !selectedTooth.emerged && (
-                <div className="tooth-modal-overlay" onClick={() => setShowDatePicker(false)}>
-                    <div className="tooth-modal" onClick={e => e.stopPropagation()}>
-                        <button className="tooth-modal-close" onClick={() => setShowDatePicker(false)}>
-                            <X size={18} />
-                        </button>
-                        <h4>{t('teething.markEmerged', { name: selectedTooth.name })}</h4>
-                        <p className="tooth-modal-subtitle">
-                            {selectedTooth.position.includes('upper') ? t('teething.upper') : t('teething.lower')} {selectedTooth.label}
-                        </p>
-                        <input
-                            type="date"
-                            value={emergedDate}
-                            onChange={(e) => setEmergedDate(e.target.value)}
-                            className="tooth-date-input"
-                        />
-                        <div className="tooth-modal-actions">
-                            <button
-                                className="btn btn-primary"
-                                onClick={handleMarkEmerged}
-                                disabled={saving}
-                            >
-                                {saving ? t('common:saving') : t('teething.markEmergedBtn')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Info Modal for emerged tooth */}
-            {selectedTooth?.emerged && (
+            {/* Info / action modal */}
+            {showInfo && selectedTooth && (
                 <div className="tooth-modal-overlay" onClick={() => setSelectedTooth(null)}>
                     <div className="tooth-modal" onClick={e => e.stopPropagation()}>
                         <button className="tooth-modal-close" onClick={() => setSelectedTooth(null)}>
@@ -210,15 +212,88 @@ export default function TeethingCard({ baby, teeth, onToothAdded, onToothDeleted
                         <p className="tooth-modal-subtitle">
                             {selectedTooth.position.includes('upper') ? t('teething.upper') : t('teething.lower')} {selectedTooth.label}
                         </p>
-                        <p className="tooth-emerged-date">
-                            {t('teething.emergedDate', { date: formatDate(selectedTooth.emerged.emerged_date) })}
+
+                        {record?.emerging_date && (
+                            <p className="tooth-emerged-date">
+                                {t('teething.emergingDate', { date: formatDate(record.emerging_date) })}
+                            </p>
+                        )}
+                        {record?.emerged_date && (
+                            <p className="tooth-emerged-date">
+                                {t('teething.emergedDate', { date: formatDate(record.emerged_date) })}
+                            </p>
+                        )}
+
+                        <div className="tooth-modal-actions">
+                            {!record && (
+                                <>
+                                    <button
+                                        className="btn btn-ghost"
+                                        onClick={() => openLogModal(selectedTooth, 'emerging')}
+                                    >
+                                        {t('teething.markEmergingBtn')}
+                                    </button>
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={() => openLogModal(selectedTooth, 'emerged')}
+                                    >
+                                        {t('teething.markEmergedBtn')}
+                                    </button>
+                                </>
+                            )}
+                            {record && !record.emerged_date && (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => openLogModal(selectedTooth, 'emerged')}
+                                >
+                                    {t('teething.updateToEmerged')}
+                                </button>
+                            )}
+                            {record && (
+                                <button
+                                    className="btn btn-ghost btn-danger"
+                                    onClick={() => setConfirmDeleteId(record.id)}
+                                >
+                                    {t('teething.removeRecord')}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Date picker modal */}
+            {selectedTooth && logMode && (
+                <div className="tooth-modal-overlay" onClick={() => setLogMode(null)}>
+                    <div className="tooth-modal" onClick={e => e.stopPropagation()}>
+                        <button className="tooth-modal-close" onClick={() => setLogMode(null)}>
+                            <X size={18} />
+                        </button>
+                        <h4>
+                            {logMode === 'emerged'
+                                ? t('teething.markEmerged', { name: selectedTooth.name })
+                                : t('teething.markEmerging', { name: selectedTooth.name })}
+                        </h4>
+                        <p className="tooth-modal-subtitle">
+                            {selectedTooth.position.includes('upper') ? t('teething.upper') : t('teething.lower')} {selectedTooth.label}
                         </p>
+                        <input
+                            type="date"
+                            value={logDate}
+                            onChange={(e) => setLogDate(e.target.value)}
+                            className="tooth-date-input"
+                        />
                         <div className="tooth-modal-actions">
                             <button
-                                className="btn btn-ghost btn-danger"
-                                onClick={() => setConfirmDeleteId(selectedTooth.emerged.id)}
+                                className="btn btn-primary"
+                                onClick={handleSave}
+                                disabled={saving}
                             >
-                                {t('teething.removeRecord')}
+                                {saving
+                                    ? t('common:saving')
+                                    : logMode === 'emerged'
+                                        ? t('teething.markEmergedBtn')
+                                        : t('teething.markEmergingBtn')}
                             </button>
                         </div>
                     </div>

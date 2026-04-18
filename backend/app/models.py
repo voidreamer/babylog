@@ -238,7 +238,8 @@ class Tooth(Base):
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     position = Column(String(20), nullable=False)  # e.g., "upper_A_left", "lower_E_right"
-    emerged_date = Column(DateTime, nullable=False)
+    emerging_date = Column(DateTime, nullable=True)
+    emerged_date = Column(DateTime, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
 
