@@ -1,0 +1,79 @@
+# Staging Backend Deploy
+# Deploys the FastAPI backend to the staging Lambda on each PR so the
+# Cloudflare-hosted frontend previews have a working API to call.
+
+name: Staging Backend Deploy
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/staging-deploy.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-backend-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  AWS_REGION: ca-central-1
+  STAGING_LAMBDA: simplebaby-api-staging
+
+jobs:
+  deploy-staging-backend:
+    if: github.actor != 'dependabot[bot]'
+    name: Deploy Backend to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Package backend
+        run: |
+          cd backend
+          pip install -r requirements.txt -t package/
+          cp -r app package/
+          cp -r alembic package/
+          cp alembic.ini package/
+          cd package && zip -r ../lambda.zip . -q
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL secret not set - skipping migrations"
+            exit 0
+          fi
+          cd backend
+          pip install -r requirements.txt -q
+          alembic upgrade head || echo "Migration skipped (staging DB may have migrations from other branches)"
+
+      - name: Deploy to staging Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.STAGING_LAMBDA }} \
+            --zip-file fileb://backend/lambda.zip \
+            --no-cli-pager
+          aws lambda wait function-updated \
+            --function-name ${{ env.STAGING_LAMBDA }}
+          echo "Staging Lambda updated"
