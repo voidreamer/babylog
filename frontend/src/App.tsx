@@ -25,6 +25,7 @@ import { useMoonlightFlag } from './components/moonlight/useMoonlightFlag';
 // Lazy load routes for bundle splitting
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const MoonlightHome = lazy(() => import('./components/moonlight/Home'));
+const MoonlightOnboarding = lazy(() => import('./components/moonlight/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -725,17 +726,22 @@ function MainApp() {
     }, [t, babies]);
 
     if (showOnboarding && !babiesLoading && babies.length === 0 && online) {
+        const onComplete = () => {
+            setShowOnboarding(false);
+            setOnboardingState(prev => ({ ...prev, onboardingCompleted: true }));
+            // Give Dashboard time to mount before starting tour
+            if (!onboardingState.tourCompleted) {
+                setTimeout(() => setShowTour(true), 600);
+            }
+        };
         return (
-            <Onboarding
-                onComplete={() => {
-                    setShowOnboarding(false);
-                    setOnboardingState(prev => ({ ...prev, onboardingCompleted: true }));
-                    // Give Dashboard time to mount before starting tour
-                    if (!onboardingState.tourCompleted) {
-                        setTimeout(() => setShowTour(true), 600);
-                    }
-                }}
-            />
+            <Suspense fallback={<LoadingSpinner />}>
+                {moonlight ? (
+                    <MoonlightOnboarding onComplete={onComplete} />
+                ) : (
+                    <Onboarding onComplete={onComplete} />
+                )}
+            </Suspense>
         );
     }
 
