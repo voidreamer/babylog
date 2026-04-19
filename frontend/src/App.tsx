@@ -28,6 +28,7 @@ const MoonlightHome = lazy(() => import('./components/moonlight/Home'));
 const MoonlightOnboarding = lazy(() => import('./components/moonlight/Onboarding'));
 const MoonlightTimeline = lazy(() => import('./components/moonlight/Timeline'));
 const MoonlightHealth = lazy(() => import('./components/moonlight/Health'));
+const MoonlightInsights = lazy(() => import('./components/moonlight/Insights'));
 const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -831,7 +832,13 @@ function MainApp() {
                 )}
                 {activeTab === 'insights' && (
                     <ErrorBoundary level="page">
-                        <Insights isPremium={isPremium} />
+                        <Suspense fallback={<LoadingSpinner />}>
+                            {moonlight ? (
+                                <MoonlightInsights isPremium={isPremium} />
+                            ) : (
+                                <Insights isPremium={isPremium} />
+                            )}
+                        </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'settings' && (

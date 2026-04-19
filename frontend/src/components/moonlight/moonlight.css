@@ -503,3 +503,142 @@
   letter-spacing: 1px;
 }
 
+/* ============================================================================
+   Insights tab (phase 8) — classic BabyInsights + sub-sections restyled via
+   CSS. Scoped to [data-ui="moonlight"] so the flag-off path is untouched.
+   ============================================================================ */
+
+[data-ui="moonlight"] .insights-container {
+  gap: 20px;
+}
+
+[data-ui="moonlight"] .insights-time-range {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  padding: 4px;
+}
+
+[data-ui="moonlight"] .time-range-btn {
+  color: var(--ml-text-2);
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+}
+
+[data-ui="moonlight"] .time-range-btn.active {
+  background: var(--ml-accent);
+  color: #0a0706;
+}
+
+[data-ui="moonlight"] .time-range-btn:not(.active):hover {
+  color: var(--ml-text);
+  background: color-mix(in srgb, var(--ml-text) 5%, transparent);
+}
+
+[data-ui="moonlight"] .insights-section-title {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .insights-section-title svg {
+  color: var(--ml-accent);
+}
+
+[data-ui="moonlight"] .insights-section-title .premium-lock {
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .age-badge {
+  background: color-mix(in srgb, var(--ml-accent) 12%, transparent);
+  color: var(--ml-accent);
+  border: 0.5px solid color-mix(in srgb, var(--ml-accent) 30%, transparent);
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+
+[data-ui="moonlight"] .insight-card {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 14px;
+}
+
+[data-ui="moonlight"] .insight-card-label {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .insight-card-value {
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .insight-card-alert {
+  color: #D98571;
+}
+
+/* Loading / empty / error / collecting states */
+[data-ui="moonlight"] .insights-empty,
+[data-ui="moonlight"] .insights-loading,
+[data-ui="moonlight"] .insights-error,
+[data-ui="moonlight"] .insights-collecting {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 18px;
+  color: var(--ml-text-2);
+  padding: 32px 20px;
+}
+
+[data-ui="moonlight"] .insights-empty p,
+[data-ui="moonlight"] .insights-error p,
+[data-ui="moonlight"] .insights-collecting p {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  color: var(--ml-text-2);
+}
+
+[data-ui="moonlight"] .insights-collecting h3 {
+  font-family: inherit;
+  font-weight: 400;
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .insights-collecting-icon {
+  color: var(--ml-accent);
+}
+
+[data-ui="moonlight"] .insights-collecting-progress {
+  color: var(--ml-text-3);
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+}
+
+/* Patterns / trends / benchmarks tables and chips */
+[data-ui="moonlight"] .insights-patterns,
+[data-ui="moonlight"] .insights-trends,
+[data-ui="moonlight"] .insights-benchmarks {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 18px;
+  box-shadow: none;
+}
+
+[data-ui="moonlight"] .insights-comparison-list,
+[data-ui="moonlight"] .insights-comparison-grid {
+  color: var(--ml-text);
+}
+
