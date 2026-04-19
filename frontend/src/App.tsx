@@ -26,6 +26,7 @@ import { useMoonlightFlag } from './components/moonlight/useMoonlightFlag';
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const MoonlightHome = lazy(() => import('./components/moonlight/Home'));
 const MoonlightOnboarding = lazy(() => import('./components/moonlight/Onboarding'));
+const MoonlightTimeline = lazy(() => import('./components/moonlight/Timeline'));
 const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -805,7 +806,9 @@ function MainApp() {
                 )}
                 {activeTab === 'timeline' && (
                     <ErrorBoundary level="page">
-                        <TimelineCalendar />
+                        <Suspense fallback={<LoadingSpinner />}>
+                            {moonlight ? <MoonlightTimeline /> : <TimelineCalendar />}
+                        </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'health' && (
