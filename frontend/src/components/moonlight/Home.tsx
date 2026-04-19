@@ -22,14 +22,34 @@ import { Ribbon } from './Ribbon';
 import { SectionLabel } from './UI';
 import { Icon } from './Icon';
 import { HoldButton } from './HoldButton';
+import { bumpUsage, getRankedActions, type SecondaryKind } from './usage';
+import { SECONDARY_META, getApplicableSecondaryActions } from './secondaryActions';
+import { calculateAgeInMonths } from '../../utils/ageUtils';
 import type { OrbMode, TimelineEvent } from './types';
 
 const FeedingModal = lazy(() => import('../FeedingModal'));
 const DiaperModal = lazy(() => import('../DiaperModal'));
 const SleepModal = lazy(() => import('../SleepModal'));
 const PumpingModal = lazy(() => import('../PumpingModal'));
+const TummyTimeModal = lazy(() => import('../TummyTimeModal'));
+const PottyModal = lazy(() => import('../PottyModal'));
+const BathModal = lazy(() => import('../BathModal'));
+const SupplementModal = lazy(() => import('../SupplementModal'));
+const SolidModal = lazy(() => import('../SolidModal'));
 
-type ModalKind = 'feeding' | 'diaper' | 'sleep' | 'pumping' | null;
+type ModalKind =
+  | 'feeding'
+  | 'diaper'
+  | 'sleep'
+  | 'pumping'
+  | 'tummy'
+  | 'potty'
+  | 'bath'
+  | 'supplement'
+  | 'solid'
+  | null;
+
+const SLEEP_ACCENT = '#8BA5C4';
 
 function parseUTC(time: string): Date {
   return new Date(time.endsWith('Z') ? time : time + 'Z');
@@ -219,10 +239,32 @@ export default function MoonlightHome() {
     setActiveModal(kind);
   }, []);
   const closeModal = useCallback(() => setActiveModal(null), []);
-  const onModalSave = useCallback(() => {
-    setActiveModal(null);
-    void load();
-  }, [load]);
+  /**
+   * Saved-from-modal handler. Bumps usage for tracked secondary kinds so the
+   * dynamic-layout ranking updates immediately; feed/sleep aren't tracked
+   * (they're fixed heroes).
+   */
+  const onModalSave = useCallback(
+    (kind: ModalKind) => {
+      // Map the ModalKind back to a SecondaryKind for usage tracking.
+      // feed/sleep are fixed heroes and aren't tracked.
+      const secondary: SecondaryKind | null =
+        kind === 'pumping'
+          ? 'pump'
+          : kind === 'diaper' ||
+              kind === 'tummy' ||
+              kind === 'potty' ||
+              kind === 'bath' ||
+              kind === 'supplement' ||
+              kind === 'solid'
+            ? kind
+            : null;
+      if (secondary) bumpUsage(secondary);
+      setActiveModal(null);
+      void load();
+    },
+    [load],
+  );
 
   // Quick-log handlers mirror the production widgets' api payloads so offline
   // sync + cache invalidation remain identical.
@@ -281,6 +323,7 @@ export default function MoonlightHome() {
               ? t('dashboard:diaper.poo')
               : t('dashboard:diaper.both');
         toast.success(t('dashboard:diaper.diaperLogged', { type: label }));
+        bumpUsage('diaper');
         await load();
       } catch {
         toast.error(t('dashboard:toast_failedToLogDiaper'));
@@ -340,6 +383,7 @@ export default function MoonlightHome() {
       });
       hapticNotification();
       toast.success(t('dashboard:pumping.quickLogged', { amount: '60 ml' }));
+      bumpUsage('pump');
       await load();
     } catch {
       toast.error(t('dashboard:toast_failedToSavePumping'));
@@ -347,6 +391,181 @@ export default function MoonlightHome() {
       setSavingChip(null);
     }
   }, [selectedBaby, load, t]);
+
+  // Derive the ordered list of secondary actions for this baby's age, then
+  // rank by recent usage. Top 2 render as "large" tiles; rest render compact.
+  const ageMonths = selectedBaby?.birth_date
+    ? calculateAgeInMonths(selectedBaby.birth_date)
+    : null;
+  const rankedSecondaries = useMemo(() => {
+    const applicable = getApplicableSecondaryActions(ageMonths);
+    return getRankedActions(applicable);
+  }, [ageMonths, dashboard]);
+  const largeSecondaries = rankedSecondaries.slice(0, 2);
+  const compactSecondaries = rankedSecondaries.slice(2);
+
+  // Map secondary kind → ModalKind (pump → pumping, else identical).
+  const modalKindFor = (k: SecondaryKind): ModalKind =>
+    k === 'pump' ? 'pumping' : k;
+
+  // Map kind → rendered icon. Kept local so the registry stays tree-shakeable.
+  const iconFor = (k: SecondaryKind) => {
+    switch (k) {
+      case 'diaper':
+        return <Icon.Diaper />;
+      case 'pump':
+        return <Icon.Plus />;
+      case 'tummy':
+        return <Icon.Play />;
+      case 'potty':
+        return <Icon.Check />;
+      case 'bath':
+        return <Icon.Home />;
+      case 'supplement':
+        return <Icon.Plus />;
+      case 'solid':
+        return <Icon.Feed />;
+    }
+  };
+
+  const largeTileStyle: CSSProperties = {
+    padding: '12px',
+    borderRadius: 18,
+    background: 'var(--ml-surface)',
+    color: 'var(--ml-text)',
+    border: '0.5px solid var(--ml-line)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 6,
+  };
+
+  const compactTileStyle: CSSProperties = {
+    padding: '12px 8px',
+    borderRadius: 14,
+    background: 'var(--ml-surface)',
+    color: 'var(--ml-text)',
+    border: '0.5px solid var(--ml-line)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+  };
+
+  const renderLargeTile = (kind: SecondaryKind) => {
+    const meta = SECONDARY_META[kind];
+    const label = t(meta.labelKey);
+    const IconNode = iconFor(kind);
+
+    if (kind === 'diaper') {
+      return (
+        <HoldButton
+          key={kind}
+          ariaLabel={`${label}. ${t('common:moonlight.holdForOptions')}`}
+          onHold={() => openModal('diaper')}
+          borderRadius={18}
+          style={largeTileStyle}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ color: meta.color }}>{IconNode}</div>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>{label}</div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <Chip
+              variant="ghost"
+              disabled={savingChip !== null}
+              onTap={() => quickLogDiaper('pee')}
+              ariaLabel={t('dashboard:diaper.pee')}
+            >
+              {savingChip === 'diaper:pee' ? '…' : t('dashboard:diaper.pee')}
+            </Chip>
+            <Chip
+              variant="ghost"
+              disabled={savingChip !== null}
+              onTap={() => quickLogDiaper('poo')}
+              ariaLabel={t('dashboard:diaper.poo')}
+            >
+              {savingChip === 'diaper:poo' ? '…' : t('dashboard:diaper.poo')}
+            </Chip>
+            <Chip
+              variant="ghost"
+              disabled={savingChip !== null}
+              onTap={() => quickLogDiaper('mixed')}
+              ariaLabel={t('dashboard:diaper.both')}
+            >
+              {savingChip === 'diaper:mixed' ? '…' : t('dashboard:diaper.both')}
+            </Chip>
+          </div>
+        </HoldButton>
+      );
+    }
+
+    if (kind === 'pump') {
+      return (
+        <HoldButton
+          key={kind}
+          ariaLabel={`${label}. ${t('common:moonlight.holdForOptions')}`}
+          onHold={() => openModal('pumping')}
+          borderRadius={18}
+          style={largeTileStyle}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ color: meta.color }}>{IconNode}</div>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>{label}</div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <Chip
+              variant="ghost"
+              disabled={savingChip !== null}
+              onTap={quickLogPumpTimerless}
+              ariaLabel="60 ml"
+            >
+              {savingChip === 'pump:60' ? '…' : '60 ml'}
+            </Chip>
+          </div>
+        </HoldButton>
+      );
+    }
+
+    // No chips → plain tap-to-modal button (hold gesture not meaningful here).
+    return (
+      <button
+        key={kind}
+        type="button"
+        onClick={() => openModal(modalKindFor(kind))}
+        aria-label={label}
+        style={{ ...largeTileStyle, cursor: 'pointer' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ color: meta.color }}>{IconNode}</div>
+          <div style={{ fontSize: 13, fontWeight: 500 }}>{label}</div>
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--ml-text-3)' }}>
+          {t('dashboard:tapToLog')}
+        </div>
+      </button>
+    );
+  };
+
+  const renderCompactTile = (kind: SecondaryKind) => {
+    const meta = SECONDARY_META[kind];
+    const label = t(meta.labelKey);
+    return (
+      <button
+        key={kind}
+        type="button"
+        onClick={() => openModal(modalKindFor(kind))}
+        aria-label={label}
+        style={compactTileStyle}
+      >
+        <div style={{ color: meta.color }}>{iconFor(kind)}</div>
+        <div style={{ fontSize: 11, fontWeight: 500, textAlign: 'center' }}>{label}</div>
+      </button>
+    );
+  };
 
   const now = new Date();
   const orb = useMemo(() => deriveOrbState(dashboard), [dashboard]);
@@ -492,7 +711,7 @@ export default function MoonlightHome() {
             </div>
           </HoldButton>
 
-          {/* Sleep — toggle based on current_sleep */}
+          {/* Sleep — soft blue filled, toggle based on current_sleep */}
           <HoldButton
             ariaLabel={`${t('dashboard:quickActionsSection.sleep')}. ${t('common:moonlight.holdForOptions')}`}
             onHold={() => openModal('sleep')}
@@ -500,9 +719,8 @@ export default function MoonlightHome() {
             style={{
               padding: '18px 16px 14px',
               borderRadius: 22,
-              background: 'var(--ml-surface)',
-              color: 'var(--ml-text)',
-              border: '0.5px solid var(--ml-line)',
+              background: SLEEP_ACCENT,
+              color: '#0a0706',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
@@ -510,16 +728,14 @@ export default function MoonlightHome() {
               textAlign: 'left',
             }}
           >
-            <div style={{ color: '#8BA5C4' }}>
-              <Icon.Sleep />
-            </div>
-            <div style={{ fontSize: 17, fontWeight: 500, marginTop: 2 }}>
+            <Icon.Sleep />
+            <div style={{ fontSize: 17, fontWeight: 600, marginTop: 2 }}>
               {t('dashboard:quickActionsSection.sleep')}
             </div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
               {dashboard?.current_sleep?.id ? (
                 <Chip
-                  variant="ghost"
+                  variant="solid"
                   disabled={savingChip !== null}
                   onTap={quickWakeUp}
                   ariaLabel={t('dashboard:toast_babyIsAwake')}
@@ -528,7 +744,7 @@ export default function MoonlightHome() {
                 </Chip>
               ) : (
                 <Chip
-                  variant="ghost"
+                  variant="solid"
                   disabled={savingChip !== null}
                   onTap={quickStartSleep}
                   ariaLabel={t('dashboard:sleep.startSleep')}
@@ -537,104 +753,29 @@ export default function MoonlightHome() {
                 </Chip>
               )}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--ml-text-3)', marginTop: 2 }}>
+            <div style={{ fontSize: 11, opacity: 0.7, marginTop: 2 }}>
               {t('common:moonlight.holdForOptions')}
             </div>
           </HoldButton>
         </div>
       )}
 
-      {selectedBaby && (
+      {selectedBaby && largeSecondaries.length > 0 && (
         <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {/* Diaper — chip row */}
-          <HoldButton
-            ariaLabel={`${t('dashboard:quickActionsSection.diaper')}. ${t('common:moonlight.holdForOptions')}`}
-            onHold={() => openModal('diaper')}
-            borderRadius={18}
-            style={{
-              padding: '12px',
-              borderRadius: 18,
-              background: 'var(--ml-surface)',
-              color: 'var(--ml-text)',
-              border: '0.5px solid var(--ml-line)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: 6,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ color: '#D9C388' }}>
-                <Icon.Diaper />
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 500 }}>
-                {t('dashboard:quickActionsSection.diaper')}
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <Chip
-                variant="ghost"
-                disabled={savingChip !== null}
-                onTap={() => quickLogDiaper('pee')}
-                ariaLabel={t('dashboard:diaper.pee')}
-              >
-                {savingChip === 'diaper:pee' ? '…' : t('dashboard:diaper.pee')}
-              </Chip>
-              <Chip
-                variant="ghost"
-                disabled={savingChip !== null}
-                onTap={() => quickLogDiaper('poo')}
-                ariaLabel={t('dashboard:diaper.poo')}
-              >
-                {savingChip === 'diaper:poo' ? '…' : t('dashboard:diaper.poo')}
-              </Chip>
-              <Chip
-                variant="ghost"
-                disabled={savingChip !== null}
-                onTap={() => quickLogDiaper('mixed')}
-                ariaLabel={t('dashboard:diaper.both')}
-              >
-                {savingChip === 'diaper:mixed' ? '…' : t('dashboard:diaper.both')}
-              </Chip>
-            </div>
-          </HoldButton>
+          {largeSecondaries.map((kind) => renderLargeTile(kind))}
+        </div>
+      )}
 
-          {/* Pump — single quick 60ml chip; hold → modal for custom amount */}
-          <HoldButton
-            ariaLabel={`${t('dashboard:quickActionsSection.pump')}. ${t('common:moonlight.holdForOptions')}`}
-            onHold={() => openModal('pumping')}
-            borderRadius={18}
-            style={{
-              padding: '12px',
-              borderRadius: 18,
-              background: 'var(--ml-surface)',
-              color: 'var(--ml-text)',
-              border: '0.5px solid var(--ml-line)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: 6,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ color: '#9BC29E' }}>
-                <Icon.Plus />
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 500 }}>
-                {t('dashboard:quickActionsSection.pump')}
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <Chip
-                variant="ghost"
-                disabled={savingChip !== null}
-                onTap={quickLogPumpTimerless}
-                ariaLabel="60 ml"
-              >
-                {savingChip === 'pump:60' ? '…' : '60 ml'}
-              </Chip>
-            </div>
-          </HoldButton>
+      {selectedBaby && compactSecondaries.length > 0 && (
+        <div
+          style={{
+            marginTop: 10,
+            display: 'grid',
+            gridTemplateColumns: `repeat(${Math.min(4, compactSecondaries.length)}, 1fr)`,
+            gap: 8,
+          }}
+        >
+          {compactSecondaries.map((kind) => renderCompactTile(kind))}
         </div>
       )}
 
@@ -656,16 +797,50 @@ export default function MoonlightHome() {
       {activeModal && selectedBaby && (
         <Suspense fallback={null}>
           {activeModal === 'feeding' && (
-            <FeedingModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+            <FeedingModal
+              babyId={selectedBaby.id}
+              onClose={closeModal}
+              onSave={() => onModalSave('feeding')}
+            />
           )}
           {activeModal === 'diaper' && (
-            <DiaperModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+            <DiaperModal
+              babyId={selectedBaby.id}
+              onClose={closeModal}
+              onSave={() => onModalSave('diaper')}
+            />
           )}
           {activeModal === 'sleep' && (
-            <SleepModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+            <SleepModal
+              babyId={selectedBaby.id}
+              onClose={closeModal}
+              onSave={() => onModalSave('sleep')}
+            />
           )}
           {activeModal === 'pumping' && (
-            <PumpingModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+            <PumpingModal
+              babyId={selectedBaby.id}
+              onClose={closeModal}
+              onSave={() => onModalSave('pumping')}
+            />
+          )}
+          {activeModal === 'tummy' && (
+            <TummyTimeModal
+              onClose={closeModal}
+              onSave={() => onModalSave('tummy')}
+            />
+          )}
+          {activeModal === 'potty' && (
+            <PottyModal onClose={closeModal} onSave={() => onModalSave('potty')} />
+          )}
+          {activeModal === 'bath' && (
+            <BathModal onClose={closeModal} onSave={() => onModalSave('bath')} />
+          )}
+          {activeModal === 'supplement' && (
+            <SupplementModal onClose={closeModal} onSave={() => onModalSave('supplement')} />
+          )}
+          {activeModal === 'solid' && (
+            <SolidModal onClose={closeModal} onSave={() => onModalSave('solid')} />
           )}
         </Suspense>
       )}
