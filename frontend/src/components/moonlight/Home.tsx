@@ -17,6 +17,7 @@ import { useBaby } from '../../hooks/useBaby';
 import { api } from '../../api/client';
 import { hapticImpact, hapticNotification, hapticSelection } from '../../utils/haptics';
 import { Orb } from './Orb';
+import { BabyFace } from './BabyFace';
 import { Ribbon } from './Ribbon';
 import { SectionLabel } from './UI';
 import { Icon } from './Icon';
@@ -377,7 +378,24 @@ export default function MoonlightHome() {
       </div>
 
       <div style={{ padding: '24px 0 0', textAlign: 'center' }}>
-        <Orb size={170} mode={orb.mode} urgency={orb.urgency} />
+        <Orb
+          size={170}
+          mode={orb.mode}
+          urgency={orb.urgency}
+          iconSrc={
+            orb.mode === 'sleepy'
+              ? `${import.meta.env.BASE_URL}icons/sleep2.png`
+              : undefined
+          }
+          iconNode={
+            orb.mode === 'sleepy' ? undefined : (
+              <div style={{ color: '#2a1f1a', width: '100%', height: '100%' }}>
+                <BabyFace mood={orb.mode as 'calm' | 'content' | 'alert' | 'hungry'} />
+              </div>
+            )
+          }
+          iconScale={orb.mode === 'sleepy' ? 0.55 : 0.5}
+        />
       </div>
 
       <div style={{ padding: '16px 0 0', textAlign: 'center' }}>
