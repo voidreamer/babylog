@@ -634,71 +634,6 @@ export default function MoonlightTimeline() {
                   {detail && (
                     <div style={{ fontSize: 11, color: 'var(--ml-text-2)' }}>{detail}</div>
                   )}
-                  {isSelected && (
-                    <div
-                      style={{
-                        marginTop: 'auto',
-                        display: 'flex',
-                        gap: 6,
-                        paddingTop: 6,
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditEvent(event);
-                        }}
-                        aria-label={t('dashboard:timeline.edit', { defaultValue: 'Edit' })}
-                        style={{
-                          flex: 1,
-                          padding: '4px 8px',
-                          borderRadius: 999,
-                          border: 'none',
-                          background: 'var(--ml-text)',
-                          color: 'var(--ml-bg)',
-                          fontSize: 11,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: 4,
-                          fontFamily: 'inherit',
-                        }}
-                      >
-                        <Pencil size={11} />
-                        {t('dashboard:timeline.edit', { defaultValue: 'Edit' })}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setConfirmDelete(event);
-                        }}
-                        aria-label={t('common:delete')}
-                        style={{
-                          flex: 1,
-                          padding: '4px 8px',
-                          borderRadius: 999,
-                          border: '0.5px solid var(--ml-line)',
-                          background: 'transparent',
-                          color: 'var(--ml-text)',
-                          fontSize: 11,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: 4,
-                          fontFamily: 'inherit',
-                        }}
-                      >
-                        <Trash2 size={11} />
-                        {t('dashboard:timeline.delete', { defaultValue: 'Delete' })}
-                      </button>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -725,6 +660,112 @@ export default function MoonlightTimeline() {
           </div>
         </div>
       )}
+
+      {/* Selection action bar — single location for edit/delete regardless of block size */}
+      {(() => {
+        if (!selectedKey) return null;
+        const selected = events.find((e) => eventKey(e) === selectedKey);
+        if (!selected) return null;
+        const style = EVENT_STYLE[selected.event_type as EventType];
+        if (!style) return null;
+        const label = t(style.labelKey);
+        const time = format(parseUTC(selected.time), 'h:mm a').toLowerCase();
+        const detail = formatEventDetail(selected, t);
+        return (
+          <div
+            role="toolbar"
+            aria-label={t('dashboard:timeline.selectionActions', {
+              defaultValue: 'Event actions',
+            })}
+            style={{
+              marginTop: 10,
+              padding: '10px 12px',
+              borderRadius: 14,
+              background: 'var(--ml-surface)',
+              border: `0.5px solid ${style.color}66`,
+              borderLeft: `3px solid ${style.color}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  textTransform: 'capitalize',
+                  color: 'var(--ml-text)',
+                }}
+              >
+                {label}
+                <span
+                  className="mono"
+                  style={{ marginLeft: 8, letterSpacing: 0.6 }}
+                >
+                  {time}
+                </span>
+              </div>
+              {detail && (
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--ml-text-2)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {detail}
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditEvent(selected)}
+              style={{
+                padding: '8px 14px',
+                borderRadius: 999,
+                border: 'none',
+                background: 'var(--ml-text)',
+                color: 'var(--ml-bg)',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontFamily: 'inherit',
+              }}
+            >
+              <Pencil size={12} />
+              {t('dashboard:timeline.edit', { defaultValue: 'Edit' })}
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(selected)}
+              aria-label={t('common:delete')}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 999,
+                border: '0.5px solid var(--ml-line)',
+                background: 'transparent',
+                color: 'var(--ml-text)',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontFamily: 'inherit',
+              }}
+            >
+              <Trash2 size={12} />
+              {t('dashboard:timeline.delete', { defaultValue: 'Delete' })}
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Edit modal */}
       {editEvent && selectedBaby && (

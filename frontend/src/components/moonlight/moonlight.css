@@ -206,3 +206,300 @@
     transition: none !important;
   }
 }
+
+/* ============================================================================
+   Health tab — classic surfaces re-skinned via CSS (phase 7c)
+
+   When the moonlight flag is on the Health tab mounts classic widgets
+   (VaccinationSchedule, TeethingCard, AllergiesCard, SickDaysCard,
+   RecordsSection). Each uses .health-card and friends. Overrides below live
+   under [data-ui="moonlight"] so the flag-off path is untouched. GrowthCard
+   is out of scope because MoonlightGrowthCard (7b) replaces it wholesale.
+   ============================================================================ */
+
+[data-ui="moonlight"] .health-card {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 16px;
+}
+
+[data-ui="moonlight"] .health-card:hover {
+  box-shadow: none;
+}
+
+[data-ui="moonlight"] .health-card-header {
+  margin-bottom: 12px;
+}
+
+[data-ui="moonlight"] .health-card-title {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .health-card-title svg {
+  color: var(--ml-accent);
+}
+
+[data-ui="moonlight"] .health-card-count {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .health-card-action {
+  color: var(--ml-accent);
+  background: transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 6px 10px;
+}
+
+[data-ui="moonlight"] .health-card-action:hover {
+  background: color-mix(in srgb, var(--ml-accent) 10%, transparent);
+}
+
+[data-ui="moonlight"] .health-card-empty {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ml-text-3);
+  padding: 18px 0;
+}
+
+/* Records summary tiles */
+[data-ui="moonlight"] .records-summary-grid {
+  gap: 10px;
+}
+
+[data-ui="moonlight"] .records-summary-card {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 14px;
+  transition: border-color 0.2s;
+}
+
+[data-ui="moonlight"] .records-summary-card:hover {
+  box-shadow: none;
+  transform: none;
+  border-color: color-mix(in srgb, var(--ml-accent) 35%, var(--ml-line));
+}
+
+[data-ui="moonlight"] .records-summary-icon {
+  border-radius: 14px;
+}
+
+[data-ui="moonlight"] .records-summary-icon.visits {
+  background: color-mix(in srgb, #8BA5C4 18%, transparent);
+  color: #8BA5C4;
+}
+
+[data-ui="moonlight"] .records-summary-icon.vaccinations {
+  background: color-mix(in srgb, #9BC29E 18%, transparent);
+  color: #9BC29E;
+}
+
+[data-ui="moonlight"] .records-summary-icon.medications {
+  background: color-mix(in srgb, #B89BC4 18%, transparent);
+  color: #B89BC4;
+}
+
+[data-ui="moonlight"] .records-summary-count {
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .records-summary-label {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .records-summary-hint {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ml-text-2);
+}
+
+[data-ui="moonlight"] .records-summary-arrow {
+  color: var(--ml-text-3);
+}
+
+/* Form controls inside moonlight health cards */
+[data-ui="moonlight"] .health-card input[type="text"],
+[data-ui="moonlight"] .health-card input[type="date"],
+[data-ui="moonlight"] .health-card input[type="number"],
+[data-ui="moonlight"] .health-card select,
+[data-ui="moonlight"] .health-card textarea,
+[data-ui="moonlight"] .health-card .sick-day-date-input,
+[data-ui="moonlight"] .health-card .sick-day-temp-input,
+[data-ui="moonlight"] .health-card .sick-day-notes-input {
+  background: transparent;
+  border: 0.5px solid var(--ml-line);
+  border-radius: 10px;
+  color: var(--ml-text);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+[data-ui="moonlight"] .health-card input:focus,
+[data-ui="moonlight"] .health-card select:focus,
+[data-ui="moonlight"] .health-card textarea:focus,
+[data-ui="moonlight"] .health-card .sick-day-date-input:focus,
+[data-ui="moonlight"] .health-card .sick-day-temp-input:focus,
+[data-ui="moonlight"] .health-card .sick-day-notes-input:focus {
+  outline: none;
+  border-color: var(--ml-accent);
+}
+
+/* Buttons scoped to health cards (avoid touching global .btn styles) */
+[data-ui="moonlight"] .health-card .btn-primary,
+[data-ui="moonlight"] .health-card button[type="submit"] {
+  background: var(--ml-accent);
+  color: #0a0706;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: none;
+}
+
+[data-ui="moonlight"] .health-card .btn-secondary {
+  background: var(--ml-surface);
+  color: var(--ml-text);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+/* Allergies list */
+[data-ui="moonlight"] .allergies-list,
+[data-ui="moonlight"] .sick-days-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-ui="moonlight"] .allergy-item,
+[data-ui="moonlight"] .sick-day-item {
+  background: color-mix(in srgb, var(--ml-text) 3%, transparent);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: none;
+}
+
+[data-ui="moonlight"] .allergy-item.severity-mild {
+  border-left: 3px solid #A6C49B;
+}
+
+[data-ui="moonlight"] .allergy-item.severity-moderate {
+  border-left: 3px solid #E8A564;
+}
+
+[data-ui="moonlight"] .allergy-item.severity-severe {
+  border-left: 3px solid #D98571;
+}
+
+[data-ui="moonlight"] .allergy-name {
+  color: var(--ml-text);
+  font-weight: 500;
+}
+
+[data-ui="moonlight"] .allergy-severity,
+[data-ui="moonlight"] .allergy-reaction,
+[data-ui="moonlight"] .allergy-date,
+[data-ui="moonlight"] .allergy-notes {
+  color: var(--ml-text-2);
+  font-size: 12px;
+}
+
+[data-ui="moonlight"] .allergy-delete,
+[data-ui="moonlight"] .sick-day-delete {
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .allergy-delete:hover,
+[data-ui="moonlight"] .sick-day-delete:hover {
+  color: #D98571;
+}
+
+[data-ui="moonlight"] .sick-day-date {
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .sick-day-temp.normal {
+  color: #A6C49B;
+}
+[data-ui="moonlight"] .sick-day-temp.elevated {
+  color: #E8A564;
+}
+[data-ui="moonlight"] .sick-day-temp.fever,
+[data-ui="moonlight"] .sick-day-temp.high-fever {
+  color: #D98571;
+}
+
+[data-ui="moonlight"] .sick-day-symptoms,
+[data-ui="moonlight"] .sick-day-notes {
+  color: var(--ml-text-2);
+}
+
+/* Vaccination schedule — bands + region toggle */
+[data-ui="moonlight"] .vax-region-toggle {
+  border: 0.5px solid var(--ml-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+[data-ui="moonlight"] .vax-region-btn {
+  background: transparent;
+  color: var(--ml-text-2);
+  border: none;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+[data-ui="moonlight"] .vax-region-btn.active {
+  background: var(--ml-accent);
+  color: #0a0706;
+}
+
+[data-ui="moonlight"] .vax-progress-label {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ml-text-3);
+}
+
+/* Teething diagram — keep structural, soften tones */
+[data-ui="moonlight"] .teeth-label {
+  color: var(--ml-text-3);
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
