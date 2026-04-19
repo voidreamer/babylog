@@ -1,14 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { useBaby } from '../../hooks/useBaby';
 import { api } from '../../api/client';
-import { hapticSelection } from '../../utils/haptics';
+import { hapticImpact, hapticNotification, hapticSelection } from '../../utils/haptics';
 import { Orb } from './Orb';
 import { Ribbon } from './Ribbon';
 import { SectionLabel } from './UI';
 import { Icon } from './Icon';
+import { HoldButton } from './HoldButton';
 import type { OrbMode, TimelineEvent } from './types';
 
 const FeedingModal = lazy(() => import('../FeedingModal'));
@@ -20,6 +32,61 @@ type ModalKind = 'feeding' | 'diaper' | 'sleep' | 'pumping' | null;
 
 function parseUTC(time: string): Date {
   return new Date(time.endsWith('Z') ? time : time + 'Z');
+}
+
+/** Inline quick-log chip. stopPropagation so the tap doesn't trigger the parent HoldButton. */
+function Chip({
+  onTap,
+  disabled,
+  children,
+  ariaLabel,
+  variant = 'ghost',
+}: {
+  onTap: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+  ariaLabel: string;
+  variant?: 'solid' | 'ghost';
+}) {
+  const stop = (e: PointerEvent<HTMLButtonElement>) => e.stopPropagation();
+  const styles: CSSProperties =
+    variant === 'solid'
+      ? {
+          background: 'rgba(10, 7, 6, 0.18)',
+          color: 'inherit',
+          border: 'none',
+        }
+      : {
+          background: 'rgba(255, 255, 255, 0.10)',
+          color: 'inherit',
+          border: '0.5px solid rgba(255, 255, 255, 0.18)',
+        };
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      disabled={disabled}
+      onPointerDown={stop}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!disabled) onTap();
+      }}
+      style={{
+        padding: '8px 12px',
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 600,
+        letterSpacing: 0.2,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        fontFamily: 'inherit',
+        whiteSpace: 'nowrap',
+        ...styles,
+      }}
+    >
+      {children}
+    </button>
+  );
 }
 
 function minutesSince(time: string): number {
@@ -156,6 +223,130 @@ export default function MoonlightHome() {
     void load();
   }, [load]);
 
+  // Quick-log handlers mirror the production widgets' api payloads so offline
+  // sync + cache invalidation remain identical.
+  const [savingChip, setSavingChip] = useState<string | null>(null);
+
+  const quickLogFeed = useCallback(
+    async (type: 'breast' | 'formula' | 'bottle', amountMl: number | null) => {
+      if (!selectedBaby) return;
+      setSavingChip(`feed:${type}`);
+      try {
+        await api.createFeeding({
+          baby_id: selectedBaby.id,
+          time: new Date().toISOString(),
+          type,
+          duration_minutes: null,
+          amount_ml: amountMl,
+          notes: null,
+        });
+        hapticNotification();
+        const label =
+          type === 'breast'
+            ? t('dashboard:feeding.breast')
+            : type === 'formula'
+              ? t('dashboard:feeding.formula')
+              : t('dashboard:feeding.breastBottle');
+        toast.success(t('dashboard:feeding.quickLogged', { type: label }));
+        await load();
+      } catch {
+        toast.error(t('dashboard:toast_failedToSaveFeeding'));
+      } finally {
+        setSavingChip(null);
+      }
+    },
+    [selectedBaby, load, t],
+  );
+
+  const quickLogDiaper = useCallback(
+    async (type: 'pee' | 'poo' | 'mixed') => {
+      if (!selectedBaby) return;
+      setSavingChip(`diaper:${type}`);
+      try {
+        await api.createDiaper({
+          baby_id: selectedBaby.id,
+          time: new Date().toISOString(),
+          type,
+          poo_color: null,
+          poo_consistency: null,
+          poo_amount: null,
+          notes: null,
+        });
+        hapticNotification();
+        const label =
+          type === 'pee'
+            ? t('dashboard:diaper.pee')
+            : type === 'poo'
+              ? t('dashboard:diaper.poo')
+              : t('dashboard:diaper.both');
+        toast.success(t('dashboard:diaper.diaperLogged', { type: label }));
+        await load();
+      } catch {
+        toast.error(t('dashboard:toast_failedToLogDiaper'));
+      } finally {
+        setSavingChip(null);
+      }
+    },
+    [selectedBaby, load, t],
+  );
+
+  const quickStartSleep = useCallback(async () => {
+    if (!selectedBaby) return;
+    setSavingChip('sleep:start');
+    try {
+      await api.createSleep({
+        baby_id: selectedBaby.id,
+        start_time: new Date().toISOString(),
+        end_time: null,
+        notes: null,
+      });
+      hapticImpact();
+      toast.success(t('dashboard:toast_sleepStarted'));
+      await load();
+    } catch {
+      toast.error(t('dashboard:toast_failedToStartSleep'));
+    } finally {
+      setSavingChip(null);
+    }
+  }, [selectedBaby, load, t]);
+
+  const quickWakeUp = useCallback(async () => {
+    const current = dashboard?.current_sleep;
+    if (!current?.id) return;
+    setSavingChip('sleep:end');
+    try {
+      await api.endSleep(current.id);
+      hapticNotification();
+      toast.success(t('dashboard:toast_babyIsAwake'));
+      await load();
+    } catch {
+      toast.error(t('dashboard:toast_failedToEndSleep'));
+    } finally {
+      setSavingChip(null);
+    }
+  }, [dashboard, load, t]);
+
+  const quickLogPumpTimerless = useCallback(async () => {
+    if (!selectedBaby) return;
+    setSavingChip('pump:60');
+    try {
+      await api.createPumping({
+        baby_id: selectedBaby.id,
+        time: new Date().toISOString(),
+        duration_minutes: null,
+        amount_ml: 60,
+        notes: null,
+      });
+      hapticNotification();
+      toast.success(t('dashboard:pumping.quickLogged', { amount: '60 ml' }));
+      await load();
+    } catch {
+      toast.error(t('dashboard:toast_failedToSavePumping'));
+    } finally {
+      setSavingChip(null);
+    }
+  }, [selectedBaby, load, t]);
+
   const now = new Date();
   const orb = useMemo(() => deriveOrbState(dashboard), [dashboard]);
   const ribbon = useMemo(() => buildRibbonEvents(dashboard), [dashboard]);
@@ -231,37 +422,65 @@ export default function MoonlightHome() {
 
       {selectedBaby && (
         <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <button
-            type="button"
-            onClick={() => openModal('feeding')}
-            aria-label={t('dashboard:quickActionsSection.feeding')}
+          {/* Feeding — hero, accent */}
+          <HoldButton
+            ariaLabel={`${t('dashboard:quickActionsSection.feeding')}. ${t('common:moonlight.holdForOptions')}`}
+            onHold={() => openModal('feeding')}
+            borderRadius={22}
             style={{
-              padding: '20px 16px',
+              padding: '18px 16px 14px',
               borderRadius: 22,
               background: 'var(--ml-accent)',
               color: '#0a0706',
-              border: 'none',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              gap: 4,
-              cursor: 'pointer',
+              gap: 6,
               textAlign: 'left',
-              fontFamily: 'inherit',
             }}
           >
             <Icon.Feed />
-            <div style={{ fontSize: 17, fontWeight: 600, marginTop: 4 }}>
+            <div style={{ fontSize: 17, fontWeight: 600, marginTop: 2 }}>
               {t('dashboard:quickActionsSection.feeding')}
             </div>
-            <div style={{ fontSize: 11, opacity: 0.7 }}>{t('dashboard:tapToLog')}</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => openModal('sleep')}
-            aria-label={t('dashboard:quickActionsSection.sleep')}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
+              <Chip
+                variant="solid"
+                disabled={savingChip !== null}
+                onTap={() => quickLogFeed('breast', null)}
+                ariaLabel={t('dashboard:feeding.breast')}
+              >
+                {savingChip === 'feed:breast' ? '…' : t('dashboard:feeding.breast')}
+              </Chip>
+              <Chip
+                variant="solid"
+                disabled={savingChip !== null}
+                onTap={() => quickLogFeed('formula', 60)}
+                ariaLabel={t('dashboard:feeding.formula')}
+              >
+                {savingChip === 'feed:formula' ? '…' : t('dashboard:feeding.formula')}
+              </Chip>
+              <Chip
+                variant="solid"
+                disabled={savingChip !== null}
+                onTap={() => quickLogFeed('bottle', 60)}
+                ariaLabel={t('dashboard:feeding.breastBottle')}
+              >
+                {savingChip === 'feed:bottle' ? '…' : t('dashboard:feeding.breastBottle')}
+              </Chip>
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.7, marginTop: 2 }}>
+              {t('common:moonlight.holdForOptions')}
+            </div>
+          </HoldButton>
+
+          {/* Sleep — toggle based on current_sleep */}
+          <HoldButton
+            ariaLabel={`${t('dashboard:quickActionsSection.sleep')}. ${t('common:moonlight.holdForOptions')}`}
+            onHold={() => openModal('sleep')}
+            borderRadius={22}
             style={{
-              padding: '20px 16px',
+              padding: '18px 16px 14px',
               borderRadius: 22,
               background: 'var(--ml-surface)',
               color: 'var(--ml-text)',
@@ -269,33 +488,53 @@ export default function MoonlightHome() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              gap: 4,
-              cursor: 'pointer',
+              gap: 6,
               textAlign: 'left',
-              fontFamily: 'inherit',
             }}
           >
             <div style={{ color: '#8BA5C4' }}>
               <Icon.Sleep />
             </div>
-            <div style={{ fontSize: 17, fontWeight: 500, marginTop: 4 }}>
+            <div style={{ fontSize: 17, fontWeight: 500, marginTop: 2 }}>
               {t('dashboard:quickActionsSection.sleep')}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--ml-text-3)' }}>
-              {t('dashboard:tapToLog')}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
+              {dashboard?.current_sleep?.id ? (
+                <Chip
+                  variant="ghost"
+                  disabled={savingChip !== null}
+                  onTap={quickWakeUp}
+                  ariaLabel={t('dashboard:toast_babyIsAwake')}
+                >
+                  {savingChip === 'sleep:end' ? '…' : t('dashboard:sleep.wakeUp')}
+                </Chip>
+              ) : (
+                <Chip
+                  variant="ghost"
+                  disabled={savingChip !== null}
+                  onTap={quickStartSleep}
+                  ariaLabel={t('dashboard:sleep.startSleep')}
+                >
+                  {savingChip === 'sleep:start' ? '…' : t('dashboard:sleep.startSleep')}
+                </Chip>
+              )}
             </div>
-          </button>
+            <div style={{ fontSize: 11, color: 'var(--ml-text-3)', marginTop: 2 }}>
+              {t('common:moonlight.holdForOptions')}
+            </div>
+          </HoldButton>
         </div>
       )}
 
       {selectedBaby && (
         <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <button
-            type="button"
-            onClick={() => openModal('diaper')}
-            aria-label={t('dashboard:quickActionsSection.diaper')}
+          {/* Diaper — chip row */}
+          <HoldButton
+            ariaLabel={`${t('dashboard:quickActionsSection.diaper')}. ${t('common:moonlight.holdForOptions')}`}
+            onHold={() => openModal('diaper')}
+            borderRadius={18}
             style={{
-              padding: '14px 12px',
+              padding: '12px',
               borderRadius: 18,
               background: 'var(--ml-surface)',
               color: 'var(--ml-text)',
@@ -303,24 +542,52 @@ export default function MoonlightHome() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              gap: 4,
-              cursor: 'pointer',
-              fontFamily: 'inherit',
+              gap: 6,
             }}
           >
-            <div style={{ color: '#D9C388' }}>
-              <Icon.Diaper />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ color: '#D9C388' }}>
+                <Icon.Diaper />
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 500 }}>
+                {t('dashboard:quickActionsSection.diaper')}
+              </div>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 500 }}>
-              {t('dashboard:quickActionsSection.diaper')}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <Chip
+                variant="ghost"
+                disabled={savingChip !== null}
+                onTap={() => quickLogDiaper('pee')}
+                ariaLabel={t('dashboard:diaper.pee')}
+              >
+                {savingChip === 'diaper:pee' ? '…' : t('dashboard:diaper.pee')}
+              </Chip>
+              <Chip
+                variant="ghost"
+                disabled={savingChip !== null}
+                onTap={() => quickLogDiaper('poo')}
+                ariaLabel={t('dashboard:diaper.poo')}
+              >
+                {savingChip === 'diaper:poo' ? '…' : t('dashboard:diaper.poo')}
+              </Chip>
+              <Chip
+                variant="ghost"
+                disabled={savingChip !== null}
+                onTap={() => quickLogDiaper('mixed')}
+                ariaLabel={t('dashboard:diaper.both')}
+              >
+                {savingChip === 'diaper:mixed' ? '…' : t('dashboard:diaper.both')}
+              </Chip>
             </div>
-          </button>
-          <button
-            type="button"
-            onClick={() => openModal('pumping')}
-            aria-label={t('dashboard:quickActionsSection.pump')}
+          </HoldButton>
+
+          {/* Pump — single quick 60ml chip; hold → modal for custom amount */}
+          <HoldButton
+            ariaLabel={`${t('dashboard:quickActionsSection.pump')}. ${t('common:moonlight.holdForOptions')}`}
+            onHold={() => openModal('pumping')}
+            borderRadius={18}
             style={{
-              padding: '14px 12px',
+              padding: '12px',
               borderRadius: 18,
               background: 'var(--ml-surface)',
               color: 'var(--ml-text)',
@@ -328,18 +595,28 @@ export default function MoonlightHome() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              gap: 4,
-              cursor: 'pointer',
-              fontFamily: 'inherit',
+              gap: 6,
             }}
           >
-            <div style={{ color: '#9BC29E' }}>
-              <Icon.Plus />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ color: '#9BC29E' }}>
+                <Icon.Plus />
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 500 }}>
+                {t('dashboard:quickActionsSection.pump')}
+              </div>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 500 }}>
-              {t('dashboard:quickActionsSection.pump')}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <Chip
+                variant="ghost"
+                disabled={savingChip !== null}
+                onTap={quickLogPumpTimerless}
+                ariaLabel="60 ml"
+              >
+                {savingChip === 'pump:60' ? '…' : '60 ml'}
+              </Chip>
             </div>
-          </button>
+          </HoldButton>
         </div>
       )}
 

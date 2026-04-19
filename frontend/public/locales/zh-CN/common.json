@@ -113,5 +113,8 @@
     "syncingChanges": "同步更改...",
     "changesToSync": "将{{count}}_改为同步",
     "syncNow": "立即同步"
+  },
+  "moonlight": {
+    "holdForOptions": "长按查看选项"
   }
 }

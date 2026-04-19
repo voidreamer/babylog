@@ -113,5 +113,8 @@
     "syncingChanges": "Synchronisation des changements...",
     "changesToSync": "{{count}} change{{s}} en sync",
     "syncNow": "Synchroniser maintenant"
+  },
+  "moonlight": {
+    "holdForOptions": "Maintenir pour options"
   }
 }
