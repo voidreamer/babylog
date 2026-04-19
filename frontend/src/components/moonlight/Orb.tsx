@@ -4,6 +4,7 @@ import {
   useState,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactNode,
   type TouchEvent,
 } from 'react';
 import type { OrbMode } from './types';
@@ -15,6 +16,12 @@ type OrbProps = {
   onPress?: () => void;
   onLongPress?: () => void;
   ariaLabel?: string;
+  /** Raster asset drawn inside the orb (e.g. production sleep2.png). Takes precedence over iconNode. */
+  iconSrc?: string;
+  /** JSX drawn inside the orb (e.g. <BabyFace mood="calm" />). Ignored if iconSrc is set. */
+  iconNode?: ReactNode;
+  /** Icon scale relative to the orb, 0..1. Default 0.45. */
+  iconScale?: number;
 };
 
 type Palette = [string, string, string];
@@ -51,6 +58,9 @@ export function Orb({
   onPress,
   onLongPress,
   ariaLabel,
+  iconSrc,
+  iconNode,
+  iconScale = 0.45,
 }: OrbProps) {
   const reduced = usePrefersReducedMotion();
   const [t, setT] = useState(0);
@@ -174,6 +184,40 @@ export function Orb({
           transition: 'box-shadow 0.2s',
         }}
       />
+      {(iconSrc || iconNode) && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            width: size * iconScale,
+            height: size * iconScale,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: `scale(${scale})`,
+            pointerEvents: 'none',
+          }}
+        >
+          {iconSrc ? (
+            <img
+              src={iconSrc}
+              alt=""
+              draggable={false}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                borderRadius: '50%',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+              }}
+            />
+          ) : (
+            iconNode
+          )}
+        </div>
+      )}
       <div
         style={{
           position: 'absolute',
