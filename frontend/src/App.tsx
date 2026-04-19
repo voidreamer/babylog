@@ -802,7 +802,7 @@ function MainApp() {
                 {activeTab === 'home' && (
                     <ErrorBoundary level="page">
                         <Suspense fallback={<LoadingSpinner />}>
-                            {moonlight ? <MoonlightHome /> : <Dashboard />}
+                            {moonlight ? <MoonlightHome isPremium={isPremium} /> : <Dashboard />}
                         </Suspense>
                     </ErrorBoundary>
                 )}
