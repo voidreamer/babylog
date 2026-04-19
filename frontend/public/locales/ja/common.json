@@ -113,5 +113,8 @@
     "syncingChanges": "変更を同期...",
     "changesToSync": "TOKEN_0__を変更する{{s}}を同期させる",
     "syncNow": "今すぐ同期"
+  },
+  "moonlight": {
+    "holdForOptions": "長押しで詳細"
   }
 }
