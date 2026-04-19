@@ -6,6 +6,7 @@ import { Spark, Bars } from './Charts';
 import { PrimaryBtn, GhostBtn, SectionLabel } from './UI';
 import { Icon } from './Icon';
 import type { OrbMode, TabKey, TimelineEvent } from './types';
+import { setMoonlightFlag } from './useMoonlightFlag';
 
 const SAMPLE_EVENTS: TimelineEvent[] = [
   { t: 1, duration: 2, type: 'sleep' },
@@ -37,14 +38,12 @@ export default function MoonlightPreview() {
   const [longPressCount, setLongPressCount] = useState(0);
 
   const enableFlag = () => {
-    localStorage.setItem('ui.moonlight', 'on');
-    document.documentElement.setAttribute('data-ui', 'moonlight');
+    setMoonlightFlag(true);
     setFlagOn(true);
   };
 
   const disableFlag = () => {
-    localStorage.removeItem('ui.moonlight');
-    document.documentElement.removeAttribute('data-ui');
+    setMoonlightFlag(false);
     setFlagOn(false);
   };
 

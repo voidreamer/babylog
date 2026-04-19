@@ -18,6 +18,9 @@ import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
 import Insights from './components/Insights';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import { TabBar as MoonlightTabBar } from './components/moonlight/TabBar';
+import type { TabKey as MoonlightTabKey } from './components/moonlight/types';
+import { useMoonlightFlag } from './components/moonlight/useMoonlightFlag';
 
 // Lazy load routes for bundle splitting
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -490,6 +493,7 @@ function buildHubUrl(session: { access_token?: string; refresh_token?: string } 
 
 function MainApp() {
     const { t, i18n } = useTranslation('common');
+    const moonlight = useMoonlightFlag();
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading, refresh } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
@@ -576,7 +580,11 @@ function MainApp() {
             if (e.key === 'ui.moonlight') apply();
         };
         window.addEventListener('storage', onStorage);
-        return () => window.removeEventListener('storage', onStorage);
+        window.addEventListener('moonlight-flag-change', apply);
+        return () => {
+            window.removeEventListener('storage', onStorage);
+            window.removeEventListener('moonlight-flag-change', apply);
+        };
     }, []);
 
     useEffect(() => {
@@ -835,43 +843,57 @@ function MainApp() {
             {showTour && <SpotlightTour onComplete={() => setShowTour(false)} onNavigateTab={setActiveTab} />}
 
             {/* Bottom Navigation */}
-            <nav className="bottom-nav">
-                <button
-                    className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('home'); }}
-                >
-                    <Home size={22} />
-                    <span>{t('nav.home')}</span>
-                </button>
-                <button
-                    className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('timeline'); }}
-                >
-                    <Clock size={22} />
-                    <span>{t('nav.timeline')}</span>
-                </button>
-                <button
-                    className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('health'); }}
-                >
-                    <Activity size={22} />
-                    <span>{t('nav.health')}</span>
-                </button>
-                <button
-                    className={`bottom-nav-item ${activeTab === 'insights' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('insights'); }}
-                >
-                    <PieChart size={22} />
-                    <span>{t('nav.insights')}</span>
-                </button>
-                <button
-                    className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                    onClick={() => { hapticSelection(); setActiveTab('settings'); }}
-                >
-                    <SettingsIcon size={22} />
-                    <span>{t('nav.settings')}</span>
-                </button>
-            </nav>
+            {moonlight ? (
+                <MoonlightTabBar
+                    active={activeTab as MoonlightTabKey}
+                    onChange={(k) => { hapticSelection(); setActiveTab(k); }}
+                    labels={{
+                        home: t('nav.home'),
+                        timeline: t('nav.timeline'),
+                        health: t('nav.health'),
+                        insights: t('nav.insights'),
+                        settings: t('nav.settings'),
+                    }}
+                />
+            ) : (
+                <nav className="bottom-nav">
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+                        onClick={() => { hapticSelection(); setActiveTab('home'); }}
+                    >
+                        <Home size={22} />
+                        <span>{t('nav.home')}</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
+                        onClick={() => { hapticSelection(); setActiveTab('timeline'); }}
+                    >
+                        <Clock size={22} />
+                        <span>{t('nav.timeline')}</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
+                        onClick={() => { hapticSelection(); setActiveTab('health'); }}
+                    >
+                        <Activity size={22} />
+                        <span>{t('nav.health')}</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'insights' ? 'active' : ''}`}
+                        onClick={() => { hapticSelection(); setActiveTab('insights'); }}
+                    >
+                        <PieChart size={22} />
+                        <span>{t('nav.insights')}</span>
+                    </button>
+                    <button
+                        className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => { hapticSelection(); setActiveTab('settings'); }}
+                    >
+                        <SettingsIcon size={22} />
+                        <span>{t('nav.settings')}</span>
+                    </button>
+                </nav>
+            )}
         </div>
     );
 }
