@@ -17,6 +17,7 @@ import { useBaby } from '../../hooks/useBaby';
 import { api } from '../../api/client';
 import { hapticImpact, hapticNotification, hapticSelection } from '../../utils/haptics';
 import { useVoiceAssistant } from '../../hooks/useVoiceAssistant';
+import { unlockAudio } from '../../utils/speechSynthesis';
 import { Orb } from './Orb';
 import { BabyFace } from './BabyFace';
 import { Ribbon } from './Ribbon';
@@ -633,10 +634,21 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
           size={170}
           mode={orb.mode}
           urgency={orb.urgency}
+          // Fire audio unlock + haptic inside the original pointerdown so the
+          // browser's user-activation window is live when AudioContext.resume
+          // and navigator.vibrate run (the long-press completion fires 550ms
+          // later via RAF, which is too late for these APIs on Chromium).
+          onPressStart={
+            voice.isSupported && selectedBaby && !voiceActive
+              ? () => {
+                  unlockAudio();
+                  hapticImpact();
+                }
+              : undefined
+          }
           onLongPress={
             voice.isSupported && selectedBaby
               ? () => {
-                  hapticImpact();
                   void voice.startListening();
                 }
               : undefined

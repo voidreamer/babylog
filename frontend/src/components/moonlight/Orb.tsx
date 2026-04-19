@@ -15,6 +15,14 @@ type OrbProps = {
   urgency?: number;
   onPress?: () => void;
   onLongPress?: () => void;
+  /**
+   * Fires synchronously on pointer/touch-down, inside the original user-gesture
+   * handler — before the 550ms long-press delay elapses. Use this to unlock
+   * APIs that need transient activation (AudioContext.resume, mic permission,
+   * navigator.vibrate); they'd otherwise fail when called from the RAF-delayed
+   * onLongPress callback.
+   */
+  onPressStart?: () => void;
   ariaLabel?: string;
   /** Raster asset drawn inside the orb (e.g. production sleep2.png). Takes precedence over iconNode. */
   iconSrc?: string;
@@ -57,6 +65,7 @@ export function Orb({
   urgency = 0.3,
   onPress,
   onLongPress,
+  onPressStart,
   ariaLabel,
   iconSrc,
   iconNode,
@@ -89,6 +98,11 @@ export function Orb({
   const [c1, c2, c3] = PALETTES[mode] || PALETTES.calm;
 
   const startPress = () => {
+    // Fire onPressStart synchronously inside the original pointer/touch-down
+    // handler so browser user-activation APIs (AudioContext, navigator.vibrate,
+    // mic permission) see a live gesture — not the RAF-deferred long-press
+    // completion.
+    onPressStart?.();
     if (!onLongPress) {
       setPressed(true);
       return;
