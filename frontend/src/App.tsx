@@ -25,6 +25,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
+const Moonlight = lazy(() => import('./moonlight/Moonlight'));
 import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell, Baby, TrendingUp, Mail, Trash2, AlertTriangle } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
@@ -884,6 +885,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/callback" element={<Callback />} />
                         <Route path="/health-check" element={<Health />} />
+                        <Route path="/moonlight" element={<Moonlight />} />
                         <Route
                             path="/*"
                             element={
