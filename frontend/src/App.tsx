@@ -24,6 +24,7 @@ import { useMoonlightFlag } from './components/moonlight/useMoonlightFlag';
 
 // Lazy load routes for bundle splitting
 const Dashboard = lazy(() => import('./components/Dashboard'));
+const MoonlightHome = lazy(() => import('./components/moonlight/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -791,7 +792,9 @@ function MainApp() {
             <main>
                 {activeTab === 'home' && (
                     <ErrorBoundary level="page">
-                        <Dashboard />
+                        <Suspense fallback={<LoadingSpinner />}>
+                            {moonlight ? <MoonlightHome /> : <Dashboard />}
+                        </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'timeline' && (
