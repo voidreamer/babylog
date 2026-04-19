@@ -1,0 +1,198 @@
+/*
+ * Moonlight design tokens & primitives.
+ *
+ * All tokens + utility classes are scoped under [data-ui="moonlight"] to avoid
+ * colliding with the existing design system. Day palette (warm cream) is the
+ * default; [data-theme="dark"] flips to the near-black night palette.
+ *
+ * Fonts are loaded via @fontsource packages from main.tsx (no CDN @import).
+ */
+
+[data-ui="moonlight"] {
+  --ml-accent: #E89580;
+
+  /* Day (default) — warm cream */
+  --ml-bg: #fdf7f1;
+  --ml-surface: rgba(60, 40, 30, 0.04);
+  --ml-surface-2: rgba(60, 40, 30, 0.06);
+  --ml-line: rgba(60, 40, 30, 0.08);
+  --ml-text: #2a1f1a;
+  --ml-text-2: rgba(60, 40, 30, 0.7);
+  --ml-text-3: rgba(60, 40, 30, 0.5);
+  --ml-radius: 22px;
+
+  --ml-bg-gradient:
+    radial-gradient(1200px 600px at 15% -10%, rgba(232, 149, 128, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 110% 100%, rgba(139, 165, 196, 0.2), transparent 60%),
+    var(--ml-bg);
+
+  font-family: 'Geist Variable', 'Geist', -apple-system, system-ui, sans-serif;
+  color: var(--ml-text);
+  background: var(--ml-bg-gradient);
+  transition: background 0.6s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-ui="moonlight"][data-theme="dark"] {
+  --ml-bg: #050403;
+  --ml-surface: rgba(255, 255, 255, 0.04);
+  --ml-surface-2: rgba(255, 255, 255, 0.06);
+  --ml-line: rgba(255, 255, 255, 0.08);
+  --ml-text: #f5ece4;
+  --ml-text-2: rgba(245, 236, 228, 0.65);
+  --ml-text-3: rgba(245, 236, 228, 0.45);
+
+  --ml-bg-gradient:
+    radial-gradient(1200px 600px at 15% -10%, rgba(232, 149, 128, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 110% 100%, rgba(139, 165, 196, 0.06), transparent 60%),
+    #050403;
+}
+
+[data-ui="moonlight"] body {
+  background: var(--ml-bg-gradient);
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] *,
+[data-ui="moonlight"] *::before,
+[data-ui="moonlight"] *::after {
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-ui="moonlight"] button {
+  font-family: inherit;
+}
+
+/* Typography utilities (scoped) */
+[data-ui="moonlight"] .mono {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .serif {
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+[data-ui="moonlight"] .italic {
+  font-style: italic;
+}
+
+/* Card primitives */
+[data-ui="moonlight"] .card {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: var(--ml-radius);
+  padding: 18px;
+}
+
+[data-ui="moonlight"] .card-accent {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ml-accent) 12%, transparent),
+    color-mix(in srgb, var(--ml-accent) 3%, transparent)
+  );
+  border: 0.5px solid color-mix(in srgb, var(--ml-accent) 25%, transparent);
+}
+
+/* TabBar — bottom nav inside the real app shell */
+.ml-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 0 calc(env(safe-area-inset-bottom, 0px) + 12px);
+  background: color-mix(in srgb, var(--ml-bg) 85%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-top: 0.5px solid var(--ml-line);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 30;
+}
+
+.ml-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  color: var(--ml-text-3);
+  padding: 6px 4px;
+  position: relative;
+  transition: color 0.2s;
+  background: transparent;
+  border: none;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.ml-tab.is-active {
+  color: var(--ml-accent);
+}
+
+.ml-tab.is-active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ml-accent);
+}
+
+.ml-tab-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.ml-tab:focus-visible {
+  outline: 2px solid var(--ml-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Bub loading dots */
+[data-ui="moonlight"] .bub-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ml-text-3);
+  margin: 0 2px;
+  animation: ml-bub-bounce 1.2s infinite ease-in-out both;
+}
+
+[data-ui="moonlight"] .bub-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+[data-ui="moonlight"] .bub-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes ml-bub-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="moonlight"] .bub-dot {
+    animation: none;
+  }
+  [data-ui="moonlight"] * {
+    transition: none !important;
+  }
+}
