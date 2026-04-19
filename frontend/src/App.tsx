@@ -27,6 +27,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const MoonlightHome = lazy(() => import('./components/moonlight/Home'));
 const MoonlightOnboarding = lazy(() => import('./components/moonlight/Onboarding'));
 const MoonlightTimeline = lazy(() => import('./components/moonlight/Timeline'));
+const MoonlightHealth = lazy(() => import('./components/moonlight/Health'));
 const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -814,10 +815,17 @@ function MainApp() {
                 {activeTab === 'health' && (
                     <ErrorBoundary level="page">
                         <Suspense fallback={<LoadingSpinner />}>
-                            <Health
-                                showMedQuickLog={showMedQuickLog}
-                                onDismissMedQuickLog={() => setShowMedQuickLog(false)}
-                            />
+                            {moonlight ? (
+                                <MoonlightHealth
+                                    showMedQuickLog={showMedQuickLog}
+                                    onDismissMedQuickLog={() => setShowMedQuickLog(false)}
+                                />
+                            ) : (
+                                <Health
+                                    showMedQuickLog={showMedQuickLog}
+                                    onDismissMedQuickLog={() => setShowMedQuickLog(false)}
+                                />
+                            )}
                         </Suspense>
                     </ErrorBoundary>
                 )}
