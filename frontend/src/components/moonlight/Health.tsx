@@ -1,10 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { lazy, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBaby } from '../../hooks/useBaby';
+import { toast } from 'sonner';
 import { Baby } from 'lucide-react';
-
-const Health = lazy(() => import('../../pages/Health'));
+import { api } from '../../api/client';
+import { useBaby } from '../../hooks/useBaby';
+import { useNotificationSync } from '../../hooks/useNotificationSync';
+import { calculateAgeInMonths } from '../../utils/ageUtils';
+import {
+  WHO_HEIGHT_BOYS,
+  WHO_HEIGHT_GIRLS,
+  WHO_WEIGHT_BOYS,
+  WHO_WEIGHT_GIRLS,
+} from '../../data/whoGrowthData';
+import MoonlightGrowthCard from './GrowthCard';
+import VaccinationSchedule from '../health/VaccinationSchedule';
+import TeethingCard from '../health/TeethingCard';
+import SickDaysCard from '../health/SickDaysCard';
+import AllergiesCard from '../health/AllergiesCard';
+import RecordsSection from '../health/RecordsSection';
+import MedicationQuickLog from '../health/MedicationQuickLog';
+import { GrowthModal } from '../health/HealthModals';
 
 type Props = {
   showMedQuickLog?: boolean;
@@ -12,16 +28,12 @@ type Props = {
 };
 
 /**
- * Moonlight Health — Phase 7a of 7a-b-c.
+ * Moonlight Health — phase 7b state.
  *
- * Ships the moonlight shell (header + container + spacing) and mounts the
- * classic Health page inside. Growth chart (7b) and Vaccination schedule +
- * conditions grid + records summary (7c) are explicit follow-ups.
- *
- * With the flag off the classic Health page renders unchanged. With the flag
- * on and this phase merged, users see a moonlight-branded Health tab; the
- * inner cards clearly carry classic styling, making the work-in-progress
- * state obvious rather than accidental.
+ * Loads health data directly (instead of delegating to <Health />) so growth
+ * records can drive the re-skinned MoonlightGrowthCard. Remaining classic
+ * sub-surfaces (VaccinationSchedule, conditions grid, RecordsSection,
+ * MedicationQuickLog) render inline while they wait for their 7c treatment.
  */
 export default function MoonlightHealth({
   showMedQuickLog,
@@ -29,6 +41,63 @@ export default function MoonlightHealth({
 }: Props) {
   const { t } = useTranslation(['health', 'common']);
   const { selectedBaby } = useBaby();
+  const { reschedule } = useNotificationSync(selectedBaby?.id, selectedBaby?.name);
+
+  const [loading, setLoading] = useState(true);
+  const [showGrowthModal, setShowGrowthModal] = useState(false);
+
+  const [visits, setVisits] = useState<any[]>([]);
+  const [vaccinations, setVaccinations] = useState<any[]>([]);
+  const [medications, setMedications] = useState<any[]>([]);
+  const [growthRecords, setGrowthRecords] = useState<any[]>([]);
+  const [teeth, setTeeth] = useState<any[]>([]);
+  const [sickDays, setSickDays] = useState<any[]>([]);
+  const [allergies, setAllergies] = useState<any[]>([]);
+
+  const whoData = {
+    WHO_WEIGHT_BOYS,
+    WHO_WEIGHT_GIRLS,
+    WHO_HEIGHT_BOYS,
+    WHO_HEIGHT_GIRLS,
+  };
+
+  const loadData = async () => {
+    if (!selectedBaby) return;
+    setLoading(true);
+    try {
+      const [v, va, m, g, te, s, a] = await Promise.all([
+        api.getDoctorVisits(selectedBaby.id),
+        api.getVaccinations(selectedBaby.id),
+        api.getMedications(selectedBaby.id),
+        api.getGrowthRecords(selectedBaby.id),
+        api.getTeeth(selectedBaby.id),
+        api.getSickDays(selectedBaby.id),
+        api.getAllergies(selectedBaby.id),
+      ]);
+      setVisits(v);
+      setVaccinations(va);
+      setMedications(m);
+      setGrowthRecords(g);
+      setTeeth(te);
+      setSickDays(s);
+      setAllergies(a);
+      reschedule();
+    } catch {
+      toast.error(t('health:failedToLoad'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBaby?.id]);
+
+  const ageMonths = selectedBaby?.birth_date
+    ? calculateAgeInMonths(selectedBaby.birth_date)
+    : null;
+  const showTeething = ageMonths !== null && ageMonths >= 4;
 
   if (!selectedBaby) {
     return (
@@ -67,10 +136,7 @@ export default function MoonlightHealth({
         }}
       >
         {t('health:moonlight.growthAnd', { defaultValue: 'Growth & ' })}
-        <em
-          className="serif"
-          style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}
-        >
+        <em className="serif" style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}>
           {t('health:moonlight.wellbeing', { defaultValue: 'wellbeing' })}
         </em>
       </h1>
@@ -80,7 +146,7 @@ export default function MoonlightHealth({
           fontSize: 15,
           lineHeight: 1.4,
           color: 'var(--ml-text-2)',
-          margin: '8px 0 20px',
+          margin: '8px 0 24px',
           maxWidth: 320,
         }}
       >
@@ -90,24 +156,82 @@ export default function MoonlightHealth({
         })}
       </p>
 
-      {/* Classic Health body — re-skinned piece by piece in 7b/7c. */}
-      <div className="ml-health-classic">
-        <Suspense
-          fallback={
-            <div
-              className="serif italic"
-              style={{ color: 'var(--ml-text-3)', padding: '20px 0', textAlign: 'center' }}
-            >
-              {t('common:loading')}
-            </div>
-          }
+      {loading ? (
+        <div
+          className="serif italic"
+          style={{ color: 'var(--ml-text-3)', padding: '24px 0', textAlign: 'center' }}
         >
-          <Health
-            showMedQuickLog={showMedQuickLog}
-            onDismissMedQuickLog={onDismissMedQuickLog}
+          {t('common:loading', { defaultValue: 'Loading…' })}
+        </div>
+      ) : (
+        <>
+          <MoonlightGrowthCard
+            baby={selectedBaby}
+            growthRecords={growthRecords}
+            whoData={whoData}
+            onOpenGrowthModal={() => setShowGrowthModal(true)}
           />
-        </Suspense>
-      </div>
+
+          {/* Classic remaining surfaces — re-skinned in 7c. */}
+          <div className="ml-health-classic" style={{ marginTop: 28 }}>
+            <section className="health-section" style={{ marginBottom: 16 }}>
+              <VaccinationSchedule
+                baby={selectedBaby}
+                vaccinations={vaccinations}
+                onDataChanged={loadData}
+              />
+            </section>
+
+            <section className="health-cards-grid" style={{ marginBottom: 16 }}>
+              {showTeething && (
+                <TeethingCard
+                  baby={selectedBaby}
+                  teeth={teeth}
+                  onToothAdded={loadData}
+                  onToothDeleted={loadData}
+                />
+              )}
+              <AllergiesCard
+                baby={selectedBaby}
+                allergies={allergies}
+                onAllergyAdded={loadData}
+                onAllergyDeleted={loadData}
+              />
+              <SickDaysCard
+                baby={selectedBaby}
+                sickDays={sickDays}
+                onSickDayAdded={loadData}
+                onSickDayDeleted={loadData}
+              />
+            </section>
+
+            <section className="health-section">
+              <RecordsSection
+                baby={selectedBaby}
+                visits={visits}
+                vaccinations={vaccinations}
+                medications={medications}
+                onDataChanged={loadData}
+              />
+            </section>
+          </div>
+        </>
+      )}
+
+      {showGrowthModal && (
+        <GrowthModal
+          babyId={selectedBaby.id}
+          onClose={() => setShowGrowthModal(false)}
+          onSave={() => {
+            setShowGrowthModal(false);
+            void loadData();
+          }}
+        />
+      )}
+
+      {showMedQuickLog && onDismissMedQuickLog && (
+        <MedicationQuickLog onDismiss={onDismissMedQuickLog} />
+      )}
     </div>
   );
 }

@@ -156,6 +156,16 @@
   border-radius: 6px;
 }
 
+/* Growth chart palette override — scoped to the moonlight growth wrapper so
+   the recharts component (shared with classic Health) picks up moonlight
+   colors via its existing CSS custom properties. No prop/api changes needed. */
+[data-ui="moonlight"] .ml-growth-wrap {
+  --primary: var(--ml-accent);
+  --growth-percentile: color-mix(in srgb, var(--ml-text) 35%, transparent);
+  --growth-percentile-light: color-mix(in srgb, var(--ml-text) 15%, transparent);
+  --growth-percentile-area: color-mix(in srgb, var(--ml-accent) 8%, transparent);
+}
+
 /* Bub loading dots */
 [data-ui="moonlight"] .bub-dot {
   display: inline-block;
