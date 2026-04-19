@@ -642,3 +642,165 @@
   color: var(--ml-text);
 }
 
+/* ============================================================================
+   Settings tab (phase 9) — classic SettingsPage restyled via CSS under
+   [data-ui="moonlight"]. No TSX refactor; the existing row/group/toggle
+   structure picks up moonlight surfaces and accents.
+   ============================================================================ */
+
+[data-ui="moonlight"] .settings-page {
+  padding: 0;
+}
+
+[data-ui="moonlight"] .settings-page-title {
+  display: none; /* Moonlight header is rendered in App.tsx above the page. */
+}
+
+[data-ui="moonlight"] .settings-group {
+  background: var(--ml-surface);
+  border: 0.5px solid var(--ml-line);
+  border-radius: 18px;
+  margin-bottom: 12px;
+  box-shadow: none;
+}
+
+[data-ui="moonlight"] .settings-group-title {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  color: var(--ml-text-3);
+  padding: 14px 16px 6px;
+}
+
+[data-ui="moonlight"] .settings-row {
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--ml-line);
+  transition: background 0.2s;
+}
+
+[data-ui="moonlight"] .settings-row:last-child,
+[data-ui="moonlight"] .settings-row:last-of-type {
+  border-bottom: none;
+}
+
+[data-ui="moonlight"] .settings-row:hover {
+  background: color-mix(in srgb, var(--ml-text) 4%, transparent);
+}
+
+[data-ui="moonlight"] .settings-sub-row {
+  padding: 10px 16px 10px 60px;
+  border-bottom: 0.5px solid var(--ml-line);
+}
+
+[data-ui="moonlight"] .settings-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ml-text) 4%, transparent);
+  color: var(--ml-text-2);
+}
+
+/* Moonlight tints for the named icon-box variants */
+[data-ui="moonlight"] .settings-icon-box.peach {
+  background: color-mix(in srgb, #E89580 16%, transparent);
+  color: #E89580;
+}
+[data-ui="moonlight"] .settings-icon-box.butter {
+  background: color-mix(in srgb, #E8A564 16%, transparent);
+  color: #E8A564;
+}
+[data-ui="moonlight"] .settings-icon-box.sky {
+  background: color-mix(in srgb, #8BA5C4 16%, transparent);
+  color: #8BA5C4;
+}
+[data-ui="moonlight"] .settings-icon-box.mint {
+  background: color-mix(in srgb, #9BC29E 16%, transparent);
+  color: #9BC29E;
+}
+[data-ui="moonlight"] .settings-icon-box.lavender {
+  background: color-mix(in srgb, #B89BC4 16%, transparent);
+  color: #B89BC4;
+}
+[data-ui="moonlight"] .settings-icon-box.blush {
+  background: color-mix(in srgb, #D98571 16%, transparent);
+  color: #D98571;
+}
+[data-ui="moonlight"] .settings-icon-box.cloud {
+  background: color-mix(in srgb, #8BC4D9 16%, transparent);
+  color: #8BC4D9;
+}
+[data-ui="moonlight"] .settings-icon-box.danger {
+  background: color-mix(in srgb, #D98571 18%, transparent);
+  color: #D98571;
+}
+
+[data-ui="moonlight"] .settings-row-label {
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ml-text);
+}
+
+[data-ui="moonlight"] .settings-row-desc {
+  font-size: 12px;
+  color: var(--ml-text-2);
+  font-family: inherit;
+}
+
+[data-ui="moonlight"] .settings-arrow {
+  color: var(--ml-text-3);
+}
+
+[data-ui="moonlight"] .settings-badge {
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+}
+
+[data-ui="moonlight"] .settings-badge.mint {
+  background: color-mix(in srgb, #9BC29E 18%, transparent);
+  color: #9BC29E;
+}
+[data-ui="moonlight"] .settings-badge.sky {
+  background: color-mix(in srgb, #8BA5C4 18%, transparent);
+  color: #8BA5C4;
+}
+[data-ui="moonlight"] .settings-badge.lavender {
+  background: color-mix(in srgb, #B89BC4 18%, transparent);
+  color: #B89BC4;
+}
+
+[data-ui="moonlight"] .settings-version {
+  color: var(--ml-text-3);
+  font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin: 20px 0 32px;
+}
+
+[data-ui="moonlight"] .settings-row-danger .settings-row-label {
+  color: #D98571;
+}
+
+[data-ui="moonlight"] .settings-promo-row .form-input {
+  background: transparent;
+  border: 0.5px solid var(--ml-line);
+  border-radius: 10px;
+  color: var(--ml-text);
+  padding: 10px 12px;
+  font-family: inherit;
+}
+
+[data-ui="moonlight"] .settings-promo-row .form-input:focus {
+  outline: none;
+  border-color: var(--ml-accent);
+}
+
+/* Native-looking toggle switches (iOS style) read cleanly on moonlight */
+[data-ui="moonlight"] .settings-toggle[data-state="on"],
+[data-ui="moonlight"] .settings-toggle.active {
+  background: var(--ml-accent);
+}
+

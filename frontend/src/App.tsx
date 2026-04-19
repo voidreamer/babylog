@@ -842,27 +842,51 @@ function MainApp() {
                     </ErrorBoundary>
                 )}
                 {activeTab === 'settings' && (
-                    <SettingsPage
-                        user={user}
-                        isDark={theme === 'dark'}
-                        toggleTheme={toggleTheme}
-                        isPremium={isPremium}
-                        hasStripeSubscription={hasStripeSubscription}
-                        exportLoading={exportLoading}
-                        handleExportCsv={handleExportCsv}
-                        babies={babies}
-                        setShowPrivacyPolicy={setShowPrivacyPolicy}
-                        logout={logout}
-                        onUpgrade={() => setShowUpgradeDialog(true)}
-                        onManage={handleManageSubscription}
-                        setActiveTab={setActiveTab}
-                        hubUrl={buildHubUrl(session, theme)}
-                        onRefreshBabies={refresh}
-                        onReplayOnboarding={() => {
-                            setShowTour(true);
-                            setActiveTab('home');
-                        }}
-                    />
+                    <div style={moonlight ? { padding: '16px 20px 8px' } : undefined}>
+                        {moonlight && (
+                            <div style={{ color: 'var(--ml-text)', marginBottom: 16 }}>
+                                <div className="mono" style={{ marginBottom: 2 }}>
+                                    {t('settings:title', { defaultValue: 'settings' }).toLowerCase()}
+                                </div>
+                                <h1
+                                    style={{
+                                        fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
+                                        fontWeight: 300,
+                                        fontSize: 34,
+                                        margin: '2px 0 0',
+                                        letterSpacing: -1,
+                                    }}
+                                >
+                                    {t('settings:moonlight.yours', { defaultValue: 'Yours to ' })}
+                                    <em className="serif" style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}>
+                                        {t('settings:moonlight.tune', { defaultValue: 'tune' })}
+                                    </em>
+                                    .
+                                </h1>
+                            </div>
+                        )}
+                        <SettingsPage
+                            user={user}
+                            isDark={theme === 'dark'}
+                            toggleTheme={toggleTheme}
+                            isPremium={isPremium}
+                            hasStripeSubscription={hasStripeSubscription}
+                            exportLoading={exportLoading}
+                            handleExportCsv={handleExportCsv}
+                            babies={babies}
+                            setShowPrivacyPolicy={setShowPrivacyPolicy}
+                            logout={logout}
+                            onUpgrade={() => setShowUpgradeDialog(true)}
+                            onManage={handleManageSubscription}
+                            setActiveTab={setActiveTab}
+                            hubUrl={buildHubUrl(session, theme)}
+                            onRefreshBabies={refresh}
+                            onReplayOnboarding={() => {
+                                setShowTour(true);
+                                setActiveTab('home');
+                            }}
+                        />
+                    </div>
                 )}
             </main>
 

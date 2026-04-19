@@ -25,21 +25,45 @@ export type IconName =
   | 'check'
   | 'home';
 
+/** Maps our SecondaryKind to the widget-id used in localStorage('visibleWidgets'). */
+const WIDGET_ID_BY_KIND: Record<SecondaryKind, string> = {
+  diaper: 'diaper',
+  pump: 'pumping',
+  tummy: 'tummy',
+  potty: 'potty',
+  bath: 'bath',
+  supplement: 'supplement',
+  solid: 'solid',
+};
+
 /**
  * Age-gated list of secondary actions. Mirrors the logic in Dashboard's
- * getDefaultWidgets so moonlight shows the same surface as production.
+ * getDefaultWidgets so moonlight shows the same surface as production, then
+ * respects localStorage('visibleWidgets') so the user's classic-dashboard
+ * widget-visibility toggles apply on moonlight home too.
  */
 export function getApplicableSecondaryActions(ageMonths: number | null): SecondaryKind[] {
-  const actions: SecondaryKind[] = ['diaper'];
+  const ageGated: SecondaryKind[] = ['diaper'];
   if (ageMonths === null || ageMonths <= 12) {
-    actions.push('pump', 'tummy', 'supplement');
+    ageGated.push('pump', 'tummy', 'supplement');
   }
   if (ageMonths !== null && ageMonths >= 4) {
-    actions.push('solid');
+    ageGated.push('solid');
   }
   if (ageMonths !== null && ageMonths >= 18) {
-    actions.push('potty');
+    ageGated.push('potty');
   }
-  actions.push('bath');
-  return actions;
+  ageGated.push('bath');
+
+  // Intersect with visibleWidgets if set; otherwise return full age-gated list.
+  if (typeof window === 'undefined') return ageGated;
+  let visible: string[] | null = null;
+  try {
+    const raw = localStorage.getItem('visibleWidgets');
+    if (raw) visible = JSON.parse(raw);
+  } catch {
+    visible = null;
+  }
+  if (!Array.isArray(visible) || visible.length === 0) return ageGated;
+  return ageGated.filter((kind) => visible!.includes(WIDGET_ID_BY_KIND[kind]));
 }
