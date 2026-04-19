@@ -56,7 +56,7 @@
     "supplement": "Supplément"
   },
   "time": {
-    "justNow": "A l'heure actuelle",
+    "justNow": "A l'instant",
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "today": "Aujourd'hui",
@@ -115,6 +115,6 @@
     "syncNow": "Synchroniser maintenant"
   },
   "moonlight": {
-    "holdForOptions": "Maintenir pour options"
+    "holdForOptions": "Maintenir pour les options"
   }
 }

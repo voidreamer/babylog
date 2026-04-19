@@ -33,7 +33,7 @@
     "months": "месяцев",
     "current": "текущий",
     "birthDateRequired": "Пожалуйста, сначала установите дату рождения ребенка",
-    "median": "Медиан: {{value}}{{unit}}",
+    "median": "Медиана: {{value}}{{unit}}",
     "range": "Нормальный диапазон: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
@@ -46,13 +46,21 @@
     "upper": "Вверху",
     "lower": "Нижний",
     "emerged": "Появившийся",
-    "expected": "Ожидаемый",
+    "emerging": "Появляющиеся",
+    "dueNow": "Сейчас",
+    "dueNowHint": "Типичное возрастное окно для этого зуба - еще не зарегистрировано",
     "future": "Будущее",
+    "logTooth": "Журнал {{name}}",
     "markEmerged": "Отметить {{name}} как Появившийся",
+    "markEmerging": "Отметить {{name}} как Появившийся",
     "markEmergedBtn": "Марк Эмерджен",
-    "emergedDate": "Появились: {{date}}",
+    "markEmergingBtn": "Марк Эмеринг",
+    "updateToEmerged": "Он полностью пройден - отметьте как Emerged",
+    "emergingDate": "Начал появляться: {{date}}",
+    "emergedDate": "Полностью сформирован: {{date}}",
     "removeRecord": "Удалить запись",
-    "toothMarked": "{{name}} отмечен как появившийся!"
+    "toothMarkedEmerged": "{{name}} отмечен как появившийся!",
+    "toothMarkedEmerging": "{{name}} отмечен как появляющийся!"
   },
   "sickDays": {
     "title": "Больничные дни",
@@ -126,7 +134,7 @@
     "started": "Начал: {{date}}",
     "active": "Активный",
     "past": "Прошлое",
-    "stop": "Остановите",
+    "stop": "Остановить",
     "restart": "Перезапустите",
     "medicationStopped": "Прием лекарств прекращен",
     "medicationReactivated": "Лекарство активировано",

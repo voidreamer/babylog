@@ -28,7 +28,7 @@
   "noBabyAdded": "Aún no se ha añadido ningún bebé",
   "addBabyPrompt": "Añade a tu bebé para iniciar el seguimiento",
   "noBabySelected": "Ningún bebé seleccionado",
-  "deleteConfirmTitle": "¿Suprimir este elemento?",
+  "deleteConfirmTitle": "¿Suprimir este artículo?",
   "deleteConfirmMessage": "Esta acción no puede deshacerse.",
   "errorBoundaryTitle": "Algo salió mal",
   "errorBoundaryMessage": "Lo sentimos, pero ha ocurrido algo inesperado. Inténtelo de nuevo.",
@@ -115,6 +115,6 @@
     "syncNow": "Sincronizar ahora"
   },
   "moonlight": {
-    "holdForOptions": "Mantén para opciones"
+    "holdForOptions": "Mantener para opciones"
   }
 }

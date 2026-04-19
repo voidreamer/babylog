@@ -46,13 +46,21 @@
     "upper": "Superior",
     "lower": "Baja",
     "emerged": "Emerged",
-    "expected": "Previsto",
+    "emerging": "Emergentes",
+    "dueNow": "Vence ahora",
+    "dueNowHint": "Ventana de edad típica para este diente - aún no registrada",
     "future": "Futuro",
+    "logTooth": "Registro {{name}}",
     "markEmerged": "Marcar {{name}} como Emergido",
+    "markEmerging": "Marcar {{name}} como Emergente",
     "markEmergedBtn": "Mark Emerged",
-    "emergedDate": "Emergido: {{date}}",
+    "markEmergingBtn": "Marca Emergente",
+    "updateToEmerged": "Está totalmente terminado - marcar como Emergido",
+    "emergingDate": "Empezó a surgir: {{date}}",
+    "emergedDate": "Totalmente emergido: {{date}}",
     "removeRecord": "Eliminar registro",
-    "toothMarked": "¡{{name}} marcado como surgido!"
+    "toothMarkedEmerged": "¡{{name}} marcado como surgido!",
+    "toothMarkedEmerging": "{{name}} ¡marcado como emergente!"
   },
   "sickDays": {
     "title": "Días de enfermedad",
@@ -233,7 +241,7 @@
     "noActiveMeds": "Ningún medicamento activo"
   },
   "schedule": {
-    "progress": "Progresos en la vacunación",
+    "progress": "Avance de la vacunación",
     "complete": "completa",
     "done": "Hecho",
     "overdue": "Atrasado",

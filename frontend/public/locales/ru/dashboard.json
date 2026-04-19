@@ -128,7 +128,7 @@
     "successLabel": "✓ Успех",
     "attemptLabel": "~ Попытка",
     "accidentLabel": "✗ Несчастный случай",
-    "noPottyYet": "Горшки пока не ставит.",
+    "noPottyYet": "Пока не ходит на горшок",
     "pottyLogged": "Горшок {{result}} вошел в систему",
     "yes": "Да",
     "try": "Попробуйте"
@@ -415,7 +415,7 @@
   "toast_bathLogged": "Баня срубленная",
   "toast_failedToLogBath": "Не удалось войти в систему",
   "title_logWithNotes": "Журнал с заметками",
-  "toast_failedToSaveDiaperChange": "Не удалось спасти смену подгузников",
+  "toast_failedToSaveDiaperChange": "Не удалось сохранить смену подгузников",
   "placeholder_optionalNotes": "Дополнительные заметки...",
   "toast_failedToLogDiaper": "Не удалось зарегистрировать подгузник",
   "title_logWithDetails": "Журнал с подробной информацией",

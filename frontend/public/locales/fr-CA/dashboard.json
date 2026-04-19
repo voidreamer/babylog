@@ -358,7 +358,7 @@
     "confidenceScore": "{{score}}% confiant",
     "windowRange": "~{{earliest}} - {{latest}}",
     "sleepPressureLabel": "Pression du sommeil",
-    "signal_pattern": "Schéma historique",
+    "signal_pattern": "Modèle historique",
     "signal_pressure": "Pression du sommeil",
     "signal_circadian": "Rythme biologique",
     "signal_feeding": "Corrélation avec l'alimentation",
