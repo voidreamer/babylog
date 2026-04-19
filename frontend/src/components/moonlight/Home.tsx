@@ -1,13 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { useBaby } from '../../hooks/useBaby';
 import { api } from '../../api/client';
+import { hapticSelection } from '../../utils/haptics';
 import { Orb } from './Orb';
 import { Ribbon } from './Ribbon';
 import { SectionLabel } from './UI';
+import { Icon } from './Icon';
 import type { OrbMode, TimelineEvent } from './types';
+
+const FeedingModal = lazy(() => import('../FeedingModal'));
+const DiaperModal = lazy(() => import('../DiaperModal'));
+const SleepModal = lazy(() => import('../SleepModal'));
+const PumpingModal = lazy(() => import('../PumpingModal'));
+
+type ModalKind = 'feeding' | 'diaper' | 'sleep' | 'pumping' | null;
 
 function parseUTC(time: string): Date {
   return new Date(time.endsWith('Z') ? time : time + 'Z');
@@ -89,12 +98,14 @@ function buildRibbonEvents(dashboard: any): { events: TimelineEvent[]; nowFrac: 
 }
 
 /**
- * Moonlight Home — read-only. Phase 2a.
+ * Moonlight Home — quick-actions wired. Phase 2b.
  *
- * Renders: greeting · orb (mode from last-feed gap) · big "last feed" headline ·
- * 24h ribbon from dashboard last_* fields · soft placeholder card.
+ * Renders greeting · orb (mode from last-feed gap) · big "last feed" headline ·
+ * hero + secondary quick actions · 24h ribbon · soft placeholder card.
  *
- * No quick-action buttons yet (Phase 2b wires them through the existing modals).
+ * Quick actions open the existing modals (FeedingModal, DiaperModal, SleepModal,
+ * PumpingModal); on save we re-fetch the dashboard so the orb / headline / ribbon
+ * reflect the new event immediately.
  */
 export default function MoonlightHome() {
   const { t } = useTranslation(['dashboard', 'common']);
@@ -110,33 +121,40 @@ export default function MoonlightHome() {
       return null;
     }
   });
+  const [activeModal, setActiveModal] = useState<ModalKind>(null);
+
+  const load = useCallback(async () => {
+    if (!selectedBaby) return;
+    try {
+      const localDate = format(new Date(), 'yyyy-MM-dd');
+      const tzOffset = new Date().getTimezoneOffset();
+      const data = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
+      setDashboard(data);
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+      } catch {
+        /* quota */
+      }
+    } catch {
+      /* keep cached; silent */
+    }
+  }, [selectedBaby, cacheKey]);
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      if (!selectedBaby) return;
-      try {
-        const localDate = format(new Date(), 'yyyy-MM-dd');
-        const tzOffset = new Date().getTimezoneOffset();
-        const data = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
-        if (cancelled) return;
-        setDashboard(data);
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(data));
-        } catch {
-          /* quota */
-        }
-      } catch {
-        /* keep cached; silent */
-      }
-    }
     load();
     const id = window.setInterval(load, 30_000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
-  }, [selectedBaby, cacheKey]);
+    return () => window.clearInterval(id);
+  }, [load]);
+
+  const openModal = useCallback((kind: ModalKind) => {
+    hapticSelection();
+    setActiveModal(kind);
+  }, []);
+  const closeModal = useCallback(() => setActiveModal(null), []);
+  const onModalSave = useCallback(() => {
+    setActiveModal(null);
+    void load();
+  }, [load]);
 
   const now = new Date();
   const orb = useMemo(() => deriveOrbState(dashboard), [dashboard]);
@@ -211,6 +229,120 @@ export default function MoonlightHome() {
         )}
       </div>
 
+      {selectedBaby && (
+        <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => openModal('feeding')}
+            aria-label={t('dashboard:quickActionsSection.feeding')}
+            style={{
+              padding: '20px 16px',
+              borderRadius: 22,
+              background: 'var(--ml-accent)',
+              color: '#0a0706',
+              border: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 4,
+              cursor: 'pointer',
+              textAlign: 'left',
+              fontFamily: 'inherit',
+            }}
+          >
+            <Icon.Feed />
+            <div style={{ fontSize: 17, fontWeight: 600, marginTop: 4 }}>
+              {t('dashboard:quickActionsSection.feeding')}
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>{t('dashboard:tapToLog')}</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => openModal('sleep')}
+            aria-label={t('dashboard:quickActionsSection.sleep')}
+            style={{
+              padding: '20px 16px',
+              borderRadius: 22,
+              background: 'var(--ml-surface)',
+              color: 'var(--ml-text)',
+              border: '0.5px solid var(--ml-line)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 4,
+              cursor: 'pointer',
+              textAlign: 'left',
+              fontFamily: 'inherit',
+            }}
+          >
+            <div style={{ color: '#8BA5C4' }}>
+              <Icon.Sleep />
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 500, marginTop: 4 }}>
+              {t('dashboard:quickActionsSection.sleep')}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--ml-text-3)' }}>
+              {t('dashboard:tapToLog')}
+            </div>
+          </button>
+        </div>
+      )}
+
+      {selectedBaby && (
+        <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <button
+            type="button"
+            onClick={() => openModal('diaper')}
+            aria-label={t('dashboard:quickActionsSection.diaper')}
+            style={{
+              padding: '14px 12px',
+              borderRadius: 18,
+              background: 'var(--ml-surface)',
+              color: 'var(--ml-text)',
+              border: '0.5px solid var(--ml-line)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 4,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            <div style={{ color: '#D9C388' }}>
+              <Icon.Diaper />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>
+              {t('dashboard:quickActionsSection.diaper')}
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => openModal('pumping')}
+            aria-label={t('dashboard:quickActionsSection.pump')}
+            style={{
+              padding: '14px 12px',
+              borderRadius: 18,
+              background: 'var(--ml-surface)',
+              color: 'var(--ml-text)',
+              border: '0.5px solid var(--ml-line)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 4,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            <div style={{ color: '#9BC29E' }}>
+              <Icon.Plus />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>
+              {t('dashboard:quickActionsSection.pump')}
+            </div>
+          </button>
+        </div>
+      )}
+
       <SectionLabel extra={format(now, 'h:mm a').toLowerCase()}>today</SectionLabel>
       <Ribbon events={ribbon.events} nowFrac={ribbon.nowFrac} />
 
@@ -225,6 +357,23 @@ export default function MoonlightHome() {
             : `We'll surface rhythms as more data comes in. Keep logging as you go.`}
         </div>
       </div>
+
+      {activeModal && selectedBaby && (
+        <Suspense fallback={null}>
+          {activeModal === 'feeding' && (
+            <FeedingModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+          )}
+          {activeModal === 'diaper' && (
+            <DiaperModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+          )}
+          {activeModal === 'sleep' && (
+            <SleepModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+          )}
+          {activeModal === 'pumping' && (
+            <PumpingModal babyId={selectedBaby.id} onClose={closeModal} onSave={onModalSave} />
+          )}
+        </Suspense>
+      )}
     </div>
   );
 }
