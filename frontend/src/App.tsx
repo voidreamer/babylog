@@ -26,6 +26,7 @@ const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Health = lazy(() => import('./pages/Health'));
 const Moonlight = lazy(() => import('./moonlight/Moonlight'));
+const MoonlightPreview = lazy(() => import('./components/moonlight/Preview'));
 import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell, Baby, TrendingUp, Mail, Trash2, AlertTriangle } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
@@ -559,6 +560,25 @@ function MainApp() {
         }
     }, [theme]);
 
+    // Moonlight UI flag — opt-in via localStorage('ui.moonlight') = 'on'.
+    // When enabled, applies data-ui="moonlight" on <html> so scoped tokens activate.
+    useEffect(() => {
+        const apply = () => {
+            const on = localStorage.getItem('ui.moonlight') === 'on';
+            if (on) {
+                document.documentElement.setAttribute('data-ui', 'moonlight');
+            } else {
+                document.documentElement.removeAttribute('data-ui');
+            }
+        };
+        apply();
+        const onStorage = (e: StorageEvent) => {
+            if (e.key === 'ui.moonlight') apply();
+        };
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
+    }, []);
+
     useEffect(() => {
         const checkPremiumStatus = async () => {
             if (!user || !online) return;
@@ -886,6 +906,7 @@ function App() {
                         <Route path="/callback" element={<Callback />} />
                         <Route path="/health-check" element={<Health />} />
                         <Route path="/moonlight" element={<Moonlight />} />
+                        <Route path="/moonlight/preview" element={<MoonlightPreview />} />
                         <Route
                             path="/*"
                             element={
