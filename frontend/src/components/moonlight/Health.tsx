@@ -14,11 +14,8 @@ import {
   WHO_WEIGHT_GIRLS,
 } from '../../data/whoGrowthData';
 import MoonlightGrowthCard from './GrowthCard';
-import VaccinationSchedule from '../health/VaccinationSchedule';
-import TeethingCard from '../health/TeethingCard';
-import SickDaysCard from '../health/SickDaysCard';
-import AllergiesCard from '../health/AllergiesCard';
-import RecordsSection from '../health/RecordsSection';
+import MoonlightVaxCard from './VaxCard';
+import MoonlightWellnessCard from './WellnessCard';
 import MedicationQuickLog from '../health/MedicationQuickLog';
 import { GrowthModal } from '../health/HealthModals';
 
@@ -28,12 +25,19 @@ type Props = {
 };
 
 /**
- * Moonlight Health — phase 7b state.
+ * Moonlight Health — minimalist 3-section redesign.
  *
- * Loads health data directly (instead of delegating to <Health />) so growth
- * records can drive the re-skinned MoonlightGrowthCard. Remaining classic
- * sub-surfaces (VaccinationSchedule, conditions grid, RecordsSection,
- * MedicationQuickLog) render inline while they wait for their 7c treatment.
+ * Consolidates the production Health page's 7 sections into 3:
+ *   1. Growth (chart + latest tiles — reuses MoonlightGrowthCard)
+ *   2. Next vaccination — a single "next up / overdue / all caught up" card
+ *      that expands into the full CDC/NACI schedule in a sheet
+ *   3. Small wellness — collapsed summary card with teeth / allergies /
+ *      sick-days / records counts; expands inline for detail + edit
+ *
+ * Rationale: production's Health tab shows the entire catalogue every visit.
+ * Parents mostly check "what's next" and "is anything off"; the rest is
+ * reference. This layout keeps the reference but tucks it behind a glance-
+ * first surface.
  */
 export default function MoonlightHealth({
   showMedQuickLog,
@@ -121,7 +125,7 @@ export default function MoonlightHealth({
 
   return (
     <div style={{ padding: '16px 20px 8px', color: 'var(--ml-text)' }}>
-      {/* Moonlight header */}
+      {/* Header */}
       <div className="mono" style={{ marginBottom: 2 }}>
         {t('health:title', { defaultValue: 'health' }).toLowerCase()}
       </div>
@@ -161,10 +165,11 @@ export default function MoonlightHealth({
           className="serif italic"
           style={{ color: 'var(--ml-text-3)', padding: '24px 0', textAlign: 'center' }}
         >
-          {t('common:loading', { defaultValue: 'Loading…' })}
+          {t('common:loading', { defaultValue: 'Loading\u2026' })}
         </div>
       ) : (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* 1. Growth */}
           <MoonlightGrowthCard
             baby={selectedBaby}
             growthRecords={growthRecords}
@@ -172,50 +177,26 @@ export default function MoonlightHealth({
             onOpenGrowthModal={() => setShowGrowthModal(true)}
           />
 
-          {/* Classic remaining surfaces — re-skinned in 7c. */}
-          <div className="ml-health-classic" style={{ marginTop: 28 }}>
-            <section className="health-section" style={{ marginBottom: 16 }}>
-              <VaccinationSchedule
-                baby={selectedBaby}
-                vaccinations={vaccinations}
-                onDataChanged={loadData}
-              />
-            </section>
+          {/* 2. Next vaccination — single card with expand-to-schedule */}
+          <MoonlightVaxCard
+            baby={selectedBaby}
+            vaccinations={vaccinations}
+            onDataChanged={loadData}
+          />
 
-            <section className="health-cards-grid" style={{ marginBottom: 16 }}>
-              {showTeething && (
-                <TeethingCard
-                  baby={selectedBaby}
-                  teeth={teeth}
-                  onToothAdded={loadData}
-                  onToothDeleted={loadData}
-                />
-              )}
-              <AllergiesCard
-                baby={selectedBaby}
-                allergies={allergies}
-                onAllergyAdded={loadData}
-                onAllergyDeleted={loadData}
-              />
-              <SickDaysCard
-                baby={selectedBaby}
-                sickDays={sickDays}
-                onSickDayAdded={loadData}
-                onSickDayDeleted={loadData}
-              />
-            </section>
-
-            <section className="health-section">
-              <RecordsSection
-                baby={selectedBaby}
-                visits={visits}
-                vaccinations={vaccinations}
-                medications={medications}
-                onDataChanged={loadData}
-              />
-            </section>
-          </div>
-        </>
+          {/* 3. Small wellness — collapsed summary, expands inline */}
+          <MoonlightWellnessCard
+            baby={selectedBaby}
+            teeth={teeth}
+            allergies={allergies}
+            sickDays={sickDays}
+            visits={visits}
+            vaccinations={vaccinations}
+            medications={medications}
+            showTeething={showTeething}
+            onDataChanged={loadData}
+          />
+        </div>
       )}
 
       {showGrowthModal && (
