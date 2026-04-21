@@ -44,22 +44,28 @@ DEFAULT_TAU_MINUTES = 150.0
 # wide-kernel night-maintenance gate so propensity stays high through the night.
 CIRCADIAN_GATES: dict[tuple[int, int], list[tuple[float, float]]] = {
     (0, 12): [
-        (9.0, 0.5), (12.5, 0.6), (15.5, 0.4),
+        (9.0, 0.5),
+        (12.5, 0.6),
+        (15.5, 0.4),
         (20.0, 0.85),  # bedtime (younger babies sleep earlier-ish but unconsolidated)
-        (2.0, 0.95),   # night maintenance
+        (2.0, 0.95),  # night maintenance
     ],
     (12, 26): [
-        (9.0, 0.7), (12.5, 0.9), (15.5, 0.6),
+        (9.0, 0.7),
+        (12.5, 0.9),
+        (15.5, 0.6),
         (19.5, 0.95),  # bedtime
-        (2.0, 1.0),    # night maintenance
+        (2.0, 1.0),  # night maintenance
     ],
     (26, 52): [
-        (9.5, 0.8), (13.0, 0.9),
+        (9.5, 0.8),
+        (13.0, 0.9),
         (19.0, 0.95),  # bedtime
-        (2.0, 1.0),    # night maintenance
+        (2.0, 1.0),  # night maintenance
     ],
     (52, 78): [
-        (9.5, 0.7), (12.5, 0.8),
+        (9.5, 0.7),
+        (12.5, 0.8),
         (19.5, 0.9),
         (2.0, 1.0),
     ],
@@ -445,9 +451,7 @@ def recovery_fraction(sleep_duration_min: float, age_weeks: int) -> float:
     return min(1.0, sleep_duration_min / restorative)
 
 
-def effective_pressure_after_sleep(
-    pressure_before: float, sleep_duration_min: float, age_weeks: int
-) -> float:
+def effective_pressure_after_sleep(pressure_before: float, sleep_duration_min: float, age_weeks: int) -> float:
     """Pressure remaining after a sleep of the given duration."""
     rf = recovery_fraction(sleep_duration_min, age_weeks)
     return max(0.0, pressure_before * (1.0 - rf))
@@ -497,9 +501,7 @@ def compute_current_effective_pressure(
         et = make_aware(s.end_time)
         if last_wake is not None and st > last_wake:
             wake_min = (st - last_wake).total_seconds() / 60.0
-            pressure = sleep_pressure_at(
-                _pressure_to_minutes(pressure, tau) + wake_min, tau
-            )
+            pressure = sleep_pressure_at(_pressure_to_minutes(pressure, tau) + wake_min, tau)
         # Discharge during this sleep
         dur = float(s.duration_minutes)
         last_sleep_dur = dur
@@ -511,9 +513,7 @@ def compute_current_effective_pressure(
     wall_minutes_awake = 0.0
     if last_wake is not None and now > last_wake:
         wall_minutes_awake = (now - last_wake).total_seconds() / 60.0
-        pressure = sleep_pressure_at(
-            _pressure_to_minutes(pressure, tau) + wall_minutes_awake, tau
-        )
+        pressure = sleep_pressure_at(_pressure_to_minutes(pressure, tau) + wall_minutes_awake, tau)
 
     eff_awake = _pressure_to_minutes(pressure, tau)
     return {
@@ -698,9 +698,9 @@ def extract_bucketed_wake_durations(
         now = datetime.now(UTC)
 
     out: dict[str, dict] = {
-        "day":     {"durations": [], "weights": [], "timestamps": []},
+        "day": {"durations": [], "weights": [], "timestamps": []},
         "evening": {"durations": [], "weights": [], "timestamps": []},
-        "night":   {"durations": [], "weights": [], "timestamps": []},
+        "night": {"durations": [], "weights": [], "timestamps": []},
     }
 
     sorted_sleeps = sorted(
@@ -904,9 +904,7 @@ def project_rest_windows(
         cursor_local_for_bucket = cursor - timedelta(minutes=tz_offset)
         if boundaries and bucketed_windows:
             cursor_bucket = classify_wake_bucket(cursor_local_for_bucket, boundaries)
-            ww_mean, ww_std = bucketed_windows.get(
-                cursor_bucket, (wake_window_minutes, wake_window_std)
-            )
+            ww_mean, ww_std = bucketed_windows.get(cursor_bucket, (wake_window_minutes, wake_window_std))
         else:
             cursor_bucket = "day"
             ww_mean, ww_std = wake_window_minutes, wake_window_std
@@ -932,7 +930,10 @@ def project_rest_windows(
             # Compute the next future gate datetime, allowing wrap to tomorrow
             # (e.g. cursor at 22:00 looking for the 02:00 night gate).
             gate_local = cursor_local.replace(
-                hour=gh_int, minute=gh_min, second=0, microsecond=0,
+                hour=gh_int,
+                minute=gh_min,
+                second=0,
+                microsecond=0,
             )
             if gate_local <= cursor_local:
                 gate_local = gate_local + timedelta(days=1)
@@ -970,19 +971,19 @@ def project_rest_windows(
             bedtime_dur = night_sleep_duration if night_sleep_duration else 600
             bed_end = bedtime_utc + timedelta(minutes=bedtime_dur)
             if bed_end > now:
-                windows.append({
-                    "start": bedtime_utc.isoformat(),
-                    "end": bed_end.isoformat(),
-                    "duration_minutes": round(bedtime_dur),
-                    "label": "bedtime",
-                    "is_current": False,
-                    "sleep_pressure_at_start": round(
-                        sleep_pressure_at(
-                            (bedtime_utc - cursor).total_seconds() / 60, tau_minutes
+                windows.append(
+                    {
+                        "start": bedtime_utc.isoformat(),
+                        "end": bed_end.isoformat(),
+                        "duration_minutes": round(bedtime_dur),
+                        "label": "bedtime",
+                        "is_current": False,
+                        "sleep_pressure_at_start": round(
+                            sleep_pressure_at((bedtime_utc - cursor).total_seconds() / 60, tau_minutes),
+                            2,
                         ),
-                        2,
-                    ),
-                })
+                    }
+                )
             break
 
         # Find matching cluster for this nap's local time
@@ -1376,9 +1377,7 @@ async def get_rest_plan(
 
         sleep_pressure_state = None
         if not is_sleeping and last_wake_time:
-            sleep_pressure_state = calculate_sleep_pressure(
-                last_wake_time, age_weeks, now, bucket=current_mode
-            )
+            sleep_pressure_state = calculate_sleep_pressure(last_wake_time, age_weeks, now, bucket=current_mode)
 
         last_feed_minutes_ago = None
         if feeding_times:
