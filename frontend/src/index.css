@@ -8048,6 +8048,47 @@ a.settings-row {
   padding: var(--space-md) var(--space-lg);
 }
 
+/* Mode badge in section header */
+.rest-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: var(--space-sm);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: help;
+}
+.rest-mode-day { color: var(--feeding); }
+.rest-mode-evening { color: var(--tummy); }
+.rest-mode-night { color: var(--sleep); border-color: var(--sleep); }
+
+/* Effective awake row (shown after a catnap) */
+.rest-effective-awake {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: help;
+}
+.rest-effective-awake strong {
+  color: var(--text);
+}
+
+/* Night-mode card has a softer feel */
+.rest-night-card {
+  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--sleep) 8%, var(--surface)) 100%);
+}
+
 .rest-summary-icon {
   flex-shrink: 0;
 }

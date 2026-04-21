@@ -2,7 +2,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Coffee, Lock, Moon, Clock, AlertCircle, Beaker, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Coffee, Lock, Moon, Sun, Sunset, Clock, AlertCircle, Beaker, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+
+type RestMode = 'day' | 'evening' | 'night';
 
 // =============================================================================
 // Helpers
@@ -21,6 +23,84 @@ const formatTime = (d: Date) =>
 // =============================================================================
 // Sub-components
 // =============================================================================
+
+function ModeBadge({ mode, boundaries }: { mode: RestMode; boundaries?: any }) {
+    const { t } = useTranslation('dashboard');
+    const icon = mode === 'night' ? <Moon size={14} /> : mode === 'evening' ? <Sunset size={14} /> : <Sun size={14} />;
+    const label = t(`insights.mode_${mode}`);
+
+    let hint: string | null = null;
+    if (boundaries) {
+        if (boundaries.learned) {
+            const fmt = (h: number) => {
+                const hh = Math.floor(h);
+                const mm = Math.round((h - hh) * 60);
+                return `${hh}:${String(mm).padStart(2, '0')}`;
+            };
+            hint = t('insights.boundariesLearned', {
+                bedtime: fmt(boundaries.bedtime_hour),
+                wake: fmt(boundaries.morning_wake_hour),
+            });
+        } else {
+            hint = t('insights.boundariesDefault');
+        }
+    }
+
+    return (
+        <div className={`rest-mode-badge rest-mode-${mode}`} title={hint || undefined}>
+            {icon}
+            <span>{label}</span>
+        </div>
+    );
+}
+
+function EffectiveAwakeRow({ currentState }: { currentState: any }) {
+    const { t } = useTranslation('dashboard');
+    if (!currentState) return null;
+    const lastDur = currentState.last_sleep_duration_min;
+    const recovery = currentState.last_sleep_recovery_fraction;
+    const effective = currentState.effective_minutes_awake;
+    const wall = currentState.wall_minutes_awake;
+    // Only show when last sleep was short (recovery < 1) AND we're currently awake
+    if (recovery == null || recovery >= 0.99 || lastDur == null || currentState.is_sleeping) return null;
+    if (effective == null || wall == null) return null;
+    return (
+        <div className="rest-effective-awake" title={t('insights.effectiveAwakeTooltip', { minutes: lastDur })}>
+            <Info size={14} />
+            <span>{t('insights.effectiveAwakeLabel')}: <strong>{effective} min</strong> ({wall} min wall-clock)</span>
+        </div>
+    );
+}
+
+function NightModeCard({ currentState, patterns }: { currentState: any; patterns: any }) {
+    const { t } = useTranslation('dashboard');
+    if (!currentState) return null;
+    // Use the night-bucket optimal window for the back-to-sleep estimate
+    const nightWw = patterns?.bucketed_wake_windows?.night;
+    const remaining = nightWw
+        ? Math.max(0, Math.round(nightWw.mean_minutes - (currentState.wall_minutes_awake ?? 0)))
+        : null;
+    return (
+        <motion.div
+            className="rest-summary-card rest-night-card"
+            style={{ borderLeftColor: 'var(--sleep)' }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+        >
+            <div className="rest-summary-icon" style={{ color: 'var(--sleep)' }}>
+                <Moon size={24} />
+            </div>
+            <div className="rest-summary-text">
+                <span className="rest-summary-message">
+                    {remaining != null
+                        ? t('insights.nightModeBackToSleep', { minutes: remaining })
+                        : t('insights.mode_night')}
+                </span>
+                <span className="rest-summary-detail">{t('insights.nightModeHint')}</span>
+            </div>
+        </motion.div>
+    );
+}
 
 function RestSummaryMessage({ summary }: { summary: any }) {
     const { t } = useTranslation('dashboard');
@@ -315,20 +395,29 @@ export default function RestPlannerSection({ restPlan, isPremium }: RestPlannerS
         return null;
     }
 
-    const { rest_windows, summary } = restPlan;
+    const { rest_windows, summary, current_state, mode, boundaries } = restPlan;
+    const isNight: boolean = mode === 'night';
 
     return (
         <section className="insights-section">
             <h2 className="insights-section-title">
                 <Coffee size={18} />
                 <span>{t('insights.restPlanner')}</span>
+                {mode && <ModeBadge mode={mode as RestMode} boundaries={boundaries} />}
                 {!isPremium && <Lock size={14} className="premium-lock" />}
             </h2>
 
             <div className={`rest-planner-content ${!isPremium ? 'premium-blur' : ''}`}>
-                <RestSummaryMessage summary={summary} />
-                <RestTimeline windows={rest_windows} />
-                <RestWindowCarousel windows={rest_windows} />
+                {isNight ? (
+                    <NightModeCard currentState={current_state} patterns={restPlan.patterns_used} />
+                ) : (
+                    <>
+                        <RestSummaryMessage summary={summary} />
+                        <EffectiveAwakeRow currentState={current_state} />
+                        <RestTimeline windows={rest_windows} />
+                        <RestWindowCarousel windows={rest_windows} />
+                    </>
+                )}
                 {restPlan.patterns_used && (
                     <div className="rest-patterns-meta">
                         <span>{t('insights.basedOnDays', { days: restPlan.patterns_used.data_days })}</span>

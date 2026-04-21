@@ -362,7 +362,17 @@
     "signal_pressure": "Sleep pressure",
     "signal_circadian": "Biological rhythm",
     "signal_feeding": "Feeding correlation",
-    "poweredByScience": "Powered by sleep science"
+    "poweredByScience": "Powered by sleep science",
+    "mode_day": "Daytime",
+    "mode_evening": "Evening",
+    "mode_night": "Night mode",
+    "nightModeBackToSleep": "Back to sleep in ~{{minutes}} min",
+    "nightModeHint": "Night wakes are usually short — comfort and re-settle.",
+    "effectiveAwakeLabel": "Effective awake time",
+    "effectiveAwakeTooltip": "Last sleep ({{minutes}} min) was a catnap, so it only partially reset the wake window. Effective awake counts the leftover sleep pressure.",
+    "boundariesLearned": "Bedtime ~{{bedtime}} · Morning ~{{wake}}",
+    "boundariesDefault": "Using default bedtime · keep tracking to personalize",
+    "bedtimeWindow": "Bedtime window"
   },
   "learn": {
     "insights": "Insights",
