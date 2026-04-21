@@ -215,7 +215,10 @@ def calculate_confidence_interval(intervals: list[float], confidence_level: floa
 
 
 def calculate_sleep_pressure(
-    last_wake_time: datetime | None, age_weeks: int, now: datetime | None = None
+    last_wake_time: datetime | None,
+    age_weeks: int,
+    now: datetime | None = None,
+    bucket: str | None = None,
 ) -> dict | None:
     """
     Calculate real-time "tiredness" score (0-100).
@@ -230,6 +233,10 @@ def calculate_sleep_pressure(
         71-85: High - getting overtired, act quickly
         86-100: Overtired - may fight sleep, harder to settle
 
+    When `bucket` is provided ("day" | "evening" | "night"), uses the
+    bucket-specific wake window for that age so a 4mo at 03:00 doesn't get
+    flagged as "alert" for a 15-min wake (it's actually overtired).
+
     Returns:
         Dict with score, label, and recommendations
     """
@@ -242,8 +249,8 @@ def calculate_sleep_pressure(
     last_wake = make_aware(last_wake_time)
     now = make_aware(now)
 
-    # Get wake window for age
-    wake_window = get_wake_window_benchmarks(age_weeks)
+    # Get wake window for age (and bucket, when supplied)
+    wake_window = get_wake_window_benchmarks(age_weeks, bucket)
     min_minutes = wake_window["min_minutes"]
     optimal_minutes = wake_window["optimal_minutes"]
     max_minutes = wake_window["max_minutes"]
@@ -255,7 +262,7 @@ def calculate_sleep_pressure(
     minutes_awake = max(0, minutes_awake)
 
     # Calculate score based on position in wake window
-    if minutes_awake < min_minutes:
+    if min_minutes > 0 and minutes_awake < min_minutes:
         # Too early - low pressure (0-30)
         progress = minutes_awake / min_minutes
         score = int(progress * 30)
@@ -264,7 +271,8 @@ def calculate_sleep_pressure(
         zone = "green"
     elif minutes_awake <= optimal_minutes:
         # Building up - moderate pressure (31-70)
-        progress = (minutes_awake - min_minutes) / (optimal_minutes - min_minutes)
+        denom = max(1, optimal_minutes - min_minutes)
+        progress = max(0.0, (minutes_awake - min_minutes) / denom)
         score = 31 + int(progress * 39)
         if score < 50:
             label = "Getting sleepy"

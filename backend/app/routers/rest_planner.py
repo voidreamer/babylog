@@ -17,7 +17,11 @@ from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
-from ..benchmarks import calculate_age_weeks, get_wake_window_benchmarks
+from ..benchmarks import (
+    calculate_age_weeks,
+    get_wake_window_benchmarks,
+    restorative_minutes_for_age,
+)
 from ..database import get_db
 from ..logging_config import get_logger
 from ..models import Feeding, Sleep
@@ -35,13 +39,55 @@ logger = get_logger(__name__)
 EWMA_DECAY = 0.85
 PRESSURE_THRESHOLD = 0.65
 DEFAULT_TAU_MINUTES = 150.0
+
+# Circadian gates: (hour_of_day_local, strength). Now includes bedtime and a
+# wide-kernel night-maintenance gate so propensity stays high through the night.
 CIRCADIAN_GATES: dict[tuple[int, int], list[tuple[float, float]]] = {
-    (12, 26): [(9.0, 0.7), (12.5, 0.9), (15.5, 0.6)],  # 3-6m
-    (26, 52): [(9.5, 0.8), (13.0, 0.9)],  # 6-12m
-    (52, 78): [(9.5, 0.7), (12.5, 0.8)],  # 12-18m
-    (78, 999): [(13.0, 0.9)],  # 18m+
+    (0, 12): [
+        (9.0, 0.5), (12.5, 0.6), (15.5, 0.4),
+        (20.0, 0.85),  # bedtime (younger babies sleep earlier-ish but unconsolidated)
+        (2.0, 0.95),   # night maintenance
+    ],
+    (12, 26): [
+        (9.0, 0.7), (12.5, 0.9), (15.5, 0.6),
+        (19.5, 0.95),  # bedtime
+        (2.0, 1.0),    # night maintenance
+    ],
+    (26, 52): [
+        (9.5, 0.8), (13.0, 0.9),
+        (19.0, 0.95),  # bedtime
+        (2.0, 1.0),    # night maintenance
+    ],
+    (52, 78): [
+        (9.5, 0.7), (12.5, 0.8),
+        (19.5, 0.9),
+        (2.0, 1.0),
+    ],
+    (78, 999): [
+        (13.0, 0.9),
+        (20.0, 0.85),
+        (2.0, 1.0),
+    ],
 }
 CIRCADIAN_SIGMA = 1.0
+# Wider Gaussian kernel for the night-maintenance gate so the high-propensity
+# plateau covers the full overnight stretch rather than peaking sharply at 02:00.
+CIRCADIAN_NIGHT_SIGMA = 3.0
+NIGHT_GATE_HOUR = 2.0  # any gate at this hour is treated as "night" with a wider sigma
+
+# Day/night boundary defaults (local hours) when not enough history exists.
+# (age_weeks_max, bedtime_hour, morning_wake_hour)
+DEFAULT_DAY_NIGHT_BOUNDARIES: list[tuple[int, float, float]] = [
+    (12, 20.0, 7.0),
+    (26, 19.5, 6.5),
+    (52, 19.0, 6.5),
+    (999, 19.5, 7.0),
+]
+# Minimum overnight sleep length (minutes) used to identify the "main night sleep"
+# when learning per-baby bedtime / morning-wake.
+NIGHT_SLEEP_MIN_DURATION = 180
+LEARN_DAY_NIGHT_DAYS = 21
+LEARN_DAY_NIGHT_MIN_SAMPLES = 5
 
 
 # =============================================================================
@@ -107,15 +153,17 @@ def bayesian_wake_window(
     observed_wake_durations: list[float],
     weights: list[float],
     age_weeks: int,
+    bucket: str | None = None,
 ) -> tuple[float, float]:
     """
     Bayesian Normal-Normal conjugate update for wake windows.
 
-    Prior: N(benchmark_optimal, ((max-min)/4)^2)
+    Prior: N(benchmark_optimal, ((max-min)/4)^2) — uses the bucketed sub-window
+    when `bucket` is provided so day/evening/night each get their own prior.
     Likelihood: EWMA-weighted observed wake durations
     Returns: (posterior_mean, posterior_std)
     """
-    benchmarks = get_wake_window_benchmarks(age_weeks)
+    benchmarks = get_wake_window_benchmarks(age_weeks, bucket)
     prior_mean = benchmarks["optimal_minutes"]
     prior_std = (benchmarks["max_minutes"] - benchmarks["min_minutes"]) / 4.0
     if prior_std <= 0:
@@ -202,21 +250,285 @@ def get_circadian_gates(age_weeks: int) -> list[tuple[float, float]]:
     return [(9.0, 0.5), (12.5, 0.6), (15.5, 0.4)]
 
 
+def _gate_sigma(gate_hour: float) -> float:
+    """Use a wider kernel for the night-maintenance gate so propensity stays
+    high across the overnight stretch (not just a sharp peak at 02:00)."""
+    if abs(gate_hour - NIGHT_GATE_HOUR) < 0.5:
+        return CIRCADIAN_NIGHT_SIGMA
+    return CIRCADIAN_SIGMA
+
+
 def circadian_score(hour: float, gates: list[tuple[float, float]]) -> float:
-    """Compute circadian alignment score at a given hour (sum of Gaussian kernels)."""
+    """Compute circadian alignment score at a given hour (sum of Gaussian kernels).
+
+    Hours are treated cyclically (24h) so gates near midnight don't get cut off.
+    """
     total = 0.0
     for gate_hour, strength in gates:
-        exponent = -0.5 * ((hour - gate_hour) / CIRCADIAN_SIGMA) ** 2
+        sigma = _gate_sigma(gate_hour)
+        # Cyclical distance on a 24h clock
+        diff = (hour - gate_hour) % 24
+        if diff > 12:
+            diff -= 24
+        exponent = -0.5 * (diff / sigma) ** 2
         total += strength * math.exp(exponent)
     return total
 
 
 def circadian_nearest_gate(current_hour: float, gates: list[tuple[float, float]]) -> tuple[float, float] | None:
-    """Find the next future circadian gate from current_hour."""
-    future = [(h, s) for h, s in gates if h > current_hour]
-    if future:
-        return min(future, key=lambda x: x[0])
-    return None
+    """Find the next future circadian gate from current_hour, considering the
+    24h cycle so a gate at 02:00 can be 'next' from 22:00.
+    """
+    if not gates:
+        return None
+    best: tuple[float, float] | None = None
+    best_delta = 25.0
+    for h, s in gates:
+        delta = (h - current_hour) % 24
+        if delta == 0:
+            delta = 24  # don't return current hour itself
+        if delta < best_delta:
+            best_delta = delta
+            best = (h, s)
+    return best
+
+
+# =============================================================================
+# Day / Night Boundary Learning
+# =============================================================================
+
+
+def _default_boundaries(age_weeks: int) -> tuple[float, float]:
+    """Age-based fallback bedtime/morning-wake hours when data is sparse."""
+    for max_w, bed, wake in DEFAULT_DAY_NIGHT_BOUNDARIES:
+        if age_weeks <= max_w:
+            return bed, wake
+    return DEFAULT_DAY_NIGHT_BOUNDARIES[-1][1], DEFAULT_DAY_NIGHT_BOUNDARIES[-1][2]
+
+
+def _circular_median_hour(hours: list[float]) -> float:
+    """Median of hour-of-day values respecting 24h wrap (e.g. 23.5 and 0.5
+    should average near midnight, not noon)."""
+    if not hours:
+        return 0.0
+    if len(hours) == 1:
+        return hours[0] % 24
+    # Convert to unit-circle coordinates, average, convert back
+    xs = [math.cos(2 * math.pi * h / 24) for h in hours]
+    ys = [math.sin(2 * math.pi * h / 24) for h in hours]
+    mx = sum(xs) / len(xs)
+    my = sum(ys) / len(ys)
+    angle = math.atan2(my, mx)
+    h = (angle / (2 * math.pi)) * 24
+    h = h % 24
+    # Clamp 24.0 (possible from -0.0 % 24 float drift) into [0, 24)
+    if h >= 24.0:
+        h -= 24.0
+    return h
+
+
+def learn_day_night_boundaries(
+    sleeps: list[Sleep],
+    tz_offset: int,
+    age_weeks: int,
+    now: datetime | None = None,
+) -> dict:
+    """
+    Learn the baby's bedtime and morning-wake hour from history.
+
+    Strategy: pick the longest sleep starting between 18:00 and 03:00 local on
+    each of the last LEARN_DAY_NIGHT_DAYS days as the "main night sleep".
+    Median-aggregate its start hour (bedtime) and end hour (morning wake).
+    Fall back to age defaults if fewer than LEARN_DAY_NIGHT_MIN_SAMPLES samples.
+    """
+    if now is None:
+        now = datetime.now(UTC)
+
+    cutoff = now - timedelta(days=LEARN_DAY_NIGHT_DAYS)
+
+    # Group candidate "main night sleeps" by local calendar date of start
+    by_date: dict = {}
+    for s in sleeps:
+        if not s.end_time or not s.duration_minutes:
+            continue
+        if s.duration_minutes < NIGHT_SLEEP_MIN_DURATION:
+            continue
+        st_utc = make_aware(s.start_time)
+        if st_utc < cutoff:
+            continue
+        st_local = st_utc - timedelta(minutes=tz_offset)
+        # Accept sleeps starting 18:00 - 03:59 local as candidate night sleeps
+        if not (st_local.hour >= 18 or st_local.hour < 4):
+            continue
+        # Use the local date of the evening (so 01:30 belongs to previous day)
+        date_key = (st_local - timedelta(hours=12)).date()
+        existing = by_date.get(date_key)
+        if existing is None or s.duration_minutes > existing.duration_minutes:
+            by_date[date_key] = s
+
+    bedtime_hours: list[float] = []
+    wake_hours: list[float] = []
+    for s in by_date.values():
+        st_local = make_aware(s.start_time) - timedelta(minutes=tz_offset)
+        et_local = make_aware(s.end_time) - timedelta(minutes=tz_offset)
+        bedtime_hours.append(st_local.hour + st_local.minute / 60.0)
+        wake_hours.append(et_local.hour + et_local.minute / 60.0)
+
+    default_bed, default_wake = _default_boundaries(age_weeks)
+    if len(bedtime_hours) >= LEARN_DAY_NIGHT_MIN_SAMPLES:
+        bedtime_hour = _circular_median_hour(bedtime_hours)
+        morning_wake_hour = _circular_median_hour(wake_hours)
+        learned = True
+    else:
+        bedtime_hour = default_bed
+        morning_wake_hour = default_wake
+        learned = False
+
+    # Normalize hours to [0, 24)
+    bedtime_hour = bedtime_hour % 24
+    morning_wake_hour = morning_wake_hour % 24
+    if bedtime_hour >= 24.0:
+        bedtime_hour -= 24.0
+    if morning_wake_hour >= 24.0:
+        morning_wake_hour -= 24.0
+
+    # Evening starts ~2h before bedtime; floor at 16:00 to avoid degenerate windows
+    evening_start = max(16.0, bedtime_hour - 2.0) if bedtime_hour >= 18.0 else 16.0
+
+    return {
+        "bedtime_hour": round(bedtime_hour, 2),
+        "morning_wake_hour": round(morning_wake_hour, 2),
+        "evening_start": round(evening_start, 2),
+        "samples": len(bedtime_hours),
+        "learned": learned,
+    }
+
+
+def _hour_in_range(h: float, lo: float, hi: float) -> bool:
+    """True if hour h is in [lo, hi) on a 24h clock, supporting wrap."""
+    if lo <= hi:
+        return lo <= h < hi
+    return h >= lo or h < hi
+
+
+def classify_wake_bucket(local_dt: datetime, boundaries: dict) -> str:
+    """Return 'day' | 'evening' | 'night' for a local datetime."""
+    h = local_dt.hour + local_dt.minute / 60.0
+    morning = boundaries["morning_wake_hour"]
+    evening = boundaries["evening_start"]
+    bedtime = boundaries["bedtime_hour"]
+    # Night: from bedtime through morning wake
+    if _hour_in_range(h, bedtime, morning):
+        return "night"
+    # Evening: from evening_start to bedtime
+    if _hour_in_range(h, evening, bedtime):
+        return "evening"
+    return "day"
+
+
+# =============================================================================
+# Partial Pressure Discharge for Short Sleeps
+# =============================================================================
+
+
+def recovery_fraction(sleep_duration_min: float, age_weeks: int) -> float:
+    """
+    Fraction of sleep pressure discharged by a sleep of the given duration.
+
+    A "restorative" sleep of one age-appropriate cycle (~45 min for a 4mo)
+    fully resets pressure. Anything shorter discharges proportionally.
+    Clamped to [0, 1].
+    """
+    if sleep_duration_min <= 0:
+        return 0.0
+    restorative = max(1, restorative_minutes_for_age(age_weeks))
+    return min(1.0, sleep_duration_min / restorative)
+
+
+def effective_pressure_after_sleep(
+    pressure_before: float, sleep_duration_min: float, age_weeks: int
+) -> float:
+    """Pressure remaining after a sleep of the given duration."""
+    rf = recovery_fraction(sleep_duration_min, age_weeks)
+    return max(0.0, pressure_before * (1.0 - rf))
+
+
+def compute_current_effective_pressure(
+    sleeps: list[Sleep],
+    age_weeks: int,
+    tau: float,
+    now: datetime,
+) -> dict:
+    """
+    Walk all completed sleeps in chronological order, accumulating pressure
+    during wake and discharging it partially during each sleep, then add wake
+    accumulation since the last wake.
+
+    Returns:
+        {
+            "pressure": float in [0, 1],
+            "effective_minutes_awake": float,
+            "wall_minutes_awake": float,
+            "last_sleep_recovery_fraction": float,
+            "last_sleep_duration_min": float | None,
+        }
+    """
+    sorted_sleeps = sorted(
+        [s for s in sleeps if s.start_time and s.end_time and s.duration_minutes],
+        key=lambda s: make_aware(s.start_time),
+    )
+
+    if not sorted_sleeps:
+        return {
+            "pressure": 0.0,
+            "effective_minutes_awake": 0.0,
+            "wall_minutes_awake": 0.0,
+            "last_sleep_recovery_fraction": 1.0,
+            "last_sleep_duration_min": None,
+        }
+
+    pressure = 0.0
+    last_wake: datetime | None = None
+    last_sleep_dur: float | None = None
+    last_recovery: float = 1.0
+
+    for s in sorted_sleeps:
+        st = make_aware(s.start_time)
+        et = make_aware(s.end_time)
+        if last_wake is not None and st > last_wake:
+            wake_min = (st - last_wake).total_seconds() / 60.0
+            pressure = sleep_pressure_at(
+                _pressure_to_minutes(pressure, tau) + wake_min, tau
+            )
+        # Discharge during this sleep
+        dur = float(s.duration_minutes)
+        last_sleep_dur = dur
+        last_recovery = recovery_fraction(dur, age_weeks)
+        pressure = effective_pressure_after_sleep(pressure, dur, age_weeks)
+        last_wake = et
+
+    # Wake stretch from last wake until now
+    wall_minutes_awake = 0.0
+    if last_wake is not None and now > last_wake:
+        wall_minutes_awake = (now - last_wake).total_seconds() / 60.0
+        pressure = sleep_pressure_at(
+            _pressure_to_minutes(pressure, tau) + wall_minutes_awake, tau
+        )
+
+    eff_awake = _pressure_to_minutes(pressure, tau)
+    return {
+        "pressure": round(pressure, 4),
+        "effective_minutes_awake": round(eff_awake, 1),
+        "wall_minutes_awake": round(wall_minutes_awake, 1),
+        "last_sleep_recovery_fraction": round(last_recovery, 3),
+        "last_sleep_duration_min": last_sleep_dur,
+    }
+
+
+def _pressure_to_minutes(pressure: float, tau: float) -> float:
+    """Inverse of Process S: minutes_awake = -tau * ln(1 - pressure)."""
+    p = max(0.0, min(0.999, pressure))
+    return -tau * math.log(1.0 - p)
 
 
 def compute_feed_to_sleep_interval(sleeps: list, feedings: list, tz_offset: int) -> float | None:
@@ -361,6 +673,73 @@ def compute_confidence_score(
 
 
 # =============================================================================
+# Bucketed wake-duration extraction
+# =============================================================================
+
+
+def extract_bucketed_wake_durations(
+    sleeps: list[Sleep],
+    boundaries: dict,
+    tz_offset: int,
+    now: datetime | None = None,
+) -> dict[str, dict]:
+    """
+    Walk consecutive completed sleeps and bucket the wake-to-sleep durations
+    between them by the local time of the wake-up that started each stretch.
+
+    Returns:
+        {
+            "day":     {"durations": [...], "weights": [...], "timestamps": [...]},
+            "evening": {...},
+            "night":   {...},
+        }
+    """
+    if now is None:
+        now = datetime.now(UTC)
+
+    out: dict[str, dict] = {
+        "day":     {"durations": [], "weights": [], "timestamps": []},
+        "evening": {"durations": [], "weights": [], "timestamps": []},
+        "night":   {"durations": [], "weights": [], "timestamps": []},
+    }
+
+    sorted_sleeps = sorted(
+        [s for s in sleeps if s.end_time and s.start_time],
+        key=lambda s: make_aware(s.start_time),
+    )
+    if len(sorted_sleeps) < 2:
+        return out
+
+    # Build raw (wake_end_utc, wake_minutes, bucket) tuples first, then weight
+    raw: list[tuple[datetime, float, str]] = []
+    for i in range(1, len(sorted_sleeps)):
+        prev = sorted_sleeps[i - 1]
+        curr = sorted_sleeps[i]
+        wake_end_utc = make_aware(prev.end_time)
+        next_start_utc = make_aware(curr.start_time)
+        wake_min = (next_start_utc - wake_end_utc).total_seconds() / 60.0
+        # Allow short wakes (down to 1 minute) — we WANT to learn the night
+        # back-to-sleep stretches that the old code filtered out.
+        if not (1 <= wake_min <= 720):
+            continue
+        wake_end_local = wake_end_utc - timedelta(minutes=tz_offset)
+        bucket = classify_wake_bucket(wake_end_local, boundaries)
+        raw.append((wake_end_utc, wake_min, bucket))
+
+    if not raw:
+        return out
+
+    timestamps = [t for t, _, _ in raw]
+    weights = compute_ewma_weights(timestamps, now)
+    for (ts, wm, bucket), w in zip(raw, weights):
+        out[bucket]["durations"].append(wm)
+        out[bucket]["weights"].append(w)
+        out[bucket]["timestamps"].append(ts)
+
+    return out
+
+
+# =============================================================================
 # Nap Clustering (updated with EWMA + robust stats)
 # =============================================================================
 
@@ -456,15 +835,36 @@ def project_rest_windows(
     feed_to_sleep_minutes: float | None,
     tz_offset: int,
     now: datetime,
+    boundaries: dict | None = None,
+    bucketed_windows: dict[str, tuple[float, float]] | None = None,
+    night_sleep_duration: float | None = None,
 ) -> list[dict]:
     """
     Chain forward from last wake time to project today's remaining rest windows.
     Uses multi-signal fusion for each predicted nap.
+
+    When `boundaries` and `bucketed_windows` are provided, each chained step
+    picks the wake window matching the cursor's bucket (day / evening / night)
+    rather than using a single global average.
     """
     windows = []
-    # Default bedtime 20:00 local
     local_now = now - timedelta(minutes=tz_offset)
-    bedtime_local = local_now.replace(hour=20, minute=0, second=0, microsecond=0)
+    # Bedtime cutoff for the chain — anchor on the learned bedtime hour when
+    # available, otherwise fall back to 20:00 local.
+    if boundaries:
+        bedtime_h = boundaries["bedtime_hour"] % 24
+        bedtime_hour_int = min(23, int(bedtime_h))
+        bedtime_minute_int = min(59, int((bedtime_h % 1) * 60))
+        bedtime_local = local_now.replace(
+            hour=bedtime_hour_int,
+            minute=bedtime_minute_int,
+            second=0,
+            microsecond=0,
+        )
+        # If now is already past today's bedtime, push bedtime to "today" still
+        # (chain might still emit a window stretching into tomorrow).
+    else:
+        bedtime_local = local_now.replace(hour=20, minute=0, second=0, microsecond=0)
     bedtime_utc = bedtime_local + timedelta(minutes=tz_offset)
 
     # If baby is currently sleeping, add a "rest now" window
@@ -500,8 +900,19 @@ def project_rest_windows(
     cursor = chain_start
     max_iterations = 6
     for _ in range(max_iterations):
+        # Pick bucket-appropriate wake window for this step
+        cursor_local_for_bucket = cursor - timedelta(minutes=tz_offset)
+        if boundaries and bucketed_windows:
+            cursor_bucket = classify_wake_bucket(cursor_local_for_bucket, boundaries)
+            ww_mean, ww_std = bucketed_windows.get(
+                cursor_bucket, (wake_window_minutes, wake_window_std)
+            )
+        else:
+            cursor_bucket = "day"
+            ww_mean, ww_std = wake_window_minutes, wake_window_std
+
         # --- Signal 1: Pattern-based prediction ---
-        pattern_pred = cursor + timedelta(minutes=wake_window_minutes)
+        pattern_pred = cursor + timedelta(minutes=ww_mean)
 
         # --- Signal 2: Sleep pressure prediction ---
         (cursor - (last_wake_time or cursor)).total_seconds() / 60
@@ -515,13 +926,16 @@ def project_rest_windows(
         nearest = circadian_nearest_gate(cursor_hour, circadian_gates_list)
         if nearest:
             gate_hour, gate_strength = nearest
-            # Convert gate hour to UTC datetime for today
+            gh = gate_hour % 24
+            gh_int = min(23, int(gh))
+            gh_min = min(59, int((gh % 1) * 60))
+            # Compute the next future gate datetime, allowing wrap to tomorrow
+            # (e.g. cursor at 22:00 looking for the 02:00 night gate).
             gate_local = cursor_local.replace(
-                hour=int(gate_hour),
-                minute=int((gate_hour % 1) * 60),
-                second=0,
-                microsecond=0,
+                hour=gh_int, minute=gh_min, second=0, microsecond=0,
             )
+            if gate_local <= cursor_local:
+                gate_local = gate_local + timedelta(days=1)
             circadian_pred = gate_local + timedelta(minutes=tz_offset)
         else:
             circadian_pred = None
@@ -550,7 +964,25 @@ def project_rest_windows(
         )
 
         next_nap_start = fused_time
+        # If predicted sleep would land on/after bedtime, emit a single bedtime
+        # window using learned night-sleep duration (or fallback) and stop.
         if next_nap_start >= bedtime_utc:
+            bedtime_dur = night_sleep_duration if night_sleep_duration else 600
+            bed_end = bedtime_utc + timedelta(minutes=bedtime_dur)
+            if bed_end > now:
+                windows.append({
+                    "start": bedtime_utc.isoformat(),
+                    "end": bed_end.isoformat(),
+                    "duration_minutes": round(bedtime_dur),
+                    "label": "bedtime",
+                    "is_current": False,
+                    "sleep_pressure_at_start": round(
+                        sleep_pressure_at(
+                            (bedtime_utc - cursor).total_seconds() / 60, tau_minutes
+                        ),
+                        2,
+                    ),
+                })
             break
 
         # Find matching cluster for this nap's local time
@@ -600,8 +1032,8 @@ def project_rest_windows(
         awake_at_start = (next_nap_start - cursor).total_seconds() / 60
         pressure_val = sleep_pressure_at(awake_at_start, tau_minutes)
 
-        # Prediction interval
-        earliest, latest = compute_prediction_interval(wake_window_std, signals, now)
+        # Prediction interval (use per-step bucket std)
+        earliest, latest = compute_prediction_interval(ww_std, signals, now)
 
         # Signal agreement (for confidence)
         signal_times = []
@@ -622,7 +1054,7 @@ def project_rest_windows(
 
         conf_score = compute_confidence_score(
             sample_count=cluster["count"] if cluster else 0,
-            posterior_std=wake_window_std,
+            posterior_std=ww_std,
             signal_agreement=agreement,
             iqr_minutes=iqr_val,
         )
@@ -777,6 +1209,8 @@ async def get_rest_plan(
         # Not enough data?  Return minimal response so frontend can hide section
         completed_sleeps = [s for s in sleeps if s.end_time]
         if len(completed_sleeps) < 3:
+            fallback_boundaries = learn_day_night_boundaries([], tz_offset, age_weeks, now)
+            local_now = now - timedelta(minutes=tz_offset)
             return {
                 "baby_id": baby_id,
                 "generated_at": now.isoformat(),
@@ -795,6 +1229,8 @@ async def get_rest_plan(
                     "data_days": days,
                     "has_enough_data": False,
                 },
+                "mode": classify_wake_bucket(local_now, fallback_boundaries),
+                "boundaries": fallback_boundaries,
             }
 
         # ------------------------------------------------------------------
@@ -836,11 +1272,44 @@ async def get_rest_plan(
             wake_timestamps = wake_timestamps[: len(wake_durations)]
         wake_weights = compute_ewma_weights(wake_timestamps, now) if wake_timestamps else []
 
-        # Bayesian adaptive wake window
+        # Bayesian adaptive wake window (overall, daytime-only — backwards compat)
         adapted_ww_mean, adapted_ww_std = bayesian_wake_window(wake_durations, wake_weights, age_weeks)
 
-        # Process S time constant
+        # Process S time constant — estimated from daytime wakes only so the
+        # very-short night wakes don't deflate tau (a 5-min night wake would
+        # otherwise pull the median down).
         tau = estimate_tau(wake_durations)
+
+        # ------------------------------------------------------------------
+        # Phase 2c: Circadian-aware day/night boundaries + bucketed windows
+        # ------------------------------------------------------------------
+        boundaries = learn_day_night_boundaries(completed_sleeps, tz_offset, age_weeks, now)
+
+        bucketed_raw = extract_bucketed_wake_durations(completed_sleeps, boundaries, tz_offset, now)
+        bucketed_windows: dict[str, tuple[float, float]] = {}
+        for bucket in ("day", "evening", "night"):
+            durations = bucketed_raw[bucket]["durations"]
+            weights = bucketed_raw[bucket]["weights"]
+            mean, std = bayesian_wake_window(durations, weights, age_weeks, bucket=bucket)
+            bucketed_windows[bucket] = (mean, std)
+
+        # Median main-night-sleep duration (for bedtime windows + night-mode display)
+        night_sleep_durations = []
+        for s in completed_sleeps:
+            if s.duration_minutes and s.duration_minutes >= NIGHT_SLEEP_MIN_DURATION:
+                st_local = make_aware(s.start_time) - timedelta(minutes=tz_offset)
+                if st_local.hour >= 18 or st_local.hour < 4:
+                    night_sleep_durations.append(s.duration_minutes)
+        night_sleep_durations.sort()
+        if night_sleep_durations:
+            n = len(night_sleep_durations)
+            night_sleep_duration_median = (
+                night_sleep_durations[n // 2]
+                if n % 2 == 1
+                else (night_sleep_durations[n // 2 - 1] + night_sleep_durations[n // 2]) / 2
+            )
+        else:
+            night_sleep_duration_median = None
 
         # Circadian gates
         circ_gates = get_circadian_gates(age_weeks)
@@ -882,6 +1351,9 @@ async def get_rest_plan(
             feed_to_sleep_minutes=feed_to_sleep,
             tz_offset=tz_offset,
             now=now,
+            boundaries=boundaries,
+            bucketed_windows=bucketed_windows,
+            night_sleep_duration=night_sleep_duration_median,
         )
 
         # ------------------------------------------------------------------
@@ -898,20 +1370,36 @@ async def get_rest_plan(
         if not is_sleeping and last_wake_time:
             minutes_awake = int((now - last_wake_time).total_seconds() / 60)
 
+        # Compute current mode early so sleep-pressure is bucket-aware
+        local_now = now - timedelta(minutes=tz_offset)
+        current_mode = classify_wake_bucket(local_now, boundaries)
+
         sleep_pressure_state = None
         if not is_sleeping and last_wake_time:
-            sleep_pressure_state = calculate_sleep_pressure(last_wake_time, age_weeks, now)
+            sleep_pressure_state = calculate_sleep_pressure(
+                last_wake_time, age_weeks, now, bucket=current_mode
+            )
 
         last_feed_minutes_ago = None
         if feeding_times:
             last_feed = max(make_aware(ft) for ft in feeding_times)
             last_feed_minutes_ago = int((now - last_feed).total_seconds() / 60)
 
+        # Effective pressure walking all sleeps with partial discharge
+        eff = compute_current_effective_pressure(completed_sleeps, age_weeks, tau, now)
+
         current_state = {
             "is_sleeping": is_sleeping,
             "minutes_awake": minutes_awake,
             "sleep_pressure": sleep_pressure_state.get("score") if sleep_pressure_state else None,
             "last_feed_minutes_ago": last_feed_minutes_ago,
+            # New circadian-aware fields
+            "mode": current_mode,
+            "effective_minutes_awake": int(eff["effective_minutes_awake"]),
+            "wall_minutes_awake": int(eff["wall_minutes_awake"]),
+            "last_sleep_recovery_fraction": eff["last_sleep_recovery_fraction"],
+            "last_sleep_duration_min": eff["last_sleep_duration_min"],
+            "effective_pressure": int(round(eff["pressure"] * 100)),
         }
 
         # ------------------------------------------------------------------
@@ -962,6 +1450,18 @@ async def get_rest_plan(
             "circadian_gates": [{"hour": h, "strength": s} for h, s in circ_gates],
             "feed_to_sleep_minutes": round(feed_to_sleep, 1) if feed_to_sleep else None,
             "signals_used": signals_used,
+            # Bucketed wake windows (day / evening / night) — learned per baby
+            "bucketed_wake_windows": {
+                bucket: {
+                    "mean_minutes": round(mean, 1),
+                    "std_minutes": round(std, 1),
+                    "sample_count": len(bucketed_raw[bucket]["durations"]),
+                }
+                for bucket, (mean, std) in bucketed_windows.items()
+            },
+            "night_sleep_duration_median": (
+                round(night_sleep_duration_median) if night_sleep_duration_median else None
+            ),
         }
 
         return {
@@ -971,6 +1471,9 @@ async def get_rest_plan(
             "rest_windows": windows,
             "summary": summary,
             "patterns_used": patterns_used,
+            # Top-level mode + learned boundaries (for UI badge + tooltips)
+            "mode": current_mode,
+            "boundaries": boundaries,
         }
 
     except HTTPException:
