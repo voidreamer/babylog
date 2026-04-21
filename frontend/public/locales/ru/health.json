@@ -33,7 +33,7 @@
     "months": "месяцев",
     "current": "текущий",
     "birthDateRequired": "Пожалуйста, сначала установите дату рождения ребенка",
-    "median": "Медиана: {{value}}{{unit}}",
+    "median": "Медиан: {{value}}{{unit}}",
     "range": "Нормальный диапазон: {{low}}–{{high}}{{unit}}"
   },
   "teething": {

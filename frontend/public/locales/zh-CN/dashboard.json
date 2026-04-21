@@ -154,7 +154,7 @@
     }
   },
   "bath": {
-    "title": "浴缸",
+    "title": "浴室",
     "lastBath": "最后一次洗澡",
     "logBath": "原木浴室",
     "notes": "说明",
@@ -278,7 +278,7 @@
     "letsTrack": "让我们追踪一下今天的活动！",
     "readyToLog": "准备记录今天的第一个活动",
     "greatStart": "美好的一天开始了",
-    "doingAmazing": "你做得太棒了",
+    "doingAmazing": "你做得很好",
     "superParent": "超级家长！继续努力"
   },
   "widgetSettingsSection": {
@@ -295,8 +295,8 @@
     "analyzingPatterns": "分析模式...",
     "unableToLoad": "无法加载见解",
     "collectingData": "收集数据",
-    "collectingDataDesc": "继续跟踪几天！我们需要至少 3-5 天的数据来确定模式并做出预测。",
-    "dataPoints": "数据点：{{feedings}}_喂食次数，{{sleeps}}_睡眠次数",
+    "collectingDataDesc": "继续跟踪几天！我们需要至少 3-5 天的数据来确定模式和做出预测。",
+    "dataPoints": "数据点：{{feedings}}_次喂食，{{sleeps}}_次睡眠",
     "predictions": "预测",
     "nextFeeding": "下一次喂食",
     "nextNap": "下一个休息日",
@@ -362,7 +362,17 @@
     "signal_pressure": "睡眠压力",
     "signal_circadian": "生物节律",
     "signal_feeding": "喂养相关性",
-    "poweredByScience": "以睡眠科学为动力"
+    "poweredByScience": "以睡眠科学为动力",
+    "mode_day": "白天",
+    "mode_evening": "晚上",
+    "mode_night": "夜间模式",
+    "nightModeBackToSleep": "在 ~{{minutes}} 分钟内恢复睡眠",
+    "nightModeHint": "夜醒时间通常很短--安慰和重新安顿。",
+    "effectiveAwakeLabel": "有效清醒时间",
+    "effectiveAwakeTooltip": "最后一次睡眠（{{minutes}}_ 分钟）是一次小睡，因此只重置了部分唤醒窗口。有效唤醒计算的是剩余的睡眠压力。",
+    "boundariesLearned": "睡前 ~{{bedtime}} - 早晨 ~{{wake}}",
+    "boundariesDefault": "使用默认就寝时间 - 继续跟踪以实现个性化",
+    "bedtimeWindow": "就寝时间窗口"
   },
   "learn": {
     "insights": "洞察力",

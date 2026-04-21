@@ -362,7 +362,17 @@
     "signal_pressure": "Presión del sueño",
     "signal_circadian": "Ritmo biológico",
     "signal_feeding": "Correlación de la alimentación",
-    "poweredByScience": "Impulsado por la ciencia del sueño"
+    "poweredByScience": "Impulsado por la ciencia del sueño",
+    "mode_day": "Durante el día",
+    "mode_evening": "Por la noche",
+    "mode_night": "Modo nocturno",
+    "nightModeBackToSleep": "Volver a dormir en ~{{minutes}} min",
+    "nightModeHint": "Los despertares nocturnos suelen ser breves: reconforta y tranquiliza.",
+    "effectiveAwakeLabel": "Tiempo efectivo de vigilia",
+    "effectiveAwakeTooltip": "El último sueño ({{minutes}} min) fue una siesta, por lo que sólo reinició parcialmente la ventana de vigilia. La vigilia efectiva cuenta la presión de sueño sobrante.",
+    "boundariesLearned": "Hora de acostarse ~{{bedtime}} - Mañana ~{{wake}}",
+    "boundariesDefault": "Usar la hora de acostarse por defecto - seguir rastreando para personalizar",
+    "bedtimeWindow": "Hora de acostarse"
   },
   "learn": {
     "insights": "Perspectivas",

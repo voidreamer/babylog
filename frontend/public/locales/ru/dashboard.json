@@ -128,7 +128,7 @@
     "successLabel": "✓ Успех",
     "attemptLabel": "~ Попытка",
     "accidentLabel": "✗ Несчастный случай",
-    "noPottyYet": "Пока не ходит на горшок",
+    "noPottyYet": "Горшки пока не ставит.",
     "pottyLogged": "Горшок {{result}} вошел в систему",
     "yes": "Да",
     "try": "Попробуйте"
@@ -306,7 +306,7 @@
     "mayBeHungry": "Может быть, голоден!",
     "wakeWindow": "Окно бодрствования: {{min}}-{{max}} мин.",
     "minutesAwake": "{{count}} мин. бодрствования",
-    "upgradeToSeePredictions": "Обновляйтесь, чтобы увидеть прогнозы",
+    "upgradeToSeePredictions": "Повысьте рейтинг, чтобы увидеть прогнозы",
     "patterns": "Узоры",
     "wakesUp": "Просыпается",
     "everyHours": "Каждые {{hours}} часов",
@@ -362,7 +362,17 @@
     "signal_pressure": "Давление во сне",
     "signal_circadian": "Биологический ритм",
     "signal_feeding": "Корреляция при кормлении",
-    "poweredByScience": "На основе науки о сне"
+    "poweredByScience": "На основе науки о сне",
+    "mode_day": "Днем",
+    "mode_evening": "Вечер",
+    "mode_night": "Ночной режим",
+    "nightModeBackToSleep": "Засыпает через ~{{minutes}} минут",
+    "nightModeHint": "Ночные пробуждения обычно непродолжительны - успокаиваем и укладываем заново.",
+    "effectiveAwakeLabel": "Эффективное время бодрствования",
+    "effectiveAwakeTooltip": "Последний сон ({{minutes}} мин) был дремотой, поэтому он лишь частично сбросил окно бодрствования. Эффективное бодрствование подсчитывает оставшееся время сна.",
+    "boundariesLearned": "Время сна ~{{bedtime}} - Утро ~{{wake}}",
+    "boundariesDefault": "Использование стандартного времени отхода ко сну - продолжайте отслеживать, чтобы персонализировать",
+    "bedtimeWindow": "Окно для сна"
   },
   "learn": {
     "insights": "Insights",

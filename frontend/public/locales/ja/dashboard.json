@@ -192,7 +192,7 @@
     "reaction_disliked": "不満な点",
     "reaction_allergic": "アレルギー性",
     "notesPlaceholder": "どんな反応でも、好みでも...。",
-    "foodNameRequired": "食品名を入力してください",
+    "foodNameRequired": "料理名を入力してください",
     "failedToLog": "固形食の記録に失敗",
     "logged": "固形食の記録",
     "noSolidsYet": "固形物はまだない",
@@ -362,7 +362,17 @@
     "signal_pressure": "睡眠圧力",
     "signal_circadian": "生物学的リズム",
     "signal_feeding": "摂食相関",
-    "poweredByScience": "睡眠科学に支えられて"
+    "poweredByScience": "睡眠科学に支えられて",
+    "mode_day": "日中",
+    "mode_evening": "夕刻",
+    "mode_night": "ナイトモード",
+    "nightModeBackToSleep": "分後には眠りにつく。",
+    "nightModeHint": "夜間覚醒は通常短時間である。",
+    "effectiveAwakeLabel": "有効覚醒時間",
+    "effectiveAwakeTooltip": "最後の睡眠（{{minutes}}分）は仮眠であったため、ウェイクウィンドウは部分的にしかリセットされなかった。効果的な目覚めは、残された睡眠圧をカウントする。",
+    "boundariesLearned": "就寝 ~{{bedtime}} - 朝 ~{{wake}}",
+    "boundariesDefault": "デフォルトの就寝時間を使用 - パーソナライズするためにトラッキングを続ける",
+    "bedtimeWindow": "就寝時間"
   },
   "learn": {
     "insights": "インサイト",
