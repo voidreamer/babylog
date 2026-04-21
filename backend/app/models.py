@@ -40,6 +40,7 @@ class User(Base):
     onboarding_completed_at = Column(DateTime, nullable=True)
     tour_completed_at = Column(DateTime, nullable=True)
     telegram_chat_id = Column(String, nullable=True, index=True)
+    country = Column(String(2), nullable=True)
 
 
 class Baby(Base):

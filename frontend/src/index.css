@@ -7161,31 +7161,23 @@ h4 {
 .vax-pill.vaccine-upcoming { background: rgba(217, 119, 6, 0.15); color: #d97706; }
 .vax-pill.vaccine-future { background: var(--surface); color: var(--text-muted); }
 
-/* Region toggle */
-.vax-region-toggle {
-  display: flex;
-  gap: 4px;
-  background: var(--surface);
-  border-radius: var(--radius-full);
-  padding: 2px;
-  border: 1px solid var(--border);
-}
-
-.vax-region-btn {
-  font-size: 0.7rem;
-  padding: 4px 10px;
-  border: none;
-  background: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
+/* Country label (non-interactive — change via Settings) */
+.vax-region-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
   font-weight: 500;
-  transition: var(--transition);
 }
 
-.vax-region-btn.active {
-  background: var(--primary);
-  color: white;
+.vax-region-label-country {
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* Vaccine detail full name and description */

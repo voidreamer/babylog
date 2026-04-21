@@ -3,6 +3,12 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Syringe, AlertTriangle, Check, X as XIcon } from 'lucide-react';
 import { calculateAgeInMonths } from '../../utils/ageUtils';
+import {
+  COUNTRY_META,
+  DEFAULT_COUNTRY,
+  VACCINE_SCHEDULES,
+} from '../../data/vaccineSchedules';
+import { useUserCountry } from '../../hooks/useUserCountry';
 
 const VaccinationSchedule = lazy(() => import('../health/VaccinationSchedule'));
 
@@ -11,28 +17,6 @@ type Props = {
   vaccinations: any[];
   onDataChanged?: () => void;
 };
-
-// Minimal schedule — same data the classic VaccinationSchedule uses, kept local
-// so this card doesn't drag in the classic component unless opened. Keyed on
-// region derived from browser / preference.
-const CDC_SCHEDULE: { ageMonths: number; vaccines: string[] }[] = [
-  { ageMonths: 0, vaccines: ['Hep B'] },
-  { ageMonths: 2, vaccines: ['DTaP', 'IPV', 'Hib', 'PCV13', 'RV', 'Hep B'] },
-  { ageMonths: 4, vaccines: ['DTaP', 'IPV', 'Hib', 'PCV13', 'RV'] },
-  { ageMonths: 6, vaccines: ['DTaP', 'Hib', 'PCV13', 'RV', 'Hep B', 'Influenza'] },
-  { ageMonths: 12, vaccines: ['MMR', 'Varicella', 'Hep A', 'PCV13'] },
-  { ageMonths: 15, vaccines: ['DTaP'] },
-  { ageMonths: 18, vaccines: ['Hep A'] },
-];
-
-const CANADA_SCHEDULE: { ageMonths: number; vaccines: string[] }[] = [
-  { ageMonths: 0, vaccines: ['Hep B'] },
-  { ageMonths: 2, vaccines: ['DTaP-IPV-Hib', 'Pneu-C-13', 'RV'] },
-  { ageMonths: 4, vaccines: ['DTaP-IPV-Hib', 'Pneu-C-13', 'RV'] },
-  { ageMonths: 6, vaccines: ['DTaP-IPV-Hib', 'Influenza'] },
-  { ageMonths: 12, vaccines: ['MMR', 'Pneu-C-13', 'Men-C', 'Varicella'] },
-  { ageMonths: 18, vaccines: ['DTaP-IPV-Hib', 'MMRV'] },
-];
 
 function ageLabel(ageMonths: number, t: (k: string, o?: any) => string): string {
   if (ageMonths === 0) return t('health:schedule.birth', { defaultValue: 'birth' });
@@ -64,13 +48,9 @@ export default function MoonlightVaxCard({ baby, vaccinations, onDataChanged }: 
   const { t } = useTranslation(['health', 'common']);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const region: 'us' | 'ca' = useMemo(() => {
-    const lang = localStorage.getItem('language') || navigator.language || '';
-    if (lang.includes('CA') || lang.includes('ca')) return 'ca';
-    return 'us';
-  }, []);
-
-  const schedule = region === 'ca' ? CANADA_SCHEDULE : CDC_SCHEDULE;
+  const { country } = useUserCountry();
+  const schedule = VACCINE_SCHEDULES[country] ?? VACCINE_SCHEDULES[DEFAULT_COUNTRY];
+  const countryMeta = COUNTRY_META[country] ?? COUNTRY_META[DEFAULT_COUNTRY];
 
   const babyAgeMonths = baby?.birth_date
     ? calculateAgeInMonths(baby.birth_date)
@@ -288,7 +268,7 @@ export default function MoonlightVaxCard({ baby, vaccinations, onDataChanged }: 
                   {t('health:schedule.title', { defaultValue: 'schedule' }).toLowerCase()}
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--ml-text)' }}>
-                  {region === 'ca' ? 'NACI · Canada' : 'CDC · United States'}
+                  {countryMeta.authority} · {countryMeta.label}
                 </div>
               </div>
               <button

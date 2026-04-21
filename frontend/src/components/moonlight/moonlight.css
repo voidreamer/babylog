@@ -464,27 +464,23 @@
   color: var(--ml-text-2);
 }
 
-/* Vaccination schedule — bands + region toggle */
-[data-ui="moonlight"] .vax-region-toggle {
-  border: 0.5px solid var(--ml-line);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-[data-ui="moonlight"] .vax-region-btn {
+/* Vaccination schedule — country label */
+[data-ui="moonlight"] .vax-region-label {
   background: transparent;
   color: var(--ml-text-2);
-  border: none;
-  padding: 6px 12px;
-  font-family: inherit;
+  border: 0.5px solid var(--ml-line);
+  border-radius: 999px;
+  padding: 4px 10px;
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-[data-ui="moonlight"] .vax-region-btn.active {
-  background: var(--ml-accent);
-  color: #0a0706;
+[data-ui="moonlight"] .vax-region-label-country {
+  color: var(--ml-text-3);
+  font-weight: 400;
 }
 
 [data-ui="moonlight"] .vax-progress-label {

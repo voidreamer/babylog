@@ -716,6 +716,9 @@ class ApiClient {
     }
     async completeOnboarding(): Promise<any> { return this.request('/users/me/onboarding', { method: 'POST' }); }
     async completeTour(): Promise<any> { return this.request('/users/me/tour', { method: 'POST' }); }
+    async updateUserCountry(country: 'us' | 'ca'): Promise<any> {
+        return this.request('/users/me', { method: 'PATCH', body: JSON.stringify({ country }) });
+    }
     async deleteAccount(): Promise<any> { return this.request('/users/me', { method: 'DELETE' }); }
 
     // Billing

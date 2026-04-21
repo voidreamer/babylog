@@ -1,7 +1,8 @@
 """User profile endpoints for onboarding/tour state and account deletion."""
 
 import httpx
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
@@ -11,6 +12,12 @@ from ..logging_config import get_logger
 from ..models import AnalyticsEvent, Baby, PushSubscription, User, utc_now
 from ..rate_limit import RATE_READ, RATE_WRITE, limiter
 from .subscription import get_or_create_user
+
+SUPPORTED_COUNTRIES = {"us", "ca"}
+
+
+class UserPatch(BaseModel):
+    country: str | None = None
 
 logger = get_logger(__name__)
 
@@ -34,7 +41,26 @@ async def get_user_info(
     return {
         "onboarding_completed": db_user.onboarding_completed_at is not None,
         "tour_completed": db_user.tour_completed_at is not None,
+        "country": db_user.country,
     }
+
+
+@router.patch("/me")
+@limiter.limit(RATE_WRITE)
+async def update_user(
+    request: Request,
+    patch: UserPatch,
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    db_user = _get_user(user, db)
+    if patch.country is not None:
+        normalized = patch.country.strip().lower()
+        if normalized not in SUPPORTED_COUNTRIES:
+            raise HTTPException(status_code=400, detail="Unsupported country")
+        db_user.country = normalized
+    db.commit()
+    return {"ok": True, "country": db_user.country}
 
 
 @router.post("/me/onboarding")

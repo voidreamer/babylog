@@ -6,48 +6,14 @@ import { toast } from 'sonner';
 import { api } from '../../api/client';
 import { showApiError } from '../../utils/errorHandling';
 import { calculateAgeInMonths } from '../../utils/ageUtils';
+import {
+  COUNTRY_META,
+  DEFAULT_COUNTRY,
+  VACCINE_INFO,
+  VACCINE_SCHEDULES,
+} from '../../data/vaccineSchedules';
+import { useUserCountry } from '../../hooks/useUserCountry';
 
-/** Full names and descriptions for vaccine codes */
-const VACCINE_INFO: Record<string, { name: string; description: string }> = {
-  'Hep B': { name: 'Hepatitis B', description: 'Protects against hepatitis B virus infection' },
-  'DTaP': { name: 'Diphtheria, Tetanus & Pertussis', description: 'Protects against diphtheria, tetanus (lockjaw), and pertussis (whooping cough)' },
-  'IPV': { name: 'Inactivated Poliovirus', description: 'Protects against polio' },
-  'Hib': { name: 'Haemophilus influenzae type b', description: 'Protects against Hib bacteria that can cause meningitis and pneumonia' },
-  'PCV13': { name: 'Pneumococcal Conjugate (13-valent)', description: 'Protects against 13 types of pneumococcal bacteria' },
-  'PCV15': { name: 'Pneumococcal Conjugate (15-valent)', description: 'Protects against 15 types of pneumococcal bacteria' },
-  'RV': { name: 'Rotavirus', description: 'Protects against rotavirus, a leading cause of severe diarrhea in infants' },
-  'MMR': { name: 'Measles, Mumps & Rubella', description: 'Protects against measles, mumps, and rubella (German measles)' },
-  'Varicella': { name: 'Varicella (Chickenpox)', description: 'Protects against chickenpox' },
-  'Hep A': { name: 'Hepatitis A', description: 'Protects against hepatitis A virus infection' },
-  'Influenza': { name: 'Influenza (Flu)', description: 'Annual flu shot, recommended from 6 months' },
-  'MMRV': { name: 'Measles, Mumps, Rubella & Varicella', description: 'Combined vaccine for MMR + chickenpox' },
-  'Men-C': { name: 'Meningococcal C Conjugate', description: 'Protects against meningococcal serogroup C disease' },
-  'Pneu-C-13': { name: 'Pneumococcal Conjugate (13-valent)', description: 'Protects against 13 types of pneumococcal bacteria' },
-  'DTaP-IPV-Hib': { name: 'Combined DTaP + Polio + Hib', description: 'Single shot combining diphtheria, tetanus, pertussis, polio, and Hib protection' },
-};
-
-// CDC recommended schedule (United States)
-const CDC_SCHEDULE = [
-  { ageMonths: 0, ageKey: 'birth', vaccines: ['Hep B'] },
-  { ageMonths: 2, ageKey: '2months', vaccines: ['DTaP', 'IPV', 'Hib', 'PCV13', 'RV', 'Hep B'] },
-  { ageMonths: 4, ageKey: '4months', vaccines: ['DTaP', 'IPV', 'Hib', 'PCV13', 'RV'] },
-  { ageMonths: 6, ageKey: '6months', vaccines: ['DTaP', 'Hib', 'PCV13', 'RV', 'Hep B', 'Influenza'] },
-  { ageMonths: 12, ageKey: '12months', vaccines: ['MMR', 'Varicella', 'Hep A', 'PCV13'] },
-  { ageMonths: 15, ageKey: '15months', vaccines: ['DTaP'] },
-  { ageMonths: 18, ageKey: '18months', vaccines: ['Hep A'] },
-];
-
-// Canadian (NACI) recommended schedule
-const CANADA_SCHEDULE = [
-  { ageMonths: 0, ageKey: 'birth', vaccines: ['Hep B'] },
-  { ageMonths: 2, ageKey: '2months', vaccines: ['DTaP-IPV-Hib', 'Pneu-C-13', 'RV'] },
-  { ageMonths: 4, ageKey: '4months', vaccines: ['DTaP-IPV-Hib', 'Pneu-C-13', 'RV'] },
-  { ageMonths: 6, ageKey: '6months', vaccines: ['DTaP-IPV-Hib', 'Influenza'] },
-  { ageMonths: 12, ageKey: '12months', vaccines: ['MMR', 'Pneu-C-13', 'Men-C', 'Varicella'] },
-  { ageMonths: 18, ageKey: '18months', vaccines: ['DTaP-IPV-Hib', 'MMRV'] },
-];
-
-type ScheduleRegion = 'us' | 'ca';
 type VaccineStatus = 'done' | 'overdue' | 'upcoming' | 'future';
 
 interface VaccinationScheduleProps {
@@ -64,14 +30,9 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
   const [saving, setSaving] = useState(false);
   const [hoveredVaccine, setHoveredVaccine] = useState<string | null>(null);
 
-  // Detect region from language or allow manual toggle
-  const [region, setRegion] = useState<ScheduleRegion>(() => {
-    const lang = localStorage.getItem('language') || navigator.language;
-    if (lang.includes('CA') || lang.includes('ca')) return 'ca';
-    return 'us';
-  });
-
-  const VACCINATION_SCHEDULE = region === 'ca' ? CANADA_SCHEDULE : CDC_SCHEDULE;
+  const { country } = useUserCountry();
+  const VACCINATION_SCHEDULE = VACCINE_SCHEDULES[country] ?? VACCINE_SCHEDULES[DEFAULT_COUNTRY];
+  const countryMeta = COUNTRY_META[country] ?? COUNTRY_META[DEFAULT_COUNTRY];
 
   const babyAgeMonths = useMemo(() => {
     if (!baby?.birth_date) return null;
@@ -162,22 +123,14 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
           <Syringe size={18} />
           {t('schedule.progress')}
         </h3>
-        {/* Region toggle */}
-        <div className="vax-region-toggle">
-          <button
-            className={`vax-region-btn ${region === 'us' ? 'active' : ''}`}
-            onClick={() => setRegion('us')}
-            title="CDC (United States)"
-          >
-            🇺🇸 CDC
-          </button>
-          <button
-            className={`vax-region-btn ${region === 'ca' ? 'active' : ''}`}
-            onClick={() => setRegion('ca')}
-            title="NACI (Canada)"
-          >
-            🇨🇦 NACI
-          </button>
+        <div
+          className="vax-region-label"
+          title={t('schedule.changeCountryHint', { defaultValue: 'Change in Settings' })}
+          aria-label={`${countryMeta.authority} · ${countryMeta.label}`}
+        >
+          <span aria-hidden="true">{countryMeta.flag}</span>
+          <span>{countryMeta.authority}</span>
+          <span className="vax-region-label-country">· {countryMeta.label}</span>
         </div>
       </div>
       <div className="vaccination-schedule">
@@ -215,7 +168,7 @@ export default function VaccinationSchedule({ baby, vaccinations, onDataChanged 
 
           return (
             <div
-              key={`${region}-${group.ageMonths}`}
+              key={`${country}-${group.ageMonths}`}
               className={`vax-group ${allDone ? 'vax-group-done' : ''} ${hasOverdue ? 'vax-group-overdue' : ''} ${isCurrent ? 'vax-group-current' : ''}`}
             >
               <button

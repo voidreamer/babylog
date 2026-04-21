@@ -18,6 +18,7 @@ import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
 import Insights from './components/Insights';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import CountrySwitcher from './components/CountrySwitcher';
 import { TabBar as MoonlightTabBar } from './components/moonlight/TabBar';
 import type { TabKey as MoonlightTabKey } from './components/moonlight/types';
 import { useMoonlightFlag } from './components/moonlight/useMoonlightFlag';
@@ -225,6 +226,7 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     <div className={`toggle-switch ${isDark ? 'active' : ''}`} />
                 </div>
                 <LanguageSwitcher />
+                <CountrySwitcher />
                 <div className="settings-row" onClick={toggleUnits}>
                     <div className="settings-row-left">
                         <div className="settings-icon-box mint"><Globe size={16} /></div>

@@ -8,6 +8,7 @@ import { ArrowRight, ArrowLeft, LogOut, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../i18n/languages';
+import { countryFromLanguage } from '../data/vaccineSchedules';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const TOTAL_STEPS = 6;
@@ -57,6 +58,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     useEffect(() => {
         i18n.changeLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
+        const seededCountry = countryFromLanguage(selectedLanguage);
+        localStorage.setItem('country', seededCountry);
+        api.updateUserCountry(seededCountry).catch(() => {
+            // best-effort — useUserCountry will reconcile on next load
+        });
     }, [selectedLanguage, i18n]);
 
     useEffect(() => {
