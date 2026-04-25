@@ -270,6 +270,7 @@
     "weeksOld_plural": "{{count}} semanas de edad",
     "monthsOld": "{{count}} mes de edad",
     "monthsOld_plural": "{{count}} meses de edad",
+    "monthsWeeksOld": "{{months}} meses ({{weeks}} semanas) de edad",
     "yearsMonthsOld": "{{years}}y {{months}}m antiguo",
     "yearsOld": "{{count}} año de edad",
     "yearsOld_plural": "{{count}} años de edad"
