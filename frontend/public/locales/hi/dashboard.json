@@ -244,6 +244,7 @@
     "weeksOld_plural": "{{count}} सप्ताह का",
     "monthsOld": "{{count}} महीने का",
     "monthsOld_plural": "{{count}} महीने का",
+    "monthsWeeksOld": "{{months}} महीने ({{weeks}} सप्ताह) का",
     "yearsMonthsOld": "{{years}} साल {{months}} महीने का",
     "yearsOld": "{{count}} साल का",
     "yearsOld_plural": "{{count}} साल का"

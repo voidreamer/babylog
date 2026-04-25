@@ -270,6 +270,7 @@
     "weeksOld_plural": "{{count}} недель от роду",
     "monthsOld": "{{count}} месяц",
     "monthsOld_plural": "{{count}} месяцев",
+    "monthsWeeksOld": "{{months}} мес. ({{weeks}} нед.)",
     "yearsMonthsOld": "{{years}}y {{months}}m old",
     "yearsOld": "{{count}} год",
     "yearsOld_plural": "{{count}} лет"

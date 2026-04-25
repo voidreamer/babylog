@@ -81,6 +81,9 @@ export function formatAgeLabel(birthDate: string | null | undefined, t: TFn): st
     if (age.weeks < 12) {
         return t(age.weeks === 1 ? 'dashboard:age.weeksOld' : 'dashboard:age.weeksOld_plural', { count: age.weeks });
     }
+    if (age.months < 12) {
+        return t('dashboard:age.monthsWeeksOld', { months: age.months, weeks: age.weeks });
+    }
     if (age.months < 24) {
         return t(age.months === 1 ? 'dashboard:age.monthsOld' : 'dashboard:age.monthsOld_plural', { count: age.months });
     }

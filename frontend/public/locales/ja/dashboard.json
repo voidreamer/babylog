@@ -270,6 +270,7 @@
     "weeksOld_plural": "トーケン_0___週齢",
     "monthsOld": "生後0ヶ月",
     "monthsOld_plural": "生後0ヶ月",
+    "monthsWeeksOld": "生後{{months}}ヶ月（{{weeks}}週）",
     "yearsMonthsOld": "TOKEN_0__y {{months}}m 古い",
     "yearsOld": "歳",
     "yearsOld_plural": "歳"

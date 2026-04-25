@@ -270,6 +270,7 @@
     "weeksOld_plural": "{{count}}_周大",
     "monthsOld": "{{count}}_月龄",
     "monthsOld_plural": "{{count}}_个月大",
+    "monthsWeeksOld": "{{months}}个月（{{weeks}}周）",
     "yearsMonthsOld": "{{years}}y {{months}}m old",
     "yearsOld": "{{count}}_岁",
     "yearsOld_plural": "{{count}}_岁"
