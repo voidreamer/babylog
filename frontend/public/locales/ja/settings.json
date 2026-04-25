@@ -48,7 +48,7 @@
     "darkMode": "ダークモード",
     "darkModeDesc": "夜間でも目に優しい",
     "language": "言語",
-    "languageDesc": "言語を選択",
+    "languageDesc": "言語を選ぶ",
     "units": "単位",
     "unitsMetric": "メートル法（kg、cm、ml）",
     "unitsImperial": "インペリアル（ポンド、インチ、オンス）"
@@ -82,7 +82,7 @@
   "navigation": {
     "title": "ナビゲーション",
     "hubTitle": "ヘイバブ・ハブ",
-    "hubDesc": "保護者のための記事、サービス、その他"
+    "hubDesc": "保護者向けの記事、サービス、その他"
   },
   "support": {
     "title": "サポート",
@@ -94,7 +94,7 @@
     "deleteAccount": "アカウント削除",
     "deleteAccountDesc": "すべてのデータを永久に削除",
     "deleteAccountConfirmTitle": "アカウントを削除しますか？",
-    "deleteAccountConfirmDesc": "これにより、あなたのアカウント、すべてのベビープロフィール、すべてのトラッキングデータが永久に削除されます。この操作は元に戻せません。",
+    "deleteAccountConfirmDesc": "これにより、あなたのアカウント、すべてのベビープロフィール、すべてのトラッキングデータが永久に削除されます。この操作は元に戻すことができません。",
     "deleteAccountConfirm": "すべてを削除する",
     "deletingAccount": "削除...",
     "deleteAccountFailed": "アカウントの削除に失敗しました。もう一度お試しください。",
@@ -143,7 +143,7 @@
     "upgradeToUnlock": "TOKEN_0__のロックを解除するためのアップグレード",
     "upgradeBtn": "アップグレード"
   },
-  "toast_couldNotStartCheckoutPleaseTryAgai": "チェックアウトを開始できませんでした。もう一度お試しください。",
+  "toast_couldNotStartCheckoutPleaseTryAgai": "チェックアウトを開始できませんでした。もう一度やり直してください。",
   "toast_premiumRestoredReloading": "プレミアム復元リローディング...",
   "toast_noActiveSubscriptionFoundForThisAc": "このアカウントで有効なサブスクリプションが見つかりません。",
   "toast_couldNotCheckSubscription": "サブスクリプションをチェックできませんでした。",

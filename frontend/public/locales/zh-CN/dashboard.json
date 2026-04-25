@@ -154,7 +154,7 @@
     }
   },
   "bath": {
-    "title": "浴室",
+    "title": "浴缸",
     "lastBath": "最后一次洗澡",
     "logBath": "原木浴室",
     "notes": "说明",
@@ -258,7 +258,7 @@
     "editName": "编辑 {{name}}",
     "deleteName": "删除 {{name}}",
     "deleteConfirm": "删除 {{name}}?这将删除所有数据，且无法撤销。",
-    "babyAdded": "已添加{{name}}_！",
+    "babyAdded": "添加{{name}}_！",
     "babyUpdated": "{{name}}_已更新！",
     "editBaby": "编辑 {{name}}"
   },
@@ -270,7 +270,7 @@
     "weeksOld_plural": "{{count}}_周大",
     "monthsOld": "{{count}}_月龄",
     "monthsOld_plural": "{{count}}_个月大",
-    "monthsWeeksOld": "{{months}}个月（{{weeks}}周）",
+    "monthsWeeksOld": "{{months}}_个月（{{weeks}}_周）大",
     "yearsMonthsOld": "{{years}}y {{months}}m old",
     "yearsOld": "{{count}}_岁",
     "yearsOld_plural": "{{count}}_岁"
@@ -279,7 +279,7 @@
     "letsTrack": "让我们追踪一下今天的活动！",
     "readyToLog": "准备记录今天的第一个活动",
     "greatStart": "美好的一天开始了",
-    "doingAmazing": "你做得很好",
+    "doingAmazing": "你做得太棒了",
     "superParent": "超级家长！继续努力"
   },
   "widgetSettingsSection": {
@@ -296,8 +296,8 @@
     "analyzingPatterns": "分析模式...",
     "unableToLoad": "无法加载见解",
     "collectingData": "收集数据",
-    "collectingDataDesc": "继续跟踪几天！我们需要至少 3-5 天的数据来确定模式和做出预测。",
-    "dataPoints": "数据点：{{feedings}}_次喂食，{{sleeps}}_次睡眠",
+    "collectingDataDesc": "继续跟踪几天！我们需要至少 3-5 天的数据来确定模式并做出预测。",
+    "dataPoints": "数据点：{{feedings}}_喂食次数，{{sleeps}}_睡眠次数",
     "predictions": "预测",
     "nextFeeding": "下一次喂食",
     "nextNap": "下一个休息日",
@@ -436,7 +436,7 @@
   "toast_durationMustBeBetween0And120Minute": "持续时间必须在 0 至 120 分钟之间",
   "placeholder_optional": "可选",
   "toast_feedingStarted": "开始喂食",
-  "title_logFeedingManually": "手动原木输送",
+  "title_logFeedingManually": "手动送进原木",
   "toast_failedToSavePotty": "未能挽救便盆",
   "placeholder_anyNotes": "任何说明...",
   "toast_failedToLogPotty": "未能登录便盆",

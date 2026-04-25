@@ -33,7 +33,7 @@
     "months": "месяцев",
     "current": "текущий",
     "birthDateRequired": "Пожалуйста, сначала установите дату рождения ребенка",
-    "median": "Медиан: {{value}}{{unit}}",
+    "median": "Медиана: {{value}}{{unit}}",
     "range": "Нормальный диапазон: {{low}}–{{high}}{{unit}}"
   },
   "teething": {
@@ -202,7 +202,7 @@
   "placeholder_35": "35",
   "placeholder_50": "50",
   "placeholder_egDtapMmr": "например, DTaP, MMR",
-  "placeholder_doctorclinicName": "Название врача/клиники",
+  "placeholder_doctorclinicName": "Имя врача/клиники",
   "placeholder_eg25ml": "например, 2,5 мл",
   "placeholder_egTwiceDaily": "Например, Дважды в день",
   "toast_visitRecorded": "Посещение зафиксировано",

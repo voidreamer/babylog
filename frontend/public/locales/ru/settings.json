@@ -33,7 +33,7 @@
     "reminderTimeDesc": "Когда отправлять ежедневное напоминание о приеме лекарств",
     "permissionDenied": "Разрешение на уведомление было отклонено. Включите его в настройках устройства.",
     "visitTomorrow": "У {{babyName}} на завтра назначена встреча.",
-    "visitTomorrowBody": "Завтра назначена встреча.",
+    "visitTomorrowBody": "На завтра назначено {{type}}",
     "visitToday": "У {{babyName}} сегодня назначена встреча",
     "visitTodayBody": "Встреча {{type}} состоится сегодня!",
     "vaccinationDue": "Скоро прививка {{babyName}}",
@@ -56,7 +56,7 @@
   "account": {
     "title": "Счет",
     "signedIn": "Подписано",
-    "premiumMember": "Премиальный участник ⭐",
+    "premiumMember": "Премиум участник ⭐",
     "premium": {
       "title": "Премиум-план",
       "active": "Активный",
@@ -89,7 +89,7 @@
     "contactUs": "Свяжитесь с нами",
     "privacyPolicy": "Политика конфиденциальности",
     "termsOfService": "Условия предоставления услуг",
-    "replayOnboarding": "Replay Welcome Tour",
+    "replayOnboarding": "Приветственный тур Replay",
     "replayOnboardingDesc": "Просмотрите введение приложения еще раз",
     "deleteAccount": "Удалить аккаунт",
     "deleteAccountDesc": "Постоянное удаление всех ваших данных",
@@ -112,12 +112,12 @@
     "title": "Перейти на премиум",
     "subtitle": "Разблокируйте все функции",
     "features": {
-      "insights": "Познание детей с помощью искусственного интеллекта",
+      "insights": "Познавательная информация о детях с помощью искусственного интеллекта",
       "export": "Экспорт данных в формате CSV",
       "more": "И еще больше скоро будет..."
     },
     "promoCode": "Промокод",
-    "promoPlaceholder": "Введите промокод",
+    "promoPlaceholder": "Введите промо-код",
     "applyPromo": "Применить",
     "subscribe": "Подписаться",
     "manageSub": "Не удалось открыть управление подписками.",

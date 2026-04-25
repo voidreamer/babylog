@@ -60,7 +60,7 @@
     "premium": {
       "title": "Plan Premium",
       "active": "Activo",
-      "activeManage": "Activo - Gestionar suscripción",
+      "activeManage": "Activo - Gestionar la suscripción",
       "activePromo": "Activo - Código promocional",
       "unlock": "Descubra la inteligencia artificial y mucho más"
     },
@@ -92,7 +92,7 @@
     "replayOnboarding": "Replay Welcome Tour",
     "replayOnboardingDesc": "Volver a ver la introducción de la aplicación",
     "deleteAccount": "Eliminar cuenta",
-    "deleteAccountDesc": "Borrar permanentemente todos tus datos",
+    "deleteAccountDesc": "Elimina permanentemente todos tus datos",
     "deleteAccountConfirmTitle": "¿Borrar su cuenta?",
     "deleteAccountConfirmDesc": "Esto eliminará permanentemente tu cuenta, todos los perfiles de bebé y todos los datos de seguimiento. Esta acción no se puede deshacer.",
     "deleteAccountConfirm": "Borrar todo",
