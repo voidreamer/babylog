@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { App as CapApp } from '@capacitor/app';
 import { api } from '../api/client';
+import { BabylogBridge } from '../native/babylogBridge';
 import {
     isOnline,
     cacheBabies, getCachedBabies,
@@ -94,6 +97,21 @@ export function useOfflineSync(): UseOfflineSyncReturn {
         }
     }, [updatePendingCount]);
 
+    const drainNativeQueue = useCallback(async () => {
+        if (!Capacitor.isNativePlatform()) return;
+        try {
+            const { actions } = await BabylogBridge.drainPendingActions();
+            if (!actions?.length) return;
+            for (const action of actions) {
+                await queueForSync(action as any);
+            }
+            await updatePendingCount();
+            if (isOnline()) syncPendingChanges();
+        } catch (e) {
+            if (isDev) console.error('drainNativeQueue failed:', e);
+        }
+    }, [syncPendingChanges, updatePendingCount]);
+
     useEffect(() => {
         const handleOnline = () => { setOnline(true); syncPendingChanges(); };
         const handleOffline = () => { setOnline(false); };
@@ -103,11 +121,21 @@ export function useOfflineSync(): UseOfflineSyncReturn {
         updatePendingCount();
         cleanupCache().catch(e => { if (isDev) console.error('Cache cleanup failed:', e); });
 
+        // Drain queue written by widget/Siri extensions on every foreground
+        drainNativeQueue();
+        let appStateHandle: { remove: () => void } | null = null;
+        if (Capacitor.isNativePlatform()) {
+            CapApp.addListener('appStateChange', ({ isActive }) => {
+                if (isActive) drainNativeQueue();
+            }).then(handle => { appStateHandle = handle; });
+        }
+
         return () => {
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
+            appStateHandle?.remove();
         };
-    }, [syncPendingChanges, updatePendingCount]);
+    }, [syncPendingChanges, updatePendingCount, drainNativeQueue]);
 
     const executeAction = async (action: any) => {
         const { type, endpoint, method, data } = action;
@@ -117,6 +145,16 @@ export function useOfflineSync(): UseOfflineSyncReturn {
             case 'CREATE_SLEEP': await api.createSleep(data); break;
             case 'END_SLEEP': await api.endSleep(data.id); break;
             case 'CREATE_PUMPING': await api.createPumping(data); break;
+            case 'END_SLEEP_BY_BABY': {
+                // Queued by the iOS widget/Siri extension when "wake" was triggered offline
+                // and we couldn't resolve the active sleep id at the time. Resolve now.
+                const babyId = data?.baby_id;
+                if (babyId) {
+                    const current = await api.getCurrentSleep(babyId).catch(() => null);
+                    if (current?.id) await api.endSleep(current.id);
+                }
+                break;
+            }
             default:
                 if (endpoint && method) {
                     await api.request(endpoint, { method, body: data ? JSON.stringify(data) : undefined });
