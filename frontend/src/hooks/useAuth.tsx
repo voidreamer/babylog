@@ -4,6 +4,27 @@ import { Browser } from '@capacitor/browser';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { identifyUser, resetUser, trackEvent } from '../utils/analytics';
+import { BabylogBridge } from '../native/babylogBridge';
+
+async function pushSessionToNative(session: Session | null) {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+        if (!session?.access_token || !session?.refresh_token) {
+            await BabylogBridge.clearSession();
+            return;
+        }
+        await BabylogBridge.setSession({
+            accessToken: session.access_token,
+            refreshToken: session.refresh_token,
+            expiresAt: session.expires_at ?? 0,
+            apiBaseUrl: import.meta.env.VITE_API_URL || '',
+            supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
+            supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+        });
+    } catch (e) {
+        console.warn('[Auth] BabylogBridge.setSession failed', e);
+    }
+}
 
 const isDev = import.meta.env.DEV;
 const log = (...args: unknown[]) => isDev && console.log(...args);
@@ -107,6 +128,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
+            pushSessionToNative(session);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -114,6 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
+            pushSessionToNative(session);
         });
 
         // Listen for native deep link auth (main.tsx passes session via window global)

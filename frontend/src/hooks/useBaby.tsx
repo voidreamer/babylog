@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
 import { api } from '../api/client';
+import { BabylogBridge } from '../native/babylogBridge';
+
+function pushBabyToNative(baby: { id: number; name: string } | null) {
+    if (!Capacitor.isNativePlatform() || !baby) return;
+    BabylogBridge.setSelectedBaby({ babyId: baby.id, babyName: baby.name })
+        .catch(e => console.warn('[Baby] BabylogBridge.setSelectedBaby failed', e));
+}
 
 interface CaregiverEntry { email: string; role: 'viewer' | 'caregiver'; }
 
@@ -69,11 +77,16 @@ export function BabyProvider({ children }: BabyProviderProps) {
                 if (selectedBaby) {
                     // Refresh selectedBaby with latest data (e.g. after photo upload)
                     const updated = data.find((b: Baby) => b.id === selectedBaby.id);
-                    if (updated) setSelectedBaby(updated);
+                    if (updated) {
+                        setSelectedBaby(updated);
+                        pushBabyToNative(updated);
+                    }
                 } else {
                     const savedBabyId = localStorage.getItem('selected_baby_id');
                     const saved = data.find((b: Baby) => b.id === parseInt(savedBabyId || '0'));
-                    setSelectedBaby(saved || data[0]);
+                    const next = saved || data[0];
+                    setSelectedBaby(next);
+                    pushBabyToNative(next);
                 }
             }
         } catch (error) {
@@ -95,6 +108,7 @@ export function BabyProvider({ children }: BabyProviderProps) {
     const selectBaby = (baby: Baby) => {
         setSelectedBaby(baby);
         localStorage.setItem('selected_baby_id', String(baby.id));
+        pushBabyToNative(baby);
     };
 
     const addBaby = async (data: any): Promise<Baby> => {
