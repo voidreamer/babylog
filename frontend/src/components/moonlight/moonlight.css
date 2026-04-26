@@ -103,7 +103,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 10px 0 calc(env(safe-area-inset-bottom, 0px) + 12px);
+  padding: 10px 0 max(12px, env(safe-area-inset-bottom, 0px));
   background: color-mix(in srgb, var(--ml-bg) 85%, transparent);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
