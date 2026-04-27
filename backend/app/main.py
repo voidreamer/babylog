@@ -23,7 +23,6 @@ from .routers import (
     feedings,
     health,
     pumpings,
-    rest_planner,
     sleeps,
     subscription,
     telegram,
@@ -88,7 +87,6 @@ app.include_router(subscription.router)
 app.include_router(admin.router)
 app.include_router(export.router)
 app.include_router(billing.router)
-app.include_router(rest_planner.router)
 app.include_router(users.router)
 app.include_router(voice.router)
 app.include_router(telegram.router)
@@ -148,7 +146,7 @@ async def add_cache_control(request: Request, call_next):
 
     if "/events/dashboard" in path:
         response.headers["Cache-Control"] = "private, max-age=60"
-    elif "/analytics" in path or "/rest-planner" in path:
+    elif "/analytics" in path:
         response.headers["Cache-Control"] = "private, max-age=300"
     elif "/babies" in path:
         response.headers["Cache-Control"] = "private, max-age=60"

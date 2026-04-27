@@ -579,18 +579,6 @@ class ApiClient {
     async deleteSolid(id: number): Promise<any> { return this.request(`/activities/solids/${id}`, { method: 'DELETE' }); }
     async updateSolid(id: number, data: any): Promise<any> { return this.request(`/activities/solids/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 
-    // Rest Planner
-    async getRestPlan(babyId: number, days: number = 7): Promise<any> {
-        if (!isOnline()) return null;
-        try {
-            const tzOffset = new Date().getTimezoneOffset();
-            return await this.request(`/rest-planner/${babyId}?days=${days}&tz_offset=${tzOffset}`);
-        } catch (error) {
-            if (shouldUseFallback(error)) return null;
-            throw error;
-        }
-    }
-
     // Analytics
     async getAnalytics(babyId: number, days: number = 7): Promise<any> {
         if (!isOnline()) { return { feeding: { total: 0, avg_per_day: 0 }, diaper: { total: 0, avg_per_day: 0 }, sleep: { total_hours: 0, avg_per_day: 0 } }; }

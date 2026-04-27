@@ -11,7 +11,6 @@ import {
     TrendsSection,
     TodaySnapshotSection
 } from './insights/InsightsSections';
-import RestPlannerSection from './insights/RestPlannerSection';
 
 const TIME_RANGE_OPTIONS = [
     { value: 7, labelKey: 'insights.range7d' },
@@ -24,7 +23,6 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
     const { t } = useTranslation('dashboard');
     const { selectedBaby } = useBaby();
     const [analytics, setAnalytics] = useState<any>(null);
-    const [restPlan, setRestPlan] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [days, setDays] = useState(7);
@@ -39,12 +37,8 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
             try {
                 setLoading(true);
                 setError(null);
-                const [data, plan] = await Promise.all([
-                    api.getAnalytics(selectedBaby.id, days),
-                    api.getRestPlan(selectedBaby.id, days).catch(() => null),
-                ]);
+                const data = await api.getAnalytics(selectedBaby.id, days);
                 setAnalytics(data);
-                setRestPlan(plan);
             } catch (err) {
                 // Only log in development
                 if (import.meta.env.DEV) {
@@ -123,9 +117,6 @@ export default function BabyInsights({ isPremium = false }: BabyInsightsProps) {
                 ))}
             </div>
             <PredictionsSection predictions={predictions} isPremium={isPremium} />
-            {restPlan && restPlan.patterns_used?.has_enough_data && (
-                <RestPlannerSection restPlan={restPlan} isPremium={isPremium} />
-            )}
             <TodaySnapshotSection benchmarks={benchmarks} today_vs_average={today_vs_average} />
             <TrendsSection trends={trends} isPremium={isPremium} />
             <PatternsSection patterns={patterns} isPremium={isPremium} />
