@@ -44,6 +44,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
 
         if (notes && notes.length > 500) {
             toast.error(t('toast_notesMustBeLessThan500Characters'));
@@ -107,7 +108,7 @@ export default function DiaperModal({ babyId, editEvent, onClose, onSave }: Diap
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Droplets size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('diaper.diaperChange')}</h2>
+                    <h2 className="modal-title"><Droplets size={20} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('diaper.diaperChange')}</h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 

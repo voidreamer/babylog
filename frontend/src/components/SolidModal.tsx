@@ -45,6 +45,7 @@ export default function SolidModal({ editEvent, onClose, onSave }: SolidModalPro
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
         if (!selectedBaby) return;
 
         if (!foodName.trim()) {
@@ -83,7 +84,7 @@ export default function SolidModal({ editEvent, onClose, onSave }: SolidModalPro
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title">
-                        <UtensilsCrossed size={20} style={{ marginRight: '8px' }} />
+                        <UtensilsCrossed size={20} />
                         {isEditing ? t('modal.edit') : t('modal.log')} {t('solid.title', { defaultValue: 'Solids' })}
                     </h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
@@ -138,7 +139,7 @@ export default function SolidModal({ editEvent, onClose, onSave }: SolidModalPro
                                         className={`btn-group-item ${reaction === opt ? 'active' : ''}`}
                                         onClick={() => setReaction(opt)}
                                     >
-                                        {(() => { const Icon = REACTION_ICONS[opt]; return Icon ? <Icon size={14} style={{ marginRight: 4 }} /> : null; })()}
+                                        {(() => { const Icon = REACTION_ICONS[opt]; return Icon ? <Icon size={14} style={{ marginRight: 'var(--space-xs)' }} /> : null; })()}
                                         {t(`solid.reaction_${opt}`, { defaultValue: opt })}
                                     </button>
                                 ))}

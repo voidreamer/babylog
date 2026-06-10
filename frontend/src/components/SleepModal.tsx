@@ -33,6 +33,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
 
         if (notes && notes.length > 500) {
             toast.error(t('toast_notesMustBeLessThan500Characters'));
@@ -68,7 +69,7 @@ export default function SleepModal({ babyId, editEvent, onClose, onSave }: Sleep
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Moon size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('sleep.title')}</h2>
+                    <h2 className="modal-title"><Moon size={20} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('sleep.title')}</h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 

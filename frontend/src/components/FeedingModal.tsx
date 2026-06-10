@@ -116,7 +116,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
     };
 
     const handleSaveTimer = async () => {
-        if (timerSeconds < 1) return;
+        if (saving || timerSeconds < 1) return;
 
         // Validate amount if provided
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
@@ -152,6 +152,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
 
     const handleSubmitQuick = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
 
         // Validate duration if provided
         if (duration && (isNaN(parseInt(duration)) || parseInt(duration) < 0 || parseInt(duration) > 120)) {
@@ -202,7 +203,7 @@ export default function FeedingModal({ babyId, editEvent, onClose, onSave }: Fee
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Baby size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('feeding.title')}</h2>
+                    <h2 className="modal-title"><Baby size={20} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('feeding.title')}</h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 

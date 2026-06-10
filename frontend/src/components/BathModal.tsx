@@ -32,6 +32,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
         if (!selectedBaby) return;
 
         if (notes && notes.length > 500) {
@@ -66,7 +67,7 @@ export default function BathModal({ editEvent, onClose, onSave }: BathModalProps
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><ShowerHead size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('bath.title')}</h2>
+                    <h2 className="modal-title"><ShowerHead size={20} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('bath.title')}</h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 

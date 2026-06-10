@@ -233,7 +233,11 @@ async function scheduleMedicationNotifications(babyId: number, babyName: string,
     if (activeMeds.length === 0) return notifications;
 
     const medNames = activeMeds.map((m: { medication_name?: string }) => m.medication_name || '').join(', ');
-    const [hours, minutes] = medicationTime.split(':').map(Number);
+    const [hours = NaN, minutes = NaN] = medicationTime.split(':').map(Number);
+    if (!Number.isInteger(hours) || !Number.isInteger(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      console.warn('Invalid medication reminder time, skipping:', medicationTime);
+      return notifications;
+    }
 
     // Schedule a daily repeating notification
     const scheduleAt = new Date();

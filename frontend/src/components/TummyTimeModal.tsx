@@ -41,6 +41,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
         if (!selectedBaby) return;
 
         if (notes && notes.length > 500) {
@@ -76,7 +77,7 @@ export default function TummyTimeModal({ editEvent, onClose, onSave }: TummyTime
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Sun size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('tummyTime.title')}</h2>
+                    <h2 className="modal-title"><Sun size={20} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('tummyTime.title')}</h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 
