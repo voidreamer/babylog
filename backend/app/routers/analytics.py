@@ -125,7 +125,7 @@ async def get_baby_analytics(
     request: Request,
     baby_id: int,
     days: int = Query(default=7, ge=3, le=30, description="Days of data to analyze"),
-    tz_offset: int = Query(default=0, description="Timezone offset in minutes"),
+    tz_offset: int = Query(default=0, ge=-840, le=840, description="Timezone offset in minutes"),
     db: Session = Depends(get_db),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),

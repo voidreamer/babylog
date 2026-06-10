@@ -59,8 +59,8 @@ def get_diaper_benchmarks(age_weeks: int) -> dict:
                 "expected_dirty_diapers": {"min": benchmarks["dirty"][0], "max": benchmarks["dirty"][1]},
                 "notes": benchmarks["notes"],
             }
-    # Fallback to toddler
-    return get_diaper_benchmarks(999)
+    # Fallback to the oldest bracket (always matches, so this cannot recurse forever)
+    return get_diaper_benchmarks(max(DIAPER_BENCHMARKS))
 
 
 # =============================================================================
@@ -88,7 +88,7 @@ def get_sleep_benchmarks(age_weeks: int) -> dict:
                 "expected_naps_per_day": {"min": benchmarks["naps"][0], "max": benchmarks["naps"][1]},
                 "notes": benchmarks["notes"],
             }
-    return get_sleep_benchmarks(999)
+    return get_sleep_benchmarks(max(SLEEP_BENCHMARKS))
 
 
 # =============================================================================
@@ -251,7 +251,7 @@ def get_wake_window_benchmarks(age_weeks: int, bucket: str | None = None) -> dic
                 "max_minutes": benchmarks["max"],
                 "notes": benchmarks["notes"],
             }
-    return get_wake_window_benchmarks(999, bucket)
+    return get_wake_window_benchmarks(max(WAKE_WINDOW_BENCHMARKS), bucket)
 
 
 # =============================================================================
@@ -338,7 +338,7 @@ def get_feeding_benchmarks(age_weeks: int) -> dict:
                 },
                 "notes": benchmarks["notes"],
             }
-    return get_feeding_benchmarks(999)
+    return get_feeding_benchmarks(max(FEEDING_BENCHMARKS))
 
 
 # =============================================================================

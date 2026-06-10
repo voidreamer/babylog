@@ -92,6 +92,9 @@ class FeedingBase(BaseModel):
 
 class FeedingCreate(FeedingBase):
     baby_id: int
+    # Input-only bounds; response models stay unconstrained so legacy rows still serialize
+    duration_minutes: int | None = Field(None, ge=0, le=24 * 60)
+    amount_ml: int | None = Field(None, ge=0, le=2000)
 
     @model_validator(mode="after")
     def validate_feeding_amount(self):
@@ -103,8 +106,8 @@ class FeedingCreate(FeedingBase):
 class FeedingUpdate(BaseModel):
     time: datetime | None = None
     type: FeedingTypeEnum | None = None
-    duration_minutes: int | None = None
-    amount_ml: int | None = None
+    duration_minutes: int | None = Field(None, ge=0, le=24 * 60)
+    amount_ml: int | None = Field(None, gt=0, le=2000)
     notes: str | None = Field(None, max_length=2000)
 
 
@@ -222,12 +225,15 @@ class PumpingBase(BaseModel):
 
 class PumpingCreate(PumpingBase):
     baby_id: int
+    # Input-only bounds; response models stay unconstrained so legacy rows still serialize
+    duration_minutes: int | None = Field(None, ge=0, le=24 * 60)
+    amount_ml: int | None = Field(None, ge=0, le=2000)
 
 
 class PumpingUpdate(BaseModel):
     time: datetime | None = None
-    duration_minutes: int | None = None
-    amount_ml: int | None = None
+    duration_minutes: int | None = Field(None, ge=0, le=24 * 60)
+    amount_ml: int | None = Field(None, ge=0, le=2000)
     notes: str | None = Field(None, max_length=2000)
 
 
@@ -443,16 +449,10 @@ class GrowthRecordBase(BaseModel):
 
 class GrowthRecordCreate(GrowthRecordBase):
     baby_id: int
-
-    @model_validator(mode="after")
-    def validate_measurements(self):
-        if self.weight_kg is not None and self.weight_kg <= 0:
-            raise ValueError("weight_kg must be greater than 0")
-        if self.height_cm is not None and self.height_cm <= 0:
-            raise ValueError("height_cm must be greater than 0")
-        if self.head_cm is not None and self.head_cm <= 0:
-            raise ValueError("head_cm must be greater than 0")
-        return self
+    # Input-only sanity bounds (catch unit mix-ups like grams in the kg field)
+    weight_kg: float | None = Field(None, gt=0, le=100)
+    height_cm: float | None = Field(None, gt=0, le=250)
+    head_cm: float | None = Field(None, gt=0, le=100)
 
 
 class GrowthRecordResponse(GrowthRecordBase):
@@ -465,9 +465,9 @@ class GrowthRecordResponse(GrowthRecordBase):
 
 class GrowthRecordUpdate(BaseModel):
     recorded_date: datetime | None = None
-    weight_kg: float | None = None
-    height_cm: float | None = None
-    head_cm: float | None = None
+    weight_kg: float | None = Field(None, gt=0, le=100)
+    height_cm: float | None = Field(None, gt=0, le=250)
+    head_cm: float | None = Field(None, gt=0, le=100)
     notes: str | None = Field(None, max_length=2000)
 
 
@@ -506,6 +506,7 @@ class TummyTimeBase(BaseModel):
 
 class TummyTimeCreate(TummyTimeBase):
     baby_id: int
+    duration_minutes: int | None = Field(None, ge=0, le=24 * 60)
 
 
 class TummyTimeResponse(TummyTimeBase):

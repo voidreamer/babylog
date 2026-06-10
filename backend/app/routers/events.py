@@ -1,6 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import and_, or_, text
 from sqlalchemy.orm import Session
 
@@ -36,7 +36,7 @@ def get_timeline(
     request: Request,
     baby_id: int,
     date: str | None = None,
-    tz_offset: int = 0,
+    tz_offset: int = Query(0, ge=-840, le=840),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -400,7 +400,7 @@ def get_dashboard(
     request: Request,
     baby_id: int,
     local_date: str | None = None,
-    tz_offset: int = 0,
+    tz_offset: int = Query(0, ge=-840, le=840),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),

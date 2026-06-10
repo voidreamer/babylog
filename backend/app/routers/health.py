@@ -18,7 +18,7 @@ router = APIRouter(prefix="/health", tags=["health"], dependencies=[Depends(get_
 
 def get_accessible_baby(db: Session, baby_id: int, user_id: str, user_email: str):
     """Get a baby if user owns it or it's shared with them."""
-    baby = db.query(models.Baby).filter(models.Baby.id == baby_id, baby_access_filter(user_id, user_email)).first()
+    baby = db.query(models.Baby).filter(models.Baby.id == baby_id, baby_access_filter(user_id, user_email, db)).first()
     return baby
 
 
@@ -81,7 +81,7 @@ def update_doctor_visit(
     visit = (
         db.query(models.DoctorVisit)
         .join(models.Baby)
-        .filter(models.DoctorVisit.id == visit_id, baby_access_filter(user_id, user_email))
+        .filter(models.DoctorVisit.id == visit_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not visit:
@@ -111,7 +111,7 @@ def delete_doctor_visit(
     visit = (
         db.query(models.DoctorVisit)
         .join(models.Baby)
-        .filter(models.DoctorVisit.id == visit_id, baby_access_filter(user_id, user_email))
+        .filter(models.DoctorVisit.id == visit_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not visit:
@@ -186,7 +186,7 @@ def update_vaccination(
     vacc = (
         db.query(models.Vaccination)
         .join(models.Baby)
-        .filter(models.Vaccination.id == vaccination_id, baby_access_filter(user_id, user_email))
+        .filter(models.Vaccination.id == vaccination_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not vacc:
@@ -216,7 +216,7 @@ def delete_vaccination(
     vacc = (
         db.query(models.Vaccination)
         .join(models.Baby)
-        .filter(models.Vaccination.id == vaccination_id, baby_access_filter(user_id, user_email))
+        .filter(models.Vaccination.id == vaccination_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not vacc:
@@ -291,7 +291,7 @@ def update_medication(
     med = (
         db.query(models.Medication)
         .join(models.Baby)
-        .filter(models.Medication.id == medication_id, baby_access_filter(user_id, user_email))
+        .filter(models.Medication.id == medication_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not med:
@@ -321,7 +321,7 @@ def toggle_medication_active(
     med = (
         db.query(models.Medication)
         .join(models.Baby)
-        .filter(models.Medication.id == medication_id, baby_access_filter(user_id, user_email))
+        .filter(models.Medication.id == medication_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not med:
@@ -348,7 +348,7 @@ def delete_medication(
     med = (
         db.query(models.Medication)
         .join(models.Baby)
-        .filter(models.Medication.id == medication_id, baby_access_filter(user_id, user_email))
+        .filter(models.Medication.id == medication_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not med:
@@ -423,7 +423,7 @@ def update_milestone(
     milestone = (
         db.query(models.Milestone)
         .join(models.Baby)
-        .filter(models.Milestone.id == milestone_id, baby_access_filter(user_id, user_email))
+        .filter(models.Milestone.id == milestone_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not milestone:
@@ -453,7 +453,7 @@ def delete_milestone(
     milestone = (
         db.query(models.Milestone)
         .join(models.Baby)
-        .filter(models.Milestone.id == milestone_id, baby_access_filter(user_id, user_email))
+        .filter(models.Milestone.id == milestone_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not milestone:
@@ -528,7 +528,7 @@ def update_growth_record(
     record = (
         db.query(models.GrowthRecord)
         .join(models.Baby)
-        .filter(models.GrowthRecord.id == record_id, baby_access_filter(user_id, user_email))
+        .filter(models.GrowthRecord.id == record_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not record:
@@ -558,7 +558,7 @@ def delete_growth_record(
     record = (
         db.query(models.GrowthRecord)
         .join(models.Baby)
-        .filter(models.GrowthRecord.id == record_id, baby_access_filter(user_id, user_email))
+        .filter(models.GrowthRecord.id == record_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not record:
@@ -645,7 +645,7 @@ def update_tooth(
     tooth = (
         db.query(models.Tooth)
         .join(models.Baby)
-        .filter(models.Tooth.id == tooth_id, baby_access_filter(user_id, user_email))
+        .filter(models.Tooth.id == tooth_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not tooth:
@@ -675,7 +675,7 @@ def delete_tooth(
     tooth = (
         db.query(models.Tooth)
         .join(models.Baby)
-        .filter(models.Tooth.id == tooth_id, baby_access_filter(user_id, user_email))
+        .filter(models.Tooth.id == tooth_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not tooth:
@@ -745,7 +745,7 @@ def update_sick_day(
     sick_day = (
         db.query(models.SickDay)
         .join(models.Baby)
-        .filter(models.SickDay.id == sick_day_id, baby_access_filter(user_id, user_email))
+        .filter(models.SickDay.id == sick_day_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not sick_day:
@@ -775,7 +775,7 @@ def delete_sick_day(
     sick_day = (
         db.query(models.SickDay)
         .join(models.Baby)
-        .filter(models.SickDay.id == sick_day_id, baby_access_filter(user_id, user_email))
+        .filter(models.SickDay.id == sick_day_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not sick_day:
@@ -845,7 +845,7 @@ def update_allergy(
     allergy = (
         db.query(models.Allergy)
         .join(models.Baby)
-        .filter(models.Allergy.id == allergy_id, baby_access_filter(user_id, user_email))
+        .filter(models.Allergy.id == allergy_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not allergy:
@@ -875,7 +875,7 @@ def delete_allergy(
     allergy = (
         db.query(models.Allergy)
         .join(models.Baby)
-        .filter(models.Allergy.id == allergy_id, baby_access_filter(user_id, user_email))
+        .filter(models.Allergy.id == allergy_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
     if not allergy:

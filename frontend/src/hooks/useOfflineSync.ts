@@ -140,11 +140,7 @@ export function useOfflineSync(): UseOfflineSyncReturn {
     const executeAction = async (action: any) => {
         const { type, endpoint, method, data } = action;
         switch (type) {
-            case 'CREATE_FEEDING': await api.createFeeding(data); break;
-            case 'CREATE_DIAPER': await api.createDiaper(data); break;
-            case 'CREATE_SLEEP': await api.createSleep(data); break;
             case 'END_SLEEP': await api.endSleep(data.id); break;
-            case 'CREATE_PUMPING': await api.createPumping(data); break;
             case 'END_SLEEP_BY_BABY': {
                 // Queued by the iOS widget/Siri extension when "wake" was triggered offline
                 // and we couldn't resolve the active sleep id at the time. Resolve now.
@@ -156,8 +152,13 @@ export function useOfflineSync(): UseOfflineSyncReturn {
                 break;
             }
             default:
+                // Hit the API directly: the api.create* wrappers would re-queue on
+                // network failure, duplicating the action and its cached optimistic
+                // entry while resetting the retry counter.
                 if (endpoint && method) {
                     await api.request(endpoint, { method, body: data ? JSON.stringify(data) : undefined });
+                } else {
+                    log('Dropping sync action without endpoint:', action);
                 }
         }
     };

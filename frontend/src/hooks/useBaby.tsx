@@ -44,25 +44,26 @@ interface BabyProviderProps {
     children: ReactNode;
 }
 
+/** Parse the localStorage baby cache, tolerating missing or corrupted data. */
+function readCachedBabies(): Baby[] {
+    try {
+        const raw = localStorage.getItem('heybub_babies');
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
+}
+
 export function BabyProvider({ children }: BabyProviderProps) {
     // Instant hydration: restore babies from localStorage synchronously so Dashboard can render immediately
-    const [babies, setBabies] = useState<Baby[]>(() => {
-        try { const raw = localStorage.getItem('heybub_babies'); return raw ? JSON.parse(raw) : []; } catch { return []; }
-    });
+    const [babies, setBabies] = useState<Baby[]>(readCachedBabies);
     const [selectedBaby, setSelectedBaby] = useState<Baby | null>(() => {
-        try {
-            const raw = localStorage.getItem('heybub_babies');
-            if (!raw) return null;
-            const cached: Baby[] = JSON.parse(raw);
-            if (cached.length === 0) return null;
-            const savedId = localStorage.getItem('selected_baby_id');
-            return cached.find(b => b.id === parseInt(savedId || '0')) || cached[0];
-        } catch { return null; }
+        const cached = readCachedBabies();
+        if (cached.length === 0) return null;
+        const savedId = localStorage.getItem('selected_baby_id');
+        return cached.find(b => b.id === parseInt(savedId || '0', 10)) || cached[0];
     });
     // If we have cached babies, skip loading state entirely (stale-while-revalidate)
-    const [loading, setLoading] = useState(() => {
-        try { const raw = localStorage.getItem('heybub_babies'); return !raw || JSON.parse(raw).length === 0; } catch { return true; }
-    });
+    const [loading, setLoading] = useState(() => readCachedBabies().length === 0);
     const [error, setError] = useState<string | null>(null);
 
     const loadBabies = async () => {

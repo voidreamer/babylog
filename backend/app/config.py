@@ -29,10 +29,14 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_service_key: str = ""
     photo_bucket: str = "photos"
+    # Admin API key for protected operations (migrations etc.)
+    admin_api_key: str = ""
 
     class Config:
         env_file = ".env"
         case_sensitive = False
+        # Unknown keys in .env must not crash startup
+        extra = "ignore"
 
 
 @lru_cache

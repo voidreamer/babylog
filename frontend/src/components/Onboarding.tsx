@@ -173,7 +173,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         </button>
                         <div className="onboarding-footer">
                             {user?.email && <span className="onboarding-email">{user.email}</span>}
-                            <button className="btn-link" onClick={logout} style={{ marginTop: '8px' }}>
+                            <button className="btn-link" onClick={logout} style={{ marginTop: 'var(--space-sm)' }}>
                                 <LogOut size={14} /> {t('auth:onboarding.signOut')}
                             </button>
                         </div>

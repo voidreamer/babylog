@@ -78,7 +78,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
     };
 
     const handleSaveTimer = async () => {
-        if (timerSeconds < 1) return;
+        if (saving || timerSeconds < 1) return;
 
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
             toast.error(t('toast_amountMustBeBetween0And500Ml'));
@@ -110,6 +110,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
 
     const handleSubmitQuick = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
 
         if (amount && (isNaN(parseInt(amount)) || parseInt(amount) < 0 || parseInt(amount) > (isImperial ? 17 : 500))) {
             toast.error(t('toast_amountMustBeBetween0And500Ml'));
@@ -150,7 +151,7 @@ export default function PumpingModal({ babyId, editEvent, onClose, onSave }: Pum
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Milk size={20} style={{ marginRight: '8px' }} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('pumping.title')}</h2>
+                    <h2 className="modal-title"><Milk size={20} /> {isEditing ? t('modal.edit') : t('modal.log')} {t('pumping.title')}</h2>
                     <button className="modal-close" onClick={onClose} aria-label={t('common:close')}>×</button>
                 </div>
 

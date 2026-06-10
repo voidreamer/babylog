@@ -90,6 +90,11 @@
   --accent: #d4849c;
   --secondary: #7ab89c;
 
+  /* Vivid semantic states for text/border accents (pastel --success/--danger are fills) */
+  --success-strong: #10b981;
+  --warning: #f59e0b;
+  --danger-strong: #ef4444;
+
   --shadow-sm: 0 2px 8px rgba(74, 64, 68, 0.06);
   --shadow: 0 2px 8px rgba(74, 64, 68, 0.06);
   --shadow-md: 0 4px 16px rgba(74, 64, 68, 0.08);
@@ -182,6 +187,11 @@
   --success: #88c8a8;
   --accent: #e8a8c0;
   --secondary: #88c8a8;
+
+  /* Vivid semantic states (brighter for dark surfaces) */
+  --success-strong: #34d399;
+  --warning: #fbbf24;
+  --danger-strong: #f87171;
 
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -1118,6 +1128,15 @@ h4 {
   color: var(--diaper);
 }
 
+.widget.solid {
+  background: var(--solid-bg);
+  border-color: var(--solid-light);
+}
+
+.widget.solid .widget-icon-row svg {
+  color: var(--solid);
+}
+
 .widget-label {
   font-family: var(--font-family-heading);
   font-size: 0.85rem;
@@ -1394,7 +1413,7 @@ h4 {
 }
 
 .tip-title svg {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .tip-dismiss {
@@ -2115,6 +2134,31 @@ h4 {
 
 .btn-danger:hover {
   opacity: 0.9;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.btn-ghost:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.btn-link:hover {
+  opacity: 0.8;
 }
 
 .btn-lg {
@@ -3172,6 +3216,12 @@ h4 {
 .modal-title {
   font-size: 1.25rem;
   font-weight: 600;
+}
+
+.modal-title svg {
+  margin-right: var(--space-sm);
+  flex-shrink: 0;
+  vertical-align: text-bottom;
 }
 
 .modal-close {
@@ -4592,7 +4642,7 @@ h4 {
   height: 80px;
   border-radius: var(--radius-full);
   background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  color: var(--danger-strong);
   margin-bottom: var(--space-lg);
 }
 
@@ -7794,7 +7844,7 @@ a.settings-row {
 }
 
 .icon-gold {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .icon-primary {
@@ -7848,7 +7898,7 @@ a.settings-row {
 }
 
 .pricing-card-yearly {
-  border: 2px solid #f59e0b;
+  border: 2px solid var(--warning);
 }
 
 .promo-badge {
@@ -7871,7 +7921,7 @@ a.settings-row {
   position: absolute;
   top: -10px;
   right: -6px;
-  background: #f59e0b;
+  background: var(--warning);
   color: #fff;
   font-size: 0.58rem;
   font-weight: 800;

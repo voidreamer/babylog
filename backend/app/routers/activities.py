@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
@@ -35,8 +35,8 @@ router = APIRouter(prefix="/activities", tags=["activities"])
 def get_potty_logs(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -88,7 +88,7 @@ def delete_potty_log(
     """Delete a potty log."""
     user_id = user.get("sub")
 
-    potty = db.query(Potty).join(Baby).filter(Potty.id == potty_id, baby_access_filter(user_id, user_email)).first()
+    potty = db.query(Potty).join(Baby).filter(Potty.id == potty_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not potty:
         logger.warning("Delete potty not found", extra={"potty_id": potty_id})
@@ -116,7 +116,7 @@ def update_potty_log(
     """Update a potty log."""
     user_id = user.get("sub")
 
-    potty = db.query(Potty).join(Baby).filter(Potty.id == potty_id, baby_access_filter(user_id, user_email)).first()
+    potty = db.query(Potty).join(Baby).filter(Potty.id == potty_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not potty:
         raise HTTPException(status_code=404, detail="Potty log not found")
@@ -143,8 +143,8 @@ def update_potty_log(
 def get_tummy_times(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -203,7 +203,10 @@ def delete_tummy_time(
     user_id = user.get("sub")
 
     tummy = (
-        db.query(TummyTime).join(Baby).filter(TummyTime.id == tummy_id, baby_access_filter(user_id, user_email)).first()
+        db.query(TummyTime)
+        .join(Baby)
+        .filter(TummyTime.id == tummy_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not tummy:
@@ -233,7 +236,10 @@ def update_tummy_time(
     user_id = user.get("sub")
 
     tummy = (
-        db.query(TummyTime).join(Baby).filter(TummyTime.id == tummy_id, baby_access_filter(user_id, user_email)).first()
+        db.query(TummyTime)
+        .join(Baby)
+        .filter(TummyTime.id == tummy_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not tummy:
@@ -260,8 +266,8 @@ def update_tummy_time(
 def get_baths(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -307,7 +313,7 @@ def delete_bath(
     """Delete a bath log."""
     user_id = user.get("sub")
 
-    bath = db.query(Bath).join(Baby).filter(Bath.id == bath_id, baby_access_filter(user_id, user_email)).first()
+    bath = db.query(Bath).join(Baby).filter(Bath.id == bath_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not bath:
         logger.warning("Delete bath not found", extra={"bath_id": bath_id})
@@ -335,7 +341,7 @@ def update_bath(
     """Update a bath log."""
     user_id = user.get("sub")
 
-    bath = db.query(Bath).join(Baby).filter(Bath.id == bath_id, baby_access_filter(user_id, user_email)).first()
+    bath = db.query(Bath).join(Baby).filter(Bath.id == bath_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not bath:
         raise HTTPException(status_code=404, detail="Bath not found")
@@ -360,8 +366,8 @@ def update_bath(
 def get_supplements(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -423,7 +429,7 @@ def delete_supplement(
     supplement = (
         db.query(Supplement)
         .join(Baby)
-        .filter(Supplement.id == supplement_id, baby_access_filter(user_id, user_email))
+        .filter(Supplement.id == supplement_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
 
@@ -456,7 +462,7 @@ def update_supplement(
     supplement = (
         db.query(Supplement)
         .join(Baby)
-        .filter(Supplement.id == supplement_id, baby_access_filter(user_id, user_email))
+        .filter(Supplement.id == supplement_id, baby_access_filter(user_id, user_email, db))
         .first()
     )
 
@@ -485,8 +491,8 @@ def update_supplement(
 def get_solids(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -539,7 +545,7 @@ def delete_solid(
     """Delete a solid food log."""
     user_id = user.get("sub")
 
-    solid = db.query(Solid).join(Baby).filter(Solid.id == solid_id, baby_access_filter(user_id, user_email)).first()
+    solid = db.query(Solid).join(Baby).filter(Solid.id == solid_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not solid:
         logger.warning("Delete solid not found", extra={"solid_id": solid_id})
@@ -567,7 +573,7 @@ def update_solid(
     """Update a solid food log."""
     user_id = user.get("sub")
 
-    solid = db.query(Solid).join(Baby).filter(Solid.id == solid_id, baby_access_filter(user_id, user_email)).first()
+    solid = db.query(Solid).join(Baby).filter(Solid.id == solid_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not solid:
         raise HTTPException(status_code=404, detail="Solid food log not found")

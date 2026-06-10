@@ -44,7 +44,7 @@ def get_babies(
     """Get all babies for the current user (owned or shared)."""
     user_id = user.get("sub")
 
-    babies = db.query(Baby).filter(baby_access_filter(user_id, user_email)).all()
+    babies = db.query(Baby).filter(baby_access_filter(user_id, user_email, db)).all()
 
     return [baby_to_response(b, user_id) for b in babies]
 
@@ -61,7 +61,7 @@ def get_baby(
     """Get a specific baby by ID."""
     user_id = user.get("sub")
 
-    baby = db.query(Baby).filter(Baby.id == baby_id, baby_access_filter(user_id, user_email)).first()
+    baby = db.query(Baby).filter(Baby.id == baby_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not baby:
         raise HTTPException(status_code=404, detail="Baby not found")

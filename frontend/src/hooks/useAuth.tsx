@@ -95,20 +95,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 : window.location.pathname;
             window.history.replaceState({}, '', cleanUrl);
 
+            let relayCancelled = false;
             supabase.auth.setSession({
                 access_token: accessToken,
                 refresh_token: refreshToken,
             }).then(({ data: { session }, error }) => {
+                if (relayCancelled) return;
                 if (error) {
                     console.error('[Auth] Auth relay failed:', error);
                 } else {
                     log('[Auth] Auth relay success');
                     setSession(session);
                     setUser(session?.user ?? null);
+                    pushSessionToNative(session);
                 }
                 setLoading(false);
             });
-            return; // Skip normal session check, relay will handle it
+            // Skip the normal session check; relay handles it
+            return () => { relayCancelled = true; };
         }
 
         // Check for theme param (even without auth relay)

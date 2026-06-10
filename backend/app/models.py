@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import relationship
 
@@ -55,7 +55,8 @@ class Baby(Base):
     blood_type = Column(String(5), nullable=True)
     birthplace = Column(String(200), nullable=True)
     birth_time = Column(String(5), nullable=True)
-    shared_with = Column(JSONB, default=list, server_default="[]")
+    # JSONB on Postgres; plain JSON on SQLite so the local test suite can run
+    shared_with = Column(JSONB().with_variant(JSON(), "sqlite"), default=list, server_default="[]")
     created_at = Column(DateTime, default=utc_now)
 
     # Relationships
@@ -254,7 +255,8 @@ class SickDay(Base):
     id = Column(Integer, primary_key=True, index=True)
     baby_id = Column(Integer, ForeignKey("babies.id"), nullable=False)
     date = Column(DateTime, nullable=False)
-    symptoms = Column(ARRAY(String), default=list)  # ["fever", "cough", "runny_nose"]
+    # ARRAY on Postgres; JSON list on SQLite for the local test suite
+    symptoms = Column(ARRAY(String).with_variant(JSON(), "sqlite"), default=list)  # ["fever", "cough"]
     temperature = Column(Numeric(4, 1), nullable=True)  # e.g., 38.5
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)

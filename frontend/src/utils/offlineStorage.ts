@@ -31,7 +31,18 @@ let dbPromise: Promise<IDBPDatabase<any>> | null = null;
 async function getDB() {
     if (dbPromise) return dbPromise;
 
-    dbPromise = openDB(DB_NAME, DB_VERSION, {
+    // On failure, clear the cached promise so the next call can retry instead of
+    // replaying the same rejection forever (e.g. transient quota/privacy errors).
+    dbPromise = openDBWithStores().catch((err) => {
+        dbPromise = null;
+        throw err;
+    });
+
+    return dbPromise;
+}
+
+function openDBWithStores() {
+    return openDB(DB_NAME, DB_VERSION, {
         upgrade(db) {
             if (!db.objectStoreNames.contains(STORES.BABIES)) {
                 db.createObjectStore(STORES.BABIES, { keyPath: 'id' });
@@ -96,8 +107,6 @@ async function getDB() {
             }
         }
     });
-
-    return dbPromise;
 }
 
 export function isOnline(): boolean {

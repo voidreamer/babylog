@@ -11,6 +11,8 @@ interface PremiumState {
 }
 
 let cachedResult: { isPremium: boolean; plan: string | null; expiresAt: string | null; cancelAtPeriodEnd: boolean } | null = null;
+// Shared across hook instances so several premium gates mounting at once trigger one request
+let inflightRefresh: Promise<void> | null = null;
 
 export function usePremium(): PremiumState {
   const [isPremium, setIsPremium] = useState(cachedResult?.isPremium ?? localStorage.getItem('isPremium') === 'true');
@@ -20,24 +22,28 @@ export function usePremium(): PremiumState {
   const [isLoading, setIsLoading] = useState(!cachedResult);
 
   const refresh = useCallback(async () => {
-    try {
-      const res = await api.getBillingSubscription();
-      cachedResult = {
-        isPremium: res.is_premium,
-        plan: res.plan,
-        expiresAt: res.expires_at,
-        cancelAtPeriodEnd: res.cancel_at_period_end,
-      };
-      setIsPremium(res.is_premium);
-      setPlan(res.plan);
-      setExpiresAt(res.expires_at);
-      setCancelAtPeriodEnd(res.cancel_at_period_end);
-      localStorage.setItem('isPremium', String(res.is_premium));
-    } catch {
-      // keep cached/localStorage value
-    } finally {
-      setIsLoading(false);
+    if (!inflightRefresh) {
+      inflightRefresh = api.getBillingSubscription()
+        .then((res) => {
+          cachedResult = {
+            isPremium: res.is_premium,
+            plan: res.plan,
+            expiresAt: res.expires_at,
+            cancelAtPeriodEnd: res.cancel_at_period_end,
+          };
+          try { localStorage.setItem('isPremium', String(res.is_premium)); } catch { /* quota */ }
+        })
+        .catch(() => { /* keep cached/localStorage value */ })
+        .finally(() => { inflightRefresh = null; });
     }
+    await inflightRefresh;
+    if (cachedResult) {
+      setIsPremium(cachedResult.isPremium);
+      setPlan(cachedResult.plan);
+      setExpiresAt(cachedResult.expiresAt);
+      setCancelAtPeriodEnd(cachedResult.cancelAtPeriodEnd);
+    }
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {

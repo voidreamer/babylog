@@ -61,7 +61,7 @@ export function VisitModal({ babyId, editData, onClose, onSave }: VisitModalProp
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><ClipboardList size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Doctor Visit</h2>
+                    <h2 className="modal-title"><ClipboardList size={20} /> {editData ? 'Edit' : 'Log'} Doctor Visit</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -165,7 +165,7 @@ export function VaccModal({ babyId, editData, onClose, onSave }: VaccModalProps)
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Syringe size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Vaccination</h2>
+                    <h2 className="modal-title"><Syringe size={20} /> {editData ? 'Edit' : 'Log'} Vaccination</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -252,7 +252,7 @@ export function MedModal({ babyId, editData, onClose, onSave }: MedModalProps) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><Pill size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Add'} Medication</h2>
+                    <h2 className="modal-title"><Pill size={20} /> {editData ? 'Edit' : 'Add'} Medication</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -334,7 +334,7 @@ export function GrowthModal({ babyId, editData, onClose, onSave }: GrowthModalPr
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2 className="modal-title"><TrendingUp size={20} style={{ marginRight: '8px' }} /> {editData ? 'Edit' : 'Log'} Growth</h2>
+                    <h2 className="modal-title"><TrendingUp size={20} /> {editData ? 'Edit' : 'Log'} Growth</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>

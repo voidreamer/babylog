@@ -1,22 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { captureException } from '../utils/analytics';
 
 type ErrorLevel = 'app' | 'page' | 'widget';
 
 /**
- * Error Fallback UI shown when an error is caught
+ * Error Fallback UI shown when an error is caught.
+ * defaultValue keeps the fallback usable even if i18n itself failed to load.
  */
 interface ErrorFallbackProps { error: Error | null; level: ErrorLevel; onRetry: () => void; }
 function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps) {
+    const { t } = useTranslation('common');
+
     if (level === 'widget') {
         return (
             <div className="error-fallback-widget">
-                <h3 className="error-fallback-title">Widget unavailable</h3>
+                <h3 className="error-fallback-title">{t('errorBoundaryWidgetTitle', { defaultValue: 'Widget unavailable' })}</h3>
                 <button className="btn btn-ghost btn-sm" onClick={onRetry}>
                     <RefreshCw size={14} />
-                    <span>Retry</span>
+                    <span>{t('retry', { defaultValue: 'Retry' })}</span>
                 </button>
             </div>
         );
@@ -28,9 +32,9 @@ function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps) {
                 <div className="error-fallback-icon">
                     <AlertTriangle size={32} />
                 </div>
-                <h2 className="error-fallback-title">This page ran into a problem</h2>
+                <h2 className="error-fallback-title">{t('errorBoundaryPageTitle', { defaultValue: 'This page ran into a problem' })}</h2>
                 <p className="error-fallback-message">
-                    Try again or switch to a different tab.
+                    {t('errorBoundaryPageMessage', { defaultValue: 'Try again or switch to a different tab.' })}
                 </p>
                 {error?.message && import.meta.env.DEV && (
                     <pre className="error-fallback-details">
@@ -42,7 +46,7 @@ function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps) {
                     onClick={onRetry}
                 >
                     <RefreshCw size={16} />
-                    <span>Try Again</span>
+                    <span>{t('tryAgain', { defaultValue: 'Try Again' })}</span>
                 </button>
             </div>
         );
@@ -54,9 +58,9 @@ function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps) {
                 <div className="error-fallback-icon">
                     <AlertTriangle size={48} />
                 </div>
-                <h2 className="error-fallback-title">Something went wrong</h2>
+                <h2 className="error-fallback-title">{t('errorBoundaryTitle', { defaultValue: 'Something went wrong' })}</h2>
                 <p className="error-fallback-message">
-                    We're sorry, but something unexpected happened. Please try again.
+                    {t('errorBoundaryMessage', { defaultValue: "We're sorry, but something unexpected happened. Please try again." })}
                 </p>
                 {error?.message && import.meta.env.DEV && (
                     <pre className="error-fallback-details">
@@ -68,7 +72,7 @@ function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps) {
                     onClick={onRetry}
                 >
                     <RefreshCw size={18} />
-                    <span>Try Again</span>
+                    <span>{t('tryAgain', { defaultValue: 'Try Again' })}</span>
                 </button>
             </div>
         </div>

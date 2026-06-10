@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
@@ -19,8 +19,8 @@ router = APIRouter(prefix="/feedings", tags=["feedings"])
 def get_feedings(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -52,7 +52,10 @@ def get_feeding(
     user_id = user.get("sub")
 
     feeding = (
-        db.query(Feeding).join(Baby).filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email)).first()
+        db.query(Feeding)
+        .join(Baby)
+        .filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not feeding:
@@ -104,7 +107,10 @@ def update_feeding(
     user_id = user.get("sub")
 
     feeding = (
-        db.query(Feeding).join(Baby).filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email)).first()
+        db.query(Feeding)
+        .join(Baby)
+        .filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not feeding:
@@ -136,7 +142,10 @@ def delete_feeding(
     user_id = user.get("sub")
 
     feeding = (
-        db.query(Feeding).join(Baby).filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email)).first()
+        db.query(Feeding)
+        .join(Baby)
+        .filter(Feeding.id == feeding_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not feeding:

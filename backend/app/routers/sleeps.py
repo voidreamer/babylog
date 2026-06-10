@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
@@ -21,8 +21,8 @@ router = APIRouter(prefix="/sleeps", tags=["sleeps"])
 def get_sleeps(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -74,7 +74,7 @@ def get_sleep(
     """Get a specific sleep session by ID."""
     user_id = user.get("sub")
 
-    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email)).first()
+    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not sleep:
         raise HTTPException(status_code=404, detail="Sleep not found")
@@ -122,7 +122,7 @@ def update_sleep(
     """Update a sleep session (e.g., end the sleep)."""
     user_id = user.get("sub")
 
-    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email)).first()
+    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not sleep:
         raise HTTPException(status_code=404, detail="Sleep not found")
@@ -152,7 +152,7 @@ def end_sleep(
     """End an active sleep session (sets end_time to now)."""
     user_id = user.get("sub")
 
-    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email)).first()
+    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not sleep:
         raise HTTPException(status_code=404, detail="Sleep not found")
@@ -182,7 +182,7 @@ def delete_sleep(
     """Delete a sleep record."""
     user_id = user.get("sub")
 
-    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email)).first()
+    sleep = db.query(Sleep).join(Baby).filter(Sleep.id == sleep_id, baby_access_filter(user_id, user_email, db)).first()
 
     if not sleep:
         logger.warning("Delete sleep not found", extra={"sleep_id": sleep_id})
