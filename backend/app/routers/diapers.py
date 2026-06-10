@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
@@ -19,8 +19,8 @@ router = APIRouter(prefix="/diapers", tags=["diapers"])
 def get_diapers(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -46,7 +46,9 @@ def get_diaper(
     """Get a specific diaper change by ID."""
     user_id = user.get("sub")
 
-    diaper = db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email)).first()
+    diaper = (
+        db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email, db)).first()
+    )
 
     if not diaper:
         raise HTTPException(status_code=404, detail="Diaper not found")
@@ -97,7 +99,9 @@ def update_diaper(
     """Update a diaper record."""
     user_id = user.get("sub")
 
-    diaper = db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email)).first()
+    diaper = (
+        db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email, db)).first()
+    )
 
     if not diaper:
         raise HTTPException(status_code=404, detail="Diaper not found")
@@ -127,7 +131,9 @@ def delete_diaper(
     """Delete a diaper record."""
     user_id = user.get("sub")
 
-    diaper = db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email)).first()
+    diaper = (
+        db.query(Diaper).join(Baby).filter(Diaper.id == diaper_id, baby_access_filter(user_id, user_email, db)).first()
+    )
 
     if not diaper:
         logger.warning("Delete diaper not found", extra={"diaper_id": diaper_id})

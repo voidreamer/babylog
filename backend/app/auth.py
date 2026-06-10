@@ -21,12 +21,18 @@ def verify_token(token: str) -> dict:
         return {"sub": "dev-user-123", "email": "dev@example.com"}
 
     try:
-        # Supabase uses HS256 with audience "authenticated"
+        # Supabase uses HS256 with audience "authenticated".
+        # Validate the issuer too when the Supabase project URL is configured.
+        decode_kwargs = {}
+        if settings.supabase_url:
+            decode_kwargs["issuer"] = f"{settings.supabase_url.rstrip('/')}/auth/v1"
+
         claims = jwt.decode(
             token,
             settings.supabase_jwt_secret,
             algorithms=["HS256"],
             audience="authenticated",
+            **decode_kwargs,
         )
 
         return claims

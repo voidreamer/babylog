@@ -14,12 +14,12 @@ from .benchmarks import get_wake_window_benchmarks
 
 
 def make_aware(dt: datetime | None) -> datetime | None:
-    """Ensure datetime is timezone-aware (UTC)."""
+    """Ensure datetime is timezone-aware and normalized to UTC."""
     if dt is None:
         return None
     if dt.tzinfo is None:
         return dt.replace(tzinfo=UTC)
-    return dt
+    return dt.astimezone(UTC)
 
 
 # =============================================================================

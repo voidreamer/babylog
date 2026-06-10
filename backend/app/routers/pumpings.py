@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user, get_user_email
@@ -19,8 +19,8 @@ router = APIRouter(prefix="/pumpings", tags=["pumpings"])
 def get_pumpings(
     request: Request,
     baby_id: int,
-    skip: int = 0,
-    limit: int = 50,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     user: dict = Depends(get_current_user),
     user_email: str = Depends(get_user_email),
     db: Session = Depends(get_db),
@@ -52,7 +52,10 @@ def get_pumping(
     user_id = user.get("sub")
 
     pumping = (
-        db.query(Pumping).join(Baby).filter(Pumping.id == pumping_id, baby_access_filter(user_id, user_email)).first()
+        db.query(Pumping)
+        .join(Baby)
+        .filter(Pumping.id == pumping_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not pumping:
@@ -103,7 +106,10 @@ def update_pumping(
     user_id = user.get("sub")
 
     pumping = (
-        db.query(Pumping).join(Baby).filter(Pumping.id == pumping_id, baby_access_filter(user_id, user_email)).first()
+        db.query(Pumping)
+        .join(Baby)
+        .filter(Pumping.id == pumping_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not pumping:
@@ -135,7 +141,10 @@ def delete_pumping(
     user_id = user.get("sub")
 
     pumping = (
-        db.query(Pumping).join(Baby).filter(Pumping.id == pumping_id, baby_access_filter(user_id, user_email)).first()
+        db.query(Pumping)
+        .join(Baby)
+        .filter(Pumping.id == pumping_id, baby_access_filter(user_id, user_email, db))
+        .first()
     )
 
     if not pumping:

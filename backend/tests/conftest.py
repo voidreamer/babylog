@@ -3,16 +3,26 @@ Pytest fixtures for HeyBub API tests.
 Uses PostgreSQL in CI, SQLite fallback for local development.
 """
 import os
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, Column, Text
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
-from app.main import app
-from app.database import Base, get_db
-from app.rate_limit import limiter
-from app import models
+# Hermetic test config: env vars beat any local .env, and they must be set
+# BEFORE app modules import Settings. Keeps local runs identical to CI
+# (dev-mode auth bypass, no Sentry events, no real Stripe keys).
+os.environ["ENVIRONMENT"] = "test"
+os.environ["SUPABASE_JWT_SECRET"] = ""
+os.environ["SENTRY_DSN"] = ""
+os.environ["STRIPE_SECRET_KEY"] = ""
+os.environ["STRIPE_WEBHOOK_SECRET"] = ""
+os.environ["ADMIN_API_KEY"] = ""
+
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import create_engine  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
+from sqlalchemy.pool import StaticPool  # noqa: E402
+
+from app.database import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
+from app.rate_limit import limiter  # noqa: E402
 
 # Disable rate limiting in tests — TestClient shares one IP across all requests
 limiter.enabled = False
@@ -30,7 +40,7 @@ else:
     # The ARRAY column issue is handled by using a different SQLite-compatible approach
     # We don't need to patch the model - just use the engine without PostgreSQL features
     USE_POSTGRES = False
-    
+
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -57,14 +67,14 @@ def test_db():
     Base.metadata.drop_all(bind=engine)
 
 
-@pytest.fixture(scope="function") 
+@pytest.fixture(scope="function")
 def client(test_db):
     """Test client with overridden dependencies."""
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 

@@ -4,7 +4,7 @@ Admin management endpoints.
 Protected endpoints for database migrations and admin operations.
 """
 
-import os
+import secrets
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 
@@ -25,7 +25,7 @@ def verify_admin_key(x_admin_key: str = Header(None)):
     In production, set ADMIN_API_KEY environment variable.
     This protects migration and other admin endpoints.
     """
-    expected_key = os.environ.get("ADMIN_API_KEY", "")
+    expected_key = settings.admin_api_key
 
     if not expected_key:
         # If no admin key is configured, only allow in development
@@ -33,7 +33,8 @@ def verify_admin_key(x_admin_key: str = Header(None)):
             raise HTTPException(status_code=403, detail="Admin operations require ADMIN_API_KEY to be configured")
         return True
 
-    if not x_admin_key or x_admin_key != expected_key:
+    # compare_digest prevents timing attacks on the key
+    if not x_admin_key or not secrets.compare_digest(x_admin_key, expected_key):
         logger.warning("Invalid admin key attempt")
         raise HTTPException(status_code=403, detail="Invalid admin key")
 

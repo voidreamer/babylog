@@ -3,6 +3,7 @@ import uuid
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from mangum import Mangum
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -64,6 +65,17 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Log unhandled errors with context and return a generic 500 to the client."""
+    logger.exception(
+        "Unhandled exception",
+        extra={"method": request.method, "path": request.url.path},
+    )
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+
 # CORS - Restrict to allowed origins from settings
 allowed_origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
 app.add_middleware(
@@ -111,7 +123,8 @@ async def log_requests(request: Request, call_next):
             payload += "=" * (-len(payload) % 4)
             claims = _json.loads(base64.urlsafe_b64decode(payload))
             user_id = claims.get("sub", "anonymous")
-        except Exception:
+        except (ValueError, IndexError, UnicodeDecodeError):
+            # Malformed token — request logging still proceeds as anonymous
             pass
 
     start = time.perf_counter()
