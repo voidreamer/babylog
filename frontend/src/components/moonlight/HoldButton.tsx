@@ -10,6 +10,9 @@ import {
 
 type HoldButtonProps = {
   onHold: () => void;
+  /** Fires on a quick release (progress < 35%). Without it, a short tap does
+   *  nothing, which reads as broken on a card-sized button. */
+  onTap?: () => void;
   holdMs?: number;
   children: ReactNode;
   className?: string;
@@ -37,6 +40,7 @@ type HoldButtonProps = {
  */
 export function HoldButton({
   onHold,
+  onTap,
   holdMs = 500,
   children,
   className,
@@ -110,6 +114,14 @@ export function HoldButton({
     }
   };
 
+  const release = () => {
+    // Quick release = tap. Guard on `holding` so chip taps (which
+    // stopPropagation on pointerdown and never start a hold) don't fire it.
+    const wasTap = holding && progress < 0.35;
+    cancel();
+    if (wasTap && !disabled) onTap?.();
+  };
+
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (disabled) return;
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -134,7 +146,7 @@ export function HoldButton({
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : 0}
       onPointerDown={onPointerDown}
-      onPointerUp={cancel}
+      onPointerUp={release}
       onPointerLeave={cancel}
       onPointerCancel={cancel}
       onKeyDown={onKeyDown}

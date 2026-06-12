@@ -7,13 +7,14 @@ type SectionLabelProps = {
 };
 
 export function SectionLabel({ children, extra }: SectionLabelProps) {
+  // No horizontal padding: every caller renders inside an already-padded
+  // page, so padding here pushed labels 20px out of line with their cards.
   return (
     <div
       style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'baseline',
-        padding: '0 20px',
         marginTop: 24,
         marginBottom: 10,
       }}

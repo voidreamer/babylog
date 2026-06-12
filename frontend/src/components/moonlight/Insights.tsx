@@ -27,38 +27,24 @@ export default function MoonlightInsights({ isPremium = false }: Props) {
 
   return (
     <div style={{ padding: '16px 20px 8px', color: 'var(--ml-text)' }}>
-      {/* Moonlight header */}
-      <div className="mono" style={{ marginBottom: 2 }}>
-        {t('dashboard:learn.insights').toLowerCase()}
-      </div>
+      {/* Moonlight header: compact and plain (see Timeline/Health). */}
+      {selectedBaby && ageLabel && (
+        <div className="mono" style={{ marginBottom: 2 }}>
+          {t('dashboard:learn.forBabyAge', { name: selectedBaby.name, age: ageLabel }).toLowerCase()}
+        </div>
+      )}
       <h1
         style={{
           fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
-          fontWeight: 300,
-          fontSize: 34,
-          margin: '2px 0 4px',
-          letterSpacing: -1,
+          fontWeight: 400,
+          fontSize: 24,
+          margin: '2px 0 16px',
+          letterSpacing: -0.4,
           color: 'var(--ml-text)',
         }}
       >
-        {t('dashboard:moonlight.patternsAnd', { defaultValue: 'Patterns & ' })}
-        <em className="serif" style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}>
-          {t('dashboard:moonlight.rhythms', { defaultValue: 'rhythms' })}
-        </em>
+        {t('dashboard:learn.insights', { defaultValue: 'Insights' })}
       </h1>
-      {selectedBaby && ageLabel && (
-        <p
-          className="serif italic"
-          style={{
-            fontSize: 14,
-            lineHeight: 1.4,
-            color: 'var(--ml-text-2)',
-            margin: '8px 0 20px',
-          }}
-        >
-          {t('dashboard:learn.forBabyAge', { name: selectedBaby.name, age: ageLabel })}
-        </p>
-      )}
 
       <Suspense
         fallback={

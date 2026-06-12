@@ -11,14 +11,16 @@
 [data-ui="moonlight"] {
   --ml-accent: #E89580;
 
-  /* Day (default) — warm cream */
+  /* Day (default): warm cream.
+     text-2/text-3 alphas are tuned for legibility: text-3 carries the 11px
+     mono labels, so it must stay near WCAG 4.5:1 on the cream bg. */
   --ml-bg: #fdf7f1;
   --ml-surface: rgba(60, 40, 30, 0.04);
   --ml-surface-2: rgba(60, 40, 30, 0.06);
   --ml-line: rgba(60, 40, 30, 0.08);
   --ml-text: #2a1f1a;
-  --ml-text-2: rgba(60, 40, 30, 0.7);
-  --ml-text-3: rgba(60, 40, 30, 0.5);
+  --ml-text-2: rgba(42, 31, 26, 0.78);
+  --ml-text-3: rgba(42, 31, 26, 0.64);
   --ml-radius: 22px;
 
   --ml-bg-gradient:
@@ -39,8 +41,8 @@
   --ml-surface-2: rgba(255, 255, 255, 0.06);
   --ml-line: rgba(255, 255, 255, 0.08);
   --ml-text: #f5ece4;
-  --ml-text-2: rgba(245, 236, 228, 0.65);
-  --ml-text-3: rgba(245, 236, 228, 0.45);
+  --ml-text-2: rgba(245, 236, 228, 0.75);
+  --ml-text-3: rgba(245, 236, 228, 0.6);
 
   --ml-bg-gradient:
     radial-gradient(1200px 600px at 15% -10%, rgba(232, 149, 128, 0.08), transparent 60%),
@@ -63,11 +65,13 @@
   font-family: inherit;
 }
 
-/* Typography utilities (scoped) */
+/* Typography utilities (scoped).
+   11px is the floor for the uppercase mono labels; 10px with wide tracking
+   was the single biggest readability complaint on real devices. */
 [data-ui="moonlight"] .mono {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
-  font-size: 10px;
-  letter-spacing: 1.4px;
+  font-size: 11px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
   color: var(--ml-text-3);
 }
@@ -145,7 +149,7 @@
 }
 
 .ml-tab-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.2px;
 }
@@ -247,7 +251,7 @@
 
 [data-ui="moonlight"] .health-card-count {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--ml-text-3);
@@ -324,8 +328,8 @@
 
 [data-ui="moonlight"] .records-summary-label {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 1.4px;
+  font-size: 11px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
   color: var(--ml-text-3);
 }
@@ -489,7 +493,7 @@
 
 [data-ui="moonlight"] .vax-progress-label {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--ml-text-3);
@@ -499,7 +503,7 @@
 [data-ui="moonlight"] .teeth-label {
   color: var(--ml-text-3);
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 1px;
 }
 
@@ -521,7 +525,7 @@
 [data-ui="moonlight"] .time-range-btn {
   color: var(--ml-text-2);
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   padding: 6px 12px;
@@ -558,7 +562,7 @@
   color: var(--ml-accent);
   border: 0.5px solid color-mix(in srgb, var(--ml-accent) 30%, transparent);
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.6px;
 }
 
@@ -572,7 +576,7 @@
 
 [data-ui="moonlight"] .insight-card-label {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--ml-text-3);
@@ -666,8 +670,8 @@
 
 [data-ui="moonlight"] .settings-group-title {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 1.4px;
+  font-size: 11px;
+  letter-spacing: 1.1px;
   color: var(--ml-text-3);
   padding: 14px 16px 6px;
 }
@@ -753,7 +757,7 @@
 
 [data-ui="moonlight"] .settings-badge {
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   padding: 3px 8px;
@@ -775,7 +779,7 @@
 [data-ui="moonlight"] .settings-version {
   color: var(--ml-text-3);
   font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 1px;
   margin: 20px 0 32px;
 }
@@ -802,5 +806,40 @@
 [data-ui="moonlight"] .settings-toggle[data-state="on"],
 [data-ui="moonlight"] .settings-toggle.active {
   background: var(--ml-accent);
+}
+
+/* ============================================================================
+   Layout: moonlight pages bring their own 20px gutter, so the legacy
+   .app-container's 1.5rem horizontal padding would double it (44px total on
+   a phone). Zero it here; bottom padding stays for the fixed tab bar.
+   ============================================================================ */
+
+[data-ui="moonlight"] .app-container {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ============================================================================
+   Orb breathing: CSS-driven so the idle animation costs no JS.
+   Amplitude/duration arrive via inline custom properties set from urgency.
+   ============================================================================ */
+
+@keyframes ml-orb-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(calc(1 + var(--ml-orb-amp, 0.06))); }
+}
+
+[data-ui="moonlight"] .ml-orb-breathe {
+  animation: ml-orb-breathe var(--ml-orb-dur, 3s) ease-in-out infinite;
+}
+
+[data-ui="moonlight"] .ml-orb-breathe.is-held {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="moonlight"] .ml-orb-breathe {
+    animation: none;
+  }
 }
 

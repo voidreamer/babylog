@@ -264,6 +264,13 @@ export default function MoonlightTimeline() {
 
   useEffect(() => {
     void load();
+    // Reload when the app returns to the foreground; the webview keeps the
+    // last render alive for hours in Capacitor.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void load();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
   }, [load]);
 
   // Scroll the grid to ~2 hours before "now" on today, 6am for past days.
@@ -274,15 +281,19 @@ export default function MoonlightTimeline() {
     gridRef.current.scrollTop = hour * HOUR_PX;
   }, [loading, selectedDate]);
 
+  // Clear events when the day changes so the previous day's blocks never
+  // render under the new date header while the fetch is in flight.
   const navigateDay = useCallback((delta: number) => {
     hapticSelection();
     setSelectedDate((prev) => (delta > 0 ? addDays(prev, 1) : subDays(prev, 1)));
+    setEvents([]);
     setSelectedKey(null);
   }, []);
 
   const goToToday = useCallback(() => {
     hapticSelection();
     setSelectedDate(new Date());
+    setEvents([]);
     setSelectedKey(null);
   }, []);
 
@@ -372,29 +383,24 @@ export default function MoonlightTimeline() {
 
   return (
     <div style={{ padding: '12px 20px 8px', color: 'var(--ml-text)' }}>
-      {/* Header */}
+      {/* Header: compact and plain. This tab is a daily tool, not a poster.
+          The decorative 34px serif-accent headline cost ~120px of scroll. */}
       <div className="mono" style={{ marginBottom: 2 }}>
         {format(selectedDate, 'EEEE · MMMM d').toLowerCase()}
       </div>
       <h1
         style={{
           fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
-          fontWeight: 300,
-          fontSize: 34,
+          fontWeight: 400,
+          fontSize: 24,
           margin: '2px 0 0',
-          letterSpacing: -1,
+          letterSpacing: -0.4,
           color: 'var(--ml-text)',
         }}
       >
         {isToday(selectedDate)
-          ? t('dashboard:timeline.todayAtGlance', { defaultValue: 'Today at a ' })
-          : t('dashboard:timeline.dayAtGlance', { defaultValue: 'This day at a ' })}
-        <em
-          className="serif"
-          style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}
-        >
-          {t('dashboard:timeline.glance', { defaultValue: 'glance' })}
-        </em>
+          ? t('dashboard:timeline.titleToday', { defaultValue: 'Today' })
+          : format(selectedDate, 'MMMM d')}
       </h1>
 
       {/* Date stepper */}

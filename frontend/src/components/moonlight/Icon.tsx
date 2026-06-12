@@ -138,6 +138,56 @@ export const Icon = {
       />
     </svg>
   ),
+  Bath: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 12h16v2.5a4.5 4.5 0 01-4.5 4.5h-7A4.5 4.5 0 014 14.5V12z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="M7 12V6.5a2.5 2.5 0 015 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M7 21l-.5 1M17 21l.5 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  ),
+  Pump: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="9" y="8" width="6" height="12" rx="2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 8V6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="12" cy="4.2" r="1.4" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M9 13H6.5M15 13h2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  ),
+  Drop: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 3s6 6.5 6 11a6 6 0 11-12 0c0-4.5 6-11 6-11z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  Spoon: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <ellipse cx="12" cy="7" rx="3.5" ry="4.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 11.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  ),
+  Potty: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <ellipse cx="12" cy="8.5" rx="6.5" ry="2.8" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M6.5 10.5l1.2 7.5h8.6l1.2-7.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  Tummy: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="6.5" cy="12" r="2.6" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M9.2 13.2c2.6 1.6 6 1.4 8.3-.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M17.5 12.6c1.4-.9 2-2.3 2-3.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M4 17.5h16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  ),
   Mic: () => (
     <svg
       width="20"

@@ -73,6 +73,9 @@ function Chip({
   variant?: 'solid' | 'ghost';
 }) {
   const stop = (e: PointerEvent<HTMLButtonElement>) => e.stopPropagation();
+  // solid sits on the constant accent/blue hero fills (dark text), so fixed
+  // dark alpha is fine. ghost sits on theme surfaces; it must derive from
+  // --ml-text or it disappears in light mode (white-on-cream).
   const styles: CSSProperties =
     variant === 'solid'
       ? {
@@ -81,9 +84,9 @@ function Chip({
           border: 'none',
         }
       : {
-          background: 'rgba(255, 255, 255, 0.10)',
+          background: 'color-mix(in srgb, var(--ml-text) 6%, transparent)',
           color: 'inherit',
-          border: '0.5px solid rgba(255, 255, 255, 0.18)',
+          border: '0.5px solid color-mix(in srgb, var(--ml-text) 22%, transparent)',
         };
   return (
     <button
@@ -214,9 +217,29 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
       return null;
     }
   });
+  // Cached data renders instantly, but state-dependent toggles (sleep) stay
+  // gated until the API confirms; toggling against a stale cache can open a
+  // duplicate sleep session or end the wrong one.
+  const [hasLoadedFresh, setHasLoadedFresh] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKind>(null);
   const [showBubsense, setShowBubsense] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+
+  // State initializers only run on mount: re-seed from cache when the
+  // selected baby changes so the previous baby's data never lingers.
+  useEffect(() => {
+    setHasLoadedFresh(false);
+    if (!cacheKey) {
+      setDashboard(null);
+      return;
+    }
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      setDashboard(raw ? JSON.parse(raw) : null);
+    } catch {
+      setDashboard(null);
+    }
+  }, [cacheKey]);
 
   const load = useCallback(async () => {
     if (!selectedBaby) return;
@@ -225,6 +248,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
       const tzOffset = new Date().getTimezoneOffset();
       const data = await api.getDashboard(selectedBaby.id, localDate, tzOffset);
       setDashboard(data);
+      setHasLoadedFresh(true);
       try {
         localStorage.setItem(cacheKey, JSON.stringify(data));
       } catch {
@@ -238,7 +262,17 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
   useEffect(() => {
     load();
     const id = window.setInterval(load, 30_000);
-    return () => window.clearInterval(id);
+    // Refresh immediately when the app returns to the foreground; the
+    // webview keeps the last render alive for hours in Capacitor, so without
+    // this the screen shows stale state until the next 30s tick.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void load();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [load]);
 
   const openModal = useCallback((kind: ModalKind) => {
@@ -401,13 +435,15 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
 
   // Derive the ordered list of secondary actions for this baby's age, then
   // rank by recent usage. Top 2 render as "large" tiles; rest render compact.
+  // Ranking is intentionally frozen per visit (not re-derived per poll):
+  // buttons that reshuffle right after you tap them break muscle memory.
   const ageMonths = selectedBaby?.birth_date
     ? calculateAgeInMonths(selectedBaby.birth_date)
     : null;
   const rankedSecondaries = useMemo(() => {
     const applicable = getApplicableSecondaryActions(ageMonths);
     return getRankedActions(applicable);
-  }, [ageMonths, dashboard]);
+  }, [ageMonths, selectedBaby?.id]);
   const largeSecondaries = rankedSecondaries.slice(0, 2);
   const compactSecondaries = rankedSecondaries.slice(2);
 
@@ -421,17 +457,17 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
       case 'diaper':
         return <Icon.Diaper />;
       case 'pump':
-        return <Icon.Plus />;
+        return <Icon.Pump />;
       case 'tummy':
-        return <Icon.Play />;
+        return <Icon.Tummy />;
       case 'potty':
-        return <Icon.Check />;
+        return <Icon.Potty />;
       case 'bath':
-        return <Icon.Home />;
+        return <Icon.Bath />;
       case 'supplement':
-        return <Icon.Plus />;
+        return <Icon.Drop />;
       case 'solid':
-        return <Icon.Feed />;
+        return <Icon.Spoon />;
     }
   };
 
@@ -472,6 +508,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
         <HoldButton
           key={kind}
           ariaLabel={`${label}. ${t('common:moonlight.holdForOptions')}`}
+          onTap={() => openModal('diaper')}
           onHold={() => openModal('diaper')}
           borderRadius={18}
           style={largeTileStyle}
@@ -515,6 +552,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
         <HoldButton
           key={kind}
           ariaLabel={`${label}. ${t('common:moonlight.holdForOptions')}`}
+          onTap={() => openModal('pumping')}
           onHold={() => openModal('pumping')}
           borderRadius={18}
           style={largeTileStyle}
@@ -606,8 +644,21 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
     ? minutesSince(dashboard.last_feeding.time)
     : null;
 
-  const hours = lastFeed != null ? Math.floor(lastFeed / 60) : null;
-  const mins = lastFeed != null ? lastFeed % 60 : null;
+  const sleepStart = dashboard?.current_sleep?.start_time ?? null;
+  const sleepMins = sleepStart ? minutesSince(sleepStart) : null;
+
+  const fmtElapsed = (totalMins: number): string =>
+    totalMins >= 60
+      ? `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`
+      : `${totalMins} min`;
+
+  // Quick-log chips repeat the last logged amount for that feed type; 60 ml
+  // is only the cold-start fallback.
+  const quickAmountFor = (type: 'formula' | 'bottle'): number => {
+    const lf = dashboard?.last_feeding;
+    const amt = lf?.type === type ? Number(lf?.amount_ml) : NaN;
+    return Number.isFinite(amt) && amt > 0 ? amt : 60;
+  };
 
   return (
     <div
@@ -641,7 +692,22 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
                 }
               : undefined
           }
-          onPress={voiceActive ? voice.cancel : undefined}
+          onPress={
+            voiceActive
+              ? voice.cancel
+              : voice.isSupported && selectedBaby
+                ? () => {
+                    // A bare tap on the orb used to do nothing, a dead zone
+                    // on the most prominent element. Teach the gesture instead.
+                    hapticSelection();
+                    toast(
+                      t('dashboard:moonlight.orbHint', {
+                        defaultValue: 'Hold the orb to talk to Bubsense',
+                      }),
+                    );
+                  }
+                : undefined
+          }
           ariaLabel={
             voiceActive
               ? t('common:voice.tapToCancel', { defaultValue: 'Tap to cancel voice' })
@@ -751,101 +817,71 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
         </div>
       )}
 
+      {/* Status headline. While asleep, the sleep timer IS the headline;
+          that's what a parent glances for; last feed drops to the subline. */}
       <div style={{ padding: '16px 0 0', textAlign: 'center' }}>
-        <div className="mono" style={{ color: 'var(--ml-accent)' }}>
-          last feed
-        </div>
-        <div
-          style={{
-            fontSize: 44,
-            fontWeight: 300,
-            marginTop: 6,
-            letterSpacing: -1,
-            lineHeight: 1.02,
-          }}
-        >
-          {lastFeed == null ? (
-            <span className="serif italic" style={{ color: 'var(--ml-accent)' }}>
-              no feeds yet
-            </span>
-          ) : hours! > 0 ? (
-            <>
-              <span className="serif italic" style={{ color: 'var(--ml-accent)' }}>
-                {hours}h {mins}m
-              </span>
-              {' '}ago
-            </>
-          ) : (
-            <>
-              <span className="serif italic" style={{ color: 'var(--ml-accent)' }}>
-                {mins} min
-              </span>
-              {' '}ago
-            </>
-          )}
-        </div>
-        {dashboard?.current_sleep?.start_time && (
-          <div style={{ fontSize: 13, color: 'var(--ml-text-2)', marginTop: 6 }}>
-            sleeping · started {minutesSince(dashboard.current_sleep.start_time)} min ago
-          </div>
+        {sleepMins != null ? (
+          <>
+            <div className="mono" style={{ color: SLEEP_ACCENT }}>
+              {t('dashboard:moonlight.asleep', { defaultValue: 'asleep' })}
+            </div>
+            <div
+              style={{
+                fontSize: 44,
+                fontWeight: 300,
+                marginTop: 6,
+                letterSpacing: -1,
+                lineHeight: 1.02,
+                color: SLEEP_ACCENT,
+              }}
+            >
+              {fmtElapsed(sleepMins)}
+            </div>
+            {lastFeed != null && (
+              <div style={{ fontSize: 13, color: 'var(--ml-text-2)', marginTop: 6 }}>
+                {t('dashboard:moonlight.lastFeedAgo', {
+                  defaultValue: 'last feed {{time}} ago',
+                  time: fmtElapsed(lastFeed),
+                })}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="mono" style={{ color: 'var(--ml-accent)' }}>
+              {t('dashboard:moonlight.lastFeed', { defaultValue: 'last feed' })}
+            </div>
+            <div
+              style={{
+                fontSize: 44,
+                fontWeight: 300,
+                marginTop: 6,
+                letterSpacing: -1,
+                lineHeight: 1.02,
+              }}
+            >
+              {lastFeed == null ? (
+                <span style={{ color: 'var(--ml-accent)' }}>
+                  {t('dashboard:moonlight.noFeedsYet', { defaultValue: 'no feeds yet' })}
+                </span>
+              ) : (
+                <>
+                  <span style={{ color: 'var(--ml-accent)' }}>{fmtElapsed(lastFeed)}</span>{' '}
+                  {t('dashboard:moonlight.ago', { defaultValue: 'ago' })}
+                </>
+              )}
+            </div>
+          </>
         )}
       </div>
 
       {selectedBaby && (
-        <button
-          type="button"
-          onClick={() => {
-            hapticSelection();
-            setShowBubsense(true);
-          }}
-          style={{
-            marginTop: 20,
-            width: '100%',
-            padding: '12px 16px',
-            borderRadius: 16,
-            background: 'linear-gradient(180deg, color-mix(in srgb, var(--ml-accent) 14%, transparent), color-mix(in srgb, var(--ml-accent) 4%, transparent))',
-            border: '0.5px solid color-mix(in srgb, var(--ml-accent) 35%, transparent)',
-            color: 'var(--ml-text)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            textAlign: 'left',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              className="mono"
-              style={{ color: 'var(--ml-accent)', marginBottom: 2 }}
-            >
-              {isPremium
-                ? t('dashboard:bubsense.askBubsense', { defaultValue: 'ask bubsense' })
-                : t('dashboard:bubsense.premium', { defaultValue: 'premium' })}
-            </div>
-            <div
-              className="serif italic"
-              style={{ fontSize: 15, lineHeight: 1.3, color: 'var(--ml-text)' }}
-            >
-              {isPremium
-                ? t('dashboard:bubsense.promptHint', {
-                    defaultValue: 'Ask anything about your baby.',
-                  })
-                : t('dashboard:bubsense.upgradeHint', {
-                    defaultValue: 'Unlock a private baby expert, always on.',
-                  })}
-            </div>
-          </div>
-          <Icon.Arrow />
-        </button>
-      )}
-
-      {selectedBaby && (
-        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {/* Feeding — hero, accent */}
+        <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {/* Feeding hero (accent). Tap or hold opens the full editor;
+              chips are the one-tap quick logs. */}
           <HoldButton
             ariaLabel={`${t('dashboard:quickActionsSection.feeding')}. ${t('common:moonlight.holdForOptions')}`}
+            onTap={() => openModal('feeding')}
             onHold={() => openModal('feeding')}
             borderRadius={22}
             style={{
@@ -876,28 +912,31 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
               <Chip
                 variant="solid"
                 disabled={savingChip !== null}
-                onTap={() => quickLogFeed('formula', 60)}
-                ariaLabel={t('dashboard:feeding.formula')}
+                onTap={() => quickLogFeed('formula', quickAmountFor('formula'))}
+                ariaLabel={`${t('dashboard:feeding.formula')} ${quickAmountFor('formula')} ml`}
               >
-                {savingChip === 'feed:formula' ? '…' : t('dashboard:feeding.formula')}
+                {savingChip === 'feed:formula'
+                  ? '…'
+                  : `${t('dashboard:feeding.formula')} ${quickAmountFor('formula')}`}
               </Chip>
               <Chip
                 variant="solid"
                 disabled={savingChip !== null}
-                onTap={() => quickLogFeed('bottle', 60)}
-                ariaLabel={t('dashboard:feeding.breastBottle')}
+                onTap={() => quickLogFeed('bottle', quickAmountFor('bottle'))}
+                ariaLabel={`${t('dashboard:feeding.breastBottle')} ${quickAmountFor('bottle')} ml`}
               >
-                {savingChip === 'feed:bottle' ? '…' : t('dashboard:feeding.breastBottle')}
+                {savingChip === 'feed:bottle'
+                  ? '…'
+                  : `${t('dashboard:feeding.breastBottle')} ${quickAmountFor('bottle')}`}
               </Chip>
-            </div>
-            <div style={{ fontSize: 11, opacity: 0.7, marginTop: 2 }}>
-              {t('common:moonlight.holdForOptions')}
             </div>
           </HoldButton>
 
-          {/* Sleep — soft blue filled, toggle based on current_sleep */}
+          {/* Sleep hero (soft blue), toggle based on current_sleep. The
+              toggle stays disabled until fresh data confirms the state. */}
           <HoldButton
             ariaLabel={`${t('dashboard:quickActionsSection.sleep')}. ${t('common:moonlight.holdForOptions')}`}
+            onTap={() => openModal('sleep')}
             onHold={() => openModal('sleep')}
             borderRadius={22}
             style={{
@@ -920,7 +959,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
               {dashboard?.current_sleep?.id ? (
                 <Chip
                   variant="solid"
-                  disabled={savingChip !== null}
+                  disabled={savingChip !== null || !hasLoadedFresh}
                   onTap={quickWakeUp}
                   ariaLabel={t('dashboard:toast_babyIsAwake')}
                 >
@@ -929,16 +968,13 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
               ) : (
                 <Chip
                   variant="solid"
-                  disabled={savingChip !== null}
+                  disabled={savingChip !== null || !hasLoadedFresh}
                   onTap={quickStartSleep}
                   ariaLabel={t('dashboard:sleep.startSleep')}
                 >
                   {savingChip === 'sleep:start' ? '…' : t('dashboard:sleep.startSleep')}
                 </Chip>
               )}
-            </div>
-            <div style={{ fontSize: 11, opacity: 0.7, marginTop: 2 }}>
-              {t('common:moonlight.holdForOptions')}
             </div>
           </HoldButton>
         </div>
@@ -963,20 +999,57 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
         </div>
       )}
 
-      <SectionLabel extra={format(now, 'h:mm a').toLowerCase()}>today</SectionLabel>
+      <SectionLabel>{t('dashboard:moonlight.today', { defaultValue: 'today' })}</SectionLabel>
       <Ribbon events={ribbon.events} nowFrac={ribbon.nowFrac} />
 
-      <SectionLabel>tonight's story</SectionLabel>
-      <div className="card card-accent">
-        <div className="mono" style={{ color: 'var(--ml-accent)' }}>
-          quiet observation
-        </div>
-        <div className="serif" style={{ fontSize: 17, lineHeight: 1.4, marginTop: 8 }}>
-          {lastFeed == null
-            ? 'Log a first feed to start seeing patterns here.'
-            : `We'll surface rhythms as more data comes in. Keep logging as you go.`}
-        </div>
-      </div>
+      {/* Bubsense entry, below the logging surface on purpose: at 3am the
+          actions come first, the assistant (and its upsell) second. */}
+      {selectedBaby && (
+        <button
+          type="button"
+          onClick={() => {
+            hapticSelection();
+            setShowBubsense(true);
+          }}
+          style={{
+            marginTop: 18,
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: 16,
+            background: 'linear-gradient(180deg, color-mix(in srgb, var(--ml-accent) 14%, transparent), color-mix(in srgb, var(--ml-accent) 4%, transparent))',
+            border: '0.5px solid color-mix(in srgb, var(--ml-accent) 35%, transparent)',
+            color: 'var(--ml-text)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            textAlign: 'left',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              className="mono"
+              style={{ color: 'var(--ml-accent)', marginBottom: 2 }}
+            >
+              {isPremium
+                ? t('dashboard:bubsense.askBubsense', { defaultValue: 'ask bubsense' })
+                : t('dashboard:bubsense.premium', { defaultValue: 'premium' })}
+            </div>
+            <div style={{ fontSize: 14, lineHeight: 1.3, color: 'var(--ml-text-2)' }}>
+              {isPremium
+                ? t('dashboard:bubsense.promptHint', {
+                    defaultValue: 'Ask anything about your baby.',
+                  })
+                : t('dashboard:bubsense.upgradeHint', {
+                    defaultValue: 'Unlock a private baby expert, always on.',
+                  })}
+            </div>
+          </div>
+          <Icon.Arrow />
+        </button>
+      )}
 
       {activeModal && selectedBaby && (
         <Suspense fallback={null}>

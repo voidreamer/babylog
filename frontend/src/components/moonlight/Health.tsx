@@ -125,40 +125,23 @@ export default function MoonlightHealth({
 
   return (
     <div style={{ padding: '16px 20px 8px', color: 'var(--ml-text)' }}>
-      {/* Header */}
+      {/* Header: compact and plain; the old serif headline + intro
+          paragraph pushed the growth tiles below the fold for no information. */}
       <div className="mono" style={{ marginBottom: 2 }}>
-        {t('health:title', { defaultValue: 'health' }).toLowerCase()}
+        {selectedBaby.name ? selectedBaby.name.toLowerCase() : ''}
       </div>
       <h1
         style={{
           fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
-          fontWeight: 300,
-          fontSize: 34,
-          margin: '2px 0 4px',
-          letterSpacing: -1,
+          fontWeight: 400,
+          fontSize: 24,
+          margin: '2px 0 16px',
+          letterSpacing: -0.4,
           color: 'var(--ml-text)',
         }}
       >
-        {t('health:moonlight.growthAnd', { defaultValue: 'Growth & ' })}
-        <em className="serif" style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}>
-          {t('health:moonlight.wellbeing', { defaultValue: 'wellbeing' })}
-        </em>
+        {t('health:title', { defaultValue: 'Health' })}
       </h1>
-      <p
-        className="serif italic"
-        style={{
-          fontSize: 15,
-          lineHeight: 1.4,
-          color: 'var(--ml-text-2)',
-          margin: '8px 0 24px',
-          maxWidth: 320,
-        }}
-      >
-        {t('health:moonlight.intro', {
-          defaultValue:
-            "Growth curves, vaccinations, and the small things worth remembering.",
-        })}
-      </p>
 
       {loading ? (
         <div
