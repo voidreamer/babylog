@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+.env
+.env.*
+.venv
+venv
+tests
+.pytest_cache
+lambda.zip
+package
+uv.lock

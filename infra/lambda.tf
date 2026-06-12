@@ -34,7 +34,10 @@ resource "aws_lambda_function" "api" {
   handler       = "app.main.handler"
   runtime       = "python3.11"
   timeout       = 30
-  memory_size   = 256
+  # 1024 MB buys a ~4x larger CPU slice; cold starts drop from multiple
+  # seconds to around one. At this app's request volume the cost difference
+  # is cents. Stopgap until the API moves to a persistent server.
+  memory_size   = 1024
 
   filename         = data.archive_file.lambda_placeholder.output_path
   source_code_hash = data.archive_file.lambda_placeholder.output_base64sha256
