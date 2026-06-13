@@ -1,7 +1,7 @@
 import {
-  useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -36,21 +36,11 @@ const PALETTES: Record<OrbMode, Palette> = {
 
 const LONG_PRESS_MS = 550;
 
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-  return reduced;
-}
-
+/**
+ * The idle "breathing" is a CSS animation (ml-orb-breathe in moonlight.css)
+ * parameterized by --ml-orb-amp / --ml-orb-dur, so it costs no JS per frame.
+ * JS only runs during an active press (long-press progress ring).
+ */
 export function Orb({
   size = 160,
   mode = 'calm',
@@ -62,29 +52,16 @@ export function Orb({
   iconNode,
   iconScale = 0.45,
 }: OrbProps) {
-  const reduced = usePrefersReducedMotion();
-  const [t, setT] = useState(0);
   const [pressed, setPressed] = useState(false);
   const [holding, setHolding] = useState(0);
   const holdRaf = useRef<number | null>(null);
   const holdStart = useRef(0);
 
-  useEffect(() => {
-    if (reduced) return;
-    let raf: number;
-    const start = performance.now();
-    const loop = () => {
-      setT((performance.now() - start) / 1000);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [reduced]);
-
+  // Match the old rAF feel: speed rose with urgency; period = 2π / speed.
   const speed = 0.5 + urgency * 2.0;
-  const amp = reduced ? 0 : 0.04 + urgency * 0.08;
-  const breath = reduced ? 0.5 : (Math.sin(t * speed) + 1) / 2;
-  const scale = 1 + breath * amp + (pressed ? -0.04 : 0) + holding * 0.04;
+  const breatheDur = `${((2 * Math.PI) / speed).toFixed(2)}s`;
+  const bodyAmp = 0.04 + urgency * 0.08;
+  const glowAmp = 0.12 + urgency * 0.15;
 
   const [c1, c2, c3] = PALETTES[mode] || PALETTES.calm;
 
@@ -124,6 +101,7 @@ export function Orb({
   const handleMouseLeave = (_e: MouseEvent) => endPress(false);
   const handleTouchStart = (_e: TouchEvent) => startPress();
   const handleTouchEnd = (_e: TouchEvent) => endPress(true);
+  const handleTouchCancel = (_e: TouchEvent) => endPress(false);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -135,6 +113,14 @@ export function Orb({
   const role = interactive ? 'button' : undefined;
   const tabIndex = interactive ? 0 : undefined;
 
+  const held = pressed || holding > 0;
+  const breatheClass = `ml-orb-breathe${held ? ' is-held' : ''}`;
+  const breatheVars = (amp: number) =>
+    ({
+      '--ml-orb-amp': amp,
+      '--ml-orb-dur': breatheDur,
+    }) as CSSProperties;
+
   return (
     <div
       role={role}
@@ -145,6 +131,7 @@ export function Orb({
       onMouseLeave={interactive ? handleMouseLeave : undefined}
       onTouchStart={interactive ? handleTouchStart : undefined}
       onTouchEnd={interactive ? handleTouchEnd : undefined}
+      onTouchCancel={interactive ? handleTouchCancel : undefined}
       onKeyDown={interactive ? handleKeyDown : undefined}
       style={{
         width: size,
@@ -156,37 +143,43 @@ export function Orb({
         cursor: interactive ? 'pointer' : 'default',
         userSelect: 'none',
         WebkitUserSelect: 'none',
+        // Press feedback lives on the container so it composes with the
+        // layers' CSS breathing.
+        transform: `scale(${1 + (pressed ? -0.04 : 0) + holding * 0.06})`,
+        transition: held ? 'transform 80ms' : 'transform 200ms',
       }}
     >
       <div
+        className={breatheClass}
         style={{
           position: 'absolute',
           width: size,
           height: size,
           borderRadius: '50%',
           background: `radial-gradient(circle, ${c1}55 0%, ${c2}22 40%, transparent 70%)`,
-          transform: `scale(${1 + breath * (0.12 + urgency * 0.15) + holding * 0.08})`,
           filter: 'blur(12px)',
-          transition: 'filter 0.2s',
+          ...breatheVars(glowAmp),
         }}
       />
       <div
+        className={breatheClass}
         style={{
           position: 'absolute',
           width: size * 0.82,
           height: size * 0.82,
           borderRadius: '50%',
           background: `radial-gradient(circle at 30% 30%, ${c3}, ${c2} 50%, ${c1} 100%)`,
-          transform: `scale(${scale})`,
           boxShadow: `inset -10px -15px 40px ${c1}88, inset 8px 10px 30px ${c3}aa, 0 8px 24px ${c1}${
             holding > 0 ? 'cc' : '44'
           }`,
           transition: 'box-shadow 0.2s',
+          ...breatheVars(bodyAmp),
         }}
       />
       {(iconSrc || iconNode) && (
         <div
           aria-hidden="true"
+          className={breatheClass}
           style={{
             position: 'absolute',
             width: size * iconScale,
@@ -195,8 +188,8 @@ export function Orb({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transform: `scale(${scale})`,
             pointerEvents: 'none',
+            ...breatheVars(bodyAmp),
           }}
         >
           {iconSrc ? (
@@ -219,6 +212,7 @@ export function Orb({
         </div>
       )}
       <div
+        className={breatheClass}
         style={{
           position: 'absolute',
           width: size * 0.35,
@@ -227,8 +221,8 @@ export function Orb({
           top: size * 0.18,
           left: size * 0.22,
           background: 'radial-gradient(circle, #ffffffaa, transparent 70%)',
-          transform: `scale(${scale})`,
           filter: 'blur(6px)',
+          ...breatheVars(bodyAmp),
         }}
       />
       {holding > 0 && (

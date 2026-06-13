@@ -782,8 +782,9 @@ function MainApp() {
 
     return (
         <div className="app-container">
-            {/* Floating dark mode toggle — dashboard only */}
-            {activeTab === 'home' && (
+            {/* Floating dark mode toggle, legacy dashboard only. Moonlight
+                keeps Home clean; the toggle lives in Settings there. */}
+            {activeTab === 'home' && !moonlight && (
                 <button
                     className="theme-toggle-float"
                     onClick={toggleTheme}
@@ -845,23 +846,16 @@ function MainApp() {
                     <div style={moonlight ? { padding: '16px 20px 8px' } : undefined}>
                         {moonlight && (
                             <div style={{ color: 'var(--ml-text)', marginBottom: 16 }}>
-                                <div className="mono" style={{ marginBottom: 2 }}>
-                                    {t('settings:title', { defaultValue: 'settings' }).toLowerCase()}
-                                </div>
                                 <h1
                                     style={{
                                         fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
-                                        fontWeight: 300,
-                                        fontSize: 34,
+                                        fontWeight: 400,
+                                        fontSize: 24,
                                         margin: '2px 0 0',
-                                        letterSpacing: -1,
+                                        letterSpacing: -0.4,
                                     }}
                                 >
-                                    {t('settings:moonlight.yours', { defaultValue: 'Yours to ' })}
-                                    <em className="serif" style={{ color: 'var(--ml-accent)', fontStyle: 'italic' }}>
-                                        {t('settings:moonlight.tune', { defaultValue: 'tune' })}
-                                    </em>
-                                    .
+                                    {t('settings:title', { defaultValue: 'Settings' })}
                                 </h1>
                             </div>
                         )}

@@ -7,12 +7,12 @@ export const SECONDARY_META: Record<
   { labelKey: string; color: string; iconName: IconName }
 > = {
   diaper: { labelKey: 'dashboard:quickActionsSection.diaper', color: '#D9C388', iconName: 'diaper' },
-  pump: { labelKey: 'dashboard:quickActionsSection.pump', color: '#9BC29E', iconName: 'plus' },
-  tummy: { labelKey: 'common:widgets.tummyTime', color: '#E8A564', iconName: 'play' },
-  potty: { labelKey: 'common:widgets.potty', color: '#D98571', iconName: 'check' },
-  bath: { labelKey: 'common:widgets.bath', color: '#8BA5C4', iconName: 'home' },
-  supplement: { labelKey: 'common:widgets.supplement', color: '#9BC29E', iconName: 'plus' },
-  solid: { labelKey: 'dashboard:solid.title', color: '#E89580', iconName: 'feed' },
+  pump: { labelKey: 'dashboard:quickActionsSection.pump', color: '#9BC29E', iconName: 'pump' },
+  tummy: { labelKey: 'common:widgets.tummyTime', color: '#E8A564', iconName: 'tummy' },
+  potty: { labelKey: 'common:widgets.potty', color: '#D98571', iconName: 'potty' },
+  bath: { labelKey: 'common:widgets.bath', color: '#8BA5C4', iconName: 'bath' },
+  supplement: { labelKey: 'common:widgets.supplement', color: '#9BC29E', iconName: 'drop' },
+  solid: { labelKey: 'dashboard:solid.title', color: '#E89580', iconName: 'spoon' },
 };
 
 export type IconName =
@@ -23,7 +23,13 @@ export type IconName =
   | 'note'
   | 'play'
   | 'check'
-  | 'home';
+  | 'home'
+  | 'bath'
+  | 'pump'
+  | 'drop'
+  | 'spoon'
+  | 'potty'
+  | 'tummy';
 
 /** Maps our SecondaryKind to the widget-id used in localStorage('visibleWidgets'). */
 const WIDGET_ID_BY_KIND: Record<SecondaryKind, string> = {
