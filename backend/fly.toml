@@ -1,0 +1,41 @@
+# Fly.io config for the HeyBub API.
+#
+# First deploy:
+#   fly launch --no-deploy   (or: fly apps create heybub-api)
+#   fly secrets set DATABASE_URL=... SUPABASE_JWT_SECRET=... CORS_ORIGINS=... \
+#     STRIPE_SECRET_KEY=... STRIPE_WEBHOOK_SECRET=... STRIPE_PRICE_MONTHLY=... \
+#     STRIPE_PRICE_YEARLY=... GROQ_API_KEY=... SENTRY_DSN=... SUPABASE_URL=... \
+#     SUPABASE_SERVICE_KEY=... ADMIN_API_KEY=... ENVIRONMENT=production
+#   fly deploy
+#
+# primary_region must match the Supabase project's region (DB round-trips
+# dominate response time once cold starts are gone). Check the DATABASE_URL
+# host; this project's AWS side runs in ca-central-1, so if Supabase matches,
+# use "yul" (Montreal).
+
+app = "heybub-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Always keep one machine running: the entire point of leaving Lambda
+  # is to never make a tired parent wait for a cold start.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "512mb"

@@ -871,10 +871,12 @@ h4 {
   user-select: none;
 }
 
-/* Active timers (feeding/pumping/tummy) and sleeping state are driven by
-   local state, not the stale cached data, so keep them interactive. */
-.widgets-grid.stale .widget.active-timer,
-.widgets-grid.stale .widget.sleeping {
+/* Active timers (feeding/pumping/tummy) persist in localStorage, so they are
+   driven by local state and stay interactive. Sleep is NOT exempt: its
+   current/ended state comes from the same cached dashboard payload as the
+   other cards, and toggling it against stale data can open a duplicate
+   sleep session or end the wrong one. */
+.widgets-grid.stale .widget.active-timer {
   pointer-events: auto;
   user-select: auto;
 }
@@ -903,13 +905,11 @@ h4 {
   transition: opacity 0.3s ease;
 }
 
-/* Don't shimmer or fade active timers / sleeping widgets */
-.widgets-grid.stale .widget.active-timer::after,
-.widgets-grid.stale .widget.sleeping::after {
+/* Don't shimmer or fade active-timer widgets */
+.widgets-grid.stale .widget.active-timer::after {
   display: none;
 }
-.widgets-grid.stale .widget.active-timer > .widget-content,
-.widgets-grid.stale .widget.sleeping > .widget-content {
+.widgets-grid.stale .widget.active-timer > .widget-content {
   opacity: 1;
 }
 
