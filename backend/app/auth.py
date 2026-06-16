@@ -22,17 +22,16 @@ def verify_token(token: str) -> dict:
 
     try:
         # Supabase uses HS256 with audience "authenticated".
-        # Validate the issuer too when the Supabase project URL is configured.
-        decode_kwargs = {}
-        if settings.supabase_url:
-            decode_kwargs["issuer"] = f"{settings.supabase_url.rstrip('/')}/auth/v1"
-
+        # NOTE: the issuer is intentionally NOT validated. Auth and data can live
+        # in different Supabase projects (split setup), so the token issuer (auth
+        # project) differs from SUPABASE_URL (data/storage project). Per-project
+        # JWT secrets already prevent tokens from one project validating against
+        # another, so signature + audience are sufficient.
         claims = jwt.decode(
             token,
             settings.supabase_jwt_secret,
             algorithms=["HS256"],
             audience="authenticated",
-            **decode_kwargs,
         )
 
         return claims

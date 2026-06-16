@@ -32,7 +32,8 @@ env:
 
 jobs:
   deploy-preview:
-    if: github.actor != 'dependabot[bot]'
+    # AWS preview env disabled (AWS account suspended). Set repo var DEPLOY_AWS=true to re-enable.
+    if: github.actor != 'dependabot[bot]' && vars.DEPLOY_AWS == 'true'
     name: Deploy Preview
     runs-on: ubuntu-latest
     timeout-minutes: 10

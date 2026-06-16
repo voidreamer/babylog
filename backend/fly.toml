@@ -14,7 +14,9 @@
 # use "yul" (Montreal).
 
 app = "heybub-api"
-primary_region = "iad"
+# Supabase Postgres is in ca-central-1 (aws-1-ca-central-1.pooler.supabase.com);
+# co-locate the API there so DB round-trips stay fast once cold starts are gone.
+primary_region = "yul"
 
 [build]
   dockerfile = "Dockerfile"
