@@ -190,8 +190,6 @@ jobs:
           echo "s3_bucket=$(terraform output -raw s3_bucket_name)" >> $GITHUB_OUTPUT
           echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
           echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
-          echo "preview_cf_id=$(terraform output -raw preview_cloudfront_id 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
-          echo "preview_cf_domain=$(terraform output -raw preview_cloudfront_domain 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
 
       # ----- Backend Deploy -----
       - name: Set up Python
@@ -308,9 +306,3 @@ jobs:
           echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Frontend:** https://app.heybub.app" >> $GITHUB_STEP_SUMMARY
           echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ steps.tf-outputs.outputs.preview_cf_id }}" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Preview Infrastructure" >> $GITHUB_STEP_SUMMARY
-            echo "**CloudFront ID:** \`${{ steps.tf-outputs.outputs.preview_cf_id }}\` (set as PREVIEW_CLOUDFRONT_ID secret)" >> $GITHUB_STEP_SUMMARY
-            echo "**CloudFront Domain:** ${{ steps.tf-outputs.outputs.preview_cf_domain }} (CNAME previews.heybub.app)" >> $GITHUB_STEP_SUMMARY
-          fi
