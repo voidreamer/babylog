@@ -31,6 +31,7 @@ import { motion } from 'framer-motion';
 import { Baby, WifiOff, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { calculateAgeInMonths } from '../utils/ageUtils';
+import { buildWidgetData, updateWidgetData, reloadWidgetTimelines } from '../utils/widgetBridge';
 
 type ModalType = 'feeding'|'diaper'|'sleep'|'pumping'|'potty'|'tummy'|'bath'|'supplement'|'solid'|null;
 
@@ -185,6 +186,10 @@ export default function Dashboard() {
             setUpcoming(upcomingItems);
             try { localStorage.setItem('heybub_upcoming', JSON.stringify(upcomingItems)); } catch { /* quota */ }
             warmOfflineCache(selectedBaby.id);
+
+            // Keep native widget data in sync (iOS WidgetKit / Android Glance)
+            const widgetData = buildWidgetData(selectedBaby.name, selectedBaby.id, dashboardData);
+            updateWidgetData(widgetData).then(() => reloadWidgetTimelines()).catch(() => {});
         } catch (error) {
             console.error('Failed to load dashboard:', error);
             // Only toast on initial load when we have no data at all
