@@ -1,6 +1,26 @@
-# Huckle CI/CD Pipeline
-# Runs tests, then deploys infrastructure and code to AWS
-# - main branch -> production environment
+# HeyBub CI/CD Pipeline
+#
+# Tests, then on push to main deploys:
+#   - Backend  -> Oracle Cloud VM  (api.heybub.app, served via Cloudflare Tunnel)
+#   - Frontend -> Cloudflare Pages (app.heybub.app)
+#   - AWS (Terraform + Lambda + S3 + CloudFront) -> OPTIONAL, runs ONLY when the
+#     repo variable DEPLOY_AWS == 'true'. Kept intact so it can be re-enabled on a
+#     future AWS account; off by default so a push never touches AWS.
+#
+# Required GitHub SECRETS (Settings -> Secrets and variables -> Actions -> Secrets):
+#   Backend (Oracle):  ORACLE_SSH_KEY  (private key that auths as opc@ the VM), DATABASE_URL
+#   Frontend (Pages):  CLOUDFLARE_API_TOKEN  (Pages: Edit),
+#                      VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY  (the AUTH project),
+#                      VITE_SENTRY_DSN, VITE_MIXPANEL_TOKEN, VITE_ELEVENLABS_API_KEY, VITE_DEEPGRAM_API_KEY
+#   Notify:            TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+#   AWS (only if DEPLOY_AWS=true): AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SUPABASE_JWT_SECRET,
+#                      ADMIN_API_KEY, ACM_CERTIFICATE_ARN, ALERT_EMAIL, SENTRY_DSN, GROQ_API_KEY
+#
+# Required GitHub VARIABLES (Settings -> Secrets and variables -> Actions -> Variables):
+#   ORACLE_HOST              VM public IP (e.g. 132.145.109.74)
+#   CLOUDFLARE_ACCOUNT_ID    Cloudflare account id
+#   CLOUDFLARE_PAGES_PROJECT (optional) Pages project name, defaults to 'heybub'
+#   DEPLOY_AWS               set to 'true' to re-enable the AWS deploy path (default: off)
 
 name: CI/CD Pipeline
 
@@ -9,7 +29,6 @@ on:
     branches: [main]
     paths-ignore:
       - '**/package-lock.json'
-      - '**/requirements.txt'
       - '.github/dependabot.yml'
   pull_request:
     branches: [main]
@@ -22,10 +41,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  AWS_REGION: ca-central-1
   PYTHON_VERSION: "3.11"
   NODE_VERSION: "22"
-  TF_VERSION: "1.14.8"
 
 jobs:
   # ============================================
@@ -121,14 +138,136 @@ jobs:
         run: ls -lh dist/
 
   # ============================================
-  # Deploy to Production (on main branch)
+  # Deploy backend -> Oracle Cloud VM
   # ============================================
-  deploy-production:
-    name: Deploy to Production
+  deploy-backend:
+    name: Deploy backend (Oracle)
     needs: [test-backend, test-frontend]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "DATABASE_URL not set — skipping migrations"; exit 0; fi
+          cd backend
+          pip install -r requirements.txt -q
+          alembic upgrade head
+
+      - name: Deploy code to the VM and restart the service
+        env:
+          ORACLE_HOST: ${{ vars.ORACLE_HOST }}
+          ORACLE_SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+        run: |
+          test -n "$ORACLE_HOST" || { echo "::error::ORACLE_HOST variable not set"; exit 1; }
+          mkdir -p ~/.ssh
+          printf '%s\n' "$ORACLE_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$ORACLE_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          # Sync code; preserve VM-only paths (venv, uv-managed python, .env with secrets)
+          rsync -az --delete \
+            --exclude '.venv' --exclude '.uv-python' --exclude '__pycache__' \
+            --exclude '*.pyc' --exclude '.pytest_cache' --exclude 'tests' --exclude '.env' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            backend/ opc@"$ORACLE_HOST":/opt/heybub/
+          # Install deps, relabel for SELinux, restart, health-check on the box
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new opc@"$ORACLE_HOST" '
+            set -e
+            export PATH="$HOME/.local/bin:$PATH"
+            cd /opt/heybub
+            uv pip install --python .venv/bin/python -r requirements.txt
+            sudo chcon -R -t bin_t /opt/heybub/.venv/bin /opt/heybub/.uv-python 2>/dev/null || true
+            sudo systemctl restart heybub-api
+            for i in $(seq 1 20); do curl -fsS -m5 http://127.0.0.1:8080/health >/dev/null 2>&1 && break; sleep 2; done
+            systemctl is-active --quiet heybub-api || { sudo journalctl -u heybub-api -n 25 --no-pager; exit 1; }
+            echo "heybub-api restarted and healthy"
+          '
+
+      - name: Health check (public API)
+        run: |
+          CODE=000
+          for i in $(seq 1 10); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" https://api.heybub.app/health || echo 000)
+            [ "$CODE" = "200" ] && { echo "✅ api.heybub.app healthy"; exit 0; }
+            sleep 3
+          done
+          echo "::error::API health check failed (last HTTP $CODE)"; exit 1
+
+  # ============================================
+  # Deploy frontend -> Cloudflare Pages
+  # ============================================
+  deploy-frontend:
+    name: Deploy frontend (Cloudflare Pages)
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: https://api.heybub.app
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_MIXPANEL_TOKEN: ${{ secrets.VITE_MIXPANEL_TOKEN }}
+          VITE_ELEVENLABS_API_KEY: ${{ secrets.VITE_ELEVENLABS_API_KEY }}
+          VITE_DEEPGRAM_API_KEY: ${{ secrets.VITE_DEEPGRAM_API_KEY }}
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd frontend
+          npx wrangler pages deploy dist \
+            --project-name "${{ vars.CLOUDFLARE_PAGES_PROJECT || 'heybub' }}" \
+            --branch main --commit-dirty=true
+
+      - name: Health check (frontend)
+        run: |
+          sleep 10
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" https://app.heybub.app || echo 000)
+          [ "$CODE" = "200" ] && echo "✅ app.heybub.app healthy" || { echo "::error::Frontend health $CODE"; exit 1; }
+
+  # ============================================
+  # Deploy to AWS — OPTIONAL (only when repo var DEPLOY_AWS == 'true')
+  # Kept for re-enabling on a future AWS account; never runs by default.
+  # ============================================
+  deploy-aws:
+    name: Deploy to AWS (optional)
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_AWS == 'true'
+    environment: production
+    env:
+      AWS_REGION: ca-central-1
+      TF_VERSION: "1.14.8"
 
     steps:
       - name: Checkout code
@@ -141,7 +280,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # ----- Terraform Infrastructure -----
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -151,21 +289,6 @@ jobs:
       - name: Terraform Init
         working-directory: infra
         run: terraform init -backend-config="key=prod/terraform.tfstate"
-
-      - name: Terraform Plan
-        working-directory: infra
-        env:
-          TF_VAR_environment: prod
-          TF_VAR_database_url: ${{ secrets.DATABASE_URL }}
-          TF_VAR_supabase_jwt_secret: ${{ secrets.SUPABASE_JWT_SECRET }}
-          TF_VAR_admin_api_key: ${{ secrets.ADMIN_API_KEY }}
-          TF_VAR_custom_domain: app.heybub.app
-          TF_VAR_acm_certificate_arn: ${{ secrets.ACM_CERTIFICATE_ARN }}
-          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
-          TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
-          TF_VAR_sentry_dsn: ${{ secrets.SENTRY_DSN }}
-          TF_VAR_groq_api_key: ${{ secrets.GROQ_API_KEY }}
-        run: terraform plan -out=tfplan
 
       - name: Terraform Apply
         working-directory: infra
@@ -180,7 +303,9 @@ jobs:
           TF_VAR_budget_alert_email: ${{ secrets.ALERT_EMAIL }}
           TF_VAR_sentry_dsn: ${{ secrets.SENTRY_DSN }}
           TF_VAR_groq_api_key: ${{ secrets.GROQ_API_KEY }}
-        run: terraform apply -auto-approve tfplan
+        run: |
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
 
       - name: Get Terraform outputs
         id: tf-outputs
@@ -190,10 +315,7 @@ jobs:
           echo "s3_bucket=$(terraform output -raw s3_bucket_name)" >> $GITHUB_OUTPUT
           echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
           echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
-          echo "preview_cf_id=$(terraform output -raw preview_cloudfront_id 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
-          echo "preview_cf_domain=$(terraform output -raw preview_cloudfront_domain 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
 
-      # ----- Backend Deploy -----
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -208,28 +330,14 @@ jobs:
           cp alembic.ini package/
           cd package && zip -r ../lambda.zip . -q
 
-      - name: Run database migrations
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL secret not set - skipping migrations"
-            exit 0
-          fi
-          cd backend
-          pip install -r requirements.txt -q
-          alembic upgrade head
-
       - name: Deploy backend to Lambda
         run: |
           aws lambda update-function-code \
             --function-name ${{ steps.tf-outputs.outputs.lambda_name }} \
-            --zip-file fileb://backend/lambda.zip \
-            --no-cli-pager
+            --zip-file fileb://backend/lambda.zip --no-cli-pager
           aws lambda wait function-updated \
             --function-name ${{ steps.tf-outputs.outputs.lambda_name }}
 
-      # ----- Frontend Deploy -----
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -237,7 +345,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Build frontend
+      - name: Build & deploy frontend to S3/CloudFront
         env:
           VITE_API_URL: ${{ steps.tf-outputs.outputs.api_url }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -247,70 +355,27 @@ jobs:
           VITE_ELEVENLABS_API_KEY: ${{ secrets.VITE_ELEVENLABS_API_KEY }}
           VITE_DEEPGRAM_API_KEY: ${{ secrets.VITE_DEEPGRAM_API_KEY }}
         run: |
-          cd frontend
-          npm ci
-          npm run build
-
-      - name: Deploy frontend to S3
-        run: |
-          aws s3 sync frontend/dist/ s3://${{ steps.tf-outputs.outputs.s3_bucket }}/ \
-            --delete \
-            --no-cli-pager
-
-      - name: Invalidate CloudFront cache
-        run: |
+          cd frontend && npm ci && npm run build
+          aws s3 sync dist/ s3://${{ steps.tf-outputs.outputs.s3_bucket }}/ --delete --no-cli-pager
           aws cloudfront create-invalidation \
-            --distribution-id ${{ steps.tf-outputs.outputs.cloudfront_id }} \
-            --paths "/*" \
-            --no-cli-pager
+            --distribution-id ${{ steps.tf-outputs.outputs.cloudfront_id }} --paths "/*" --no-cli-pager
 
-      # ----- Post-Deploy Health Check -----
-      - name: Health check (frontend)
+  # ============================================
+  # Notify (Telegram)
+  # ============================================
+  notify:
+    name: Notify
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Telegram notification
         run: |
-          echo "Waiting 30s for CloudFront invalidation..."
-          sleep 30
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://app.heybub.app)
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "❌ Health check failed! HTTP $HTTP_CODE"
-            echo "🔄 Triggering rollback..."
-            exit 1
+          if [ "${{ needs.deploy-backend.result }}" = "success" ] && [ "${{ needs.deploy-frontend.result }}" = "success" ]; then
+            TEXT="🚀 <b>HeyBub</b> deployed to <b>PRODUCTION</b> (Oracle + Cloudflare)%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A🔗 https://app.heybub.app"
+          else
+            TEXT="🔥 <b>HeyBub</b> PRODUCTION deploy <b>FAILED</b>%0A%0Abackend=${{ needs.deploy-backend.result }} frontend=${{ needs.deploy-frontend.result }}%0A🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
-          echo "✅ Frontend health check passed (HTTP $HTTP_CODE)"
-
-      - name: Health check (API)
-        run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.tf-outputs.outputs.api_url }}/health 2>/dev/null || echo "000")
-          echo "API health check: HTTP $HTTP_CODE"
-
-      # ----- Notifications -----
-      - name: Notify deploy success
-        if: success()
-        run: |
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d parse_mode=HTML \
-            -d text="🚀 <b>HeyBub Tracker</b> deployed to <b>PRODUCTION</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A📝 ${{ github.event.head_commit.message }}%0A🔗 https://app.heybub.app" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d parse_mode=HTML -d text="$TEXT" \
             --no-progress-meter > /dev/null || true
-
-      - name: Notify deploy failure
-        if: failure()
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d parse_mode=HTML \
-            -d text="🔥 <b>HeyBub Tracker</b> PRODUCTION deploy <b>FAILED</b>%0A%0A📦 <code>${{ github.sha }}</code>%0A👤 ${{ github.actor }}%0A🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --no-progress-meter > /dev/null || true
-
-      - name: Output deployment info
-        run: |
-          echo "## Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Backend:** ${{ steps.tf-outputs.outputs.lambda_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Frontend:** https://app.heybub.app" >> $GITHUB_STEP_SUMMARY
-          echo "**API:** ${{ steps.tf-outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ steps.tf-outputs.outputs.preview_cf_id }}" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Preview Infrastructure" >> $GITHUB_STEP_SUMMARY
-            echo "**CloudFront ID:** \`${{ steps.tf-outputs.outputs.preview_cf_id }}\` (set as PREVIEW_CLOUDFRONT_ID secret)" >> $GITHUB_STEP_SUMMARY
-            echo "**CloudFront Domain:** ${{ steps.tf-outputs.outputs.preview_cf_domain }} (CNAME previews.heybub.app)" >> $GITHUB_STEP_SUMMARY
-          fi

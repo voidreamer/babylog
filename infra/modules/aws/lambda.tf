@@ -37,24 +37,24 @@ resource "aws_lambda_function" "api" {
   # 1024 MB buys a ~4x larger CPU slice; cold starts drop from multiple
   # seconds to around one. At this app's request volume the cost difference
   # is cents. Stopgap until the API moves to a persistent server.
-  memory_size   = 1024
+  memory_size = 1024
 
   filename         = data.archive_file.lambda_placeholder.output_path
   source_code_hash = data.archive_file.lambda_placeholder.output_base64sha256
 
   environment {
     variables = {
-      DATABASE_URL        = var.database_url
-      ENVIRONMENT         = var.environment
-      SUPABASE_JWT_SECRET = var.supabase_jwt_secret
-      CORS_ORIGINS           = var.cors_origins
-      ADMIN_API_KEY          = var.admin_api_key
-      STRIPE_SECRET_KEY      = var.stripe_secret_key
-      STRIPE_WEBHOOK_SECRET  = var.stripe_webhook_secret
-      STRIPE_PRICE_MONTHLY   = var.stripe_price_monthly
-      STRIPE_PRICE_YEARLY    = var.stripe_price_yearly
-      SENTRY_DSN             = var.sentry_dsn
-      GROQ_API_KEY           = var.groq_api_key
+      DATABASE_URL          = var.database_url
+      ENVIRONMENT           = var.environment
+      SUPABASE_JWT_SECRET   = var.supabase_jwt_secret
+      CORS_ORIGINS          = var.cors_origins
+      ADMIN_API_KEY         = var.admin_api_key
+      STRIPE_SECRET_KEY     = var.stripe_secret_key
+      STRIPE_WEBHOOK_SECRET = var.stripe_webhook_secret
+      STRIPE_PRICE_MONTHLY  = var.stripe_price_monthly
+      STRIPE_PRICE_YEARLY   = var.stripe_price_yearly
+      SENTRY_DSN            = var.sentry_dsn
+      GROQ_API_KEY          = var.groq_api_key
     }
   }
 }

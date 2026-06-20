@@ -15,3 +15,20 @@ supabase_jwt_secret = "your-jwt-secret-here"
 
 # Admin API key for protected endpoints
 admin_api_key = ""
+
+# ============================================================================
+# Oracle Cloud — the live production host (Always-Free Ampere A1).
+# Auth comes from the API-key profile in ~/.oci/config (default: HEYBUB);
+# tenancy/compartment/region default to the heybub tenancy in variables.tf.
+# ============================================================================
+# oci_config_profile = "HEYBUB"
+# oci_region         = "ca-toronto-1"
+# ssh_public_key     = "ssh-ed25519 AAAA... you@host"   # injected into the opc user
+# oci_ocpus          = 2     # Always-Free Ampere pool allows up to 4
+# oci_memory_gb      = 16    # ...and up to 24 GB total
+
+# ============================================================================
+# AWS — dormant by default (free tier ended; stack preserved for DR / a fresh
+# account). Flip to true ONLY against a clean AWS account, then `terraform apply`.
+# ============================================================================
+# enable_aws = false
