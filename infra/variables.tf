@@ -99,3 +99,76 @@ variable "babyhub_cloudfront_arn" {
   type        = string
   default     = ""
 }
+
+# ============================================================================
+# Toggle: AWS infra is dormant by default (production moved to Oracle Cloud)
+# ============================================================================
+variable "enable_aws" {
+  description = "Provision the AWS module (Lambda/S3/CloudFront/IAM/budgets). Off by default; the app runs on Oracle Cloud. Set true to rebuild on a fresh AWS account."
+  type        = bool
+  default     = false
+}
+
+# ============================================================================
+# Oracle Cloud (primary API host)
+# ============================================================================
+variable "oci_config_profile" {
+  description = "Profile in ~/.oci/config used to authenticate (API key)."
+  type        = string
+  default     = "HEYBUB"
+}
+variable "oci_region" {
+  type    = string
+  default = "ca-toronto-1"
+}
+variable "oci_tenancy_ocid" {
+  type    = string
+  default = "ocid1.tenancy.oc1..aaaaaaaaoidpevgnu74on5qx2i7kex4ea52262q42eqywrkqdbljogasquvq"
+}
+variable "oci_compartment_ocid" {
+  description = "Compartment for the VM + network (defaults to the root tenancy)."
+  type        = string
+  default     = "ocid1.tenancy.oc1..aaaaaaaaoidpevgnu74on5qx2i7kex4ea52262q42eqywrkqdbljogasquvq"
+}
+variable "oci_availability_domain" {
+  description = "AD for the instance; empty = first AD in the region."
+  type        = string
+  default     = ""
+}
+variable "oci_instance_shape" {
+  type    = string
+  default = "VM.Standard.A1.Flex"
+}
+variable "oci_ocpus" {
+  description = "OCPUs (Always Free Ampere pool: up to 4)."
+  type        = number
+  default     = 2
+}
+variable "oci_memory_gb" {
+  description = "Memory in GB (Always Free Ampere pool: up to 24)."
+  type        = number
+  default     = 16
+}
+variable "ssh_public_key" {
+  description = "SSH public key injected into the instance (opc user)."
+  type        = string
+  default     = ""
+}
+
+# AWS pass-through vars (declared here at root because main.tf forwards them to
+# the aws module; their in-module twins live in monitoring.tf / budget.tf).
+variable "alert_email" {
+  description = "Email for CloudWatch alarm notifications"
+  type        = string
+  default     = ""
+}
+variable "budget_limit_usd" {
+  description = "Monthly AWS budget limit in USD"
+  type        = string
+  default     = "10"
+}
+variable "budget_alert_email" {
+  description = "Email to notify when AWS budget thresholds are hit"
+  type        = string
+  default     = ""
+}

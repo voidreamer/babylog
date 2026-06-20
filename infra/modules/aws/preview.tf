@@ -25,6 +25,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "previews_lifecycle" {
     id     = "auto-expire-stale-previews"
     status = "Enabled"
 
+    # Empty filter = apply to every object in the bucket (required by the
+    # provider; without it the rule is ambiguous and errors on newer versions).
+    filter {}
+
     # Safety net: auto-delete objects older than 30 days
     # in case cleanup workflow misses something
     expiration {
@@ -110,8 +114,8 @@ resource "aws_cloudfront_distribution" "previews" {
 
     # Short TTL — previews update frequently
     min_ttl     = 0
-    default_ttl = 300   # 5 min
-    max_ttl     = 3600  # 1 hour
+    default_ttl = 300  # 5 min
+    max_ttl     = 3600 # 1 hour
 
     forwarded_values {
       query_string = false
