@@ -5,7 +5,7 @@ Accepts a transcript + baby context, returns a structured action
 or a clarification question for conversational flow.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -25,6 +25,54 @@ router = APIRouter(prefix="/voice", tags=["voice"])
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama-3.3-70b-versatile"
+
+# Timeout budget: a status question makes two sequential Groq calls; together
+# they must land under the frontend's 15s request abort (frontend/src/api/client.ts).
+GROQ_PARSE_TIMEOUT = 8.0
+GROQ_STATUS_TIMEOUT = 6.0
+
+# Shared client so back-to-back calls (parse → status answer) reuse the same
+# TLS connection. Module-level survives warm Lambda invocations.
+_groq_client: httpx.AsyncClient | None = None
+
+
+def _get_groq_client() -> httpx.AsyncClient:
+    global _groq_client
+    if _groq_client is None or _groq_client.is_closed:
+        _groq_client = httpx.AsyncClient()
+    return _groq_client
+
+
+async def _call_groq(
+    api_key: str,
+    messages: list[dict],
+    *,
+    tools: list[dict] | None = None,
+    temperature: float = 0.1,
+    max_tokens: int = 200,
+    timeout: float = GROQ_PARSE_TIMEOUT,
+) -> dict:
+    """Single home for the Groq chat-completions call (URL/model/auth/timeout)."""
+    payload: dict = {
+        "model": GROQ_MODEL,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    if tools is not None:
+        payload["tools"] = tools
+        payload["tool_choice"] = "auto"
+    resp = await _get_groq_client().post(
+        GROQ_API_URL,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=timeout,
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 
 # -- Request / Response schemas --
@@ -285,6 +333,21 @@ TOOLS = [
 ]
 
 
+# Actions whose minutes_ago the server resolves into a concrete `time` param.
+# Sleep tools are deliberately absent: retroactive sleep would fight the
+# active-sleep auto-correct guard.
+POINT_IN_TIME_ACTIONS = {
+    "createFeeding",
+    "createDiaper",
+    "createPumping",
+    "createTummyTime",
+    "createBath",
+    "createSupplement",
+    "createSolid",
+    "createPotty",
+}
+
+
 def _build_baby_context(db: Session, baby: Baby) -> str:
     """Build a natural language context string about the baby's current state."""
     now = datetime.now(UTC).replace(tzinfo=None)
@@ -372,7 +435,13 @@ RULES:
 - Respond warmly — this is for tired parents"""
 
 
-async def _generate_status_answer(api_key: str, question: str, context: str) -> str:
+async def _generate_status_answer(
+    api_key: str,
+    question: str,
+    query: str | None,
+    history: list[dict] | None,
+    context: str,
+) -> str:
     """Answer a status question in natural language (second, tool-less LLM pass).
 
     The old behavior returned the raw context dump ("Baby: Mila. Currently
@@ -380,37 +449,34 @@ async def _generate_status_answer(api_key: str, question: str, context: str) -> 
     that dump if the call fails, so status questions never hard-error.
     """
     fallback = context.replace("\n", ". ")
+    messages: list[dict] = [
+        {
+            "role": "system",
+            "content": (
+                "You are HeyBub, a warm baby-tracking assistant talking to a "
+                "tired parent. Answer their question in 1-3 short sentences "
+                "using ONLY this data — never invent numbers or events. "
+                "Respond in the same language as the question.\n\n"
+                f"{context}"
+            ),
+        },
+    ]
+    # Prior turns give follow-ups ("and yesterday?") their referent.
+    if history:
+        messages.extend(history[-10:])
+    user_content = question
+    if query and query.strip() and query.strip().lower() != question.strip().lower():
+        # The tool-calling pass already distilled the question with history in
+        # view — pass its reading along.
+        user_content = f"{question}\n(interpreted as: {query})"
+    messages.append({"role": "user", "content": user_content})
+
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.post(
-                GROQ_API_URL,
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": GROQ_MODEL,
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": (
-                                "You are HeyBub, a warm baby-tracking assistant talking to a "
-                                "tired parent. Answer their question in 1-3 short sentences "
-                                "using ONLY this data — never invent numbers or events. "
-                                "Respond in the same language as the question.\n\n"
-                                f"{context}"
-                            ),
-                        },
-                        {"role": "user", "content": question},
-                    ],
-                    "temperature": 0.3,
-                    "max_tokens": 150,
-                },
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            content = (data["choices"][0]["message"].get("content") or "").strip()
-            return content or fallback
+        data = await _call_groq(
+            api_key, messages, temperature=0.3, max_tokens=150, timeout=GROQ_STATUS_TIMEOUT
+        )
+        content = (data["choices"][0]["message"].get("content") or "").strip()
+        return content or fallback
     except Exception:
         logger.warning("Status answer generation failed; falling back to raw context")
         return fallback
@@ -445,23 +511,7 @@ async def parse_voice_command(
 
     # Call Groq
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.post(
-                GROQ_API_URL,
-                headers={
-                    "Authorization": f"Bearer {settings.groq_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": GROQ_MODEL,
-                    "messages": messages,
-                    "tools": TOOLS,
-                    "tool_choice": "auto",
-                    "temperature": 0.1,
-                    "max_tokens": 200,
-                },
-            )
-            resp.raise_for_status()
+        data = await _call_groq(settings.groq_api_key, messages, tools=TOOLS)
     except httpx.TimeoutException:
         logger.warning("Groq API timeout for voice parse")
         raise HTTPException(504, "Voice parsing timed out")
@@ -472,32 +522,16 @@ async def parse_voice_command(
         if "tool_use_failed" in error_body:
             logger.info("Retrying without tools due to tool_use_failed")
             try:
-                async with httpx.AsyncClient(timeout=10) as client2:
-                    resp = await client2.post(
-                        GROQ_API_URL,
-                        headers={
-                            "Authorization": f"Bearer {settings.groq_api_key}",
-                            "Content-Type": "application/json",
-                        },
-                        json={
-                            "model": GROQ_MODEL,
-                            "messages": messages,
-                            "temperature": 0.1,
-                            "max_tokens": 200,
-                        },
-                    )
-                    resp.raise_for_status()
-                    data = resp.json()
-                    content = data["choices"][0]["message"].get("content", "")
-                    return VoiceParseResponse(
-                        type="clarification",
-                        question=content or "Could you say that again?",
-                    )
+                retry_data = await _call_groq(settings.groq_api_key, messages)
+                content = retry_data["choices"][0]["message"].get("content", "")
+                return VoiceParseResponse(
+                    type="clarification",
+                    question=content or "Could you say that again?",
+                )
             except Exception:
                 pass
         raise HTTPException(502, "Voice parsing service error")
 
-    data = resp.json()
     choice = data["choices"][0]
     message = choice["message"]
 
@@ -524,6 +558,21 @@ async def parse_voice_command(
             logger.warning("LLM said endSleep but baby is not sleeping — correcting to startSleep")
             fn_name = "startSleep"
 
+        # Resolve minutes_ago into a concrete timestamp here — the server owns
+        # "now". The value is popped for every action so a hallucinated
+        # minutes_ago on the sleep tools (whose schemas don't declare it, but
+        # nothing forces the LLM to comply) can never back-date a session.
+        raw_minutes = fn_args.pop("minutes_ago", None)
+        if fn_name in POINT_IN_TIME_ACTIONS and raw_minutes is not None:
+            try:
+                minutes = int(raw_minutes)
+            except (TypeError, ValueError):
+                minutes = 0
+            minutes = max(0, min(minutes, 24 * 60))
+            if minutes:
+                resolved = datetime.now(UTC) - timedelta(minutes=minutes)
+                fn_args["time"] = resolved.isoformat().replace("+00:00", "Z")
+
         logger.info(
             "Voice parsed: %s(%s) from '%s'",
             fn_name,
@@ -544,7 +593,11 @@ async def parse_voice_command(
 
         if fn_name == "getStatus":
             status_text = await _generate_status_answer(
-                settings.groq_api_key, body.transcript, context
+                settings.groq_api_key,
+                body.transcript,
+                fn_args.get("query"),
+                body.conversation_history,
+                context,
             )
             return VoiceParseResponse(
                 type="status_response",

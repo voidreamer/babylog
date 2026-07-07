@@ -4,6 +4,7 @@ Tests for the voice/Bubsense parse endpoint.
 The Groq call itself is mocked — these cover the tool schema the LLM sees,
 the params passthrough (createPotty, minutes_ago), and confirmation text.
 """
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 import httpx
@@ -119,7 +120,16 @@ class TestParseEndpoint:
         assert data["params"] == {"result": "success", "potty_type": "pee"}
         assert "potty" in data["confirmation_text"]
 
-    def test_minutes_ago_passthrough(
+    def _parse(self, client, auth_headers, baby_id, transcript):
+        resp = client.post(
+            "/voice/parse",
+            json={"transcript": transcript, "baby_id": baby_id},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 200
+        return resp.json()
+
+    def test_minutes_ago_resolved_to_time(
         self, client, auth_headers, sample_baby_data, monkeypatch
     ):
         baby_id = self._create_baby(client, auth_headers, sample_baby_data)
@@ -129,15 +139,47 @@ class TestParseEndpoint:
             '{"type": "bottle", "amount_ml": 120, "minutes_ago": 20}',
         )
 
-        resp = client.post(
-            "/voice/parse",
-            json={"transcript": "120ml bottle 20 minutes ago", "baby_id": baby_id},
-            headers=auth_headers,
-        )
-        assert resp.status_code == 200
-        data = resp.json()
+        data = self._parse(client, auth_headers, baby_id, "120ml bottle 20 minutes ago")
         assert data["type"] == "action"
         assert data["action"] == "createFeeding"
-        # The client back-dates the timestamp from minutes_ago; the server
-        # passes it through untouched.
-        assert data["params"]["minutes_ago"] == 20
+        # The server owns "now": minutes_ago is resolved into a concrete
+        # timestamp and never reaches the client.
+        assert "minutes_ago" not in data["params"]
+        resolved = datetime.fromisoformat(data["params"]["time"].replace("Z", "+00:00"))
+        expected = datetime.now(UTC) - timedelta(minutes=20)
+        assert abs((resolved - expected).total_seconds()) < 60
+
+    def test_minutes_ago_string_is_coerced(
+        self, client, auth_headers, sample_baby_data, monkeypatch
+    ):
+        baby_id = self._create_baby(client, auth_headers, sample_baby_data)
+        _mock_groq(monkeypatch, "createDiaper", '{"type": "pee", "minutes_ago": "45"}')
+
+        data = self._parse(client, auth_headers, baby_id, "wet diaper 45 min ago")
+        resolved = datetime.fromisoformat(data["params"]["time"].replace("Z", "+00:00"))
+        expected = datetime.now(UTC) - timedelta(minutes=45)
+        assert abs((resolved - expected).total_seconds()) < 60
+
+    def test_minutes_ago_clamped_to_24h(
+        self, client, auth_headers, sample_baby_data, monkeypatch
+    ):
+        baby_id = self._create_baby(client, auth_headers, sample_baby_data)
+        _mock_groq(monkeypatch, "createBath", '{"minutes_ago": 999999}')
+
+        data = self._parse(client, auth_headers, baby_id, "bath ages ago")
+        resolved = datetime.fromisoformat(data["params"]["time"].replace("Z", "+00:00"))
+        expected = datetime.now(UTC) - timedelta(hours=24)
+        assert abs((resolved - expected).total_seconds()) < 60
+
+    def test_minutes_ago_ignored_on_start_sleep(
+        self, client, auth_headers, sample_baby_data, monkeypatch
+    ):
+        baby_id = self._create_baby(client, auth_headers, sample_baby_data)
+        # Sleep tools don't declare minutes_ago, but nothing forces the LLM to
+        # comply — a hallucinated value must never back-date a session.
+        _mock_groq(monkeypatch, "startSleep", '{"minutes_ago": 30}')
+
+        data = self._parse(client, auth_headers, baby_id, "she fell asleep 30 min ago")
+        assert data["action"] == "startSleep"
+        assert "minutes_ago" not in data["params"]
+        assert "time" not in data["params"]

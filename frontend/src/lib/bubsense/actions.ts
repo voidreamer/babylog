@@ -4,17 +4,22 @@ import { api } from '../../api/client';
 /**
  * Execute a parsed Bubsense action against the REST API.
  *
- * The LLM may set `minutes_ago` on point-in-time events ("120ml 20 min ago");
- * it's translated into a back-dated timestamp here and never sent to the API.
+ * Retroactive logging ("120ml 20 min ago") arrives as a server-resolved
+ * `time` in params — the server owns "now", coerces/clamps the LLM's
+ * minutes_ago, and never emits it for sleep tools. The minutes_ago handling
+ * below is a defensive fallback for responses from older backends only.
  */
 export async function executeBubsenseAction(
   babyId: number,
   action: string,
   params: Record<string, any>,
 ): Promise<void> {
-  const { minutes_ago, ...rest } = params;
-  const minutesAgo = typeof minutes_ago === 'number' && minutes_ago > 0 ? minutes_ago : 0;
-  const time = new Date(Date.now() - minutesAgo * 60_000).toISOString();
+  const { minutes_ago, time: resolvedTime, ...rest } = params;
+  const legacyMinutes = Math.max(0, Number(minutes_ago) || 0);
+  const time =
+    typeof resolvedTime === 'string' && resolvedTime
+      ? resolvedTime
+      : new Date(Date.now() - legacyMinutes * 60_000).toISOString();
 
   switch (action) {
     case 'createFeeding':
