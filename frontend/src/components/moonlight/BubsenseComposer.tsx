@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -75,18 +76,23 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
       };
     }, []);
 
+    // Callbacks read the current text from inputRef (a controlled textarea's
+    // .value mirrors state) instead of closing over `input`, so none of them —
+    // nor the imperative handle — are rebuilt per keystroke.
+    const currentText = useCallback(() => (inputRef.current?.value ?? '').trim(), []);
+
     const toggleDictation = useCallback(() => {
       hapticSelection();
       if (dictation.state === 'listening') {
         void dictation.stop();
       } else {
-        dictationBaseRef.current = input.trim();
+        dictationBaseRef.current = currentText();
         void dictation.start();
       }
-    }, [dictation, input]);
+    }, [currentText, dictation]);
 
     const send = useCallback(async () => {
-      const text = input.trim();
+      const text = currentText();
       // Mirror the send button's disabled conditions — Enter must not bypass
       // the offline guard.
       if (!text || bubsense.status === 'sending' || !online) return;
@@ -100,7 +106,7 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
       // Parse failed — give the parent their words back instead of making
       // them retype (only if they haven't started typing something new).
       if (result?.type === 'error') setInput((current) => current || text);
-    }, [bubsense, dictation, input, online]);
+    }, [bubsense, currentText, dictation, online]);
 
     useImperativeHandle(
       ref,
@@ -108,12 +114,12 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
         focus: () => inputRef.current?.focus(),
         startDictation: () => {
           if (dictation.state !== 'listening') {
-            dictationBaseRef.current = input.trim();
+            dictationBaseRef.current = currentText();
             void dictation.start();
           }
         },
       }),
-      [dictation, input],
+      [currentText, dictation],
     );
 
     const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -320,4 +326,6 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
   },
 );
 
-export default BubsenseComposer;
+// Memoized: Home re-renders every 30s from the dashboard poll (elapsed-time
+// headlines need it); the composer subtree shouldn't come along for the ride.
+export default memo(BubsenseComposer);

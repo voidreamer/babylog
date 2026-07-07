@@ -244,6 +244,10 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
     }
   }, [cacheKey]);
 
+  // Last payload written to the cache — skips the synchronous
+  // localStorage.setItem on the 30s polls where nothing changed.
+  const lastSavedRef = useRef('');
+
   const load = useCallback(async () => {
     if (!selectedBaby) return;
     try {
@@ -253,7 +257,11 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
       setDashboard(data);
       setHasLoadedFresh(true);
       try {
-        localStorage.setItem(cacheKey, JSON.stringify(data));
+        const serialized = JSON.stringify(data);
+        if (serialized !== lastSavedRef.current) {
+          localStorage.setItem(cacheKey, serialized);
+          lastSavedRef.current = serialized;
+        }
       } catch {
         /* quota */
       }
@@ -620,8 +628,13 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
   const ribbon = useMemo(() => buildRibbonEvents(dashboard), [dashboard]);
 
   // Bubsense composer — the orb is its front door: tap focuses the input,
-  // long-press focuses it and opens the mic.
+  // long-press focuses it and opens the mic. Stable callback so the memoized
+  // composer isn't re-rendered by the 30s dashboard poll.
   const composerRef = useRef<BubsenseComposerHandle | null>(null);
+  const expandChat = useCallback((handoff: BubsenseHandoff) => {
+    setChatHandoff(handoff);
+    setShowBubsense(true);
+  }, []);
   const lastFeed = dashboard?.last_feeding?.time
     ? minutesSince(dashboard.last_feeding.time)
     : null;
@@ -895,11 +908,8 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
         <BubsenseComposer
           ref={composerRef}
           babyId={selectedBaby.id}
-          onActionExecuted={() => void load()}
-          onExpand={(handoff) => {
-            setChatHandoff(handoff);
-            setShowBubsense(true);
-          }}
+          onActionExecuted={load}
+          onExpand={expandChat}
         />
       )}
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Capacitor } from '@capacitor/core';
 
@@ -194,5 +194,10 @@ export function useDictation({ onTranscript }: UseDictationOptions) {
     };
   }, [isNative, removeNativeListeners]);
 
-  return { state, isSupported, start, stop };
+  // Stable identity unless state actually changes — consumers hang callbacks
+  // and imperative handles off this object.
+  return useMemo(
+    () => ({ state, isSupported, start, stop }),
+    [state, isSupported, start, stop],
+  );
 }
