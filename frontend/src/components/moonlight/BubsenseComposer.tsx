@@ -84,7 +84,9 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
 
     const send = useCallback(async () => {
       const text = input.trim();
-      if (!text || bubsense.status === 'sending') return;
+      // Mirror the send button's disabled conditions — Enter must not bypass
+      // the offline guard.
+      if (!text || bubsense.status === 'sending' || !online) return;
       if (dictation.state === 'listening') void dictation.stop();
       setInput('');
       setReplyDismissed(false);
@@ -92,7 +94,10 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
       if (result?.type === 'action') hapticNotification();
       // A clarification means Bubsense is waiting on the parent's answer.
       if (result?.type === 'clarification') inputRef.current?.focus();
-    }, [bubsense, dictation, input]);
+      // Parse failed — give the parent their words back instead of making
+      // them retype (only if they haven't started typing something new).
+      if (result?.type === 'error') setInput((current) => current || text);
+    }, [bubsense, dictation, input, online]);
 
     useImperativeHandle(
       ref,
