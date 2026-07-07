@@ -47,6 +47,21 @@ class VoiceParseResponse(BaseModel):
 
 # -- Tool definitions for the LLM --
 
+# Shared param for point-in-time events so parents can log retroactively
+# ("120ml 20 minutes ago"). The client back-dates the timestamp; the value
+# never reaches the REST API. Deliberately NOT on start/endSleep — retroactive
+# sleep interacts badly with the active-sleep auto-correct guard.
+_MINUTES_AGO_PARAM = {
+    "minutes_ago": {
+        "type": "integer",
+        "description": (
+            "How many minutes ago this happened, if the user said so "
+            "('20 minutes ago', 'an hour ago' = 60). Omit when it just happened. "
+            "NEVER invent this."
+        ),
+    },
+}
+
 TOOLS = [
     {
         "type": "function",
@@ -68,6 +83,7 @@ TOOLS = [
                         "type": "integer",
                         "description": "Duration in minutes (for breast feeding only).",
                     },
+                    **_MINUTES_AGO_PARAM,
                 },
                 "required": ["type"],
             },
@@ -97,6 +113,7 @@ TOOLS = [
                             "orange",
                         ],
                     },
+                    **_MINUTES_AGO_PARAM,
                 },
                 "required": ["type"],
             },
@@ -138,6 +155,7 @@ TOOLS = [
                 "properties": {
                     "amount_ml": {"type": "integer"},
                     "duration_minutes": {"type": "integer"},
+                    **_MINUTES_AGO_PARAM,
                 },
             },
         },
@@ -151,6 +169,7 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "duration_minutes": {"type": "integer"},
+                    **_MINUTES_AGO_PARAM,
                 },
                 "required": ["duration_minutes"],
             },
@@ -165,6 +184,7 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "notes": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
                 },
             },
         },
@@ -183,6 +203,7 @@ TOOLS = [
                         "description": "Supplement type. Use vitamin_d for 'vitamin d/D3'.",
                     },
                     "dosage": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
                 },
                 "required": ["name"],
             },
@@ -198,8 +219,32 @@ TOOLS = [
                 "properties": {
                     "food_name": {"type": "string"},
                     "reaction": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
                 },
                 "required": ["food_name"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "createPotty",
+            "description": "Log a potty-training event (potty seat/toilet, NOT a diaper change).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "result": {
+                        "type": "string",
+                        "enum": ["success", "accident", "attempt"],
+                    },
+                    "potty_type": {
+                        "type": "string",
+                        "enum": ["pee", "poo", "both"],
+                    },
+                    "notes": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
+                },
+                "required": ["result"],
             },
         },
     },
@@ -315,13 +360,60 @@ RULES:
 - Convert ounces to ml: 1oz = 30ml (e.g., "4 ounces" → amount_ml=120)
 - "wet diaper" or "pee" → createDiaper(type="pee")
 - "dirty diaper" or "poo" or "poop" → createDiaper(type="poo")
+- "potty", "used the potty", "potty accident" → createPotty (potty training, not a diaper)
 - "formula" alone → createFeeding(type="formula") — do NOT add amount unless user said one
+- If the user says it happened in the past ("20 minutes ago", "an hour ago"), set minutes_ago. NEVER invent it.
 - ONLY include parameters the user explicitly mentioned. Do NOT invent amounts, durations, or notes.
 - If the command is unclear or missing critical info, use askClarification()
 - For status questions ("how's the day", "when did she eat"), use getStatus()
 - Use the baby's name in any clarification or status response
 - Keep responses SHORT (under 15 words for confirmations)
+- Respond in the same language as the user's message
 - Respond warmly — this is for tired parents"""
+
+
+async def _generate_status_answer(api_key: str, question: str, context: str) -> str:
+    """Answer a status question in natural language (second, tool-less LLM pass).
+
+    The old behavior returned the raw context dump ("Baby: Mila. Currently
+    AWAKE. ...") — robotic and ignores what was actually asked. Falls back to
+    that dump if the call fails, so status questions never hard-error.
+    """
+    fallback = context.replace("\n", ". ")
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(
+                GROQ_API_URL,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": GROQ_MODEL,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are HeyBub, a warm baby-tracking assistant talking to a "
+                                "tired parent. Answer their question in 1-3 short sentences "
+                                "using ONLY this data — never invent numbers or events. "
+                                "Respond in the same language as the question.\n\n"
+                                f"{context}"
+                            ),
+                        },
+                        {"role": "user", "content": question},
+                    ],
+                    "temperature": 0.3,
+                    "max_tokens": 150,
+                },
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            content = (data["choices"][0]["message"].get("content") or "").strip()
+            return content or fallback
+    except Exception:
+        logger.warning("Status answer generation failed; falling back to raw context")
+        return fallback
 
 
 @router.post("/parse", response_model=VoiceParseResponse)
@@ -451,12 +543,14 @@ async def parse_voice_command(
             )
 
         if fn_name == "getStatus":
-            # Build a status response from current context
+            status_text = await _generate_status_answer(
+                settings.groq_api_key, body.transcript, context
+            )
             return VoiceParseResponse(
                 type="status_response",
                 action="getStatus",
                 params=fn_args,
-                status_text=context.replace("\n", ". "),
+                status_text=status_text,
             )
 
         # Generate confirmation text
@@ -526,5 +620,8 @@ def _generate_confirmation(action: str, params: dict, baby_name: str) -> str:
 
     if action == "createSolid":
         return f"Logged {params.get('food_name', 'solid food')} for {name}"
+
+    if action == "createPotty":
+        return f"Logged potty {params.get('result', 'attempt')} for {name}"
 
     return "Done"

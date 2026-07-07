@@ -10,20 +10,14 @@ import { checkRateLimit, recordAttempt, getTimeUntilReset, clearRateLimit } from
 import { hapticSelection } from './utils/haptics';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
-import TimelineCalendar from './components/TimelineCalendar';
-import Onboarding from './components/Onboarding';
-import SpotlightTour from './components/SpotlightTour';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineIndicator from './components/OfflineIndicator';
 import LoadingSpinner from './components/LoadingSpinner';
-import Insights from './components/Insights';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { TabBar as MoonlightTabBar } from './components/moonlight/TabBar';
 import type { TabKey as MoonlightTabKey } from './components/moonlight/types';
-import { useMoonlightFlag } from './components/moonlight/useMoonlightFlag';
 
 // Lazy load routes for bundle splitting
-const Dashboard = lazy(() => import('./components/Dashboard'));
 const MoonlightHome = lazy(() => import('./components/moonlight/Home'));
 const MoonlightOnboarding = lazy(() => import('./components/moonlight/Onboarding'));
 const MoonlightTimeline = lazy(() => import('./components/moonlight/Timeline'));
@@ -32,10 +26,7 @@ const MoonlightInsights = lazy(() => import('./components/moonlight/Insights'));
 const Login = lazy(() => import('./pages/Login'));
 const Callback = lazy(() => import('./pages/Callback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-const Health = lazy(() => import('./pages/Health'));
-const Moonlight = lazy(() => import('./moonlight/Moonlight'));
-const MoonlightPreview = lazy(() => import('./components/moonlight/Preview'));
-import { Home, Clock, Activity, PieChart, Settings as SettingsIcon, LogOut, ChevronRight, User, FileText, Moon, Sun, Star, Sparkles, Download, Shield, Globe, Crown, Bell, Baby, TrendingUp, Mail, Trash2, AlertTriangle } from 'lucide-react';
+import { LogOut, ChevronRight, User, FileText, Moon, Download, Shield, Globe, Crown, Bell, TrendingUp, Mail, Trash2, AlertTriangle } from 'lucide-react';
 import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission, rescheduleAll, cancelAll, checkAndShowWebReminders, sendTestNotification, type NotificationSettings } from './utils/notificationScheduler';
 import UpgradeDialog from './components/UpgradeDialog';
 import CaregiverModal from './components/CaregiverModal';
@@ -44,8 +35,8 @@ import BabyAvatar from './components/BabyAvatar';
 import { Toaster, toast } from 'sonner';
 
 // SettingsPage component
-interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; onRefreshBabies: () => void; onReplayOnboarding: () => void; }
-function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl, onRefreshBabies, onReplayOnboarding }: SettingsPageProps) {
+interface SettingsPageProps { user: any; isDark: boolean; toggleTheme: () => void; isPremium: boolean; hasStripeSubscription: boolean; exportLoading: boolean; handleExportCsv: () => void; babies: any[]; setShowPrivacyPolicy: (v: boolean) => void; logout: () => void; onUpgrade: () => void; onManage: () => void; setActiveTab: (tab: string) => void; hubUrl: string; onRefreshBabies: () => void; }
+function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscription, exportLoading, handleExportCsv, babies, setShowPrivacyPolicy, logout, onUpgrade, onManage, setActiveTab, hubUrl, onRefreshBabies }: SettingsPageProps) {
     const { t } = useTranslation(['settings', 'common']);
     const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings);
     const [unitsSystem, setUnitsSystem] = useState(() => localStorage.getItem('heybub-units') || 'metric');
@@ -370,21 +361,6 @@ function SettingsPage({ user, isDark, toggleTheme, isPremium, hasStripeSubscript
                     <ChevronRight size={18} className="settings-arrow" />
                 </a>
                 <button
-                    className="settings-row"
-                    onClick={onReplayOnboarding}
-                >
-                    <div className="settings-row-left">
-                        <div className="settings-icon-box butter">
-                            <Sparkles size={16} />
-                        </div>
-                        <div>
-                            <div className="settings-row-label">{t('settings:support.replayOnboarding', { defaultValue: 'Replay Welcome Tour' })}</div>
-                            <div className="settings-row-desc">{t('settings:support.replayOnboardingDesc', { defaultValue: 'See the app introduction again' })}</div>
-                        </div>
-                    </div>
-                    <ChevronRight size={18} className="settings-arrow" />
-                </button>
-                <button
                     className="settings-row settings-row-danger"
                     onClick={logout}
                 >
@@ -498,13 +474,11 @@ function buildHubUrl(session: { access_token?: string; refresh_token?: string } 
 
 function MainApp() {
     const { t, i18n } = useTranslation('common');
-    const moonlight = useMoonlightFlag();
     const { user, session, logout } = useAuth();
     const { babies, loading: babiesLoading, refresh } = useBaby();
     const { online, syncing, pendingCount, syncPendingChanges } = useOfflineSync();
     const [activeTab, setActiveTab] = useState('home');
     const [showOnboarding, setShowOnboarding] = useState(false);
-    const [showTour, setShowTour] = useState(false);
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [showMedQuickLog, setShowMedQuickLog] = useState(false);
@@ -512,7 +486,6 @@ function MainApp() {
     const [onboardingState, setOnboardingState] = useState({
         loaded: false,
         onboardingCompleted: localStorage.getItem('heybub-onboarding-completed') === 'true',
-        tourCompleted: localStorage.getItem('heybub-tour-completed') === 'true',
     });
 
     const [isPremium, setIsPremium] = useState(() => {
@@ -569,29 +542,6 @@ function MainApp() {
         }
     }, [theme]);
 
-    // Moonlight UI flag — opt-in via localStorage('ui.moonlight') = 'on'.
-    // When enabled, applies data-ui="moonlight" on <html> so scoped tokens activate.
-    useEffect(() => {
-        const apply = () => {
-            const on = localStorage.getItem('ui.moonlight') === 'on';
-            if (on) {
-                document.documentElement.setAttribute('data-ui', 'moonlight');
-            } else {
-                document.documentElement.removeAttribute('data-ui');
-            }
-        };
-        apply();
-        const onStorage = (e: StorageEvent) => {
-            if (e.key === 'ui.moonlight') apply();
-        };
-        window.addEventListener('storage', onStorage);
-        window.addEventListener('moonlight-flag-change', apply);
-        return () => {
-            window.removeEventListener('storage', onStorage);
-            window.removeEventListener('moonlight-flag-change', apply);
-        };
-    }, []);
-
     useEffect(() => {
         const checkPremiumStatus = async () => {
             if (!user || !online) return;
@@ -634,11 +584,9 @@ function MainApp() {
                 const state = {
                     loaded: true,
                     onboardingCompleted: info.onboarding_completed,
-                    tourCompleted: info.tour_completed,
                 };
                 setOnboardingState(state);
                 if (info.onboarding_completed) localStorage.setItem('heybub-onboarding-completed', 'true');
-                if (info.tour_completed) localStorage.setItem('heybub-tour-completed', 'true');
             } catch {
                 setOnboardingState(prev => ({ ...prev, loaded: true }));
             }
@@ -732,18 +680,10 @@ function MainApp() {
         const onComplete = () => {
             setShowOnboarding(false);
             setOnboardingState(prev => ({ ...prev, onboardingCompleted: true }));
-            // Give Dashboard time to mount before starting tour
-            if (!onboardingState.tourCompleted) {
-                setTimeout(() => setShowTour(true), 600);
-            }
         };
         return (
             <Suspense fallback={<LoadingSpinner />}>
-                {moonlight ? (
-                    <MoonlightOnboarding onComplete={onComplete} />
-                ) : (
-                    <Onboarding onComplete={onComplete} />
-                )}
+                <MoonlightOnboarding onComplete={onComplete} />
             </Suspense>
         );
     }
@@ -782,17 +722,6 @@ function MainApp() {
 
     return (
         <div className="app-container">
-            {/* Floating dark mode toggle, legacy dashboard only. Moonlight
-                keeps Home clean; the toggle lives in Settings there. */}
-            {activeTab === 'home' && !moonlight && (
-                <button
-                    className="theme-toggle-float"
-                    onClick={toggleTheme}
-                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                >
-                    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-                </button>
-            )}
             <OfflineIndicator
                 online={online}
                 syncing={syncing}
@@ -803,62 +732,49 @@ function MainApp() {
                 {activeTab === 'home' && (
                     <ErrorBoundary level="page">
                         <Suspense fallback={<LoadingSpinner />}>
-                            {moonlight ? <MoonlightHome isPremium={isPremium} /> : <Dashboard />}
+                            <MoonlightHome isPremium={isPremium} />
                         </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'timeline' && (
                     <ErrorBoundary level="page">
                         <Suspense fallback={<LoadingSpinner />}>
-                            {moonlight ? <MoonlightTimeline /> : <TimelineCalendar />}
+                            <MoonlightTimeline />
                         </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'health' && (
                     <ErrorBoundary level="page">
                         <Suspense fallback={<LoadingSpinner />}>
-                            {moonlight ? (
-                                <MoonlightHealth
-                                    showMedQuickLog={showMedQuickLog}
-                                    onDismissMedQuickLog={() => setShowMedQuickLog(false)}
-                                />
-                            ) : (
-                                <Health
-                                    showMedQuickLog={showMedQuickLog}
-                                    onDismissMedQuickLog={() => setShowMedQuickLog(false)}
-                                />
-                            )}
+                            <MoonlightHealth
+                                showMedQuickLog={showMedQuickLog}
+                                onDismissMedQuickLog={() => setShowMedQuickLog(false)}
+                            />
                         </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'insights' && (
                     <ErrorBoundary level="page">
                         <Suspense fallback={<LoadingSpinner />}>
-                            {moonlight ? (
-                                <MoonlightInsights isPremium={isPremium} />
-                            ) : (
-                                <Insights isPremium={isPremium} />
-                            )}
+                            <MoonlightInsights isPremium={isPremium} />
                         </Suspense>
                     </ErrorBoundary>
                 )}
                 {activeTab === 'settings' && (
-                    <div style={moonlight ? { padding: '16px 20px 8px' } : undefined}>
-                        {moonlight && (
-                            <div style={{ color: 'var(--ml-text)', marginBottom: 16 }}>
-                                <h1
-                                    style={{
-                                        fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
-                                        fontWeight: 400,
-                                        fontSize: 24,
-                                        margin: '2px 0 0',
-                                        letterSpacing: -0.4,
-                                    }}
-                                >
-                                    {t('settings:title', { defaultValue: 'Settings' })}
-                                </h1>
-                            </div>
-                        )}
+                    <div style={{ padding: '16px 20px 8px' }}>
+                        <div style={{ color: 'var(--ml-text)', marginBottom: 16 }}>
+                            <h1
+                                style={{
+                                    fontFamily: 'Geist Variable, Geist, -apple-system, sans-serif',
+                                    fontWeight: 400,
+                                    fontSize: 24,
+                                    margin: '2px 0 0',
+                                    letterSpacing: -0.4,
+                                }}
+                            >
+                                {t('settings:title', { defaultValue: 'Settings' })}
+                            </h1>
+                        </div>
                         <SettingsPage
                             user={user}
                             isDark={theme === 'dark'}
@@ -875,70 +791,25 @@ function MainApp() {
                             setActiveTab={setActiveTab}
                             hubUrl={buildHubUrl(session, theme)}
                             onRefreshBabies={refresh}
-                            onReplayOnboarding={() => {
-                                setShowTour(true);
-                                setActiveTab('home');
-                            }}
                         />
                     </div>
                 )}
             </main>
 
             {showUpgradeDialog && <UpgradeDialog onClose={() => setShowUpgradeDialog(false)} />}
-            {showTour && <SpotlightTour onComplete={() => setShowTour(false)} onNavigateTab={setActiveTab} />}
 
             {/* Bottom Navigation */}
-            {moonlight ? (
-                <MoonlightTabBar
-                    active={activeTab as MoonlightTabKey}
-                    onChange={(k) => { hapticSelection(); setActiveTab(k); }}
-                    labels={{
-                        home: t('nav.home'),
-                        timeline: t('nav.timeline'),
-                        health: t('nav.health'),
-                        insights: t('nav.insights'),
-                        settings: t('nav.settings'),
-                    }}
-                />
-            ) : (
-                <nav className="bottom-nav">
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-                        onClick={() => { hapticSelection(); setActiveTab('home'); }}
-                    >
-                        <Home size={22} />
-                        <span>{t('nav.home')}</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
-                        onClick={() => { hapticSelection(); setActiveTab('timeline'); }}
-                    >
-                        <Clock size={22} />
-                        <span>{t('nav.timeline')}</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'health' ? 'active' : ''}`}
-                        onClick={() => { hapticSelection(); setActiveTab('health'); }}
-                    >
-                        <Activity size={22} />
-                        <span>{t('nav.health')}</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'insights' ? 'active' : ''}`}
-                        onClick={() => { hapticSelection(); setActiveTab('insights'); }}
-                    >
-                        <PieChart size={22} />
-                        <span>{t('nav.insights')}</span>
-                    </button>
-                    <button
-                        className={`bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                        onClick={() => { hapticSelection(); setActiveTab('settings'); }}
-                    >
-                        <SettingsIcon size={22} />
-                        <span>{t('nav.settings')}</span>
-                    </button>
-                </nav>
-            )}
+            <MoonlightTabBar
+                active={activeTab as MoonlightTabKey}
+                onChange={(k) => { hapticSelection(); setActiveTab(k); }}
+                labels={{
+                    home: t('nav.home'),
+                    timeline: t('nav.timeline'),
+                    health: t('nav.health'),
+                    insights: t('nav.insights'),
+                    settings: t('nav.settings'),
+                }}
+            />
         </div>
     );
 }
@@ -971,9 +842,8 @@ function App() {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/callback" element={<Callback />} />
-                        <Route path="/health-check" element={<Health />} />
-                        <Route path="/moonlight" element={<Moonlight />} />
-                        <Route path="/moonlight/preview" element={<MoonlightPreview />} />
+                        {/* Lightweight uptime-probe target — keep the route, no page behind it. */}
+                        <Route path="/health-check" element={<div>ok</div>} />
                         <Route
                             path="/*"
                             element={

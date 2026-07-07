@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Lock } from 'lucide-react';
-import { api } from '../../api/client';
+import { useBubsense } from '../../hooks/useBubsense';
 import { Icon } from './Icon';
-
-type Message = { role: 'user' | 'assistant'; content: string };
 
 type Props = {
   babyId: number;
@@ -18,9 +15,10 @@ type Props = {
 /**
  * Ask-Bubsense chat modal.
  *
- * Reuses the /voice/parse endpoint (same LLM the voice assistant talks to) for
- * text-based Q&A. Multi-turn: conversation history is passed with each request
- * so follow-ups ("and what about this week?") keep context.
+ * Runs on the shared useBubsense hook (provider abstraction: on-device LLM
+ * when available, server otherwise). Multi-turn: the hook passes conversation
+ * history with each request so follow-ups ("and what about this week?") keep
+ * context.
  *
  * Premium gated — free users see an upgrade prompt. This is the first place in
  * the moonlight UI that's explicitly paywalled.
@@ -34,8 +32,8 @@ export default function BubsenseChat({
 }: Props) {
   const { t } = useTranslation(['common', 'dashboard']);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [sending, setSending] = useState(false);
+  const { messages, status, send: sendMessage } = useBubsense(babyId, onCommandExecuted);
+  const sending = status === 'sending';
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -55,52 +53,8 @@ export default function BubsenseChat({
     const text = input.trim();
     if (!text || sending) return;
     setInput('');
-    const nextMessages: Message[] = [...messages, { role: 'user', content: text }];
-    setMessages(nextMessages);
-    setSending(true);
-    try {
-      const result: any = await api.request('/voice/parse', {
-        method: 'POST',
-        body: JSON.stringify({
-          transcript: text,
-          baby_id: babyId,
-          conversation_history: nextMessages.slice(0, -1),
-        }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-      let reply = '';
-      if (result?.type === 'clarification' && result.question) {
-        reply = result.question;
-      } else if (result?.type === 'status_response' && result.status_text) {
-        reply = result.status_text;
-      } else if (result?.type === 'action') {
-        reply =
-          result.confirmation_text ||
-          t('dashboard:toast_savedSuccessfully', { defaultValue: 'Saved.' });
-        // Action was persisted server-side — refresh dashboard on the caller.
-        onCommandExecuted?.();
-      } else if (result?.confirmation_text) {
-        reply = result.confirmation_text;
-      } else {
-        reply = t('common:voice.errorGeneric', {
-          defaultValue: 'I\u2019m not sure what to say there.',
-        });
-      }
-      setMessages((m) => [...m, { role: 'assistant', content: reply }]);
-    } catch (e: any) {
-      setMessages((m) => [
-        ...m,
-        {
-          role: 'assistant',
-          content:
-            e?.message ||
-            t('common:voice.errorGeneric', { defaultValue: 'Something went wrong.' }),
-        },
-      ]);
-    } finally {
-      setSending(false);
-    }
-  }, [babyId, input, messages, onCommandExecuted, sending, t]);
+    await sendMessage(text);
+  }, [input, sendMessage, sending]);
 
   const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
