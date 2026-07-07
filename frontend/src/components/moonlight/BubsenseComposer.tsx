@@ -8,7 +8,7 @@ import {
   type CSSProperties,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBubsense } from '../../hooks/useBubsense';
+import { useBubsense, type BubsenseHandoff } from '../../hooks/useBubsense';
 import { useDictation } from '../../hooks/useDictation';
 import { hapticNotification, hapticSelection } from '../../utils/haptics';
 import { Icon } from './Icon';
@@ -22,8 +22,11 @@ type Props = {
   babyId: number;
   /** Refresh the dashboard after Bubsense logs something. */
   onActionExecuted: () => void;
-  /** Open the full Bubsense chat (premium Q&A). */
-  onExpand: () => void;
+  /**
+   * Open the full Bubsense chat (premium Q&A), carrying the composer's
+   * conversation so an in-progress clarification isn't lost.
+   */
+  onExpand: (handoff: BubsenseHandoff) => void;
 };
 
 /**
@@ -164,7 +167,7 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
             type="button"
             onClick={() => {
               hapticSelection();
-              onExpand();
+              onExpand(bubsense.snapshot());
             }}
             aria-label={t('dashboard:bubsense.openChat', {
               defaultValue: 'Open Bubsense chat',

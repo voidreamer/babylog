@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Lock } from 'lucide-react';
-import { useBubsense } from '../../hooks/useBubsense';
+import { useBubsense, type BubsenseHandoff } from '../../hooks/useBubsense';
 import { Icon } from './Icon';
 
 type Props = {
@@ -10,6 +10,8 @@ type Props = {
   onClose: () => void;
   onUpgrade: () => void;
   onCommandExecuted?: () => void;
+  /** Conversation carried over from the Home composer (expand arrow). */
+  initial?: BubsenseHandoff;
 };
 
 /**
@@ -20,6 +22,10 @@ type Props = {
  * history with each request so follow-ups ("and what about this week?") keep
  * context.
  *
+ * This is a Q&A surface, so actions the LLM parses out of a message are
+ * STAGED (confirmActions) and only written after a one-tap confirm — a
+ * misclassified question must not silently create a record.
+ *
  * Premium gated — free users see an upgrade prompt. This is the first place in
  * the moonlight UI that's explicitly paywalled.
  */
@@ -29,10 +35,18 @@ export default function BubsenseChat({
   onClose,
   onUpgrade,
   onCommandExecuted,
+  initial,
 }: Props) {
   const { t } = useTranslation(['common', 'dashboard']);
   const [input, setInput] = useState('');
-  const { messages, status, send: sendMessage } = useBubsense(babyId, onCommandExecuted);
+  const {
+    messages,
+    status,
+    send: sendMessage,
+    pendingAction,
+    confirmPending,
+    dismissPending,
+  } = useBubsense(babyId, onCommandExecuted, { confirmActions: true, initial });
   const sending = status === 'sending';
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -47,7 +61,7 @@ export default function BubsenseChat({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, sending]);
+  }, [messages, sending, pendingAction]);
 
   const send = useCallback(async () => {
     const text = input.trim();
@@ -297,6 +311,67 @@ export default function BubsenseChat({
                   {m.content}
                 </div>
               ))}
+              {pendingAction && !sending && (
+                <div
+                  role="group"
+                  aria-label={t('dashboard:bubsense.confirmLabel', {
+                    defaultValue: 'Confirm logging',
+                  })}
+                  style={{
+                    alignSelf: 'flex-start',
+                    maxWidth: '85%',
+                    padding: '10px 13px',
+                    borderRadius: '16px 16px 16px 4px',
+                    background: 'color-mix(in srgb, var(--ml-accent) 10%, transparent)',
+                    border: '0.5px solid color-mix(in srgb, var(--ml-accent) 40%, var(--ml-line))',
+                    fontSize: 14,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <div style={{ marginBottom: 8 }}>
+                    {t('dashboard:bubsense.confirmPrompt', {
+                      defaultValue: 'That sounds like something to log — {{summary}}?',
+                      summary: pendingAction.summary,
+                    })}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => void confirmPending()}
+                      style={{
+                        padding: '7px 14px',
+                        borderRadius: 999,
+                        border: 'none',
+                        background: 'var(--ml-accent)',
+                        color: '#0a0706',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      {t('dashboard:bubsense.confirmLog', { defaultValue: 'Log it' })}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={dismissPending}
+                      style={{
+                        padding: '7px 14px',
+                        borderRadius: 999,
+                        border: '0.5px solid var(--ml-line)',
+                        background: 'transparent',
+                        color: 'var(--ml-text-2)',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      {t('dashboard:bubsense.confirmDismiss', { defaultValue: 'Dismiss' })}
+                    </button>
+                  </div>
+                </div>
+              )}
               {sending && (
                 <div
                   style={{

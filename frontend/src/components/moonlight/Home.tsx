@@ -18,6 +18,7 @@ import { useBaby } from '../../hooks/useBaby';
 import { api } from '../../api/client';
 import { hapticImpact, hapticNotification, hapticSelection } from '../../utils/haptics';
 import BubsenseComposer, { type BubsenseComposerHandle } from './BubsenseComposer';
+import type { BubsenseHandoff } from '../../hooks/useBubsense';
 import { Orb } from './Orb';
 import { BabyFace } from './BabyFace';
 import { Ribbon } from './Ribbon';
@@ -224,6 +225,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
   const [hasLoadedFresh, setHasLoadedFresh] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKind>(null);
   const [showBubsense, setShowBubsense] = useState(false);
+  const [chatHandoff, setChatHandoff] = useState<BubsenseHandoff | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
   // State initializers only run on mount: re-seed from cache when the
@@ -894,8 +896,8 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
           ref={composerRef}
           babyId={selectedBaby.id}
           onActionExecuted={() => void load()}
-          onExpand={() => {
-            hapticSelection();
+          onExpand={(handoff) => {
+            setChatHandoff(handoff);
             setShowBubsense(true);
           }}
         />
@@ -957,6 +959,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
           <BubsenseChat
             babyId={selectedBaby.id}
             isPremium={isPremium}
+            initial={chatHandoff ?? undefined}
             onClose={() => setShowBubsense(false)}
             onUpgrade={() => setShowUpgrade(true)}
             onCommandExecuted={() => void load()}
