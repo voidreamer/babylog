@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Capacitor } from '@capacitor/core';
+import { LANGUAGES } from '../i18n/languages';
 
 /**
  * Speech-to-text dictation. Emits transcripts to a callback and never acts on
@@ -17,17 +18,23 @@ import { Capacitor } from '@capacitor/core';
  */
 export type DictationState = 'idle' | 'listening' | 'denied' | 'error';
 
-/** i18n language → BCP-47 tag the recognizers expect. */
-const RECOGNITION_LOCALES: Record<string, string> = {
-  en: 'en-US',
-  hi: 'hi-IN',
-  ja: 'ja-JP',
-  ru: 'ru-RU',
-};
+// The recognition tag lives on the language config itself (i18n/languages.ts)
+// so adding a locale can't silently miss dictation.
+const SPEECH_LOCALES = new Map(LANGUAGES.map((l) => [l.code, l.speechLocale]));
 
 function recognitionLocale(language: string): string {
-  if (language.includes('-')) return language; // es-CO, fr-CA, zh-CN
-  return RECOGNITION_LOCALES[language] ?? language;
+  return SPEECH_LOCALES.get(language) ?? language;
+}
+
+// One cached load — start/stop/cleanup all await the same promise instead of
+// hitting the module registry per mic toggle.
+let speechPluginPromise: Promise<
+  typeof import('@capgo/capacitor-speech-recognition')
+> | null = null;
+
+function loadSpeechPlugin() {
+  speechPluginPromise ??= import('@capgo/capacitor-speech-recognition');
+  return speechPluginPromise;
 }
 
 interface UseDictationOptions {
@@ -62,7 +69,7 @@ export function useDictation({ onTranscript }: UseDictationOptions) {
 
     if (isNative) {
       try {
-        const { SpeechRecognition } = await import('@capgo/capacitor-speech-recognition');
+        const { SpeechRecognition } = await loadSpeechPlugin();
 
         const available = await SpeechRecognition.available();
         if (!available.available) {
@@ -165,7 +172,7 @@ export function useDictation({ onTranscript }: UseDictationOptions) {
   const stop = useCallback(async () => {
     if (isNative) {
       try {
-        const { SpeechRecognition } = await import('@capgo/capacitor-speech-recognition');
+        const { SpeechRecognition } = await loadSpeechPlugin();
         await SpeechRecognition.stop();
       } catch {
         /* stopping a stopped recognizer is fine */
@@ -187,7 +194,7 @@ export function useDictation({ onTranscript }: UseDictationOptions) {
       }
       void removeNativeListeners();
       if (isNative) {
-        import('@capgo/capacitor-speech-recognition')
+        loadSpeechPlugin()
           .then(({ SpeechRecognition }) => SpeechRecognition.stop())
           .catch(() => {});
       }

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { useOnline } from './useOnline';
 import { App as CapApp } from '@capacitor/app';
 import { api } from '../api/client';
 import { BabylogBridge } from '../native/babylogBridge';
@@ -53,7 +54,7 @@ interface UseOfflineSyncReturn {
 }
 
 export function useOfflineSync(): UseOfflineSyncReturn {
-    const [online, setOnline] = useState(isOnline());
+    const online = useOnline();
     const [syncing, setSyncing] = useState(false);
     const [pendingCount, setPendingCount] = useState(0);
     const syncInProgress = useRef(false);
@@ -112,12 +113,15 @@ export function useOfflineSync(): UseOfflineSyncReturn {
         }
     }, [syncPendingChanges, updatePendingCount]);
 
+    // Kick a sync on the offline→online transition (connectivity state itself
+    // lives in useOnline).
+    const prevOnline = useRef(online);
     useEffect(() => {
-        const handleOnline = () => { setOnline(true); syncPendingChanges(); };
-        const handleOffline = () => { setOnline(false); };
+        if (online && !prevOnline.current) syncPendingChanges();
+        prevOnline.current = online;
+    }, [online, syncPendingChanges]);
 
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
+    useEffect(() => {
         updatePendingCount();
         cleanupCache().catch(e => { if (isDev) console.error('Cache cleanup failed:', e); });
 
@@ -131,11 +135,9 @@ export function useOfflineSync(): UseOfflineSyncReturn {
         }
 
         return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
             appStateHandle?.remove();
         };
-    }, [syncPendingChanges, updatePendingCount, drainNativeQueue]);
+    }, [updatePendingCount, drainNativeQueue]);
 
     const executeAction = async (action: any) => {
         const { type, endpoint, method, data } = action;

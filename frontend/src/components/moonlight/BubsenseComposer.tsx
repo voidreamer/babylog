@@ -2,7 +2,6 @@ import {
   forwardRef,
   memo,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -11,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useBubsense, type BubsenseHandoff } from '../../hooks/useBubsense';
 import { useDictation } from '../../hooks/useDictation';
+import { useOnline } from '../../hooks/useOnline';
 import { hapticNotification, hapticSelection } from '../../utils/haptics';
 import { Icon } from './Icon';
 
@@ -42,9 +42,7 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
   function BubsenseComposer({ babyId, onActionExecuted, onExpand }, ref) {
     const { t } = useTranslation(['dashboard', 'common']);
     const [input, setInput] = useState('');
-    const [online, setOnline] = useState(() =>
-      typeof navigator === 'undefined' ? true : navigator.onLine,
-    );
+    const online = useOnline();
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     // Text present when the mic opened — partials append to it instead of
     // clobbering what was already typed.
@@ -64,17 +62,6 @@ const BubsenseComposer = forwardRef<BubsenseComposerHandle, Props>(
         if (isFinal) inputRef.current?.focus();
       },
     });
-
-    useEffect(() => {
-      const goOnline = () => setOnline(true);
-      const goOffline = () => setOnline(false);
-      window.addEventListener('online', goOnline);
-      window.addEventListener('offline', goOffline);
-      return () => {
-        window.removeEventListener('online', goOnline);
-        window.removeEventListener('offline', goOffline);
-      };
-    }, []);
 
     // Callbacks read the current text from inputRef (a controlled textarea's
     // .value mirrors state) instead of closing over `input`, so none of them —

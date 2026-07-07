@@ -471,5 +471,25 @@
   },
   "sleepRing": {
     "goal": "goal"
+  },
+  "bubsense": {
+    "composerLabel": "bubsense",
+    "composerPlaceholder": "“120ml 20 min ago”, “wet diaper”, “how’s her day?”",
+    "openChat": "Open Bubsense chat",
+    "orbLabel": "Talk to Bubsense — tap to type, hold to dictate",
+    "offlineHint": "Bubsense needs a connection — the buttons above still log offline.",
+    "askBubsense": "Ask Bubsense",
+    "subtitle": "your private baby expert",
+    "premiumSubtitle": "premium",
+    "empty": "Ask about sleep windows, feed intervals, growth — anything about your baby’s data.",
+    "placeholder": "Ask about your baby…",
+    "lockTitle": "A private baby expert, always on.",
+    "lockBody": "Ask anything about your baby’s patterns, sleep, feedings — Bubsense answers with just your data as context.",
+    "upgradeCta": "Upgrade",
+    "confirmLabel": "Confirm logging",
+    "confirmPrompt": "That sounds like something to log — {{summary}}?",
+    "confirmLog": "Log it",
+    "confirmDismiss": "Dismiss",
+    "notLogged": "Okay — not logged."
   }
 }

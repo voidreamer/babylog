@@ -110,6 +110,19 @@ _MINUTES_AGO_PARAM = {
     },
 }
 
+# Confirmations come from the model so they match the user's language; the
+# hardcoded English _generate_confirmation remains as fallback. Popped from
+# params before they reach the client.
+_CONFIRMATION_PARAM = {
+    "confirmation": {
+        "type": "string",
+        "description": (
+            "REQUIRED: very short (under 12 words) warm confirmation of what "
+            "was logged, in the same language as the user's message."
+        ),
+    },
+}
+
 TOOLS = [
     {
         "type": "function",
@@ -132,6 +145,7 @@ TOOLS = [
                         "description": "Duration in minutes (for breast feeding only).",
                     },
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["type"],
             },
@@ -162,6 +176,7 @@ TOOLS = [
                         ],
                     },
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["type"],
             },
@@ -176,6 +191,7 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "notes": {"type": "string"},
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -189,6 +205,7 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "notes": {"type": "string"},
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -204,6 +221,7 @@ TOOLS = [
                     "amount_ml": {"type": "integer"},
                     "duration_minutes": {"type": "integer"},
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -218,6 +236,7 @@ TOOLS = [
                 "properties": {
                     "duration_minutes": {"type": "integer"},
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["duration_minutes"],
             },
@@ -233,6 +252,7 @@ TOOLS = [
                 "properties": {
                     "notes": {"type": "string"},
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -252,6 +272,7 @@ TOOLS = [
                     },
                     "dosage": {"type": "string"},
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["name"],
             },
@@ -268,6 +289,7 @@ TOOLS = [
                     "food_name": {"type": "string"},
                     "reaction": {"type": "string"},
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["food_name"],
             },
@@ -291,6 +313,7 @@ TOOLS = [
                     },
                     "notes": {"type": "string"},
                     **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["result"],
             },
@@ -431,6 +454,7 @@ RULES:
 - For status questions ("how's the day", "when did she eat"), use getStatus()
 - Use the baby's name in any clarification or status response
 - Keep responses SHORT (under 15 words for confirmations)
+- Every action call MUST include `confirmation` — a very short warm confirmation in the user's language
 - Respond in the same language as the user's message
 - Respond warmly — this is for tired parents"""
 
@@ -549,14 +573,25 @@ async def parse_voice_command(
                 question="Sorry, could you say that again?",
             )
 
+        # The model writes the confirmation so it matches the user's language;
+        # popped here so it never reaches the REST payload.
+        llm_confirmation = str(fn_args.pop("confirmation", "") or "").strip()
+
         # Guard: auto-correct sleep direction if LLM got it wrong
         active_sleep = db.query(Sleep).filter(Sleep.baby_id == body.baby_id, Sleep.end_time.is_(None)).first()
+        sleep_corrected = False
         if fn_name == "startSleep" and active_sleep:
             logger.warning("LLM said startSleep but baby is already sleeping — correcting to endSleep")
             fn_name = "endSleep"
+            sleep_corrected = True
         elif fn_name == "endSleep" and not active_sleep:
             logger.warning("LLM said endSleep but baby is not sleeping — correcting to startSleep")
             fn_name = "startSleep"
+            sleep_corrected = True
+        if sleep_corrected:
+            # The model's confirmation describes the direction it originally
+            # picked — wrong after the correction.
+            llm_confirmation = ""
 
         # Resolve minutes_ago into a concrete timestamp here — the server owns
         # "now". The value is popped for every action so a hallucinated
@@ -606,8 +641,7 @@ async def parse_voice_command(
                 status_text=status_text,
             )
 
-        # Generate confirmation text
-        confirmation = _generate_confirmation(fn_name, fn_args, baby.name)
+        confirmation = llm_confirmation or _generate_confirmation(fn_name, fn_args, baby.name)
 
         return VoiceParseResponse(
             type="action",

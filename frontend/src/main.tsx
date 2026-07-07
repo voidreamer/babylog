@@ -14,9 +14,6 @@ import './index.css'
 import './components/moonlight/moonlight.css'
 import { initAnalytics } from './utils/analytics';
 
-// Moonlight is the app's only UI — its scoped CSS tokens key off this attribute.
-document.documentElement.setAttribute('data-ui', 'moonlight');
-
 // Initialize Sentry + Mixpanel before rendering
 initAnalytics();
 import { Capacitor } from '@capacitor/core';
