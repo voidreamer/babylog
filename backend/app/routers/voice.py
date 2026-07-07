@@ -5,7 +5,7 @@ Accepts a transcript + baby context, returns a structured action
 or a clarification question for conversational flow.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -25,6 +25,54 @@ router = APIRouter(prefix="/voice", tags=["voice"])
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama-3.3-70b-versatile"
+
+# Timeout budget: a status question makes two sequential Groq calls; together
+# they must land under the frontend's 15s request abort (frontend/src/api/client.ts).
+GROQ_PARSE_TIMEOUT = 8.0
+GROQ_STATUS_TIMEOUT = 6.0
+
+# Shared client so back-to-back calls (parse → status answer) reuse the same
+# TLS connection. Module-level survives warm Lambda invocations.
+_groq_client: httpx.AsyncClient | None = None
+
+
+def _get_groq_client() -> httpx.AsyncClient:
+    global _groq_client
+    if _groq_client is None or _groq_client.is_closed:
+        _groq_client = httpx.AsyncClient()
+    return _groq_client
+
+
+async def _call_groq(
+    api_key: str,
+    messages: list[dict],
+    *,
+    tools: list[dict] | None = None,
+    temperature: float = 0.1,
+    max_tokens: int = 200,
+    timeout: float = GROQ_PARSE_TIMEOUT,
+) -> dict:
+    """Single home for the Groq chat-completions call (URL/model/auth/timeout)."""
+    payload: dict = {
+        "model": GROQ_MODEL,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    if tools is not None:
+        payload["tools"] = tools
+        payload["tool_choice"] = "auto"
+    resp = await _get_groq_client().post(
+        GROQ_API_URL,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=timeout,
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 
 # -- Request / Response schemas --
@@ -47,6 +95,34 @@ class VoiceParseResponse(BaseModel):
 
 # -- Tool definitions for the LLM --
 
+# Shared param for point-in-time events so parents can log retroactively
+# ("120ml 20 minutes ago"). The client back-dates the timestamp; the value
+# never reaches the REST API. Deliberately NOT on start/endSleep — retroactive
+# sleep interacts badly with the active-sleep auto-correct guard.
+_MINUTES_AGO_PARAM = {
+    "minutes_ago": {
+        "type": "integer",
+        "description": (
+            "How many minutes ago this happened, if the user said so "
+            "('20 minutes ago', 'an hour ago' = 60). Omit when it just happened. "
+            "NEVER invent this."
+        ),
+    },
+}
+
+# Confirmations come from the model so they match the user's language; the
+# hardcoded English _generate_confirmation remains as fallback. Popped from
+# params before they reach the client.
+_CONFIRMATION_PARAM = {
+    "confirmation": {
+        "type": "string",
+        "description": (
+            "REQUIRED: very short (under 12 words) warm confirmation of what "
+            "was logged, in the same language as the user's message."
+        ),
+    },
+}
+
 TOOLS = [
     {
         "type": "function",
@@ -68,6 +144,8 @@ TOOLS = [
                         "type": "integer",
                         "description": "Duration in minutes (for breast feeding only).",
                     },
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["type"],
             },
@@ -97,6 +175,8 @@ TOOLS = [
                             "orange",
                         ],
                     },
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["type"],
             },
@@ -111,6 +191,7 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "notes": {"type": "string"},
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -124,6 +205,7 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "notes": {"type": "string"},
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -138,6 +220,8 @@ TOOLS = [
                 "properties": {
                     "amount_ml": {"type": "integer"},
                     "duration_minutes": {"type": "integer"},
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -151,6 +235,8 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "duration_minutes": {"type": "integer"},
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["duration_minutes"],
             },
@@ -165,6 +251,8 @@ TOOLS = [
                 "type": "object",
                 "properties": {
                     "notes": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
             },
         },
@@ -183,6 +271,8 @@ TOOLS = [
                         "description": "Supplement type. Use vitamin_d for 'vitamin d/D3'.",
                     },
                     "dosage": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["name"],
             },
@@ -198,8 +288,34 @@ TOOLS = [
                 "properties": {
                     "food_name": {"type": "string"},
                     "reaction": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
                 },
                 "required": ["food_name"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "createPotty",
+            "description": "Log a potty-training event (potty seat/toilet, NOT a diaper change).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "result": {
+                        "type": "string",
+                        "enum": ["success", "accident", "attempt"],
+                    },
+                    "potty_type": {
+                        "type": "string",
+                        "enum": ["pee", "poo", "both"],
+                    },
+                    "notes": {"type": "string"},
+                    **_MINUTES_AGO_PARAM,
+                    **_CONFIRMATION_PARAM,
+                },
+                "required": ["result"],
             },
         },
     },
@@ -238,6 +354,21 @@ TOOLS = [
         },
     },
 ]
+
+
+# Actions whose minutes_ago the server resolves into a concrete `time` param.
+# Sleep tools are deliberately absent: retroactive sleep would fight the
+# active-sleep auto-correct guard.
+POINT_IN_TIME_ACTIONS = {
+    "createFeeding",
+    "createDiaper",
+    "createPumping",
+    "createTummyTime",
+    "createBath",
+    "createSupplement",
+    "createSolid",
+    "createPotty",
+}
 
 
 def _build_baby_context(db: Session, baby: Baby) -> str:
@@ -315,13 +446,64 @@ RULES:
 - Convert ounces to ml: 1oz = 30ml (e.g., "4 ounces" → amount_ml=120)
 - "wet diaper" or "pee" → createDiaper(type="pee")
 - "dirty diaper" or "poo" or "poop" → createDiaper(type="poo")
+- "potty", "used the potty", "potty accident" → createPotty (potty training, not a diaper)
 - "formula" alone → createFeeding(type="formula") — do NOT add amount unless user said one
+- If the user says it happened in the past ("20 minutes ago", "an hour ago"), set minutes_ago. NEVER invent it.
 - ONLY include parameters the user explicitly mentioned. Do NOT invent amounts, durations, or notes.
 - If the command is unclear or missing critical info, use askClarification()
 - For status questions ("how's the day", "when did she eat"), use getStatus()
 - Use the baby's name in any clarification or status response
 - Keep responses SHORT (under 15 words for confirmations)
+- Every action call MUST include `confirmation` — a very short warm confirmation in the user's language
+- Respond in the same language as the user's message
 - Respond warmly — this is for tired parents"""
+
+
+async def _generate_status_answer(
+    api_key: str,
+    question: str,
+    query: str | None,
+    history: list[dict] | None,
+    context: str,
+) -> str:
+    """Answer a status question in natural language (second, tool-less LLM pass).
+
+    The old behavior returned the raw context dump ("Baby: Mila. Currently
+    AWAKE. ...") — robotic and ignores what was actually asked. Falls back to
+    that dump if the call fails, so status questions never hard-error.
+    """
+    fallback = context.replace("\n", ". ")
+    messages: list[dict] = [
+        {
+            "role": "system",
+            "content": (
+                "You are HeyBub, a warm baby-tracking assistant talking to a "
+                "tired parent. Answer their question in 1-3 short sentences "
+                "using ONLY this data — never invent numbers or events. "
+                "Respond in the same language as the question.\n\n"
+                f"{context}"
+            ),
+        },
+    ]
+    # Prior turns give follow-ups ("and yesterday?") their referent.
+    if history:
+        messages.extend(history[-10:])
+    user_content = question
+    if query and query.strip() and query.strip().lower() != question.strip().lower():
+        # The tool-calling pass already distilled the question with history in
+        # view — pass its reading along.
+        user_content = f"{question}\n(interpreted as: {query})"
+    messages.append({"role": "user", "content": user_content})
+
+    try:
+        data = await _call_groq(
+            api_key, messages, temperature=0.3, max_tokens=150, timeout=GROQ_STATUS_TIMEOUT
+        )
+        content = (data["choices"][0]["message"].get("content") or "").strip()
+        return content or fallback
+    except Exception:
+        logger.warning("Status answer generation failed; falling back to raw context")
+        return fallback
 
 
 @router.post("/parse", response_model=VoiceParseResponse)
@@ -353,23 +535,7 @@ async def parse_voice_command(
 
     # Call Groq
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.post(
-                GROQ_API_URL,
-                headers={
-                    "Authorization": f"Bearer {settings.groq_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": GROQ_MODEL,
-                    "messages": messages,
-                    "tools": TOOLS,
-                    "tool_choice": "auto",
-                    "temperature": 0.1,
-                    "max_tokens": 200,
-                },
-            )
-            resp.raise_for_status()
+        data = await _call_groq(settings.groq_api_key, messages, tools=TOOLS)
     except httpx.TimeoutException:
         logger.warning("Groq API timeout for voice parse")
         raise HTTPException(504, "Voice parsing timed out")
@@ -380,32 +546,16 @@ async def parse_voice_command(
         if "tool_use_failed" in error_body:
             logger.info("Retrying without tools due to tool_use_failed")
             try:
-                async with httpx.AsyncClient(timeout=10) as client2:
-                    resp = await client2.post(
-                        GROQ_API_URL,
-                        headers={
-                            "Authorization": f"Bearer {settings.groq_api_key}",
-                            "Content-Type": "application/json",
-                        },
-                        json={
-                            "model": GROQ_MODEL,
-                            "messages": messages,
-                            "temperature": 0.1,
-                            "max_tokens": 200,
-                        },
-                    )
-                    resp.raise_for_status()
-                    data = resp.json()
-                    content = data["choices"][0]["message"].get("content", "")
-                    return VoiceParseResponse(
-                        type="clarification",
-                        question=content or "Could you say that again?",
-                    )
+                retry_data = await _call_groq(settings.groq_api_key, messages)
+                content = retry_data["choices"][0]["message"].get("content", "")
+                return VoiceParseResponse(
+                    type="clarification",
+                    question=content or "Could you say that again?",
+                )
             except Exception:
                 pass
         raise HTTPException(502, "Voice parsing service error")
 
-    data = resp.json()
     choice = data["choices"][0]
     message = choice["message"]
 
@@ -423,14 +573,40 @@ async def parse_voice_command(
                 question="Sorry, could you say that again?",
             )
 
+        # The model writes the confirmation so it matches the user's language;
+        # popped here so it never reaches the REST payload.
+        llm_confirmation = str(fn_args.pop("confirmation", "") or "").strip()
+
         # Guard: auto-correct sleep direction if LLM got it wrong
         active_sleep = db.query(Sleep).filter(Sleep.baby_id == body.baby_id, Sleep.end_time.is_(None)).first()
+        sleep_corrected = False
         if fn_name == "startSleep" and active_sleep:
             logger.warning("LLM said startSleep but baby is already sleeping — correcting to endSleep")
             fn_name = "endSleep"
+            sleep_corrected = True
         elif fn_name == "endSleep" and not active_sleep:
             logger.warning("LLM said endSleep but baby is not sleeping — correcting to startSleep")
             fn_name = "startSleep"
+            sleep_corrected = True
+        if sleep_corrected:
+            # The model's confirmation describes the direction it originally
+            # picked — wrong after the correction.
+            llm_confirmation = ""
+
+        # Resolve minutes_ago into a concrete timestamp here — the server owns
+        # "now". The value is popped for every action so a hallucinated
+        # minutes_ago on the sleep tools (whose schemas don't declare it, but
+        # nothing forces the LLM to comply) can never back-date a session.
+        raw_minutes = fn_args.pop("minutes_ago", None)
+        if fn_name in POINT_IN_TIME_ACTIONS and raw_minutes is not None:
+            try:
+                minutes = int(raw_minutes)
+            except (TypeError, ValueError):
+                minutes = 0
+            minutes = max(0, min(minutes, 24 * 60))
+            if minutes:
+                resolved = datetime.now(UTC) - timedelta(minutes=minutes)
+                fn_args["time"] = resolved.isoformat().replace("+00:00", "Z")
 
         logger.info(
             "Voice parsed: %s(%s) from '%s'",
@@ -451,16 +627,21 @@ async def parse_voice_command(
             )
 
         if fn_name == "getStatus":
-            # Build a status response from current context
+            status_text = await _generate_status_answer(
+                settings.groq_api_key,
+                body.transcript,
+                fn_args.get("query"),
+                body.conversation_history,
+                context,
+            )
             return VoiceParseResponse(
                 type="status_response",
                 action="getStatus",
                 params=fn_args,
-                status_text=context.replace("\n", ". "),
+                status_text=status_text,
             )
 
-        # Generate confirmation text
-        confirmation = _generate_confirmation(fn_name, fn_args, baby.name)
+        confirmation = llm_confirmation or _generate_confirmation(fn_name, fn_args, baby.name)
 
         return VoiceParseResponse(
             type="action",
@@ -526,5 +707,8 @@ def _generate_confirmation(action: str, params: dict, baby_name: str) -> str:
 
     if action == "createSolid":
         return f"Logged {params.get('food_name', 'solid food')} for {name}"
+
+    if action == "createPotty":
+        return f"Logged potty {params.get('result', 'attempt')} for {name}"
 
     return "Done"

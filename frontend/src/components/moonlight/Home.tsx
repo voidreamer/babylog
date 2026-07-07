@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type PointerEvent,
@@ -16,7 +17,8 @@ import { toast } from 'sonner';
 import { useBaby } from '../../hooks/useBaby';
 import { api } from '../../api/client';
 import { hapticImpact, hapticNotification, hapticSelection } from '../../utils/haptics';
-import { useVoiceAssistant } from '../../hooks/useVoiceAssistant';
+import BubsenseComposer, { type BubsenseComposerHandle } from './BubsenseComposer';
+import type { BubsenseHandoff } from '../../hooks/useBubsense';
 import { Orb } from './Orb';
 import { BabyFace } from './BabyFace';
 import { Ribbon } from './Ribbon';
@@ -223,6 +225,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
   const [hasLoadedFresh, setHasLoadedFresh] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKind>(null);
   const [showBubsense, setShowBubsense] = useState(false);
+  const [chatHandoff, setChatHandoff] = useState<BubsenseHandoff | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
   // State initializers only run on mount: re-seed from cache when the
@@ -241,6 +244,10 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
     }
   }, [cacheKey]);
 
+  // Last payload written to the cache — skips the synchronous
+  // localStorage.setItem on the 30s polls where nothing changed.
+  const lastSavedRef = useRef('');
+
   const load = useCallback(async () => {
     if (!selectedBaby) return;
     try {
@@ -250,7 +257,11 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
       setDashboard(data);
       setHasLoadedFresh(true);
       try {
-        localStorage.setItem(cacheKey, JSON.stringify(data));
+        const serialized = JSON.stringify(data);
+        if (serialized !== lastSavedRef.current) {
+          localStorage.setItem(cacheKey, serialized);
+          lastSavedRef.current = serialized;
+        }
       } catch {
         /* quota */
       }
@@ -613,33 +624,17 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
   };
 
   const now = new Date();
-  const derivedOrb = useMemo(() => deriveOrbState(dashboard), [dashboard]);
+  const orb = useMemo(() => deriveOrbState(dashboard), [dashboard]);
   const ribbon = useMemo(() => buildRibbonEvents(dashboard), [dashboard]);
 
-  // Bubsense voice — orb long-press starts listening. Voice state overrides
-  // the orb's mood so the user gets immediate visual feedback while the mic
-  // is open, and so the orb "answers back" on confirmation.
-  const voice = useVoiceAssistant(selectedBaby?.id ?? null, () => {
-    void load();
-  });
-  const voiceActive = voice.state !== 'idle';
-  const orb = useMemo(() => {
-    switch (voice.state) {
-      case 'listening':
-        return { mode: 'alert' as OrbMode, urgency: 0.85 };
-      case 'processing':
-        return { mode: 'alert' as OrbMode, urgency: 0.65 };
-      case 'confirming':
-        return { mode: 'alert' as OrbMode, urgency: 0.5 };
-      case 'executing':
-      case 'speaking':
-        return { mode: 'content' as OrbMode, urgency: 0.4 };
-      case 'error':
-        return { mode: 'hungry' as OrbMode, urgency: 0.55 };
-      default:
-        return derivedOrb;
-    }
-  }, [voice.state, derivedOrb]);
+  // Bubsense composer — the orb is its front door: tap focuses the input,
+  // long-press focuses it and opens the mic. Stable callback so the memoized
+  // composer isn't re-rendered by the 30s dashboard poll.
+  const composerRef = useRef<BubsenseComposerHandle | null>(null);
+  const expandChat = useCallback((handoff: BubsenseHandoff) => {
+    setChatHandoff(handoff);
+    setShowBubsense(true);
+  }, []);
   const lastFeed = dashboard?.last_feeding?.time
     ? minutesSince(dashboard.last_feeding.time)
     : null;
@@ -685,41 +680,32 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
           mode={orb.mode}
           urgency={orb.urgency}
           onLongPress={
-            voice.isSupported && selectedBaby
+            selectedBaby
               ? () => {
                   hapticImpact();
-                  void voice.startListening();
+                  composerRef.current?.focus();
+                  composerRef.current?.startDictation();
                 }
               : undefined
           }
           onPress={
-            voiceActive
-              ? voice.cancel
-              : voice.isSupported && selectedBaby
-                ? () => {
-                    // A bare tap on the orb used to do nothing, a dead zone
-                    // on the most prominent element. Teach the gesture instead.
-                    hapticSelection();
-                    toast(
-                      t('dashboard:moonlight.orbHint', {
-                        defaultValue: 'Hold the orb to talk to Bubsense',
-                      }),
-                    );
-                  }
-                : undefined
+            selectedBaby
+              ? () => {
+                  hapticSelection();
+                  composerRef.current?.focus();
+                }
+              : undefined
           }
-          ariaLabel={
-            voiceActive
-              ? t('common:voice.tapToCancel', { defaultValue: 'Tap to cancel voice' })
-              : t('common:voice.holdToSpeak', { defaultValue: 'Hold to speak' })
-          }
+          ariaLabel={t('dashboard:bubsense.orbLabel', {
+            defaultValue: 'Talk to Bubsense — tap to type, hold to dictate',
+          })}
           iconSrc={
-            !voiceActive && orb.mode === 'sleepy'
+            orb.mode === 'sleepy'
               ? `${import.meta.env.BASE_URL}icons/sleep2.png`
               : undefined
           }
           iconNode={
-            !voiceActive && orb.mode !== 'sleepy' ? (
+            orb.mode !== 'sleepy' ? (
               <div style={{ color: '#2a1f1a', width: '100%', height: '100%' }}>
                 <BabyFace mood={orb.mode as 'calm' | 'content' | 'alert' | 'hungry'} />
               </div>
@@ -728,94 +714,6 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
           iconScale={orb.mode === 'sleepy' ? 0.55 : 0.5}
         />
       </div>
-
-      {/* Voice status card — only rendered while bubsense is active. */}
-      {voiceActive && (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            marginTop: 14,
-            padding: '12px 14px',
-            borderRadius: 16,
-            background: 'var(--ml-surface)',
-            border: '0.5px solid color-mix(in srgb, var(--ml-accent) 35%, var(--ml-line))',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            color: 'var(--ml-text)',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              className="mono"
-              style={{
-                color: 'var(--ml-accent)',
-                fontSize: 9,
-                marginBottom: 4,
-              }}
-            >
-              {voice.state === 'listening'
-                ? t('common:voice.listening', { defaultValue: 'listening' })
-                : voice.state === 'processing'
-                  ? t('common:voice.thinking', { defaultValue: 'thinking' })
-                  : voice.state === 'confirming'
-                    ? t('common:voice.confirming', { defaultValue: 'confirm' })
-                    : voice.state === 'executing'
-                      ? t('common:voice.saving', { defaultValue: 'saving' })
-                      : voice.state === 'speaking'
-                        ? t('common:voice.done', { defaultValue: 'done' })
-                        : t('common:voice.error', { defaultValue: 'error' })}
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                lineHeight: 1.35,
-                color:
-                  voice.state === 'error' ? '#D98571' : 'var(--ml-text)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {voice.state === 'listening'
-                ? voice.transcript ||
-                  t('common:voice.listeningHint', {
-                    defaultValue: 'I\u2019m listening\u2026',
-                  })
-                : voice.state === 'error'
-                  ? voice.error || t('common:voice.errorGeneric', { defaultValue: 'Try again.' })
-                  : voice.displayText || voice.transcript}
-              {voice.state === 'listening' && (
-                <span style={{ marginLeft: 6 }}>
-                  <span className="bub-dot" />
-                  <span className="bub-dot" />
-                  <span className="bub-dot" />
-                </span>
-              )}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={voice.cancel}
-            aria-label={t('common:cancel')}
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 999,
-              border: '0.5px solid var(--ml-line)',
-              background: 'transparent',
-              color: 'var(--ml-text-2)',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: 'inherit',
-            }}
-          >
-            <Icon.Close />
-          </button>
-        </div>
-      )}
 
       {/* Status headline. While asleep, the sleep timer IS the headline;
           that's what a parent glances for; last feed drops to the subline. */}
@@ -1002,53 +900,17 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
       <SectionLabel>{t('dashboard:moonlight.today', { defaultValue: 'today' })}</SectionLabel>
       <Ribbon events={ribbon.events} nowFrac={ribbon.nowFrac} />
 
-      {/* Bubsense entry, below the logging surface on purpose: at 3am the
-          actions come first, the assistant (and its upsell) second. */}
+      {/* Bubsense composer, below the logging surface on purpose: at 3am the
+          one-tap actions come first, free text second. Quick logging and
+          one-shot answers are free; the expand arrow opens the full chat
+          (premium multi-turn Q&A). */}
       {selectedBaby && (
-        <button
-          type="button"
-          onClick={() => {
-            hapticSelection();
-            setShowBubsense(true);
-          }}
-          style={{
-            marginTop: 18,
-            width: '100%',
-            padding: '12px 16px',
-            borderRadius: 16,
-            background: 'linear-gradient(180deg, color-mix(in srgb, var(--ml-accent) 14%, transparent), color-mix(in srgb, var(--ml-accent) 4%, transparent))',
-            border: '0.5px solid color-mix(in srgb, var(--ml-accent) 35%, transparent)',
-            color: 'var(--ml-text)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            textAlign: 'left',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              className="mono"
-              style={{ color: 'var(--ml-accent)', marginBottom: 2 }}
-            >
-              {isPremium
-                ? t('dashboard:bubsense.askBubsense', { defaultValue: 'ask bubsense' })
-                : t('dashboard:bubsense.premium', { defaultValue: 'premium' })}
-            </div>
-            <div style={{ fontSize: 14, lineHeight: 1.3, color: 'var(--ml-text-2)' }}>
-              {isPremium
-                ? t('dashboard:bubsense.promptHint', {
-                    defaultValue: 'Ask anything about your baby.',
-                  })
-                : t('dashboard:bubsense.upgradeHint', {
-                    defaultValue: 'Unlock a private baby expert, always on.',
-                  })}
-            </div>
-          </div>
-          <Icon.Arrow />
-        </button>
+        <BubsenseComposer
+          ref={composerRef}
+          babyId={selectedBaby.id}
+          onActionExecuted={load}
+          onExpand={expandChat}
+        />
       )}
 
       {activeModal && selectedBaby && (
@@ -1107,6 +969,7 @@ export default function MoonlightHome({ isPremium = false }: MoonlightHomeProps)
           <BubsenseChat
             babyId={selectedBaby.id}
             isPremium={isPremium}
+            initial={chatHandoff ?? undefined}
             onClose={() => setShowBubsense(false)}
             onUpgrade={() => setShowUpgrade(true)}
             onCommandExecuted={() => void load()}

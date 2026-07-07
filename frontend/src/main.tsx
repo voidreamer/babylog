@@ -3,7 +3,6 @@ import './i18n';
 // Self-hosted fonts — eliminates render-blocking Google Fonts network request
 import '@fontsource-variable/nunito';
 import '@fontsource-variable/quicksand';
-// Moonlight fonts (loaded unconditionally; opt-in UI activates via [data-ui="moonlight"])
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import '@fontsource/instrument-serif';

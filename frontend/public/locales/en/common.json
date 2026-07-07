@@ -116,5 +116,14 @@
   },
   "moonlight": {
     "holdForOptions": "Hold for options"
+  },
+  "voice": {
+    "send": "Send",
+    "startDictation": "Dictate",
+    "stopDictation": "Stop dictation",
+    "listeningHint": "I’m listening…",
+    "micDenied": "Microphone access is off — you can type, or enable it in system settings.",
+    "micError": "Dictation isn’t available right now — typing works.",
+    "errorGeneric": "Hmm, that didn’t work — try again."
   }
 }
